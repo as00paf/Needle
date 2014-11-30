@@ -1,6 +1,17 @@
 TODO
 
-1. Implement Basic Features
+1. Get other device's location
+    - Enable Google+ Sign in
+    - Share Location with server
+
+2. Implement Basic Features
     - Geo-fencing
     - Fake target
     - Navigate to target
+
+___________________________________________
+
+Optimization/Refactoring
+
+1. Split in fragments
+2. Split in classes

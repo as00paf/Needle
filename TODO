@@ -1,8 +1,12 @@
 TODO
 
 1. Get other device's location
-    - Enable Google+ Sign in
+    - Build server
+    - Build test db
+    - Build test web service
+
     - Share Location with server
+    -
 
 2. Implement Basic Features
     - Geo-fencing

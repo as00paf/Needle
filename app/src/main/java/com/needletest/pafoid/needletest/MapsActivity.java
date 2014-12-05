@@ -211,6 +211,8 @@ public class MapsActivity extends FragmentActivity implements
 
         mMap.addMarker(markerOptions).setTitle("Your Position");
 
+        Log.i("Latitude : ", Double.toString(mCurrentLocation.getLatitude()));
+        
         //Move Camera
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(position, 100));
 

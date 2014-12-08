@@ -29,6 +29,7 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.needletest.pafoid.needletest.utils.ErrorDialogFragment;
 import com.needletest.pafoid.needletest.utils.JSONParser;
 
 import org.apache.http.NameValuePair;
@@ -83,7 +84,6 @@ public class MapsActivity extends FragmentActivity implements
     LocationClient mLocationClient;
     Location mCurrentLocation;
     LocationRequest mLocationRequest;
-    boolean mUpdatesRequested;
     SharedPreferences mPrefs;
     SharedPreferences.Editor mEditor;
     JSONParser jsonParser = new JSONParser();
@@ -91,8 +91,8 @@ public class MapsActivity extends FragmentActivity implements
     // Progress Dialog
     private ProgressDialog pDialog;
 
-    private static final String LOCATION_URL = "http://192.168.1.104/Needle/locations.php";
-    private static final String POST_LOCATION_URL = "http://192.168.1.104/Needle/updateLocation.php";
+    private static final String LOCATION_URL = AppConstants.PROJECT_URL + "locations.php";
+    private static final String POST_LOCATION_URL = AppConstants.PROJECT_URL + "updateLocation.php";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -101,12 +101,10 @@ public class MapsActivity extends FragmentActivity implements
         setUpMapIfNeeded();
     }
 
-    /*
-     * Called when the Activity becomes visible.
-     */
     @Override
     protected void onStart() {
         super.onStart();
+
         // Connect the client.
         mLocationClient.connect();
     }
@@ -116,63 +114,20 @@ public class MapsActivity extends FragmentActivity implements
         super.onResume();
         setUpMapIfNeeded();
 
-        if (mPrefs.contains("KEY_UPDATES_ON")) {
-            mUpdatesRequested =
-                    mPrefs.getBoolean("KEY_UPDATES_ON", false);
-
-            // Otherwise, turn off location updates
-        } else {
-            mEditor.putBoolean("KEY_UPDATES_ON", false);
-            mEditor.commit();
-        }
-
         new LoadLocations().execute();
     }
 
-    /*
-     * Called when the Activity is no longer visible.
-     */
     @Override
     protected void onStop() {
-        // If the client is connected
         if (mLocationClient.isConnected()) {
-            /*
-             * Remove location updates for a listener.
-             * The current Activity is the listener, so
-             * the argument is "this".
-             */
             mLocationClient.removeLocationUpdates(this);
         }
-        /*
-         * After disconnect() is called, the client is
-         * considered "dead".
-         */
+
         mLocationClient.disconnect();
         super.onStop();
     }
 
     //Google Play Services APK detection
-
-    // Define a DialogFragment that displays the error dialog
-    public static class ErrorDialogFragment extends DialogFragment {
-        // Global field to contain the error dialog
-        private Dialog mDialog;
-        // Default constructor. Sets the dialog field to null
-        public ErrorDialogFragment() {
-            super();
-            mDialog = null;
-        }
-        // Set the dialog to display
-        public void setDialog(Dialog dialog) {
-            mDialog = dialog;
-        }
-        // Return a Dialog to the DialogFragment.
-        @Override
-        public Dialog onCreateDialog(Bundle savedInstanceState) {
-            return mDialog;
-        }
-    }
-
     /*
      * Handle results returned to the FragmentActivity
      * by Google Play services
@@ -268,9 +223,7 @@ public class MapsActivity extends FragmentActivity implements
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(position, 100));
 
         // If already requested, start periodic updates
-        if (mUpdatesRequested) {
-            mLocationClient.requestLocationUpdates(mLocationRequest, this);
-        }
+        mLocationClient.requestLocationUpdates(mLocationRequest, this);
 
         // Update location on server
         new PostLocation().execute(mCurrentLocation);
@@ -361,7 +314,18 @@ public class MapsActivity extends FragmentActivity implements
         String msg = "Updated Location: " +
                 Double.toString(location.getLatitude()) + "," +
                 Double.toString(location.getLongitude());
-        Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
+        //Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
+
+        mCurrentLocation = location;
+        LatLng position = new LatLng(location.getLatitude(), location.getLongitude());
+        mMarker.setPosition(position);
+
+        //Move Camera
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(position, 100));
+
+        Log.i("onLocationChanged", msg);
+        new PostLocation().execute(mCurrentLocation);
+        new LoadLocations().execute();
     }
 
     /**
@@ -374,31 +338,45 @@ public class MapsActivity extends FragmentActivity implements
         // Create the LocationRequest object
         mLocationRequest = LocationRequest.create();
         // Use high accuracy
-        mLocationRequest.setPriority(
-                LocationRequest.PRIORITY_HIGH_ACCURACY);
+        mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
         // Set the update interval to 5 seconds
         mLocationRequest.setInterval(UPDATE_INTERVAL);
         // Set the fastest update interval to 1 second
         mLocationRequest.setFastestInterval(FASTEST_INTERVAL);
 
-       // Open the shared preferences
-                mPrefs = getSharedPreferences("SharedPreferences",
-                Context.MODE_PRIVATE);
-        // Get a SharedPreferences editor
+        mPrefs = getSharedPreferences("SharedPreferences",Context.MODE_PRIVATE);
         mEditor = mPrefs.edit();
-        /*
-         * Create a new location client, using the enclosing class to
-         * handle callbacks.
-         */
-        // Start with updates turned off
-        mUpdatesRequested = false;
-
         mLocationClient = new LocationClient(this, this, this);
     }
 
-    /**
-     * Retrieves recent post data from the server.
-     */
+    //Location Tasks
+    public class LoadLocations extends AsyncTask<Void, Void, Boolean> {
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            /*pDialog = new ProgressDialog(MapsActivity.this);
+            pDialog.setMessage("Loading Locations...");
+            pDialog.setIndeterminate(false);
+            pDialog.setCancelable(true);
+            pDialog.show();*/
+        }
+
+        @Override
+        protected Boolean doInBackground(Void... arg0) {
+            updateJSONdata();
+            return null;
+
+        }
+
+        @Override
+        protected void onPostExecute(Boolean result) {
+            super.onPostExecute(result);
+            //pDialog.dismiss();
+            updateMap();
+        }
+    }
+
     public void updateJSONdata() {
 
         // Instantiate the arraylist to contain all the JSON data.
@@ -409,7 +387,7 @@ public class MapsActivity extends FragmentActivity implements
         mLocationList = new ArrayList<HashMap<String, Object>>();
 
         // Bro, it's time to power up the J parser
-       JSONParser jParser = new JSONParser();
+        JSONParser jParser = new JSONParser();
         // Feed the beast our comments url, and it spits us
         // back a JSON object. Boo-yeah Jerome.
         JSONObject json = jParser.getJSONFromUrl(LOCATION_URL);
@@ -424,8 +402,6 @@ public class MapsActivity extends FragmentActivity implements
             // mLocations will tell us how many "locations" are
             // available
             mLocations = json.getJSONArray(TAG_LOCATIONS);
-
-            Log.i("updateJSONdata","problem with locations");
 
             // looping through all locations according to the json object returned
             for (int i = 0; i < mLocations.length(); i++) {
@@ -456,10 +432,8 @@ public class MapsActivity extends FragmentActivity implements
         }
     }
 
-    /**
-     * Inserts the parsed data into the mapview.
-     */
-    private void updateList() {
+    public void updateMap() {
+        Log.i("updateMap","MARKERS TO ADD : "+mLocationList.size());
         for (int i = 0; i < mLocationList.size(); i++) {
             HashMap<String, Object> map = mLocationList.get(i);
             String id = map.get(TAG_LOCATION_ID).toString();
@@ -468,6 +442,8 @@ public class MapsActivity extends FragmentActivity implements
 
             SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(MapsActivity.this);
             String username = sp.getString("username", "");
+
+            Log.i("updateMap","ID : "+id);
 
             if(!TextUtils.isEmpty(id) && !id.equals(username)){
                 Marker marker;
@@ -480,6 +456,8 @@ public class MapsActivity extends FragmentActivity implements
                 if(mMarkers.containsKey(id)){
                     marker = mMarkers.get(id);
                     marker.setPosition(position);
+
+                    Log.i("updateMap","MOVING MARKER : "+id);
                 }else{
                     MarkerOptions markerOptions = new MarkerOptions();
                     markerOptions.position(position);
@@ -492,6 +470,8 @@ public class MapsActivity extends FragmentActivity implements
                         marker.setPosition(position);
                     }
 
+                    Log.i("updateMap","ADDING MARKER TO MAP : "+id);
+
                     marker.setTitle(id+"'s Position");
 
                     mMarkers.put(id, marker);
@@ -500,43 +480,16 @@ public class MapsActivity extends FragmentActivity implements
         }
     }
 
-    public class LoadLocations extends AsyncTask<Void, Void, Boolean> {
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            pDialog = new ProgressDialog(MapsActivity.this);
-            pDialog.setMessage("Loading Locations...");
-            pDialog.setIndeterminate(false);
-            pDialog.setCancelable(true);
-            pDialog.show();
-        }
-
-        @Override
-        protected Boolean doInBackground(Void... arg0) {
-            updateJSONdata();
-            return null;
-
-        }
-
-        @Override
-        protected void onPostExecute(Boolean result) {
-            super.onPostExecute(result);
-            pDialog.dismiss();
-            updateList();
-        }
-    }
-
     class PostLocation extends AsyncTask<Location, String, String> {
 
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            pDialog = new ProgressDialog(MapsActivity.this);
+            /*pDialog = new ProgressDialog(MapsActivity.this);
             pDialog.setMessage("Posting Location ...");
             pDialog.setIndeterminate(false);
             pDialog.setCancelable(true);
-            pDialog.show();
+            pDialog.show();*/
         }
 
         @Override
@@ -586,11 +539,11 @@ public class MapsActivity extends FragmentActivity implements
 
         protected void onPostExecute(String file_url) {
             // dismiss the dialog once product deleted
-            pDialog.dismiss();
+           /* pDialog.dismiss();
             if (file_url != null){
                 Toast.makeText(MapsActivity.this, file_url, Toast.LENGTH_LONG).show();
             }
-
+            */
         }
 
     }

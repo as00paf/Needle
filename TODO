@@ -2,8 +2,8 @@ TODO
 
 1. High urgency
     - Use static ip on server
-    - Handle location updates
-    - Handle other user's location updates
+    - Handle location updates (UpdateLocationService)
+    - Handle other user's location updates (
 
 2. Medium urgency
     - Geo-fencing

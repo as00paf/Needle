@@ -38,21 +38,9 @@ public class Login extends Activity implements OnClickListener{
  
     // JSON parser class
     JSONParser jsonParser = new JSONParser();
-    
-    //php login script location:
-    
-    //localhost :  
-    //testing on your device
-    //put your local ip instead,  on windows, run CMD > ipconfig
-    //or in mac's terminal type ifconfig and look for the ip under en0 or en1
-   // private static final String LOGIN_URL = "http://xxx.xxx.x.x:1234/webservice/login.php";
-    
-    //testing on Emulator:
-    private static final String LOGIN_URL = "http://192.168.1.104/Needle/login.php";
-    
-  //testing from a real server:
-    //private static final String LOGIN_URL = "http://www.yourdomain.com/webservice/login.php";
-    
+
+    private static final String LOGIN_URL = AppConstants.PROJECT_URL +"login.php";
+
     //JSON element ids from repsonse of php script:
     private static final String TAG_SUCCESS = "success";
     private static final String TAG_MESSAGE = "message";

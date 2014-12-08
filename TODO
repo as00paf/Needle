@@ -4,7 +4,6 @@ TODO
     - Use static ip on server
     - Handle location updates
     - Handle other user's location updates
-    - App constants
 
 2. Medium urgency
     - Geo-fencing
@@ -14,5 +13,6 @@ ___________________________________________
 
 Optimization/Refactoring
 
-1. Split in fragments
-2. Split in classes
+- Split in fragments
+- Split in classes
+- App constants

@@ -321,7 +321,7 @@ public class MapsActivity extends FragmentActivity implements
         mMarker.setPosition(position);
 
         //Move Camera
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(position, 100));
+        //mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(position, 100));
 
         Log.i("onLocationChanged", msg);
         new PostLocation().execute(mCurrentLocation);
@@ -455,9 +455,12 @@ public class MapsActivity extends FragmentActivity implements
 
                 if(mMarkers.containsKey(id)){
                     marker = mMarkers.get(id);
-                    marker.setPosition(position);
+                    if(marker.getPosition() != position){
+                        marker.setPosition(position);
+                        Log.i("updateMap","MOVING MARKER : "+id);
+                    }
 
-                    Log.i("updateMap","MOVING MARKER : "+id);
+                    marker.showInfoWindow();
                 }else{
                     MarkerOptions markerOptions = new MarkerOptions();
                     markerOptions.position(position);
@@ -473,6 +476,7 @@ public class MapsActivity extends FragmentActivity implements
                     Log.i("updateMap","ADDING MARKER TO MAP : "+id);
 
                     marker.setTitle(id+"'s Position");
+                    marker.showInfoWindow();
 
                     mMarkers.put(id, marker);
                 }

@@ -1,16 +1,13 @@
 TODO
 
-1. Get other device's location
-    - Build server
-    - Build test db
-    - Build test web service
+1. High urgency
+    - Use static ip on server
+    - Handle location updates
+    - Handle other user's location updates
+    - App constants
 
-    - Share Location with server
-    -
-
-2. Implement Basic Features
+2. Medium urgency
     - Geo-fencing
-    - Fake target
     - Navigate to target
 
 ___________________________________________

@@ -2,14 +2,18 @@ package com.needletest.pafoid.needletest;
 
 import android.app.Activity;
 import android.app.Dialog;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.content.SharedPreferences;
 import android.location.Location;
+import android.os.AsyncTask;
+import android.preference.PreferenceManager;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -19,12 +23,23 @@ import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.location.LocationClient;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
-import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.needletest.pafoid.needletest.utils.JSONParser;
+
+import org.apache.http.NameValuePair;
+import org.apache.http.message.BasicNameValuePair;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 public class MapsActivity extends FragmentActivity implements
         GooglePlayServicesClient.ConnectionCallbacks,
@@ -46,13 +61,38 @@ public class MapsActivity extends FragmentActivity implements
     private final static int
             CONNECTION_FAILURE_RESOLUTION_REQUEST = 9000;
 
+    // JSON IDS:
+    private static final String TAG_SUCCESS = "success";
+    private static final String TAG_TITLE = "title";
+    private static final String TAG_LOCATIONS = "locations";
+    private static final String TAG_LOCATION_ID = "id";
+    private static final String TAG_USERNAME = "username";
+    private static final String TAG_MESSAGE = "message";
+    private static final String TAG_LAT = "lat";
+    private static final String TAG_LNG = "lng";
+
+
+    // An array of all of our locations
+    private JSONArray mLocations = null;
+    // manages all of our comments in a list.
+    private ArrayList<HashMap<String, Object>> mLocationList;
+
     private GoogleMap mMap; // Might be null if Google Play services APK is not available.
+    Marker mMarker;
+    HashMap<String, Marker> mMarkers;
     LocationClient mLocationClient;
     Location mCurrentLocation;
     LocationRequest mLocationRequest;
     boolean mUpdatesRequested;
     SharedPreferences mPrefs;
     SharedPreferences.Editor mEditor;
+    JSONParser jsonParser = new JSONParser();
+
+    // Progress Dialog
+    private ProgressDialog pDialog;
+
+    private static final String LOCATION_URL = "http://192.168.1.104/Needle/locations.php";
+    private static final String POST_LOCATION_URL = "http://192.168.1.104/Needle/updateLocation.php";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -85,6 +125,8 @@ public class MapsActivity extends FragmentActivity implements
             mEditor.putBoolean("KEY_UPDATES_ON", false);
             mEditor.commit();
         }
+
+        new LoadLocations().execute();
     }
 
     /*
@@ -206,12 +248,21 @@ public class MapsActivity extends FragmentActivity implements
         mCurrentLocation = mLocationClient.getLastLocation();
 
         MarkerOptions markerOptions = new MarkerOptions();
-        LatLng position = new LatLng(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude());
+        Double lat = mCurrentLocation.getLatitude();
+        Double lng = mCurrentLocation.getLongitude();
+        LatLng position = new LatLng(lat, lng);
         markerOptions.position(position);
 
-        mMap.addMarker(markerOptions).setTitle("Your Position");
+        if(mMarker == null){
+            mMarker = mMap.addMarker(markerOptions);
+        }else{
+            mMarker.setPosition(position);
+        }
 
-        Log.i("Latitude : ", Double.toString(mCurrentLocation.getLatitude()));
+        mMarker.setTitle("Your Position");
+
+        Log.i("Latitude : ", Double.toString(lat));
+        Log.i("Longitude : ", Double.toString(lng));
         
         //Move Camera
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(position, 100));
@@ -220,6 +271,9 @@ public class MapsActivity extends FragmentActivity implements
         if (mUpdatesRequested) {
             mLocationClient.requestLocationUpdates(mLocationRequest, this);
         }
+
+        // Update location on server
+        new PostLocation().execute(mCurrentLocation);
     }
 
     /*
@@ -340,5 +394,204 @@ public class MapsActivity extends FragmentActivity implements
         mUpdatesRequested = false;
 
         mLocationClient = new LocationClient(this, this, this);
+    }
+
+    /**
+     * Retrieves recent post data from the server.
+     */
+    public void updateJSONdata() {
+
+        // Instantiate the arraylist to contain all the JSON data.
+        // we are going to use a bunch of key-value pairs, referring
+        // to the json element name, and the content, for example,
+        // message it the tag, and "I'm awesome" as the content..
+
+        mLocationList = new ArrayList<HashMap<String, Object>>();
+
+        // Bro, it's time to power up the J parser
+       JSONParser jParser = new JSONParser();
+        // Feed the beast our comments url, and it spits us
+        // back a JSON object. Boo-yeah Jerome.
+        JSONObject json = jParser.getJSONFromUrl(LOCATION_URL);
+
+        // when parsing JSON stuff, we should probably
+        // try to catch any exceptions:
+        try {
+            int success = json.getInt(TAG_SUCCESS);
+            String msg = json.getString(TAG_MESSAGE);
+            Log.i("updateJSONdata","Success : "+success+", msg : "+msg+" "+json.toString());
+
+            // mLocations will tell us how many "locations" are
+            // available
+            mLocations = json.getJSONArray(TAG_LOCATIONS);
+
+            Log.i("updateJSONdata","problem with locations");
+
+            // looping through all locations according to the json object returned
+            for (int i = 0; i < mLocations.length(); i++) {
+                JSONObject c = mLocations.getJSONObject(i);
+
+                // gets the content of each tag
+                String id = c.getString(TAG_LOCATION_ID);
+                Double lat = c.getDouble(TAG_LAT);
+                Double lng = c.getDouble(TAG_LNG);
+
+                // creating new HashMap
+                HashMap<String, Object> map = new HashMap<String, Object>();
+
+                map.put(TAG_LOCATION_ID, id);
+                map.put(TAG_LAT, lat);
+                map.put(TAG_LNG, lng);
+
+                // adding HashList to ArrayList
+                mLocationList.add(map);
+
+                // annndddd, our JSON data is up to date same with our array
+                // list
+            }
+
+        } catch (JSONException e) {
+            Log.i("updateJSONdata","error");
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Inserts the parsed data into the mapview.
+     */
+    private void updateList() {
+        for (int i = 0; i < mLocationList.size(); i++) {
+            HashMap<String, Object> map = mLocationList.get(i);
+            String id = map.get(TAG_LOCATION_ID).toString();
+            Double lat = (Double) map.get(TAG_LAT);
+            Double lng = (Double) map.get(TAG_LNG);
+
+            SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(MapsActivity.this);
+            String username = sp.getString("username", "");
+
+            if(!TextUtils.isEmpty(id) && !id.equals(username)){
+                Marker marker;
+                LatLng position = new LatLng(lat, lng);
+
+                if(mMarkers == null){
+                    mMarkers = new HashMap<String, Marker>();
+                }
+
+                if(mMarkers.containsKey(id)){
+                    marker = mMarkers.get(id);
+                    marker.setPosition(position);
+                }else{
+                    MarkerOptions markerOptions = new MarkerOptions();
+                    markerOptions.position(position);
+
+                    marker = mMap.addMarker(markerOptions);
+
+                    if(marker != null){
+                        marker = mMap.addMarker(markerOptions);
+                    }else{
+                        marker.setPosition(position);
+                    }
+
+                    marker.setTitle(id+"'s Position");
+
+                    mMarkers.put(id, marker);
+                }
+            }
+        }
+    }
+
+    public class LoadLocations extends AsyncTask<Void, Void, Boolean> {
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            pDialog = new ProgressDialog(MapsActivity.this);
+            pDialog.setMessage("Loading Locations...");
+            pDialog.setIndeterminate(false);
+            pDialog.setCancelable(true);
+            pDialog.show();
+        }
+
+        @Override
+        protected Boolean doInBackground(Void... arg0) {
+            updateJSONdata();
+            return null;
+
+        }
+
+        @Override
+        protected void onPostExecute(Boolean result) {
+            super.onPostExecute(result);
+            pDialog.dismiss();
+            updateList();
+        }
+    }
+
+    class PostLocation extends AsyncTask<Location, String, String> {
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            pDialog = new ProgressDialog(MapsActivity.this);
+            pDialog.setMessage("Posting Location ...");
+            pDialog.setIndeterminate(false);
+            pDialog.setCancelable(true);
+            pDialog.show();
+        }
+
+        @Override
+        protected String doInBackground(Location... location) {
+            // Check for success tag
+            int success;
+            String lat = Double.toString(location[0].getLatitude());
+            String lng = Double.toString(location[0].getLongitude());
+
+            //We need to change this:
+            SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(MapsActivity.this);
+            String username = sp.getString("username", "anon");
+
+            try {
+                // Building Parameters
+                List<NameValuePair> params = new ArrayList<NameValuePair>();
+                params.add(new BasicNameValuePair("username", username));
+                params.add(new BasicNameValuePair("lat", lat));
+                params.add(new BasicNameValuePair("lng", lng));
+
+                Log.d("request!", "starting");
+
+                //Posting user data to script
+                JSONObject json = jsonParser.makeHttpRequest(
+                        POST_LOCATION_URL, "POST", params);
+
+                // full json response
+                Log.d("Post Location attempt", json.toString());
+
+                // json success element
+                success = json.getInt(TAG_SUCCESS);
+                if (success == 1) {
+                    Log.d("Location Added!", json.toString());
+                    return json.getString(TAG_MESSAGE);
+                }else{
+                    Log.d("Location Failure!", json.getString(TAG_MESSAGE));
+                    return json.getString(TAG_MESSAGE);
+
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+            return null;
+
+        }
+
+        protected void onPostExecute(String file_url) {
+            // dismiss the dialog once product deleted
+            pDialog.dismiss();
+            if (file_url != null){
+                Toast.makeText(MapsActivity.this, file_url, Toast.LENGTH_LONG).show();
+            }
+
+        }
+
     }
 }

@@ -1,0 +1,112 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.needletest.pafoid.needletest.fragments.CreateHaystackFragment">
+
+    <TextView
+        android:id="@+id/new_haystack_name_label"
+        android:textStyle="bold"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="25dp"
+        android:text="@string/name"
+        android:textColor="#000000"/>
+
+    <EditText
+        android:id="@+id/new_haystack_name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/new_haystack_name_label"
+        android:imeOptions="actionNext"
+        android:maxLines="1"
+        android:inputType="text"
+        android:ems="10">
+    </EditText>
+
+    <TextView
+        android:id="@+id/new_haystack_privacy_label"
+        android:textStyle="bold"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/new_haystack_name"
+        android:text="@string/privacy"
+        android:textColor="#000000"/>
+
+    <CheckBox
+        android:id="@+id/new_haystack_isPublic_checkBox"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/new_haystack_privacy_label"
+        android:text="@string/isPublic"
+        android:checked="false"
+        />
+
+    <TextView
+        android:id="@+id/new_haystack_timeLimit_label"
+        android:textStyle="bold"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/new_haystack_isPublic_checkBox"
+        android:text="@string/timeLimit"
+        android:textColor="#000000"/>
+
+    <ToggleButton
+        android:id="@+id/new_haystack_toggleDate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/new_haystack_timeLimit_label"
+        android:text="@string/date"
+        android:textOn="@string/date"
+        android:textOff="@string/date"
+        android:checked="true"/>
+
+    <ToggleButton
+        android:id="@+id/new_haystack_toggleTime"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/new_haystack_timeLimit_label"
+        android:layout_toRightOf="@id/new_haystack_toggleDate"
+        android:layout_centerHorizontal="true"
+        android:textOn="@string/time"
+        android:textOff="@string/time"
+        android:text="@string/time"/>
+
+    <DatePicker
+        android:id="@+id/new_haystack_date"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="visible"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@id/new_haystack_toggleTime"
+        />
+
+    <TimePicker
+        android:id="@+id/new_haystack_time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:visibility="invisible"
+        android:layout_below="@id/new_haystack_toggleTime"
+        />
+
+    <TextView
+        android:id="@+id/new_haystack_users_label"
+        android:textStyle="bold"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/new_haystack_date"
+        android:text="@string/users"
+        android:textColor="#000000"/>
+
+    <Button
+        android:id="@+id/create_haystack_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="25dp"
+        android:text="@string/create_haystack" />
+
+
+</RelativeLayout>

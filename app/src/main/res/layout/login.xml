@@ -23,7 +23,6 @@
         android:maxLines="1"
         android:inputType="text"
         android:ems="10">
-        <requestFocus />
         </EditText>
 
      <TextView

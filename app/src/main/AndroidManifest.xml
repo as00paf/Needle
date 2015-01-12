@@ -26,25 +26,27 @@
             android:value="@string/google_maps_key" />
 
         <activity
-            android:name="com.needletest.pafoid.needletest.Login"
+            android:name=".activities.LoginActivity"
             android:label="@string/app_name" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
         <activity
-            android:name="com.needletest.pafoid.needletest.Register"
-            android:label="@string/app_name"  >
+            android:name=".activities.RegisterActivity"
+            android:label="@string/app_name" >
         </activity>
-
         <activity
-            android:name="com.needletest.pafoid.needletest.MapsActivity"
-            android:label="@string/title_activity_maps">
+            android:name=".activities.MapsActivity"
+            android:label="@string/title_activity_maps" >
         </activity>
-
-
-
+        <activity
+            android:name=".activities.HomeActivity"
+            android:label="@string/title_activity_haystack"
+            android:theme="@style/AppTheme2">
+        </activity>
     </application>
 
 </manifest>

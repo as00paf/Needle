@@ -1,4 +1,4 @@
-package com.needletest.pafoid.needletest;
+package com.needletest.pafoid.needletest.activities;
 
 import android.app.Activity;
 import android.app.Dialog;
@@ -10,7 +10,6 @@ import android.content.SharedPreferences;
 import android.location.Location;
 import android.os.AsyncTask;
 import android.preference.PreferenceManager;
-import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -26,9 +25,13 @@ import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptor;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.needletest.pafoid.needletest.AppConstants;
+import com.needletest.pafoid.needletest.R;
 import com.needletest.pafoid.needletest.utils.ErrorDialogFragment;
 import com.needletest.pafoid.needletest.utils.JSONParser;
 
@@ -207,6 +210,8 @@ public class MapsActivity extends FragmentActivity implements
         Double lng = mCurrentLocation.getLongitude();
         LatLng position = new LatLng(lat, lng);
         markerOptions.position(position);
+
+
 
         if(mMarker == null){
             mMarker = mMap.addMarker(markerOptions);
@@ -458,12 +463,23 @@ public class MapsActivity extends FragmentActivity implements
                     if(marker.getPosition() != position){
                         marker.setPosition(position);
                         Log.i("updateMap","MOVING MARKER : "+id);
+
+                        Location loc = new Location("");
+                        loc.setLatitude(lat);
+                        loc.setLongitude(lng);
+
+                        double distanceInMeters = Math.floor(mCurrentLocation.distanceTo(loc));
+
+                        marker.setSnippet("Distance to " + id + " :" + distanceInMeters + "m");
                     }
 
-                    marker.showInfoWindow();
+                    //marker.showInfoWindow();
                 }else{
                     MarkerOptions markerOptions = new MarkerOptions();
                     markerOptions.position(position);
+
+                    BitmapDescriptor icon = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_VIOLET);
+                    markerOptions.icon(icon);
 
                     marker = mMap.addMarker(markerOptions);
 
@@ -476,7 +492,7 @@ public class MapsActivity extends FragmentActivity implements
                     Log.i("updateMap","ADDING MARKER TO MAP : "+id);
 
                     marker.setTitle(id+"'s Position");
-                    marker.showInfoWindow();
+                    //marker.showInfoWindow();
 
                     mMarkers.put(id, marker);
                 }

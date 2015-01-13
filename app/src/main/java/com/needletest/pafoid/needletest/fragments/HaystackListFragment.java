@@ -3,51 +3,36 @@ package com.needletest.pafoid.needletest.fragments;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Outline;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.text.Html;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewOutlineProvider;
 import android.widget.AdapterView;
-import android.widget.Button;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 
 import com.needletest.pafoid.needletest.AppConstants;
 import com.needletest.pafoid.needletest.HaystackListAdapter;
 import com.needletest.pafoid.needletest.R;
-import com.needletest.pafoid.needletest.activities.HomeActivity;
 import com.needletest.pafoid.needletest.activities.MapsActivity;
-import com.needletest.pafoid.needletest.activities.RegisterActivity;
 import com.needletest.pafoid.needletest.models.Haystack;
 import com.needletest.pafoid.needletest.utils.JSONParser;
 import com.shamanland.fab.FloatingActionButton;
 
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.DefaultHttpClient;
+
 import org.apache.http.message.BasicNameValuePair;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.Serializable;
-import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -61,22 +46,17 @@ import java.util.List;
  * create an instance of this fragment.
  */
 public class HaystackListFragment extends Fragment {
-
     private static final String GET_HAYSTACKS_URL = AppConstants.PROJECT_URL +"getHaystacks.php";
-    private static final int MAX_HAYSTACK_COUNT =20;
 
     private OnFragmentInteractionListener mListener;
     private View rootView;
     private ListView listView;
     private HaystackListAdapter haystackListAdapter;
     private ArrayList<Haystack> haystackList = null;
-    private int haystackCount = 0;
     private ProgressBar progressbar = null;
     FloatingActionButton fab = null;
     JSONParser jsonParser = new JSONParser();
-    //JSON element ids from repsonse of php script:
-    private static final String TAG_SUCCESS = "success";
-    private static final String TAG_MESSAGE = "message";
+
     private String userName;
 
     public static HaystackListFragment newInstance(String param1, String param2) {
@@ -208,7 +188,7 @@ public class HaystackListFragment extends Fragment {
                 Log.d("FetchHaystacks attempt", json.toString());
 
                 // json success tag
-                success = json.getInt(TAG_SUCCESS);
+                success = json.getInt(AppConstants.TAG_SUCCESS);
                 if (success == 1) {
                     Log.d("FetchHaystacks Successful!", json.toString());
 
@@ -252,7 +232,7 @@ public class HaystackListFragment extends Fragment {
                         }
                     }
                 }else{
-                    Log.d("FetchHaystacks Failure!", json.getString(TAG_MESSAGE));
+                    Log.d("FetchHaystacks Failure!", json.getString(AppConstants.TAG_MESSAGE));
                     haystackList = null;
                 }
             } catch (JSONException e) {

@@ -9,6 +9,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.preference.PreferenceManager;
+import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -25,6 +26,9 @@ import android.widget.ToggleButton;
 import com.needletest.pafoid.needletest.AppConstants;
 import com.needletest.pafoid.needletest.R;
 import com.needletest.pafoid.needletest.haystack.MapsActivity;
+import com.needletest.pafoid.needletest.home.task.CreateHaystackResult;
+import com.needletest.pafoid.needletest.home.task.CreateHaystackTask;
+import com.needletest.pafoid.needletest.home.task.CreateHaystackTaskParams;
 import com.needletest.pafoid.needletest.models.Haystack;
 import com.needletest.pafoid.needletest.utils.JSONParser;
 
@@ -50,17 +54,8 @@ import java.util.Locale;
  */
 public class CreateHaystackFragment extends Fragment {
 
-    // JSON parser class
-    JSONParser jsonParser = new JSONParser();
-
-    private static final String CREATE_HAYSTACK_URL = AppConstants.PROJECT_URL +"createHaystack.php";
-
     public static final String SQL_DATE_FORMAT = "yyyy-MM-dd";
     public static final String SQL_DATETIME_FORMAT = "yyyy-MM-dd HH:mm:ss";
-
-    //JSON element ids from repsonse of php script:
-    private static final String TAG_SUCCESS = "success";
-    private static final String TAG_MESSAGE = "message";
 
     private View rootView;
     private OnFragmentInteractionListener mListener;
@@ -88,7 +83,6 @@ public class CreateHaystackFragment extends Fragment {
     }
 
     public CreateHaystackFragment() {
-        // Required empty public constructor
     }
 
     @Override
@@ -99,10 +93,11 @@ public class CreateHaystackFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         rootView = inflater.inflate(R.layout.fragment_create_haystack, container, false);
+
+        String title = getResources().getString(R.string.create_haystack);
+        ((ActionBarActivity) getActivity()).getSupportActionBar().setTitle(title);
 
         txtName = (EditText) rootView.findViewById(R.id.new_haystack_name);
         isPublicCheckbox = (CheckBox) rootView.findViewById(R.id.new_haystack_isPublic_checkBox);
@@ -214,7 +209,14 @@ public class CreateHaystackFragment extends Fragment {
         ArrayList<String> bannedUsers = new ArrayList<String>();
         haystack.setBannedUsers(bannedUsers);
 
-        new CreateHaystack().execute();
+        CreateHaystackTaskParams params = new CreateHaystackTaskParams(rootView.getContext(), haystack);
+        try{
+            CreateHaystackResult result = new CreateHaystackTask(params).execute().get();
+            if(result.successCode == 0){
+
+            }
+        }catch (Exception e) {
+        }
     }
 
     private Boolean useDate(){
@@ -245,87 +247,4 @@ public class CreateHaystackFragment extends Fragment {
 
     public interface OnFragmentInteractionListener {
     }
-
-    class CreateHaystack extends AsyncTask<Void, String, String> {
-
-        /**
-         * Before starting background thread Show Progress Dialog
-         * */
-        boolean failure = false;
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-        }
-
-        @Override
-        protected String doInBackground(Void... args) {
-            // Check for success tag
-            int success;
-            try {
-                // Building Parameters
-                List<NameValuePair> params = new ArrayList<NameValuePair>();
-                params.add(new BasicNameValuePair("name", haystack.getName()));
-                params.add(new BasicNameValuePair("owner", String.valueOf(haystack.getOwner())));
-                params.add(new BasicNameValuePair("isPublic", (haystack.getIsPublic()) ? "1" : "0"));
-                params.add(new BasicNameValuePair("timeLimit", haystack.getTimeLimit()));
-                params.add(new BasicNameValuePair("zone", haystack.getZone()));
-                params.add(new BasicNameValuePair("pictureURL", haystack.getPictureURL()));
-
-                int i;
-                ArrayList<String> haystackUsers = haystack.getUsers();
-                for(i=0;i<haystackUsers.size();i++){
-                    String user = haystackUsers.get(i);
-                    params.add(new BasicNameValuePair("haystack_user", user));
-                }
-
-                ArrayList<String> haystackActiveUsers = haystack.getActiveUsers();
-                for(i=0;i<haystackActiveUsers.size();i++){
-                    String user = haystackActiveUsers.get(i);
-                    params.add(new BasicNameValuePair("haystack_active_user", user));
-                }
-
-                ArrayList<String> haystackBannedUsers = haystack.getBannedUsers();
-                for(i=0;i<haystackBannedUsers.size();i++){
-                    String user = haystackBannedUsers.get(i);
-                    params.add(new BasicNameValuePair("haystack_banned_user", user));
-                }
-
-                Log.d("request!", "starting");
-                // getting product details by making HTTP request
-                JSONObject json = jsonParser.makeHttpRequest(CREATE_HAYSTACK_URL, "POST", params);
-
-                // check your log for json response
-                Log.d("Login attempt", json.toString());
-
-                // json success tag
-                success = json.getInt(TAG_SUCCESS);
-                if (success == 1) {
-                    Log.d("CreateHaystack Successful!", json.toString());
-
-                    haystack.setId(json.getInt(AppConstants.TAG_HAYSTACK_ID));
-
-                    Intent intent = new Intent(rootView.getContext(), MapsActivity.class);
-                    intent.putExtra("haystack", (Parcelable) haystack);
-                    startActivity(intent);
-                    return json.getString(TAG_MESSAGE);
-                }else{
-                    Log.d("CreateHaystack Failure!", json.getString(TAG_MESSAGE));
-                    return json.getString(TAG_MESSAGE);
-
-                }
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-
-            return null;
-
-        }
-
-        protected void onPostExecute(String file_url) {
-
-        }
-
-    }
-
 }

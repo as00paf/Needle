@@ -2,7 +2,8 @@
     xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="com.needletest.pafoid.needletest.home.CreateHaystackFragment"
-    android:scrollbarAlwaysDrawVerticalTrack="true">
+    android:scrollbarAlwaysDrawVerticalTrack="true"
+    android:padding="5dp">
 
     <TextView
         android:id="@+id/new_haystack_name_label"

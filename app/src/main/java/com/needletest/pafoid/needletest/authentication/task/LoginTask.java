@@ -8,7 +8,7 @@ import android.preference.PreferenceManager;
 import android.util.Log;
 
 import com.needletest.pafoid.needletest.AppConstants;
-import com.needletest.pafoid.needletest.activities.HomeActivity;
+import com.needletest.pafoid.needletest.home.HomeActivity;
 import com.needletest.pafoid.needletest.utils.JSONParser;
 
 import org.apache.http.NameValuePair;

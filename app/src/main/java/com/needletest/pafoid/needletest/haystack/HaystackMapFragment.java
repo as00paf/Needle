@@ -1,7 +1,6 @@
-package com.needletest.pafoid.needletest.fragments;
+package com.needletest.pafoid.needletest.haystack;
 
 import android.app.Activity;
-import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -9,19 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.location.LocationRequest;
-import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.MapView;
-import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.Marker;
-import com.needletest.pafoid.needletest.AppConstants;
 import com.needletest.pafoid.needletest.R;
-
-import org.json.JSONArray;
-
-import java.util.ArrayList;
-import java.util.HashMap;
 
 /**
  * A simple {@link Fragment} subclass.

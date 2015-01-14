@@ -1,4 +1,4 @@
-package com.needletest.pafoid.needletest.fragments;
+package com.needletest.pafoid.needletest.home;
 
 import android.support.v7.app.ActionBarActivity;
 import android.app.Activity;
@@ -29,7 +29,7 @@ import com.needletest.pafoid.needletest.R;
  * See the <a href="https://developer.android.com/design/patterns/navigation-drawer.html#Interaction">
  * design guidelines</a> for a complete explanation of the behaviors implemented here.
  */
-public class NavigationDrawerFragment extends Fragment {
+public class HomeNavigationDrawerFragment extends Fragment {
 
     /**
      * Remember the position of the selected item.
@@ -60,7 +60,7 @@ public class NavigationDrawerFragment extends Fragment {
     private boolean mFromSavedInstanceState;
     private boolean mUserLearnedDrawer;
 
-    public NavigationDrawerFragment() {
+    public HomeNavigationDrawerFragment() {
     }
 
     @Override

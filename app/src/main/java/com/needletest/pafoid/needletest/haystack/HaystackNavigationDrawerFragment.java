@@ -1,4 +1,4 @@
-package com.needletest.pafoid.needletest.activities;
+package com.needletest.pafoid.needletest.haystack;
 
 import android.support.v7.app.ActionBarActivity;
 import android.app.Activity;

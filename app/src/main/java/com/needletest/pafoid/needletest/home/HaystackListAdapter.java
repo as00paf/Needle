@@ -1,4 +1,4 @@
-package com.needletest.pafoid.needletest;
+package com.needletest.pafoid.needletest.home;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -8,7 +8,8 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.needletest.pafoid.needletest.asynctask.ImageDownloaderTask;
+import com.needletest.pafoid.needletest.R;
+import com.needletest.pafoid.needletest.home.task.ImageDownloaderTask;
 import com.needletest.pafoid.needletest.models.Haystack;
 
 import java.util.ArrayList;

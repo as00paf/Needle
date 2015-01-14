@@ -1,4 +1,4 @@
-package com.needletest.pafoid.needletest.activities;
+package com.needletest.pafoid.needletest.haystack;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -9,7 +9,6 @@ import android.os.AsyncTask;
 import android.preference.PreferenceManager;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
-import android.support.v7.app.ActionBarActivity;
 import android.text.TextUtils;
 import android.util.Log;
 import android.widget.Toast;
@@ -29,8 +28,8 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.needletest.pafoid.needletest.AppConstants;
 import com.needletest.pafoid.needletest.R;
-import com.needletest.pafoid.needletest.asynctask.PostLocation;
-import com.needletest.pafoid.needletest.models.PostLocationParams;
+import com.needletest.pafoid.needletest.haystack.task.PostLocationTask;
+import com.needletest.pafoid.needletest.haystack.task.PostLocationParams;
 import com.needletest.pafoid.needletest.utils.JSONParser;
 
 import org.apache.http.NameValuePair;
@@ -400,7 +399,7 @@ public class MapsActivity extends FragmentActivity implements GoogleApiClient.Co
     }
 
     public void postLocation(){
-        new PostLocation().execute(new PostLocationParams(this, getUserName(), mCurrentLocation));
+        new PostLocationTask().execute(new PostLocationParams(this, getUserName(), mCurrentLocation));
     }
 
     private String getUserName(){

@@ -1,4 +1,4 @@
-package com.needletest.pafoid.needletest.fragments;
+package com.needletest.pafoid.needletest.home;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -18,10 +18,8 @@ import android.widget.ListView;
 import android.widget.ProgressBar;
 
 import com.needletest.pafoid.needletest.AppConstants;
-import com.needletest.pafoid.needletest.HaystackListAdapter;
 import com.needletest.pafoid.needletest.R;
-import com.needletest.pafoid.needletest.activities.HaystackActivity;
-import com.needletest.pafoid.needletest.activities.MapsActivity;
+import com.needletest.pafoid.needletest.haystack.HaystackActivity;
 import com.needletest.pafoid.needletest.models.Haystack;
 import com.needletest.pafoid.needletest.utils.JSONParser;
 import com.shamanland.fab.FloatingActionButton;

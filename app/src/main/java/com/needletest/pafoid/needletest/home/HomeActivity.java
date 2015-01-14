@@ -1,37 +1,32 @@
-package com.needletest.pafoid.needletest.activities;
+package com.needletest.pafoid.needletest.home;
 
-import android.app.Activity;
+import android.content.Intent;
 import android.net.Uri;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.os.Bundle;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewGroup;
 import android.support.v4.widget.DrawerLayout;
 
-import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.SupportMapFragment;
 import com.needletest.pafoid.needletest.R;
-import com.needletest.pafoid.needletest.fragments.HaystackMapFragment;
+import com.needletest.pafoid.needletest.settings.AppSettingsActivity;
 
-public class HaystackActivity extends ActionBarActivity
-        implements HaystackNavigationDrawerFragment.NavigationDrawerCallbacks, HaystackMapFragment.OnFragmentInteractionListener {
+public class HomeActivity extends ActionBarActivity
+        implements HomeNavigationDrawerFragment.NavigationDrawerCallbacks, HaystackListFragment.OnFragmentInteractionListener, CreateHaystackFragment.OnFragmentInteractionListener {
 
-    private HaystackNavigationDrawerFragment mNavigationDrawerFragment;
+    private HomeNavigationDrawerFragment mNavigationDrawerFragment;
+    private HaystackListFragment haystackListFragment;
     private CharSequence mTitle;
-    private GoogleMap mMap;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_haystack);
+        setContentView(R.layout.activity_home);
 
-        mNavigationDrawerFragment = (HaystackNavigationDrawerFragment)
+        mNavigationDrawerFragment = (HomeNavigationDrawerFragment)
                 getSupportFragmentManager().findFragmentById(R.id.navigation_drawer);
         mTitle = getTitle();
 
@@ -39,21 +34,45 @@ public class HaystackActivity extends ActionBarActivity
         mNavigationDrawerFragment.setUp(
                 R.id.navigation_drawer,
                 (DrawerLayout) findViewById(R.id.drawer_layout));
+
+        haystackListFragment = HaystackListFragment.newInstance("","");
+        onNavigationDrawerItemSelected(0);
     }
 
     @Override
     public void onNavigationDrawerItemSelected(int position) {
-        // update the main content by replacing fragments
-        FragmentManager fragmentManager = getSupportFragmentManager();
-        fragmentManager.beginTransaction()
-                .replace(R.id.container, HaystackMapFragment.newInstance())
-                .commit();
+        Fragment fragment = null;
+        Intent intent = null;
+
+        switch (position){
+            case 0:
+                fragment = haystackListFragment;
+                break;
+            case 1:
+                intent = new Intent(this, AppSettingsActivity.class);
+                break;
+            default:
+                fragment = haystackListFragment;
+                break;
+        }
+
+        if(null != fragment){
+            FragmentManager fragmentManager = getSupportFragmentManager();
+            fragmentManager.beginTransaction()
+                    .replace(R.id.container, fragment)
+                    .commit();
+        }else if(intent != null){
+            startActivity(intent);
+        }
     }
 
     public void onSectionAttached(int number) {
         switch (number) {
             case 1:
-                mTitle = getString(R.string.title_section1);
+                mTitle = getString(R.string.title_haystacks);
+                break;
+            case 2:
+                mTitle = getString(R.string.title_settings);
                 break;
         }
     }

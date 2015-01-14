@@ -1,4 +1,4 @@
-package com.needletest.pafoid.needletest.activities;
+package com.needletest.pafoid.needletest.settings;
 
 import android.annotation.TargetApi;
 import android.content.Context;

@@ -1,14 +1,11 @@
-package com.needletest.pafoid.needletest.asynctask;
+package com.needletest.pafoid.needletest.haystack.task;
 
-import android.content.Context;
 import android.content.SharedPreferences;
-import android.location.Location;
 import android.os.AsyncTask;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
 import com.needletest.pafoid.needletest.AppConstants;
-import com.needletest.pafoid.needletest.models.PostLocationParams;
 import com.needletest.pafoid.needletest.utils.JSONParser;
 
 import org.apache.http.NameValuePair;
@@ -19,7 +16,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
-public class PostLocation extends AsyncTask<PostLocationParams, String, String> {
+public class PostLocationTask extends AsyncTask<PostLocationParams, String, String> {
 
     private static final String TAG_SUCCESS = "success";
     private static final String TAG_MESSAGE = "message";

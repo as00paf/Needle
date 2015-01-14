@@ -1,4 +1,4 @@
-package com.needletest.pafoid.needletest.models;
+package com.needletest.pafoid.needletest.haystack.task;
 
 import android.content.Context;
 import android.location.Location;

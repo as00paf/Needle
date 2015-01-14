@@ -1,114 +1,148 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context="com.needletest.pafoid.needletest.home.CreateHaystackFragment"
-    android:scrollbarAlwaysDrawVerticalTrack="true"
-    android:padding="5dp">
 
-    <TextView
-        android:id="@+id/new_haystack_name_label"
-        android:textStyle="bold"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_marginTop="25dp"
-        android:text="@string/name"
-        android:textColor="#000000"/>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/ScrollView01"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent" >
 
-    <EditText
-        android:id="@+id/new_haystack_name"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/new_haystack_name_label"
-        android:imeOptions="actionNext"
-        android:maxLines="1"
-        android:inputType="text"
-        android:ems="10">
-    </EditText>
+    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools" android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        tools:context="com.needletest.pafoid.needletest.home.CreateHaystackFragment"
+        android:padding="10dp">
 
-    <TextView
-        android:id="@+id/new_haystack_privacy_label"
-        android:textStyle="bold"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/new_haystack_name"
-        android:text="@string/privacy"
-        android:textColor="#000000"/>
+        <TextView
+            android:id="@+id/new_haystack_name_label"
+            android:textStyle="bold"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_marginTop="5dp"
+            android:text="@string/name"
+            android:textColor="#000000"
+            android:textAppearance="?android:attr/textAppearanceMedium"/>
 
-    <CheckBox
-        android:id="@+id/new_haystack_isPublic_checkBox"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/new_haystack_privacy_label"
-        android:text="@string/isPublic"
-        android:checked="false"
-        />
+        <EditText
+            android:id="@+id/new_haystack_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/new_haystack_name_label"
+            android:imeOptions="actionNext"
+            android:maxLines="1"
+            android:inputType="text"
+            android:ems="10">
+        </EditText>
 
-    <TextView
-        android:id="@+id/new_haystack_timeLimit_label"
-        android:textStyle="bold"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/new_haystack_isPublic_checkBox"
-        android:text="@string/timeLimit"
-        android:textColor="#000000"/>
+        <TextView
+            android:id="@+id/new_haystack_privacy_label"
+            android:textStyle="bold"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/new_haystack_name"
+            android:text="@string/privacy"
+            android:textColor="#000000"
+            android:paddingTop="10dp"
+            android:textAppearance="?android:attr/textAppearanceMedium"/>
 
-    <ToggleButton
-        android:id="@+id/new_haystack_toggleDate"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/new_haystack_timeLimit_label"
-        android:text="@string/date"
-        android:textOn="@string/date"
-        android:textOff="@string/date"
-        android:checked="true"/>
+        <CheckBox
+            android:id="@+id/new_haystack_isPublic_checkBox"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/new_haystack_privacy_label"
+            android:text="@string/isPublic"
+            android:checked="false"
+            android:paddingLeft="10dp"
+            />
 
-    <ToggleButton
-        android:id="@+id/new_haystack_toggleTime"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/new_haystack_timeLimit_label"
-        android:layout_toRightOf="@id/new_haystack_toggleDate"
-        android:textOn="@string/time"
-        android:textOff="@string/time"
-        android:text="@string/time"/>
+        <TextView
+            android:id="@+id/new_haystack_timeLimit_label"
+            android:textStyle="bold"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/new_haystack_isPublic_checkBox"
+            android:text="@string/timeLimit"
+            android:textColor="#000000"
+            android:paddingTop="10dp"
+            android:textAppearance="?android:attr/textAppearanceMedium"/>
+
+        <LinearLayout
+            android:id="@+id/toogleButtonsContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/new_haystack_timeLimit_label"
+            android:orientation="horizontal"
+            android:gravity="center_horizontal">
+
+            <ToggleButton
+                android:id="@+id/new_haystack_toggleDate"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/date"
+                android:textOn="@string/date"
+                android:textOff="@string/date"
+                android:checked="true"/>
+
+            <ToggleButton
+                android:id="@+id/new_haystack_toggleTime"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textOn="@string/time"
+                android:textOff="@string/time"
+                android:text="@string/time"/>
+
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/timeLimitText"
+            android:textStyle="bold"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/toogleButtonsContainer"
+            android:text="2015-01-14 00:00:00"
+            android:textAlignment="center"
+            android:textColor="#000000"
+            android:layout_centerHorizontal="true"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:paddingTop="15dp"/>
+
+        <Button
+            android:id="@+id/changeTimeLimitButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/timeLimitText"
+            android:layout_centerHorizontal="true"
+            android:text="@string/change"
+            android:layout_marginTop="15dp"/>
 
 
-    <TextView
-        android:id="@+id/timeLimitText"
-        android:textStyle="bold"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/new_haystack_toggleTime"
-        android:text="@string/users"
-        android:textColor="#000000"
-        android:layout_centerHorizontal="true"/>
+        <TextView
+            android:id="@+id/new_haystack_users_label"
+            android:textStyle="bold"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/changeTimeLimitButton"
+            android:text="@string/users"
+            android:textColor="#000000"
+            android:paddingTop="10dp"
+            android:textAppearance="?android:attr/textAppearanceMedium"/>
 
-    <Button
-        android:id="@+id/changeTimeLimitButton"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/timeLimitText"
-        android:text="@string/change"/>
+        <ListView
+            android:layout_width="match_parent"
+            android:layout_height="250dp"
+            android:id="@+id/haystack_user_list"
+            android:layout_below="@id/new_haystack_users_label"
+            android:paddingTop="5dp"
+            android:background="@drawable/border_ui"
+            />
 
+        <Button
+            android:id="@+id/create_haystack_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_below="@id/haystack_user_list"
+            android:layout_centerHorizontal="true"
+            android:layout_marginBottom="5dp"
+            android:text="@string/create_haystack" />
 
-    <TextView
-        android:id="@+id/new_haystack_users_label"
-        android:textStyle="bold"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/changeTimeLimitButton"
-        android:text="@string/users"
-        android:textColor="#000000"/>
-
-    <Button
-        android:id="@+id/create_haystack_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginBottom="5dp"
-        android:text="@string/create_haystack" />
-
-
-</RelativeLayout>
+    </RelativeLayout>
+</ScrollView>

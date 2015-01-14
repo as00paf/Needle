@@ -17,6 +17,7 @@
     <string name="login">Login</string>
     <string name="register">Register</string>
     <string name="rememberMe">Remember Me</string>
+    <string name="registerDialog">Creating User...</string>
 
 
     <!-- Haystack List Fragment -->

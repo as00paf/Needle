@@ -14,11 +14,14 @@
     <string name="register">Register</string>
     <string name="rememberMe">Remember Me</string>
 
+
     <!-- Haystack List Fragment -->
     <string name="publicHeader">Public Haystacks</string>
     <string name="privateHeader">Private Haystacks</string>
     <string name="noHaystackAvailable">No Haystacks Available</string>
 
+    <!-- Create Haystack Fragment -->
+    <string name="change">Change</string>
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>

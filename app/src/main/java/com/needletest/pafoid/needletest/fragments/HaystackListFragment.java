@@ -111,6 +111,31 @@ public class HaystackListFragment extends Fragment {
         if(savedInstanceState != null){
             publicHaystackList = savedInstanceState.getParcelableArrayList("publicHaystackList");
             privateHaystackList = savedInstanceState.getParcelableArrayList("privateHaystackList");
+
+            if(publicHaystackList.size() >  0 || privateHaystackList.size() >  0 ){
+                haystackList = new ArrayList<Object>();
+                haystackList.add(getResources().getString(R.string.publicHeader));
+
+                int i;
+                int count = publicHaystackList.size();
+                if(count==0){
+                    haystackList.add(getResources().getString(R.string.noHaystackAvailable));
+                }
+
+                for(i=0;i<count;i++){
+                    haystackList.add(publicHaystackList.get(i));
+                }
+
+                haystackList.add(getResources().getString(R.string.privateHeader));
+                count = privateHaystackList.size();
+                if(count==0){
+                    haystackList.add(getResources().getString(R.string.noHaystackAvailable));
+                }
+
+                for(i=0;i<count;i++){
+                    haystackList.add(privateHaystackList.get(i));
+                }
+            }
         }
     }
 
@@ -164,7 +189,7 @@ public class HaystackListFragment extends Fragment {
                 List<NameValuePair> requestParams = new ArrayList<NameValuePair>();
                 requestParams.add(new BasicNameValuePair("userId", String.valueOf(getUserId())));
 
-                Log.d("request!", "starting");
+                Log.d("request!", "starting with userId : SELECT * FROM haystack INNER JOIN haystack_users ON haystack.id = haystack_users.haystackId AND haystack_users.userId = "+String.valueOf(getUserId())+" WHERE haystack.isPublic = 0");
                 // getting product details by making HTTP request
                 JSONObject json = jsonParser.makeHttpRequest(
                         GET_HAYSTACKS_URL, "POST", requestParams);

@@ -3,6 +3,7 @@ package com.needletest.pafoid.needletest.fragments;
 import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.app.ProgressDialog;
+import android.app.TimePickerDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
@@ -18,6 +19,7 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 import android.widget.ToggleButton;
@@ -71,13 +73,13 @@ public class CreateHaystackFragment extends Fragment {
     private CheckBox isPublicCheckbox;
     private ToggleButton toggleDateButton;
     private ToggleButton toggleTimeButton;
-    private DatePicker datePicker;
-    private TimePicker timePicker;
+    private Button changeTimeLimitButton;
     private Button createHaystackButton;
+    private TextView timeLimitText;
 
     private Calendar calendar;
     private String dateLimit;
-    private int year, month, day;
+    private int year, month, day, hours, minutes;
     private String timeLimit;
     private String userName;
     private Haystack haystack;
@@ -113,9 +115,6 @@ public class CreateHaystackFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 toggleTimeButton.setChecked(!toggleDateButton.isChecked());
-
-                datePicker.setVisibility((toggleTimeButton.isChecked()) ? View.INVISIBLE : View.VISIBLE);
-                timePicker.setVisibility((toggleDateButton.isChecked()) ? View.INVISIBLE : View.VISIBLE);
             }
         });
         toggleTimeButton = (ToggleButton) rootView.findViewById(R.id.new_haystack_toggleTime);
@@ -123,39 +122,45 @@ public class CreateHaystackFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 toggleDateButton.setChecked(!toggleTimeButton.isChecked());
-
-                datePicker.setVisibility((toggleTimeButton.isChecked()) ? View.INVISIBLE : View.VISIBLE);
-                timePicker.setVisibility((toggleDateButton.isChecked()) ? View.INVISIBLE : View.VISIBLE);
             }
         });
-
-        datePicker = (DatePicker) rootView.findViewById(R.id.new_haystack_date);
-        final DatePickerDialog.OnDateSetListener datePickerListener = new DatePickerDialog.OnDateSetListener() {
-            @Override
-            public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
-                //dateLimit = year+"-"+(monthOfYear + 1)+"-"+dayOfMonth;
-                SimpleDateFormat sdf = new SimpleDateFormat(SQL_DATE_FORMAT, Locale.US);
-                dateLimit = sdf.format(new Date(year - 1900, month, day));
-            }
-        };
 
         calendar = Calendar.getInstance();
         year = calendar.get(Calendar.YEAR);
         month = calendar.get(Calendar.MONTH);
         day = calendar.get(Calendar.DAY_OF_MONTH);
-        datePicker.setOnClickListener(new View.OnClickListener() {
+        hours = calendar.getTime().getHours()+1;
+        minutes = calendar.getTime().getMinutes() + 10;
+
+        SimpleDateFormat sdf = new SimpleDateFormat(SQL_DATETIME_FORMAT, Locale.US);
+        timeLimit = sdf.format(new Date(year-1900, month, day, hours, minutes));
+
+        timeLimitText = (TextView) rootView.findViewById(R.id.timeLimitText);
+        timeLimitText.setText(timeLimit);
+
+        changeTimeLimitButton = (Button) rootView.findViewById(R.id.changeTimeLimitButton);
+        changeTimeLimitButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                new DatePickerDialog(rootView.getContext(), datePickerListener, year, month, day).show();
-            }
-        });
-
-        timePicker = (TimePicker) rootView.findViewById(R.id.new_haystack_time);
-        timePicker.setOnTimeChangedListener(new TimePicker.OnTimeChangedListener() {
-            @Override
-            public void onTimeChanged(TimePicker view, int hourOfDay, int minute) {
-                SimpleDateFormat sdf = new SimpleDateFormat(SQL_DATETIME_FORMAT, Locale.US);
-                timeLimit = sdf.format(new Date(year, month, day, hourOfDay, minute));
+                if(toggleTimeButton.isChecked()){
+                    TimePickerDialog dialog = new TimePickerDialog(getActivity(), new TimePickerDialog.OnTimeSetListener() {
+                        @Override
+                        public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
+                            SimpleDateFormat sdf = new SimpleDateFormat(SQL_DATETIME_FORMAT, Locale.US);
+                            timeLimit = sdf.format(new Date(year, month, day, hourOfDay, minute));
+                        }
+                    }, hours, minutes, true);
+                    dialog.show();
+                }else{
+                    DatePickerDialog dialog = new DatePickerDialog(getActivity(), new DatePickerDialog.OnDateSetListener() {
+                        @Override
+                        public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
+                            SimpleDateFormat sdf = new SimpleDateFormat(SQL_DATE_FORMAT, Locale.US);
+                            dateLimit = sdf.format(new Date(year - 1900, month, day));
+                        }
+                    }, year, month, day);
+                    dialog.show();
+                }
             }
         });
 

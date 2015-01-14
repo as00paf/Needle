@@ -83,6 +83,7 @@ public class CreateHaystackFragment extends Fragment {
     private String timeLimit;
     private String userName;
     private Haystack haystack;
+    private int userId = -1;
 
     public static CreateHaystackFragment newInstance() {
         CreateHaystackFragment fragment = new CreateHaystackFragment();
@@ -202,11 +203,11 @@ public class CreateHaystackFragment extends Fragment {
             haystack.setTimeLimit(timeLimit);
         }
 
-        haystack.setOwner(getUserName());
+        haystack.setOwner(getUserId());
 
         //Users
         ArrayList<String> users = new ArrayList<String>();
-        users.add(getUserName());
+        users.add(String.valueOf(getUserId()));
         haystack.setUsers(users);
 
         //Active users
@@ -236,6 +237,17 @@ public class CreateHaystackFragment extends Fragment {
         return userName;
     }
 
+    private int getUserId(){
+        if(userId == -1){
+            SharedPreferences sp = PreferenceManager
+                    .getDefaultSharedPreferences(rootView.getContext());
+
+            userId = sp.getInt("userId", -1);
+        }
+
+        return userId;
+    }
+
     public interface OnFragmentInteractionListener {
     }
 
@@ -259,7 +271,7 @@ public class CreateHaystackFragment extends Fragment {
                 // Building Parameters
                 List<NameValuePair> params = new ArrayList<NameValuePair>();
                 params.add(new BasicNameValuePair("name", haystack.getName()));
-                params.add(new BasicNameValuePair("owner", haystack.getOwner()));
+                params.add(new BasicNameValuePair("owner", String.valueOf(haystack.getOwner())));
                 params.add(new BasicNameValuePair("isPublic", (haystack.getIsPublic()) ? "1" : "0"));
                 params.add(new BasicNameValuePair("timeLimit", haystack.getTimeLimit()));
                 params.add(new BasicNameValuePair("zone", haystack.getZone()));

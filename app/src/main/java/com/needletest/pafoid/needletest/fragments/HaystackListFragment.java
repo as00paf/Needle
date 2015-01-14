@@ -223,7 +223,7 @@ public class HaystackListFragment extends Fragment {
 
                         haystack.setName(haystackData.getString("name"));
                         haystack.setIsPublic(haystackData.getInt("isPublic") == 1);
-                        haystack.setOwner(haystackData.getString("owner"));
+                        haystack.setOwner(haystackData.getInt("owner"));
                         haystack.setTimeLimit(haystackData.getString("timeLimit"));
 
                        /* haystack.setActiveUsers(new ArrayList<String>(Arrays.asList(haystackData.getString("activeUsers").split(","))));
@@ -265,7 +265,7 @@ public class HaystackListFragment extends Fragment {
 
                         haystack.setName(haystackData.getString("name"));
                         haystack.setIsPublic(haystackData.getInt("isPublic") == 1);
-                        haystack.setOwner(haystackData.getString("owner"));
+                        haystack.setOwner(haystackData.getInt("owner"));
                         haystack.setTimeLimit(haystackData.getString("timeLimit"));
 
                        /* haystack.setActiveUsers(new ArrayList<String>(Arrays.asList(haystackData.getString("activeUsers").split(","))));

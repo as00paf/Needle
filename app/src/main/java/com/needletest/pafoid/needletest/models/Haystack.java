@@ -17,7 +17,7 @@ public class Haystack implements Serializable, Parcelable {
     private ArrayList<String> bannedUsers;
     private String pictureURL = "";
     private String zone = "";
-    private String owner;
+    private int owner;
 
     public Haystack(){
 
@@ -38,7 +38,7 @@ public class Haystack implements Serializable, Parcelable {
         in.readList(this.bannedUsers, getClass().getClassLoader());
         this.pictureURL = in.readString();
         this.zone = in.readString();
-        this.owner = in.readString();
+        this.owner = in.readInt();
     }
 
     public int getId() {
@@ -120,11 +120,11 @@ public class Haystack implements Serializable, Parcelable {
         this.zone = zone;
     }
 
-    public String getOwner() {
+    public int getOwner() {
         return owner;
     }
 
-    public void setOwner(String owner) {
+    public void setOwner(int owner) {
         this.owner = owner;
     }
 
@@ -139,7 +139,7 @@ public class Haystack implements Serializable, Parcelable {
         parcel.writeList(bannedUsers);
         parcel.writeString(pictureURL);
         parcel.writeString(zone);
-        parcel.writeString(owner);
+        parcel.writeInt(owner);
     }
 
     public static final Parcelable.Creator<Haystack> CREATOR = new Parcelable.Creator<Haystack>() {

@@ -10,11 +10,15 @@ import android.app.Activity;
 import android.app.ProgressDialog;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.needletest.pafoid.needletest.AppConstants;
@@ -25,7 +29,7 @@ public class RegisterActivity extends Activity implements OnClickListener{
 	
 	private EditText user, pass;
 	private Button  mRegister;
-	
+
 	 // Progress Dialog
     private ProgressDialog pDialog;
  
@@ -35,31 +39,53 @@ public class RegisterActivity extends Activity implements OnClickListener{
     //testing on Emulator:
     private static final String LOGIN_URL = AppConstants.PROJECT_URL + "register.php";
 
-    //ids
-    private static final String TAG_SUCCESS = "success";
-    private static final String TAG_MESSAGE = "message";
-	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
-		// TODO Auto-generated method stub
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.register);
 		
 		user = (EditText)findViewById(R.id.username);
 		pass = (EditText)findViewById(R.id.password);
-		
+        pass.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                boolean handled = false;
+                if (actionId == EditorInfo.IME_ACTION_SEND) {
+                    createUser();
+                    handled = true;
+                }
+                return handled;
+            }
+        });
 
-		mRegister = (Button)findViewById(R.id.register);
+        user.requestFocus();
+
+        mRegister = (Button)findViewById(R.id.register);
 		mRegister.setOnClickListener(this);
 		
 	}
 
 	@Override
 	public void onClick(View v) {
-		new CreateUser().execute();
+		createUser();
 	}
-	
-	class CreateUser extends AsyncTask<String, String, String> {
+
+    private void createUser() {
+        if(validateCredentials()){
+            new CreateUser().execute();
+        }
+    }
+
+    private boolean validateCredentials(){
+        if(TextUtils.isEmpty(user.getText().toString()))
+            return false;
+        if(TextUtils.isEmpty(pass.getText().toString()))
+            return false;
+
+        return true;
+    }
+
+    class CreateUser extends AsyncTask<String, String, String> {
 
 		 /**
          * Before starting background thread Show Progress Dialog
@@ -100,14 +126,14 @@ public class RegisterActivity extends Activity implements OnClickListener{
                 Log.d("Login attempt", json.toString());
  
                 // json success element
-                success = json.getInt(TAG_SUCCESS);
+                success = json.getInt(AppConstants.TAG_SUCCESS);
                 if (success == 1) {
                 	Log.d("User Created!", json.toString());              	
                 	finish();
-                	return json.getString(TAG_MESSAGE);
+                	return json.getString(AppConstants.TAG_MESSAGE);
                 }else{
-                	Log.d("Login Failure!", json.getString(TAG_MESSAGE));
-                	return json.getString(TAG_MESSAGE);
+                	Log.d("Login Failure!", json.getString(AppConstants.TAG_MESSAGE));
+                	return json.getString(AppConstants.TAG_MESSAGE);
                 	
                 }
             } catch (JSONException e) {

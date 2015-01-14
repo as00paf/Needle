@@ -9,6 +9,10 @@
     <string name="title_activity_haystack">Haystacks</string>
     <string name="title_settings">Settings</string>
 
+    <!-- App Settings Activity -->
+    <string name="rememberMeSummary">Make the Needle remember your credentials</string>
+    <string name="app_settings">App Settings</string>
+
     <!-- Login Activity -->
     <string name="login">Login</string>
     <string name="register">Register</string>

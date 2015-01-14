@@ -1,0 +1,10 @@
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <CheckBoxPreference
+        android:id="@+id/appSettingsRememberMeCheckBox"
+        android:key="rememberMe"
+        android:title="@string/rememberMe"
+        android:summary="@string/rememberMeSummary"
+        android:defaultValue="true" />
+
+</PreferenceScreen>

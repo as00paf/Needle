@@ -56,6 +56,10 @@
             android:label="@string/title_activity_haystack"
             android:theme="@style/AppTheme2" >
         </activity>
+        <activity
+            android:name=".activities.AppSettingsActivity"
+            android:label="@string/title_activity_app_settings" >
+        </activity>
     </application>
 
 </manifest>

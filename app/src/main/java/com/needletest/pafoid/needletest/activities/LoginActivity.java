@@ -76,8 +76,10 @@ public class LoginActivity extends Activity implements OnClickListener{
             }
         });
 
-        //Remember me Checbox
+        //Remember me CheckBox
+        Boolean rememberMe = sp.getBoolean("rememberMe", true);
         rememberMeCheckBox = (CheckBox) findViewById(R.id.rememberMeCheckBox);
+        rememberMeCheckBox.setChecked(rememberMe);
 
 		//setup buttons
 		mSubmit = (Button)findViewById(R.id.login);

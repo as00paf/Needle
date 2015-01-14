@@ -20,6 +20,7 @@ import android.widget.ProgressBar;
 import com.needletest.pafoid.needletest.AppConstants;
 import com.needletest.pafoid.needletest.HaystackListAdapter;
 import com.needletest.pafoid.needletest.R;
+import com.needletest.pafoid.needletest.activities.HaystackActivity;
 import com.needletest.pafoid.needletest.activities.MapsActivity;
 import com.needletest.pafoid.needletest.models.Haystack;
 import com.needletest.pafoid.needletest.utils.JSONParser;
@@ -34,7 +35,6 @@ import org.json.JSONObject;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -58,6 +58,7 @@ public class HaystackListFragment extends Fragment {
     JSONParser jsonParser = new JSONParser();
 
     private String userName;
+    private int userId = -1;
 
     public static HaystackListFragment newInstance(String param1, String param2) {
         HaystackListFragment fragment = new HaystackListFragment();
@@ -98,7 +99,8 @@ public class HaystackListFragment extends Fragment {
                 Object o = listView.getItemAtPosition(position);
                 Haystack haystackData = (Haystack) o;
 
-                Intent intent = new Intent(getActivity(), MapsActivity.class);
+                //Intent intent = new Intent(getActivity(), MapsActivity.class);
+                Intent intent = new Intent(getActivity(), HaystackActivity.class);
                 intent.putExtra("data", (Serializable) haystackData);
                 startActivity(intent);
             }
@@ -109,17 +111,6 @@ public class HaystackListFragment extends Fragment {
         }
 
         return rootView;
-    }
-
-    private String getUserName(){
-        if(userName == null){
-            SharedPreferences sp = PreferenceManager
-                    .getDefaultSharedPreferences(rootView.getContext());
-
-            userName = sp.getString("username", null);
-        }
-
-        return userName;
     }
 
     @Override
@@ -177,7 +168,7 @@ public class HaystackListFragment extends Fragment {
             try {
                 // Building Parameters
                 List<NameValuePair> requestParams = new ArrayList<NameValuePair>();
-                requestParams.add(new BasicNameValuePair("username", username));
+                requestParams.add(new BasicNameValuePair("userId", String.valueOf(getUserId())));
 
                 Log.d("request!", "starting");
                 // getting product details by making HTTP request
@@ -189,47 +180,82 @@ public class HaystackListFragment extends Fragment {
 
                 // json success tag
                 success = json.getInt(AppConstants.TAG_SUCCESS);
-                if (success == 1) {
-                    Log.d("FetchHaystacks Successful!", json.toString());
+                Log.d("FetchHaystacks Successful!", json.toString());
 
-                    JSONArray haystacks = json.getJSONArray("haystacks");
-                    if (haystacks != null) {
-                        haystackList = new ArrayList<Haystack>();
-                        int count = haystacks.length();
+                JSONArray publicHaystacks = json.getJSONArray("public_haystacks");
+                JSONArray privateHaystacks = json.getJSONArray("private_haystacks");
 
-                        for (int i = 0; i < count; i++) {
-                            JSONObject haystackData = (JSONObject) haystacks.getJSONObject(i);
-                            Haystack haystack = new Haystack();
+                if (publicHaystacks != null || privateHaystacks != null) {
+                    haystackList = new ArrayList<Haystack>();
+                    int count = publicHaystacks.length();
 
-                            haystack.setName(haystackData.getString("name"));
-                            haystack.setIsPublic(haystackData.getInt("isPublic") == 1);
-                            haystack.setOwner(haystackData.getString("owner"));
-                            haystack.setTimeLimit(haystackData.getString("timeLimit"));
+                    for (int i = 0; i < count; i++) {
+                        JSONObject haystackData = (JSONObject) publicHaystacks.getJSONObject(i);
+                        Haystack haystack = new Haystack();
 
-                            haystack.setActiveUsers(new ArrayList<String>(Arrays.asList(haystackData.getString("activeUsers").split(","))));
-                            haystack.setUsers(new ArrayList<String>(Arrays.asList(haystackData.getString("users").split(","))));
-                            haystack.setBannedUsers(new ArrayList<String>(Arrays.asList(haystackData.getString("bannedUsers").split(","))));
+                        haystack.setName(haystackData.getString("name"));
+                        haystack.setIsPublic(haystackData.getInt("isPublic") == 1);
+                        haystack.setOwner(haystackData.getString("owner"));
+                        haystack.setTimeLimit(haystackData.getString("timeLimit"));
 
-                            //Optionals
-                            try{
-                                String pictureURL = haystackData.getString("pictureURL");
-                                if (pictureURL != null)
-                                    haystack.setPictureURL(pictureURL);
-                            }catch(Exception e){
-                                Log.e("parseJson", "No pictureURL for #" + i );
-                            }
+                       /* haystack.setActiveUsers(new ArrayList<String>(Arrays.asList(haystackData.getString("activeUsers").split(","))));
+                        haystack.setUsers(new ArrayList<String>(Arrays.asList(haystackData.getString("users").split(","))));
+                        haystack.setBannedUsers(new ArrayList<String>(Arrays.asList(haystackData.getString("bannedUsers").split(","))));*/
 
-                            try{
-                                String zone = haystackData.getString("zone");
-                                if (zone != null)
-                                    haystack.setZone(zone);
-                            }catch(Exception e){
-                                Log.e("parseJson", "No zone for #" + i );
-                            }
-
-                            Log.e("parseJson", "Adding Haystack # "+i );
-                            haystackList.add(haystack);
+                        //Optionals
+                        try{
+                            String pictureURL = haystackData.getString("pictureURL");
+                            if (pictureURL != null)
+                                haystack.setPictureURL(pictureURL);
+                        }catch(Exception e){
+                            Log.e("parseJson", "No pictureURL for #" + i );
                         }
+
+                        try{
+                            String zone = haystackData.getString("zoneString");
+                            if (zone != null)
+                                haystack.setZone(zone);
+                        }catch(Exception e){
+                            Log.e("parseJson", "No zone for #" + i );
+                        }
+
+                        Log.e("parseJson", "Adding Haystack # "+i );
+                        haystackList.add(haystack);
+                    }
+
+                    count = privateHaystacks.length();
+                    for (int i = 0; i < count; i++) {
+                        JSONObject haystackData = (JSONObject) privateHaystacks.getJSONObject(i);
+                        Haystack haystack = new Haystack();
+
+                        haystack.setName(haystackData.getString("name"));
+                        haystack.setIsPublic(haystackData.getInt("isPublic") == 1);
+                        haystack.setOwner(haystackData.getString("owner"));
+                        haystack.setTimeLimit(haystackData.getString("timeLimit"));
+
+                       /* haystack.setActiveUsers(new ArrayList<String>(Arrays.asList(haystackData.getString("activeUsers").split(","))));
+                        haystack.setUsers(new ArrayList<String>(Arrays.asList(haystackData.getString("users").split(","))));
+                        haystack.setBannedUsers(new ArrayList<String>(Arrays.asList(haystackData.getString("bannedUsers").split(","))));*/
+
+                        //Optionals
+                        try{
+                            String pictureURL = haystackData.getString("pictureURL");
+                            if (pictureURL != null)
+                                haystack.setPictureURL(pictureURL);
+                        }catch(Exception e){
+                            Log.e("parseJson", "No pictureURL for #" + i );
+                        }
+
+                        try{
+                            String zone = haystackData.getString("zoneString");
+                            if (zone != null)
+                                haystack.setZone(zone);
+                        }catch(Exception e){
+                            Log.e("parseJson", "No zone for #" + i );
+                        }
+
+                        Log.e("parseJson", "Adding Haystack # "+i );
+                        haystackList.add(haystack);
                     }
                 }else{
                     Log.d("FetchHaystacks Failure!", json.getString(AppConstants.TAG_MESSAGE));
@@ -240,6 +266,28 @@ public class HaystackListFragment extends Fragment {
             }
             return null;
         }
+    }
+
+    private int getUserId(){
+        if(userId==-1){
+            SharedPreferences sp = PreferenceManager
+                    .getDefaultSharedPreferences(rootView.getContext());
+
+            userId = sp.getInt("userId", -1);
+        }
+
+        return userId;
+    }
+
+    private String getUserName(){
+        if(userName == null){
+            SharedPreferences sp = PreferenceManager
+                    .getDefaultSharedPreferences(rootView.getContext());
+
+            userName = sp.getString("username", null);
+        }
+
+        return userName;
     }
 
     // TODO: Rename method, update argument and hook method into UI event

@@ -255,20 +255,33 @@ public class CreateHaystackFragment extends Fragment {
                 List<NameValuePair> params = new ArrayList<NameValuePair>();
                 params.add(new BasicNameValuePair("name", haystack.getName()));
                 params.add(new BasicNameValuePair("owner", haystack.getOwner()));
-                params.add(new BasicNameValuePair("isPublic", haystack.getIsPublic().toString()));
+                params.add(new BasicNameValuePair("isPublic", (haystack.getIsPublic()) ? "1" : "0"));
                 params.add(new BasicNameValuePair("timeLimit", haystack.getTimeLimit()));
-
-                params.add(new BasicNameValuePair("users", new JSONArray(haystack.getUsers()).toString()));
-                params.add(new BasicNameValuePair("activeUsers", new JSONArray(haystack.getActiveUsers()).toString()));
-                params.add(new BasicNameValuePair("bannedUsers", new JSONArray(haystack.getBannedUsers()).toString()));
-
                 params.add(new BasicNameValuePair("zone", haystack.getZone()));
                 params.add(new BasicNameValuePair("pictureURL", haystack.getPictureURL()));
 
+                int i;
+                ArrayList<String> haystackUsers = haystack.getUsers();
+                for(i=0;i<haystackUsers.size();i++){
+                    String user = haystackUsers.get(i);
+                    params.add(new BasicNameValuePair("haystack_user", user));
+                }
+
+                ArrayList<String> haystackActiveUsers = haystack.getActiveUsers();
+                for(i=0;i<haystackActiveUsers.size();i++){
+                    String user = haystackActiveUsers.get(i);
+                    params.add(new BasicNameValuePair("haystack_active_user", user));
+                }
+
+                ArrayList<String> haystackBannedUsers = haystack.getBannedUsers();
+                for(i=0;i<haystackBannedUsers.size();i++){
+                    String user = haystackBannedUsers.get(i);
+                    params.add(new BasicNameValuePair("haystack_banned_user", user));
+                }
+
                 Log.d("request!", "starting");
                 // getting product details by making HTTP request
-                JSONObject json = jsonParser.makeHttpRequest(
-                        CREATE_HAYSTACK_URL, "POST", params);
+                JSONObject json = jsonParser.makeHttpRequest(CREATE_HAYSTACK_URL, "POST", params);
 
                 // check your log for json response
                 Log.d("Login attempt", json.toString());
@@ -278,9 +291,11 @@ public class CreateHaystackFragment extends Fragment {
                 if (success == 1) {
                     Log.d("CreateHaystack Successful!", json.toString());
 
-                    Intent i = new Intent(rootView.getContext(), MapsActivity.class);
-                    i.putExtra("haystack", (Parcelable) haystack);
-                    startActivity(i);
+                    haystack.setId(json.getInt(AppConstants.TAG_HAYSTACK_ID));
+
+                    Intent intent = new Intent(rootView.getContext(), MapsActivity.class);
+                    intent.putExtra("haystack", (Parcelable) haystack);
+                    startActivity(intent);
                     return json.getString(TAG_MESSAGE);
                 }else{
                     Log.d("CreateHaystack Failure!", json.getString(TAG_MESSAGE));

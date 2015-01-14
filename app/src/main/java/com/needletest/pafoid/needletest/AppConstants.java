@@ -10,4 +10,6 @@ public class AppConstants {
     //Json tags
     public static final String TAG_SUCCESS = "success";
     public static final String TAG_MESSAGE = "message";
+    public static final String TAG_HAYSTACK_ID = "haystackId";
+    public static final String TAG_USER_ID = "userId";
 }

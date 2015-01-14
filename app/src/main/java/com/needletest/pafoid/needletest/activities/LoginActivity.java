@@ -22,6 +22,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -34,7 +35,8 @@ public class LoginActivity extends Activity implements OnClickListener{
 	
 	private EditText user, pass;
 	private Button mSubmit, mRegister;
-	
+    private CheckBox rememberMeCheckBox;
+
 	 // Progress Dialog
     private ProgressDialog pDialog;
  
@@ -42,10 +44,6 @@ public class LoginActivity extends Activity implements OnClickListener{
     JSONParser jsonParser = new JSONParser();
 
     private static final String LOGIN_URL = AppConstants.PROJECT_URL +"login.php";
-
-    //JSON element ids from repsonse of php script:
-    private static final String TAG_SUCCESS = "success";
-    private static final String TAG_MESSAGE = "message";
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -58,6 +56,7 @@ public class LoginActivity extends Activity implements OnClickListener{
 		user = (EditText)findViewById(R.id.username);
         user.setText(sp.getString("username", ""));
 		pass = (EditText)findViewById(R.id.password);
+        pass.setText(sp.getString("password", ""));
 
         if(TextUtils.isEmpty(user.getText())){
             user.requestFocus();
@@ -76,7 +75,10 @@ public class LoginActivity extends Activity implements OnClickListener{
                 return handled;
             }
         });
-		
+
+        //Remember me Checbox
+        rememberMeCheckBox = (CheckBox) findViewById(R.id.rememberMeCheckBox);
+
 		//setup buttons
 		mSubmit = (Button)findViewById(R.id.login);
 		mRegister = (Button)findViewById(R.id.register);
@@ -87,10 +89,21 @@ public class LoginActivity extends Activity implements OnClickListener{
 		
 	}
 
+    @Override
+    public void onResume(){
+        SharedPreferences sp = PreferenceManager
+                .getDefaultSharedPreferences(LoginActivity.this);
+        boolean autoLogin = sp.getBoolean("rememberMe", false);
+
+        if(!user.getText().toString().isEmpty() && !pass.getText().toString().isEmpty() && autoLogin){
+            login();
+        }
+
+        super.onResume();
+    }
+
     private void login(){
-        Log.i(TAG_MESSAGE, "Trying to login with credentials : "+user.getText().toString() +", "+pass.getText().toString());
-
-
+        Log.i(AppConstants.TAG_MESSAGE, "Trying to login with credentials : "+user.getText().toString() +", "+pass.getText().toString());
 
         String username = user.getText().toString();
         String password = pass.getText().toString();
@@ -157,7 +170,7 @@ public class LoginActivity extends Activity implements OnClickListener{
                 Log.d("Login attempt", json.toString());
  
                 // json success tag
-                success = json.getInt(TAG_SUCCESS);
+                success = json.getInt(AppConstants.TAG_SUCCESS);
                 if (success == 1) {
                 	Log.d("Login Successful!", json.toString());
 
@@ -166,16 +179,22 @@ public class LoginActivity extends Activity implements OnClickListener{
                             .getDefaultSharedPreferences(LoginActivity.this);
                     SharedPreferences.Editor edit = sp.edit();
                     edit.putString("username", username);
+                    edit.putInt("userId", json.getInt(AppConstants.TAG_USER_ID));
+                    edit.putBoolean("rememberMe", rememberMeCheckBox.isChecked());
+                    if(rememberMeCheckBox.isChecked()){
+                        edit.putString("password", password);
+                    }
+
                     edit.commit();
 
                 	//Intent i = new Intent(Login.this, MapsActivity.class);
                     Intent i = new Intent(LoginActivity.this, HomeActivity.class);
                 	finish();
     				startActivity(i);
-                	return json.getString(TAG_MESSAGE);
+                	return json.getString(AppConstants.TAG_MESSAGE);
                 }else{
-                	Log.d("Login Failure!", json.getString(TAG_MESSAGE));
-                	return json.getString(TAG_MESSAGE);
+                	Log.d("Login Failure!", json.getString(AppConstants.TAG_MESSAGE));
+                	return json.getString(AppConstants.TAG_MESSAGE);
                 	
                 }
             } catch (JSONException e) {

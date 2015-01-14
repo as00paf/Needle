@@ -14,23 +14,24 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.support.v4.widget.DrawerLayout;
 
-import com.needletest.pafoid.needletest.fragments.CreateHaystackFragment;
-import com.needletest.pafoid.needletest.fragments.HaystackListFragment;
-import com.needletest.pafoid.needletest.fragments.NavigationDrawerFragment;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.SupportMapFragment;
 import com.needletest.pafoid.needletest.R;
+import com.needletest.pafoid.needletest.fragments.HaystackMapFragment;
 
-public class HomeActivity extends ActionBarActivity
-        implements NavigationDrawerFragment.NavigationDrawerCallbacks, HaystackListFragment.OnFragmentInteractionListener, CreateHaystackFragment.OnFragmentInteractionListener {
+public class HaystackActivity extends ActionBarActivity
+        implements HaystackNavigationDrawerFragment.NavigationDrawerCallbacks, HaystackMapFragment.OnFragmentInteractionListener {
 
-    private NavigationDrawerFragment mNavigationDrawerFragment;
+    private HaystackNavigationDrawerFragment mNavigationDrawerFragment;
     private CharSequence mTitle;
+    private GoogleMap mMap;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_home);
+        setContentView(R.layout.activity_haystack);
 
-        mNavigationDrawerFragment = (NavigationDrawerFragment)
+        mNavigationDrawerFragment = (HaystackNavigationDrawerFragment)
                 getSupportFragmentManager().findFragmentById(R.id.navigation_drawer);
         mTitle = getTitle();
 
@@ -45,17 +46,14 @@ public class HomeActivity extends ActionBarActivity
         // update the main content by replacing fragments
         FragmentManager fragmentManager = getSupportFragmentManager();
         fragmentManager.beginTransaction()
-                .replace(R.id.container, HaystackListFragment.newInstance("",""))
+                .replace(R.id.container, HaystackMapFragment.newInstance())
                 .commit();
     }
 
     public void onSectionAttached(int number) {
         switch (number) {
             case 1:
-                mTitle = getString(R.string.title_haystacks);
-                break;
-            case 2:
-                mTitle = getString(R.string.title_settings);
+                mTitle = getString(R.string.title_section1);
                 break;
         }
     }

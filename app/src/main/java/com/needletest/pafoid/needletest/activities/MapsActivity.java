@@ -33,6 +33,8 @@ import com.needletest.pafoid.needletest.asynctask.PostLocation;
 import com.needletest.pafoid.needletest.models.PostLocationParams;
 import com.needletest.pafoid.needletest.utils.JSONParser;
 
+import org.apache.http.NameValuePair;
+import org.apache.http.message.BasicNameValuePair;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -41,6 +43,7 @@ import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 
 public class MapsActivity extends FragmentActivity implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener {
 
@@ -77,6 +80,7 @@ public class MapsActivity extends FragmentActivity implements GoogleApiClient.Co
     private Marker mMarker;
     private HashMap<String, Marker> mMarkers;
     private String username = "";
+    private String haystackId;
 
     //Activity Lifecycle
     @Override
@@ -252,12 +256,27 @@ public class MapsActivity extends FragmentActivity implements GoogleApiClient.Co
     }
 
     public void updateJSONdata() {
+        int success;
         mLocationList = new ArrayList<HashMap<String, Object>>();
         JSONParser jParser = new JSONParser();
-        JSONObject json = jParser.getJSONFromUrl(LOCATION_URL);
 
         try {
-            int success = json.getInt(TAG_SUCCESS);
+            List<NameValuePair> requestParams = new ArrayList<NameValuePair>();
+            requestParams.add(new BasicNameValuePair("username", username));
+            requestParams.add(new BasicNameValuePair("haystackId", haystackId));
+
+            Log.d("request!", "starting");
+
+            JSONObject json = jParser.makeHttpRequest(LOCATION_URL, "POST", requestParams);
+
+            Log.d("Post Location attempt", json.toString());
+
+            success = json.getInt(TAG_SUCCESS);
+            if (success == 1) {
+                Log.d("Location Added!", json.toString());
+            }else{
+                Log.d("Location Failure!", json.getString(TAG_MESSAGE));
+            }
             String msg = json.getString(TAG_MESSAGE);
             Log.i("updateJSONdata","Success : "+success+", msg : "+msg+" "+json.toString());
 

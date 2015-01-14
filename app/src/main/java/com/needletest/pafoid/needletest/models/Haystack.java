@@ -8,6 +8,7 @@ import java.util.ArrayList;
 
 public class Haystack implements Serializable, Parcelable {
 
+    private int id;
     private String name;
     private Boolean isPublic;
     private String timeLimit;
@@ -28,6 +29,7 @@ public class Haystack implements Serializable, Parcelable {
     }
 
     public Haystack(Parcel in){
+        this.id = in.readInt();
         this.name = in.readString();
         this.isPublic = (Boolean) in.readValue(ClassLoader.getSystemClassLoader());
         this.timeLimit = in.readString();
@@ -37,6 +39,14 @@ public class Haystack implements Serializable, Parcelable {
         this.pictureURL = in.readString();
         this.zone = in.readString();
         this.owner = in.readString();
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     public String getName() {
@@ -120,6 +130,7 @@ public class Haystack implements Serializable, Parcelable {
 
     @Override
     public void writeToParcel(Parcel parcel, int i) {
+        parcel.writeInt(id);
         parcel.writeString(name);
         parcel.writeValue(isPublic);
         parcel.writeString(timeLimit);

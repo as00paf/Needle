@@ -111,10 +111,18 @@ public class HaystackListAdapter extends BaseAdapter {
                     holder.titleView = (TextView) convertView.findViewById(R.id.title);
                     holder.userCountView = (TextView) convertView.findViewById(R.id.active_users);
                     holder.imageView = (ImageView) convertView.findViewById(R.id.thumbImage);
+                    holder.active_until = (TextView) convertView.findViewById(R.id.active_until);
 
                     Haystack haystack = (Haystack) listData.get(position);
                     holder.titleView.setText(haystack.getName());
-                    holder.userCountView.setText(haystack.getActiveUsers().size()+" active users");
+
+                    int count = haystack.getActiveUsers().size();
+                    String userCount = count + " " +mContext.getResources().getString(R.string.activeUsers);
+                    holder.userCountView.setText(userCount);
+
+                    String activeUntil = mContext.getResources().getString(R.string.activeUntil)+ " "+haystack.getTimeLimit();
+                    activeUntil = activeUntil.replace(" 00:00:00", "");
+                    holder.active_until.setText(activeUntil);
 
                     if (holder.imageView != null) {
                         new ImageDownloaderTask(holder.imageView).execute(haystack.getPictureURL());
@@ -143,8 +151,7 @@ public class HaystackListAdapter extends BaseAdapter {
  
     static class ViewHolder {
         //Item
-        TextView titleView;
-        TextView userCountView;
+        TextView titleView, userCountView, active_until;
         ImageView imageView;
 
         //Header

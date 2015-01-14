@@ -37,14 +37,6 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * A simple {@link Fragment} subclass.
- * Activities that contain this fragment must implement the
- * {@link HaystackListFragment.OnFragmentInteractionListener} interface
- * to handle interaction events.
- * Use the {@link HaystackListFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
 public class HaystackListFragment extends Fragment {
     private static final String GET_HAYSTACKS_URL = AppConstants.PROJECT_URL +"getHaystacks.php";
 
@@ -52,7 +44,9 @@ public class HaystackListFragment extends Fragment {
     private View rootView;
     private ListView listView;
     private HaystackListAdapter haystackListAdapter;
-    private ArrayList<Haystack> haystackList = null;
+    private ArrayList<Object> haystackList = null;
+    private ArrayList<Haystack> publicHaystackList = null;
+    private ArrayList<Haystack> privateHaystackList = null;
     private ProgressBar progressbar = null;
     FloatingActionButton fab = null;
     JSONParser jsonParser = new JSONParser();
@@ -66,7 +60,6 @@ public class HaystackListFragment extends Fragment {
     }
 
     public HaystackListFragment() {
-        // Required empty public constructor
     }
 
     @Override
@@ -89,9 +82,7 @@ public class HaystackListFragment extends Fragment {
         });
         fab.initBackground();
 
-        haystackListAdapter = new HaystackListAdapter(rootView.getContext(), haystackList);
         listView = (ListView) rootView.findViewById(R.id.haystack_list);
-        listView.setAdapter(haystackListAdapter);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
             @Override
@@ -118,7 +109,8 @@ public class HaystackListFragment extends Fragment {
         super.onCreate(savedInstanceState);
 
         if(savedInstanceState != null){
-            haystackList = savedInstanceState.getParcelableArrayList("haystackList");
+            publicHaystackList = savedInstanceState.getParcelableArrayList("publicHaystackList");
+            privateHaystackList = savedInstanceState.getParcelableArrayList("privateHaystackList");
         }
     }
 
@@ -126,7 +118,8 @@ public class HaystackListFragment extends Fragment {
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
 
-        outState.putParcelableArrayList("haystackList", haystackList);
+        outState.putParcelableArrayList("publicHaystackList", publicHaystackList);
+        outState.putParcelableArrayList("privateHaystackList", privateHaystackList);
     }
 
     private void fetchHaystacks(){
@@ -134,8 +127,9 @@ public class HaystackListFragment extends Fragment {
     }
 
     public void updateHaystackList() {
-        haystackListAdapter = new HaystackListAdapter(rootView.getContext(), haystackList);
+        haystackListAdapter = new HaystackListAdapter(rootView.getContext());
         listView.setAdapter(haystackListAdapter);
+        haystackListAdapter.addAllItems(haystackList);
 
         haystackListAdapter.notifyDataSetChanged();
         listView.invalidate();
@@ -186,8 +180,17 @@ public class HaystackListFragment extends Fragment {
                 JSONArray privateHaystacks = json.getJSONArray("private_haystacks");
 
                 if (publicHaystacks != null || privateHaystacks != null) {
-                    haystackList = new ArrayList<Haystack>();
+                    haystackList = new ArrayList<Object>();
+                    publicHaystackList = new ArrayList<Haystack>();
+                    privateHaystackList = new ArrayList<Haystack>();
+
+
+                    //Public haystacks
+                    haystackList.add(getResources().getString(R.string.publicHeader));
                     int count = publicHaystacks.length();
+                    if(count == 0){
+                        haystackList.add(getResources().getString(R.string.noHaystackAvailable));
+                    }
 
                     for (int i = 0; i < count; i++) {
                         JSONObject haystackData = (JSONObject) publicHaystacks.getJSONObject(i);
@@ -220,10 +223,17 @@ public class HaystackListFragment extends Fragment {
                         }
 
                         Log.e("parseJson", "Adding Haystack # "+i );
+                        publicHaystackList.add(haystack);
                         haystackList.add(haystack);
                     }
 
+                    //Private haystacks
+                    haystackList.add(getResources().getString(R.string.privateHeader));
                     count = privateHaystacks.length();
+                    if(count == 0){
+                        haystackList.add(getResources().getString(R.string.noHaystackAvailable));
+                    }
+
                     for (int i = 0; i < count; i++) {
                         JSONObject haystackData = (JSONObject) privateHaystacks.getJSONObject(i);
                         Haystack haystack = new Haystack();
@@ -255,11 +265,11 @@ public class HaystackListFragment extends Fragment {
                         }
 
                         Log.e("parseJson", "Adding Haystack # "+i );
+                        privateHaystackList.add(haystack);
                         haystackList.add(haystack);
                     }
                 }else{
                     Log.d("FetchHaystacks Failure!", json.getString(AppConstants.TAG_MESSAGE));
-                    haystackList = null;
                 }
             } catch (JSONException e) {
                 e.printStackTrace();

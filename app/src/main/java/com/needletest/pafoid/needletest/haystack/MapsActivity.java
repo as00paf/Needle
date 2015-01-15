@@ -233,7 +233,7 @@ public class MapsActivity extends FragmentActivity implements GoogleApiClient.Co
     }
 
     //Location Tasks
-    public class LoadLocations extends AsyncTask<Void, Void, Boolean> {
+    private class LoadLocations extends AsyncTask<Void, Void, Boolean> {
 
         @Override
         protected void onPreExecute() {
@@ -399,7 +399,7 @@ public class MapsActivity extends FragmentActivity implements GoogleApiClient.Co
     }
 
     public void postLocation(){
-        new PostLocationTask().execute(new PostLocationParams(this, getUserName(), mCurrentLocation));
+        //new PostLocationTask().execute(new PostLocationParams(this, getUserName(), mCurrentLocation));
     }
 
     private String getUserName(){

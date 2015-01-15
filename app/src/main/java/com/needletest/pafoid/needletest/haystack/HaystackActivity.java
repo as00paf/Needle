@@ -9,46 +9,63 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.support.v4.widget.DrawerLayout;
 
-import com.google.android.gms.maps.GoogleMap;
 import com.needletest.pafoid.needletest.R;
+import com.needletest.pafoid.needletest.models.Haystack;
+
 
 public class HaystackActivity extends ActionBarActivity
-        implements HaystackNavigationDrawerFragment.NavigationDrawerCallbacks, HaystackMapFragment.OnFragmentInteractionListener {
+        implements HaystackNavigationDrawerFragment.NavigationDrawerCallbacks, HaystackMapFragment.OnFragmentInteractionListener,
+        HaystackUserListFragment.OnFragmentInteractionListener{
+
+    private static final String TAG = "HaystackActivity";
 
     private HaystackNavigationDrawerFragment mNavigationDrawerFragment;
     private CharSequence mTitle;
-    private GoogleMap mMap;
+    private Haystack haystack;
 
+    private HaystackMapFragment mapFragment;
+
+    //Lifecycle Methods
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_haystack);
 
-        mNavigationDrawerFragment = (HaystackNavigationDrawerFragment)
-                getSupportFragmentManager().findFragmentById(R.id.navigation_drawer);
+        mNavigationDrawerFragment = (HaystackNavigationDrawerFragment) getSupportFragmentManager().findFragmentById(R.id.navigation_drawer);
         mTitle = getTitle();
 
         // Set up the drawer.
-        mNavigationDrawerFragment.setUp(
-                R.id.navigation_drawer,
-                (DrawerLayout) findViewById(R.id.drawer_layout));
+        mNavigationDrawerFragment.setUp(R.id.navigation_drawer, (DrawerLayout) findViewById(R.id.drawer_layout));
+        onNavigationDrawerItemSelected(0);
+    }
+
+    @Override
+    public void onResume(){
+        super.onResume();
     }
 
     @Override
     public void onNavigationDrawerItemSelected(int position) {
-        // update the main content by replacing fragments
         FragmentManager fragmentManager = getSupportFragmentManager();
-        fragmentManager.beginTransaction()
-                .replace(R.id.container, HaystackMapFragment.newInstance())
-                .commit();
-    }
 
-    public void onSectionAttached(int number) {
-        switch (number) {
+        switch (position){
+            case 0:
+                fragmentManager.beginTransaction()
+                        .replace(R.id.container, HaystackMapFragment.newInstance())
+                        .commit();
+                break;
             case 1:
-                mTitle = getString(R.string.title_section1);
+                //User list
+                fragmentManager.beginTransaction()
+                        .replace(R.id.container, HaystackUserListFragment.newInstance(haystack))
+                        .commit();
+
+                break;
+            case 2:
+            //Share location
                 break;
         }
+
     }
 
     public void restoreActionBar() {

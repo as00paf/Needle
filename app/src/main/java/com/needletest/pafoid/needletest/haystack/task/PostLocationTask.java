@@ -1,8 +1,6 @@
 package com.needletest.pafoid.needletest.haystack.task;
 
-import android.content.SharedPreferences;
 import android.os.AsyncTask;
-import android.preference.PreferenceManager;
 import android.util.Log;
 
 import com.needletest.pafoid.needletest.AppConstants;
@@ -16,14 +14,16 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
-public class PostLocationTask extends AsyncTask<PostLocationParams, String, String> {
-
-    private static final String TAG_SUCCESS = "success";
-    private static final String TAG_MESSAGE = "message";
-
+public class PostLocationTask extends AsyncTask<Void, Void, PostLocationResult> {
     private static final String POST_LOCATION_URL = AppConstants.PROJECT_URL + "updateLocation.php";
+    private static final String TAG = "PostLocationTask";
 
     private JSONParser jsonParser = new JSONParser();
+    private PostLocationParams params;
+
+    public PostLocationTask(PostLocationParams params){
+        this.params = params;
+    }
 
     @Override
     protected void onPreExecute() {
@@ -31,46 +31,38 @@ public class PostLocationTask extends AsyncTask<PostLocationParams, String, Stri
     }
 
     @Override
-    protected String doInBackground(PostLocationParams... params) {
+    protected PostLocationResult doInBackground(Void... args) {
+        PostLocationResult result = new PostLocationResult();
+
         int success;
-
-        String lat = Double.toString(params[0].location.getLatitude());
-        String lng = Double.toString(params[0].location.getLongitude());
-
-        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(params[0].context);
-        String username = sp.getString("username", "anon");
 
         try {
             List<NameValuePair> requestParams = new ArrayList<NameValuePair>();
-            requestParams.add(new BasicNameValuePair("username", username));
-            requestParams.add(new BasicNameValuePair("lat", lat));
-            requestParams.add(new BasicNameValuePair("lng", lng));
+            requestParams.add(new BasicNameValuePair("username", params.username));
+            requestParams.add(new BasicNameValuePair("userId", params.userId));
+            requestParams.add(new BasicNameValuePair("lat", String.valueOf(params.position.latitude)));
+            requestParams.add(new BasicNameValuePair("lng", String.valueOf(params.position.longitude)));
 
-            Log.d("request!", "starting");
-
+            Log.d(TAG, "Posting Location...");
             JSONObject json = jsonParser.makeHttpRequest(POST_LOCATION_URL, "POST", requestParams);
 
-            Log.d("Post Location attempt", json.toString());
+            success = json.getInt(AppConstants.TAG_SUCCESS);
+            result.successCode = success;
 
-            success = json.getInt(TAG_SUCCESS);
             if (success == 1) {
-                Log.d("Location Added!", json.toString());
-                return json.getString(TAG_MESSAGE);
+                Log.d(TAG, json.toString());
+                result.message = json.getString(AppConstants.TAG_MESSAGE);
+                return result;
             }else{
-                Log.d("Location Failure!", json.getString(TAG_MESSAGE));
-                return json.getString(TAG_MESSAGE);
-
+                Log.e(TAG, json.getString(AppConstants.TAG_MESSAGE));
+                result.message = json.getString(AppConstants.TAG_MESSAGE);
+                return result;
             }
         } catch (JSONException e) {
             e.printStackTrace();
         }
 
         return null;
-
-    }
-
-    protected void onPostExecute(String file_url) {
-
     }
 
 }

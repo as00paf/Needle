@@ -9,7 +9,12 @@
     <FrameLayout android:id="@+id/container" android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
-    <!-- android:layout_gravity="start" tells DrawerLayout to treat
+    <!--<fragment
+        android:id="@+id/haystack_map"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        class="com.google.android.gms.maps.SupportMapFragment"/>
+
          this as a sliding drawer on the left side for left-to-right
          languages and on the right side for right-to-left languages.
          If you're not building against API 17 or higher, use
@@ -21,5 +26,6 @@
         android:layout_gravity="start"
         android:name="com.needletest.pafoid.needletest.haystack.HaystackNavigationDrawerFragment"
         tools:layout="@layout/fragment_haystack_navigation_drawer" />
+
 
 </android.support.v4.widget.DrawerLayout>

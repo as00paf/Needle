@@ -78,11 +78,14 @@ public class HaystackListFragment extends Fragment {
             @Override
             public void onItemClick(AdapterView<?> a, View v, int position,	long id) {
                 Object o = listView.getItemAtPosition(position);
-                Haystack haystackData = (Haystack) o;
+                if(o instanceof String){
+                    //Header
+                    return;
+                }
 
-                //Intent intent = new Intent(getActivity(), MapsActivity.class);
+                Haystack haystackData = (Haystack) o;
                 Intent intent = new Intent(getActivity(), HaystackActivity.class);
-                intent.putExtra("data", (Serializable) haystackData);
+                //intent.putExtra("data", (Serializable) haystackData);
                 startActivity(intent);
             }
         });

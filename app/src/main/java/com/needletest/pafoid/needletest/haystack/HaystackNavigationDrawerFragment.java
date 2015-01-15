@@ -18,42 +18,28 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
 
 import com.needletest.pafoid.needletest.R;
+import com.needletest.pafoid.needletest.models.Haystack;
 
-/**
- * Fragment used for managing interactions for and presentation of a navigation drawer.
- * See the <a href="https://developer.android.com/design/patterns/navigation-drawer.html#Interaction">
- * design guidelines</a> for a complete explanation of the behaviors implemented here.
- */
+import java.util.ArrayList;
+import java.util.List;
+
 public class HaystackNavigationDrawerFragment extends Fragment {
 
-    /**
-     * Remember the position of the selected item.
-     */
     private static final String STATE_SELECTED_POSITION = "selected_navigation_drawer_position";
-
-    /**
-     * Per the design guidelines, you should show the drawer on launch until the user manually
-     * expands it. This shared preference tracks this.
-     */
     private static final String PREF_USER_LEARNED_DRAWER = "navigation_drawer_learned";
 
-    /**
-     * A pointer to the current callbacks instance (the Activity).
-     */
     private NavigationDrawerCallbacks mCallbacks;
 
-    /**
-     * Helper component that ties the action bar to the navigation drawer.
-     */
     private ActionBarDrawerToggle mDrawerToggle;
 
     private DrawerLayout mDrawerLayout;
     private ListView mDrawerListView;
+    private HaystackNavigationDrawerAdapter mDrawerListAdapter;
+    private List<HaystackDrawerItem> dataList;
     private View mFragmentContainerView;
 
     private int mCurrentSelectedPosition = 0;
@@ -67,8 +53,6 @@ public class HaystackNavigationDrawerFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // Read in the flag indicating whether or not the user has demonstrated awareness of the
-        // drawer. See PREF_USER_LEARNED_DRAWER for details.
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getActivity());
         mUserLearnedDrawer = sp.getBoolean(PREF_USER_LEARNED_DRAWER, false);
 
@@ -79,35 +63,30 @@ public class HaystackNavigationDrawerFragment extends Fragment {
 
         // Select either the default item (0) or the last selected item.
         selectItem(mCurrentSelectedPosition);
+
+        //Add items
+        dataList = new ArrayList<HaystackDrawerItem>();
+        dataList.add(new HaystackDrawerItem(HaystackDrawerItem.SimpleItem, getResources().getString(R.string.title_haystacks), R.drawable.ic_action_group));
+        dataList.add(new HaystackDrawerItem(HaystackDrawerItem.SimpleItem, getResources().getString(R.string.userList), R.drawable.ic_action_group));
+        dataList.add(new HaystackDrawerItem(HaystackDrawerItem.SimpleItem, getResources().getString(R.string.shareLocation), R.drawable.ic_action_location_found));
     }
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        // Indicate that this fragment would like to influence the set of actions in the action bar.
         setHasOptionsMenu(true);
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        mDrawerListView = (ListView) inflater.inflate(
-                R.layout.fragment_haystack_navigation_drawer, container, false);
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        mDrawerListAdapter = new HaystackNavigationDrawerAdapter(getActionBar().getThemedContext(), R.layout.haystack_drawer_item, dataList, inflater);
+
+        mDrawerListView = (ListView) inflater.inflate(R.layout.fragment_haystack_navigation_drawer, container, false);
         mDrawerListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                selectItem(position);
-            }
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {selectItem(position);}
         });
-        mDrawerListView.setAdapter(new ArrayAdapter<String>(
-                getActionBar().getThemedContext(),
-                android.R.layout.simple_list_item_activated_1,
-                android.R.id.text1,
-                new String[]{
-                        getString(R.string.title_section1),
-                        getString(R.string.title_section2),
-                        getString(R.string.title_section3),
-                }));
+        mDrawerListView.setAdapter(mDrawerListAdapter);
         mDrawerListView.setItemChecked(mCurrentSelectedPosition, true);
         return mDrawerListView;
     }

@@ -2,6 +2,7 @@ package com.needletest.pafoid.needletest.models;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.text.TextUtils;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -53,7 +54,17 @@ public class Haystack implements Serializable, Parcelable {
     }
 
     public String getName() {
-        return name;
+        StringBuffer res = new StringBuffer();
+        String[] strArr = name.split(" ");
+        for (String str : strArr) {
+            char[] stringArray = str.trim().toCharArray();
+            stringArray[0] = Character.toUpperCase(stringArray[0]);
+            str = new String(stringArray);
+
+            res.append(str).append(" ");
+        }
+
+        return res.toString();
     }
 
     public void setName(String name) {

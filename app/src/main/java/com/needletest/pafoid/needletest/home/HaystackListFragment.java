@@ -68,7 +68,7 @@ public class HaystackListFragment extends Fragment {
             public void onClick(View v) {
                 FragmentManager fragmentManager = getFragmentManager();
                 fragmentManager.beginTransaction()
-                        .replace(R.id.container, CreateHaystackFragment.newInstance())
+                        .replace(R.id.home_fragment_container, CreateHaystackFragment.newInstance())
                         .commit();
             }
         });
@@ -94,6 +94,8 @@ public class HaystackListFragment extends Fragment {
 
         if(haystackList == null){
             fetchHaystacks();
+        }else {
+            updateHaystackList();
         }
 
         return rootView;
@@ -107,7 +109,7 @@ public class HaystackListFragment extends Fragment {
             publicHaystackList = savedInstanceState.getParcelableArrayList("publicHaystackList");
             privateHaystackList = savedInstanceState.getParcelableArrayList("privateHaystackList");
 
-            if(publicHaystackList.size() >  0 || privateHaystackList.size() >  0 ){
+            if(haystackList == null && (publicHaystackList.size() >  0 || privateHaystackList.size() >  0 )){
                 haystackList = new ArrayList<Object>();
                 haystackList.add(getResources().getString(R.string.publicHeader));
 
@@ -131,6 +133,8 @@ public class HaystackListFragment extends Fragment {
                     haystackList.add(privateHaystackList.get(i));
                 }
             }
+        }else {
+            updateHaystackList();
         }
     }
 
@@ -142,7 +146,7 @@ public class HaystackListFragment extends Fragment {
         outState.putParcelableArrayList("privateHaystackList", privateHaystackList);
     }
 
-    private void fetchHaystacks(){
+    public void fetchHaystacks(){
         FetchHaystacksParams params = new FetchHaystacksParams(getUserName(), String.valueOf(getUserId()), rootView.getContext(), progressbar);
 
         try{

@@ -9,6 +9,8 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.ActionBarActivity;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -38,6 +40,7 @@ import com.needletest.pafoid.needletest.haystack.task.RetrieveLocationsParams;
 import com.needletest.pafoid.needletest.haystack.task.RetrieveLocationsResult;
 import com.needletest.pafoid.needletest.haystack.task.RetrieveLocationsTask;
 import com.needletest.pafoid.needletest.models.Haystack;
+import com.shamanland.fab.FloatingActionButton;
 
 import org.json.JSONArray;
 
@@ -66,6 +69,7 @@ public class HaystackMapFragment extends Fragment implements GoogleApiClient.Con
     private int userId = -1;
     private Haystack haystack;
     private String haystackId;
+    private boolean isOwner;
 
     private OnFragmentInteractionListener mListener;
     private View rootView;
@@ -141,7 +145,24 @@ public class HaystackMapFragment extends Fragment implements GoogleApiClient.Con
 
         getChildFragmentManager().beginTransaction().add(R.id.haystack_map_container, mMapFragment).commit();
 
+        isOwner = haystack.getOwner() == getUserId();
+        FloatingActionButton fab = (FloatingActionButton) rootView.findViewById(R.id.fab_add_users);
+        if(isOwner){
+            fab.setSize(FloatingActionButton.SIZE_NORMAL);
+            fab.setColor(getResources().getColor(R.color.primary));
+
+            fab.initBackground();
+            fab.setImageResource(R.drawable.ic_action_add_person);
+            fab.setVisibility(View.VISIBLE);
+        }else{
+            fab.setVisibility(View.INVISIBLE);
+        }
+
         return rootView;
+    }
+
+    private ActionBar getActionBar() {
+        return ((ActionBarActivity) getActivity()).getSupportActionBar();
     }
 
     public void onButtonPressed(Uri uri) {

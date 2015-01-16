@@ -34,13 +34,13 @@ public class HaystackActivity extends ActionBarActivity
         setContentView(R.layout.activity_haystack);
 
         mNavigationDrawerFragment = (HaystackNavigationDrawerFragment) getSupportFragmentManager().findFragmentById(R.id.navigation_drawer);
-        mTitle = getTitle();
 
         // Set up the drawer.
         mNavigationDrawerFragment.setUp(R.id.navigation_drawer, (DrawerLayout) findViewById(R.id.drawer_layout));
         onNavigationDrawerItemSelected(0);
 
         haystack = (Haystack) getIntent().getExtras().getParcelable(AppConstants.HAYSTACK_DATA_KEY);
+        mTitle = haystack.getName();
     }
 
     @Override
@@ -55,13 +55,13 @@ public class HaystackActivity extends ActionBarActivity
         switch (position){
             case 0:
                 fragmentManager.beginTransaction()
-                        .replace(R.id.container, getHaystackMapFragment())
+                        .replace(R.id.haystack_fragment_container, getHaystackMapFragment())
                         .commit();
                 break;
             case 1:
                 //User list
                 fragmentManager.beginTransaction()
-                        .replace(R.id.container, getHaystackUserListFragment())
+                        .replace(R.id.haystack_fragment_container, getHaystackUserListFragment())
                         .commit();
 
                 break;
@@ -124,6 +124,8 @@ public class HaystackActivity extends ActionBarActivity
     public HaystackUserListFragment getHaystackUserListFragment() {
         if(haystackUserListFragment==null){
             haystackUserListFragment = HaystackUserListFragment.newInstance(haystack);
+            mTitle = haystack.getName();
+            restoreActionBar();
         }
 
         return haystackUserListFragment;

@@ -74,7 +74,6 @@ public class LoginTask extends AsyncTask<Void, Void, AuthenticationResult> {
 
                 edit.commit();
 
-                //Intent i = new Intent(Login.this, MapsActivity.class);
                 Intent i = new Intent(params.context, HomeActivity.class);
                 params.context.startActivity(i);
 

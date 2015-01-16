@@ -26,6 +26,7 @@
     <string name="noHaystackAvailable">No Haystacks Available</string>
     <string name="activeUntil">Active Until</string>
     <string name="activeUsers"> Active Users</string>
+    <string name="refresh">Refresh</string>
 
     <!-- Create Haystack Fragment -->
     <string name="change">Change</string>

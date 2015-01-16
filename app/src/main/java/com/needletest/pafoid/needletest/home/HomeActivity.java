@@ -59,7 +59,7 @@ public class HomeActivity extends ActionBarActivity
         if(null != fragment){
             FragmentManager fragmentManager = getSupportFragmentManager();
             fragmentManager.beginTransaction()
-                    .replace(R.id.container, fragment)
+                    .replace(R.id.home_fragment_container, fragment)
                     .commit();
         }else if(intent != null){
             startActivity(intent);

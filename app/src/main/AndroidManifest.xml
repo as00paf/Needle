@@ -43,17 +43,12 @@
             android:label="@string/app_name" >
         </activity>
         <activity
-            android:name=".haystack.MapsActivity"
-            android:label="@string/title_activity_maps" >
-        </activity>
-        <activity
             android:name=".home.HomeActivity"
             android:label="@string/title_activity_haystack"
             android:theme="@style/AppTheme2" >
         </activity>
         <activity
             android:name=".haystack.HaystackActivity"
-            android:label="@string/title_activity_haystack"
             android:theme="@style/AppTheme2" >
         </activity>
         <activity

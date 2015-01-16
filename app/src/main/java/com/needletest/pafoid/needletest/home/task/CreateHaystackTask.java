@@ -8,7 +8,7 @@ import android.util.Log;
 
 import com.needletest.pafoid.needletest.AppConstants;
 import com.needletest.pafoid.needletest.R;
-import com.needletest.pafoid.needletest.haystack.MapsActivity;
+import com.needletest.pafoid.needletest.haystack.HaystackActivity;
 import com.needletest.pafoid.needletest.models.User;
 import com.needletest.pafoid.needletest.utils.JSONParser;
 
@@ -82,10 +82,9 @@ public class CreateHaystackTask extends AsyncTask<Void, Void, CreateHaystackResu
 
             if (success == 1) {
                 params.haystack.setId(json.getInt(AppConstants.TAG_HAYSTACK_ID));
-
-                Intent intent = new Intent(params.context, MapsActivity.class);
-                intent.putExtra("haystack", (Parcelable) params.haystack);
-                params.context.startActivity(intent);
+                params.haystack.setUsers(haystackUsers);
+                params.haystack.setActiveUsers(haystackActiveUsers);
+                params.haystack.setBannedUsers(haystackBannedUsers);
 
                 result.haystack = params.haystack;
                 result.message = json.getString(AppConstants.TAG_MESSAGE);;

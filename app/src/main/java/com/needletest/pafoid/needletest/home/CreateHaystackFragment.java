@@ -9,6 +9,8 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.preference.PreferenceManager;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -25,34 +27,19 @@ import android.widget.ToggleButton;
 
 import com.needletest.pafoid.needletest.AppConstants;
 import com.needletest.pafoid.needletest.R;
-import com.needletest.pafoid.needletest.haystack.MapsActivity;
+import com.needletest.pafoid.needletest.haystack.HaystackActivity;
 import com.needletest.pafoid.needletest.home.task.CreateHaystackResult;
 import com.needletest.pafoid.needletest.home.task.CreateHaystackTask;
 import com.needletest.pafoid.needletest.home.task.CreateHaystackTaskParams;
 import com.needletest.pafoid.needletest.models.Haystack;
 import com.needletest.pafoid.needletest.models.User;
-import com.needletest.pafoid.needletest.utils.JSONParser;
-
-import org.apache.http.NameValuePair;
-import org.apache.http.message.BasicNameValuePair;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.List;
 import java.util.Locale;
 
-/**
- * A simple {@link Fragment} subclass.
- * Activities that contain this fragment must implement the
- * {@link CreateHaystackFragment.OnFragmentInteractionListener} interface
- * to handle interaction events.
- * Use the {@link CreateHaystackFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
 public class CreateHaystackFragment extends Fragment {
 
     public static final String SQL_DATE_FORMAT = "yyyy-MM-dd";
@@ -220,6 +207,17 @@ public class CreateHaystackFragment extends Fragment {
             CreateHaystackResult result = new CreateHaystackTask(params).execute().get();
             if(result.successCode == 0){
 
+            }else{
+                FragmentManager manager = getActivity().getSupportFragmentManager();
+                FragmentTransaction trans = manager.beginTransaction();
+                trans.remove(this);
+                trans.commit();
+
+                ((HomeActivity) getActivity()).onNavigationDrawerItemSelected(0);
+
+                Intent intent = new Intent(params.context, HaystackActivity.class);
+                intent.putExtra(AppConstants.HAYSTACK_DATA_KEY, (Parcelable) haystack);
+                params.context.startActivity(intent);
             }
         }catch (Exception e) {
         }

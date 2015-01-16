@@ -31,6 +31,9 @@
     <string name="change">Change</string>
     <string name="creatingHaystack">Creating Haystack...</string>
 
+    <!-- Haystack Map Fragment -->
+    <string name="map_view">Map View</string>
+
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
 

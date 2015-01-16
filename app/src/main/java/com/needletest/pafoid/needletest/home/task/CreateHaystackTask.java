@@ -9,6 +9,7 @@ import android.util.Log;
 import com.needletest.pafoid.needletest.AppConstants;
 import com.needletest.pafoid.needletest.R;
 import com.needletest.pafoid.needletest.haystack.MapsActivity;
+import com.needletest.pafoid.needletest.models.User;
 import com.needletest.pafoid.needletest.utils.JSONParser;
 
 import org.apache.http.NameValuePair;
@@ -55,22 +56,22 @@ public class CreateHaystackTask extends AsyncTask<Void, Void, CreateHaystackResu
             requestParams.add(new BasicNameValuePair("pictureURL", params.haystack.getPictureURL()));
 
             int i;
-            ArrayList<String> haystackUsers = params.haystack.getUsers();
+            ArrayList<User> haystackUsers = params.haystack.getUsers();
             for(i=0;i<haystackUsers.size();i++){
-                String user = haystackUsers.get(i);
-                requestParams.add(new BasicNameValuePair("haystack_user", user));
+                User user = haystackUsers.get(i);
+                requestParams.add(new BasicNameValuePair("haystack_user", String.valueOf(user.getUserId())));
             }
 
-            ArrayList<String> haystackActiveUsers = params.haystack.getActiveUsers();
+            ArrayList<User> haystackActiveUsers = params.haystack.getActiveUsers();
             for(i=0;i<haystackActiveUsers.size();i++){
-                String user = haystackActiveUsers.get(i);
-                requestParams.add(new BasicNameValuePair("haystack_active_user", user));
+                User user = haystackActiveUsers.get(i);
+                requestParams.add(new BasicNameValuePair("haystack_active_user", String.valueOf(user.getUserId())));
             }
 
-            ArrayList<String> haystackBannedUsers = params.haystack.getBannedUsers();
+            ArrayList<User> haystackBannedUsers = params.haystack.getBannedUsers();
             for(i=0;i<haystackBannedUsers.size();i++){
-                String user = haystackBannedUsers.get(i);
-                requestParams.add(new BasicNameValuePair("haystack_banned_user", user));
+                User user = haystackBannedUsers.get(i);
+                requestParams.add(new BasicNameValuePair("haystack_banned_user", String.valueOf(user.getUserId())));
             }
 
             Log.d(TAG, "Creating Haystack ...");

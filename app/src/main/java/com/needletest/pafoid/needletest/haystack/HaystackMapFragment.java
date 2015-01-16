@@ -121,13 +121,15 @@ public class HaystackMapFragment extends Fragment implements GoogleApiClient.Con
         // Inflate the layout for this fragment
         rootView = inflater.inflate(R.layout.fragment_haystack_map, container, false);
 
+        updateValuesFromBundle(savedInstanceState);
+
         //Map
         /*if (GooglePlayServicesUtil.isGooglePlayServicesAvailable(getActivity()) != ConnectionResult.SUCCESS) {
             Log.e(TAG, "Google Play Services Unavailable");
         }else{
             setUpMapIfNeeded();
-            updateValuesFromBundle(savedInstanceState);
         }*/
+
 
         mMapFragment = new SupportMapFragment() {
             @Override
@@ -136,8 +138,8 @@ public class HaystackMapFragment extends Fragment implements GoogleApiClient.Con
                 setUpMapIfNeeded();
             }
         };
-        getChildFragmentManager().beginTransaction().add(R.id.haystack_map_container, mMapFragment).commit();
 
+        getChildFragmentManager().beginTransaction().add(R.id.haystack_map_container, mMapFragment).commit();
 
         return rootView;
     }
@@ -146,17 +148,6 @@ public class HaystackMapFragment extends Fragment implements GoogleApiClient.Con
         if (mListener != null) {
             mListener.onFragmentInteraction(uri);
         }
-    }
-
-    @Override
-    public void onResume(){
-        super.onResume();
-
-        /*if (mGoogleApiClient.isConnected() && !mRequestingLocationUpdates && mMap != null) {
-            startLocationUpdates();
-            RetrieveLocationsParams params =  new RetrieveLocationsParams(getUserName(), String.valueOf(getUserId()), haystackId);
-            new RetrieveLocationsTask(params).execute();
-        }*/
     }
 
     @Override
@@ -200,6 +191,8 @@ public class HaystackMapFragment extends Fragment implements GoogleApiClient.Con
                 Log.i(TAG, "Map set up");
                 connectToApiClient();
             }
+        }else if(mGoogleApiClient.isConnected()){
+           resumeOperations();
         }
     }
 
@@ -245,6 +238,8 @@ public class HaystackMapFragment extends Fragment implements GoogleApiClient.Con
         moveCamera();
 
         postLocation();
+        RetrieveLocationsParams params =  new RetrieveLocationsParams(getUserName(), String.valueOf(getUserId()), haystackId);
+        new RetrieveLocationsTask(params).execute();
     }
 
     @Override
@@ -279,6 +274,50 @@ public class HaystackMapFragment extends Fragment implements GoogleApiClient.Con
         retrieveLocations();
     }
 
+    private void resumeOperations(){
+        mMap = mMapFragment.getMap();
+
+        //Add user's marker back
+        MarkerOptions markerOptions = new MarkerOptions();
+        markerOptions.position(mCurrentPosition);
+        mMarker = mMap.addMarker(markerOptions);
+
+        //Add other user's markers back
+        Log.i(TAG,"Markers to add : "+mLocationList.size());
+        for (int i = 0; i < mLocationList.size(); i++) {
+            HashMap<String, Object> map = mLocationList.get(i);
+            String id = map.get(AppConstants.TAG_USER_ID).toString();
+            Double lat = (Double) map.get(AppConstants.TAG_LAT);
+            Double lng = (Double) map.get(AppConstants.TAG_LNG);
+
+            if(!TextUtils.isEmpty(id) && !id.equals(getUserName())){
+                Marker marker;
+                LatLng position = new LatLng(lat, lng);
+
+                markerOptions = new MarkerOptions();
+                markerOptions.position(position);
+                BitmapDescriptor icon = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_VIOLET);
+                markerOptions.icon(icon);
+
+                marker = mMap.addMarker(markerOptions);
+                marker.setPosition(position);
+
+                Log.i(TAG,"Adding marker with id : "+id+" to map.");
+
+                marker.setTitle(id+"'s Position");
+                marker.showInfoWindow();
+            }
+        }
+
+        startLocationUpdates();
+        updateMap();
+        moveCamera();
+
+        postLocation();
+        RetrieveLocationsParams params =  new RetrieveLocationsParams(getUserName(), String.valueOf(getUserId()), haystackId);
+        new RetrieveLocationsTask(params).execute();
+    }
+
     public void updateMap() {
         //Update user's marker
         if(mCurrentLocation != null){
@@ -295,7 +334,7 @@ public class HaystackMapFragment extends Fragment implements GoogleApiClient.Con
         Log.i(TAG,"Markers to add : "+mLocationList.size());
         for (int i = 0; i < mLocationList.size(); i++) {
             HashMap<String, Object> map = mLocationList.get(i);
-            String id = map.get(AppConstants.TAG_LOCATION_ID).toString();
+            String id = map.get(AppConstants.TAG_USER_ID).toString();
             Double lat = (Double) map.get(AppConstants.TAG_LAT);
             Double lng = (Double) map.get(AppConstants.TAG_LNG);
 
@@ -331,12 +370,7 @@ public class HaystackMapFragment extends Fragment implements GoogleApiClient.Con
                     markerOptions.icon(icon);
 
                     marker = mMap.addMarker(markerOptions);
-
-                    if(marker != null){
-                        marker = mMap.addMarker(markerOptions);
-                    }else{
-                        marker.setPosition(position);
-                    }
+                    marker.setPosition(position);
 
                     Log.i(TAG,"Adding marker with id : "+id+" to map.");
 
@@ -374,10 +408,7 @@ public class HaystackMapFragment extends Fragment implements GoogleApiClient.Con
     }
 
     public void moveCamera(){
-        Double lat = mCurrentLocation.getLatitude();
-        Double lng = mCurrentLocation.getLongitude();
-        LatLng position = new LatLng(lat, lng);
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(position, 100));
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(mCurrentPosition, 100));
     }
 
     public void postLocation(){

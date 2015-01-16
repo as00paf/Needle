@@ -4,16 +4,27 @@ import android.app.Activity;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.ActionBarActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
 
 import com.needletest.pafoid.needletest.R;
 import com.needletest.pafoid.needletest.models.Haystack;
+import com.needletest.pafoid.needletest.models.User;
+
+import java.util.ArrayList;
 
 public class HaystackUserListFragment extends Fragment {
     private OnFragmentInteractionListener mListener;
     private View rootView;
+    private ListView listView;
+    private HaystackUserListAdapter listAdapter;
+    private ArrayList<User> userList;
+
     private Haystack haystack;
 
     public static HaystackUserListFragment newInstance(Haystack haystack) {
@@ -41,6 +52,12 @@ public class HaystackUserListFragment extends Fragment {
         rootView = inflater.inflate(R.layout.fragment_haystack_user_list, container, false);
 
         //Populate list
+        listView = (ListView) rootView.findViewById(R.id.haystackUserList);
+        userList = haystack.getUsers();
+        if(userList != null){
+            listAdapter = new HaystackUserListAdapter(getActionBar().getThemedContext(), R.layout.haystack_drawer_item, userList, inflater);
+            listView.setAdapter(listAdapter);
+        }
 
         return rootView;
     }
@@ -73,18 +90,11 @@ public class HaystackUserListFragment extends Fragment {
         mListener = null;
     }
 
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p/>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
-     */
+    private ActionBar getActionBar() {
+        return ((ActionBarActivity) getActivity()).getSupportActionBar();
+    }
+
     public interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
         public void onFragmentInteraction(Uri uri);
     }
 

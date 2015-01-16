@@ -57,13 +57,13 @@ public class RetrieveLocationsTask extends AsyncTask<Void, Void, RetrieveLocatio
                 for (int i = 0; i < result.locations.length(); i++) {
                     JSONObject c = result.locations.getJSONObject(i);
 
-                    String id = c.getString(AppConstants.TAG_LOCATION_ID);
+                    String id = c.getString(AppConstants.TAG_USER_ID);
                     Double lat = c.getDouble(AppConstants.TAG_LAT);
                     Double lng = c.getDouble(AppConstants.TAG_LNG);
 
                     HashMap<String, Object> map = new HashMap<String, Object>();
 
-                    map.put(AppConstants.TAG_LOCATION_ID, id);
+                    map.put(AppConstants.TAG_USER_ID, id);
                     map.put(AppConstants.TAG_LAT, lat);
                     map.put(AppConstants.TAG_LNG, lng);
 

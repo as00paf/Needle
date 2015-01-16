@@ -9,6 +9,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.support.v4.widget.DrawerLayout;
 
+import com.needletest.pafoid.needletest.AppConstants;
 import com.needletest.pafoid.needletest.R;
 import com.needletest.pafoid.needletest.models.Haystack;
 
@@ -23,7 +24,8 @@ public class HaystackActivity extends ActionBarActivity
     private CharSequence mTitle;
     private Haystack haystack;
 
-    private HaystackMapFragment mapFragment;
+    private HaystackMapFragment haystackMapFragment;
+    private HaystackUserListFragment haystackUserListFragment;
 
     //Lifecycle Methods
     @Override
@@ -37,6 +39,8 @@ public class HaystackActivity extends ActionBarActivity
         // Set up the drawer.
         mNavigationDrawerFragment.setUp(R.id.navigation_drawer, (DrawerLayout) findViewById(R.id.drawer_layout));
         onNavigationDrawerItemSelected(0);
+
+        haystack = (Haystack) getIntent().getExtras().getParcelable(AppConstants.HAYSTACK_DATA_KEY);
     }
 
     @Override
@@ -51,13 +55,13 @@ public class HaystackActivity extends ActionBarActivity
         switch (position){
             case 0:
                 fragmentManager.beginTransaction()
-                        .replace(R.id.container, HaystackMapFragment.newInstance())
+                        .replace(R.id.container, getHaystackMapFragment())
                         .commit();
                 break;
             case 1:
                 //User list
                 fragmentManager.beginTransaction()
-                        .replace(R.id.container, HaystackUserListFragment.newInstance(haystack))
+                        .replace(R.id.container, getHaystackUserListFragment())
                         .commit();
 
                 break;
@@ -107,5 +111,21 @@ public class HaystackActivity extends ActionBarActivity
     @Override
     public void onFragmentInteraction(Uri uri) {
 
+    }
+
+    public HaystackMapFragment getHaystackMapFragment() {
+        if(haystackMapFragment==null){
+            haystackMapFragment = HaystackMapFragment.newInstance();
+        }
+
+        return haystackMapFragment;
+    }
+
+    public HaystackUserListFragment getHaystackUserListFragment() {
+        if(haystackUserListFragment==null){
+            haystackUserListFragment = HaystackUserListFragment.newInstance(haystack);
+        }
+
+        return haystackUserListFragment;
     }
 }

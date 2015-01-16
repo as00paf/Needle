@@ -66,7 +66,7 @@ public class HaystackNavigationDrawerFragment extends Fragment {
 
         //Add items
         dataList = new ArrayList<HaystackDrawerItem>();
-        dataList.add(new HaystackDrawerItem(HaystackDrawerItem.SimpleItem, getResources().getString(R.string.title_haystacks), R.drawable.ic_action_group));
+        dataList.add(new HaystackDrawerItem(HaystackDrawerItem.SimpleItem, getResources().getString(R.string.map_view), R.drawable.ic_action_map));
         dataList.add(new HaystackDrawerItem(HaystackDrawerItem.SimpleItem, getResources().getString(R.string.userList), R.drawable.ic_action_group));
         dataList.add(new HaystackDrawerItem(HaystackDrawerItem.SimpleItem, getResources().getString(R.string.shareLocation), R.drawable.ic_action_location_found));
     }

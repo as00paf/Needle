@@ -12,9 +12,9 @@ public class Haystack implements Serializable, Parcelable {
     private String name;
     private Boolean isPublic;
     private String timeLimit;
-    private ArrayList<String> users;
-    private ArrayList<String> activeUsers;
-    private ArrayList<String> bannedUsers;
+    private ArrayList<User> users;
+    private ArrayList<User> activeUsers;
+    private ArrayList<User> bannedUsers;
     private String pictureURL = "";
     private String zone = "";
     private int owner;
@@ -33,8 +33,11 @@ public class Haystack implements Serializable, Parcelable {
         this.name = in.readString();
         this.isPublic = (Boolean) in.readValue(ClassLoader.getSystemClassLoader());
         this.timeLimit = in.readString();
+        this.users = new ArrayList<>();
         in.readList(this.users, getClass().getClassLoader());
+        this.activeUsers = new ArrayList<>();
         in.readList(this.activeUsers, getClass().getClassLoader());
+        this.bannedUsers = new ArrayList<>();
         in.readList(this.bannedUsers, getClass().getClassLoader());
         this.pictureURL = in.readString();
         this.zone = in.readString();
@@ -73,34 +76,34 @@ public class Haystack implements Serializable, Parcelable {
         this.timeLimit = timeLimit;
     }
 
-    public ArrayList<String> getUsers() {
+    public ArrayList<User> getUsers() {
         return users;
     }
 
-    public void setUsers(ArrayList<String> value) {
+    public void setUsers(ArrayList<User> value) {
         this.users = value;
     }
 
-    public ArrayList<String> getActiveUsers() {
+    public ArrayList<User> getActiveUsers() {
         if(activeUsers == null){
-            activeUsers = new ArrayList<String>();
+            activeUsers = new ArrayList<User>();
         }
 
         return activeUsers;
     }
 
-    public void setActiveUsers(ArrayList<String> value) {
+    public void setActiveUsers(ArrayList<User> value) {
         this.activeUsers = value;
     }
 
-    public ArrayList<String> getBannedUsers() {
+    public ArrayList<User> getBannedUsers() {
         if(bannedUsers == null){
-            bannedUsers = new ArrayList<String>();
+            bannedUsers = new ArrayList<User>();
         }
         return bannedUsers;
     }
 
-    public void setBannedUsers(ArrayList<String> value) {
+    public void setBannedUsers(ArrayList<User> value) {
         this.bannedUsers = value;
     }
 

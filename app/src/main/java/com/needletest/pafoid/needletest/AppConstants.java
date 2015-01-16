@@ -11,9 +11,10 @@ public class AppConstants {
     public static final String TAG_SUCCESS = "success";
     public static final String TAG_MESSAGE = "message";
     public static final String TAG_HAYSTACK_ID = "haystackId";
+    public static final String TAG_USER_NAME = "userName";
     public static final String TAG_USER_ID = "userId";
+    public static final String TAG_PICTURE_URL = "pictureURL";
     public static final String TAG_LOCATIONS = "locations";
-    public static final String TAG_LOCATION_ID = "userId";
     public static final String TAG_LAT = "lat";
     public static final String TAG_LNG = "lng";
 

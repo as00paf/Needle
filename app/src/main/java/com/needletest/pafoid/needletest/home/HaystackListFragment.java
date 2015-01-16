@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -16,6 +17,7 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 
+import com.needletest.pafoid.needletest.AppConstants;
 import com.needletest.pafoid.needletest.R;
 import com.needletest.pafoid.needletest.haystack.HaystackActivity;
 import com.needletest.pafoid.needletest.home.task.FetchHaystacksParams;
@@ -85,7 +87,7 @@ public class HaystackListFragment extends Fragment {
 
                 Haystack haystackData = (Haystack) o;
                 Intent intent = new Intent(getActivity(), HaystackActivity.class);
-                //intent.putExtra("data", (Serializable) haystackData);
+                intent.putExtra(AppConstants.HAYSTACK_DATA_KEY, (Parcelable) haystackData);
                 startActivity(intent);
             }
         });

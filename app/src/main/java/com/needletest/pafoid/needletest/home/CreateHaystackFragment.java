@@ -30,6 +30,7 @@ import com.needletest.pafoid.needletest.home.task.CreateHaystackResult;
 import com.needletest.pafoid.needletest.home.task.CreateHaystackTask;
 import com.needletest.pafoid.needletest.home.task.CreateHaystackTaskParams;
 import com.needletest.pafoid.needletest.models.Haystack;
+import com.needletest.pafoid.needletest.models.User;
 import com.needletest.pafoid.needletest.utils.JSONParser;
 
 import org.apache.http.NameValuePair;
@@ -195,18 +196,23 @@ public class CreateHaystackFragment extends Fragment {
 
         haystack.setOwner(getUserId());
 
+        //Current User
+        User user = new User();
+        user.setUserId(getUserId());
+        user.setUserName(getUserName());
+
         //Users
-        ArrayList<String> users = new ArrayList<String>();
-        users.add(String.valueOf(getUserId()));
+        ArrayList<User> users = new ArrayList<User>();
+        users.add(user);
         haystack.setUsers(users);
 
         //Active users
-        ArrayList<String> activeUsers = new ArrayList<String>();
-        activeUsers.add(getUserName());
+        ArrayList<User> activeUsers = new ArrayList<User>();
+        activeUsers.add(user);
         haystack.setActiveUsers(activeUsers);
 
         //Banned users
-        ArrayList<String> bannedUsers = new ArrayList<String>();
+        ArrayList<User> bannedUsers = new ArrayList<User>();
         haystack.setBannedUsers(bannedUsers);
 
         CreateHaystackTaskParams params = new CreateHaystackTaskParams(rootView.getContext(), haystack);

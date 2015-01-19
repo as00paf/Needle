@@ -67,6 +67,14 @@ public class HaystackActivity extends ActionBarActivity
                 break;
             case 2:
             //Share location
+                if(getHaystackMapFragment().isPostingLocationUpdates()){
+                    getHaystackMapFragment().stopSharingLocation();
+                   mNavigationDrawerFragment.setLocationLabel(getResources().getString(R.string.shareLocation));
+                }else{
+                    getHaystackMapFragment().shareLocation();
+                    mNavigationDrawerFragment.setLocationLabel(getResources().getString(R.string.stopSharingLocation));
+                }
+
                 break;
         }
 

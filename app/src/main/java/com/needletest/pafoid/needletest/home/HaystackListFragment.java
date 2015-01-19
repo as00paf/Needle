@@ -163,6 +163,10 @@ public class HaystackListFragment extends Fragment {
     }
 
     public void updateHaystackList() {
+        if(rootView == null){
+            return;
+        }
+
         haystackListAdapter = new HaystackListAdapter(rootView.getContext());
         listView.setAdapter(haystackListAdapter);
         haystackListAdapter.addAllItems(haystackList);

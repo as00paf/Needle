@@ -79,6 +79,7 @@ public class FetchHaystacksTask extends AsyncTask<Void, Void, FetchHaystacksResu
                     JSONObject haystackData = (JSONObject) publicHaystacks.getJSONObject(i);
                     Haystack haystack = new Haystack();
 
+                    haystack.setId(haystackData.getInt("id"));
                     haystack.setName(haystackData.getString("name"));
                     haystack.setIsPublic(haystackData.getInt("isPublic") == 1);
                     haystack.setOwner(haystackData.getInt("owner"));
@@ -108,7 +109,7 @@ public class FetchHaystacksTask extends AsyncTask<Void, Void, FetchHaystacksResu
                         User activeUser = new User();
                         try{
                             activeUser.setUserId(activeUserData.getInt(AppConstants.TAG_USER_ID));
-                            activeUser.setUserName(activeUserData.getString(AppConstants.TAG_USER_NAME));
+                            activeUser.setUserName(activeUserData.getString("username"));
                             //activeUser.setPictureURL(activeUserData.getString(AppConstants.TAG_PICTURE_URL));
                         }catch(Exception e){
                             Log.e(TAG, "Error with haystack active user" );

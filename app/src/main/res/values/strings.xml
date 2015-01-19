@@ -58,5 +58,6 @@
 
     <string name="userList">User List</string>
     <string name="shareLocation">Share My Location</string>
+    <string name="stopSharingLocation">Stop Sharing Location</string>
 
 </resources>

@@ -249,6 +249,12 @@ public class HaystackNavigationDrawerFragment extends Fragment {
         return ((ActionBarActivity) getActivity()).getSupportActionBar();
     }
 
+    public void setLocationLabel(String value){
+        HaystackDrawerItem item = dataList.get(2);
+        item.setItemName(value);
+        mDrawerListAdapter.notifyDataSetChanged();
+    }
+
     /**
      * Callbacks interface that all activities using this fragment must implement.
      */

@@ -4,9 +4,16 @@ import android.app.Activity;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.Paint;
+import android.graphics.Point;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.SystemClock;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
@@ -16,6 +23,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Interpolator;
+import android.view.animation.LinearInterpolator;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -26,14 +35,20 @@ import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.Projection;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.Circle;
+import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.needletest.pafoid.needletest.AppConstants;
 import com.needletest.pafoid.needletest.R;
+import com.needletest.pafoid.needletest.haystack.task.ActivateUserParams;
+import com.needletest.pafoid.needletest.haystack.task.ActivateUserResult;
+import com.needletest.pafoid.needletest.haystack.task.ActivateUserTask;
 import com.needletest.pafoid.needletest.haystack.task.PostLocationParams;
 import com.needletest.pafoid.needletest.haystack.task.PostLocationTask;
 import com.needletest.pafoid.needletest.haystack.task.RetrieveLocationsParams;
@@ -51,6 +66,8 @@ import java.util.HashMap;
 
 public class HaystackMapFragment extends Fragment implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener{
     public static final String TAG = "HaystackMapFragment";
+    private static final double EARTH_RADIUS = 6378100.0;
+
 
     private JSONArray mLocations = null;
     private ArrayList<HashMap<String, Object>> mLocationList = new ArrayList<HashMap<String, Object>>();
@@ -61,6 +78,9 @@ public class HaystackMapFragment extends Fragment implements GoogleApiClient.Con
     private String mLastUpdateTime;
     private LocationRequest mLocationRequest;
     private Boolean mRequestingLocationUpdates = true;
+
+    private Boolean mPostingLocationUpdates = false;
+    private Boolean isActivated = false;
 
     private GoogleMap mMap;
     private Marker mMarker;
@@ -74,6 +94,7 @@ public class HaystackMapFragment extends Fragment implements GoogleApiClient.Con
     private OnFragmentInteractionListener mListener;
     private View rootView;
     private SupportMapFragment mMapFragment;
+    private Circle mCircle;
 
     public static HaystackMapFragment newInstance() {
         HaystackMapFragment fragment = new HaystackMapFragment();
@@ -335,21 +356,21 @@ public class HaystackMapFragment extends Fragment implements GoogleApiClient.Con
         moveCamera();
 
         postLocation();
-        RetrieveLocationsParams params =  new RetrieveLocationsParams(getUserName(), String.valueOf(getUserId()), haystackId);
-        new RetrieveLocationsTask(params).execute();
+        retrieveLocations();
     }
 
     public void updateMap() {
         //Update user's marker
         if(mCurrentLocation != null){
-            if(mMarker == null){
+            if(mMarker == null && mCircle == null){
                 MarkerOptions markerOptions = new MarkerOptions();
                 markerOptions.position(mCurrentPosition);
-                mMarker = mMap.addMarker(markerOptions);
+                drawMarkerWithCircle(mCurrentPosition);
+            }else{
+                updateMarkerWithCircle(mCurrentPosition);
             }
 
             mMarker.setTitle("Your Position");
-            mMarker.setPosition(mCurrentPosition);
         }
 
         Log.i(TAG,"Markers to add : "+mLocationList.size());
@@ -370,7 +391,10 @@ public class HaystackMapFragment extends Fragment implements GoogleApiClient.Con
                 if(mMarkers.containsKey(id)){
                     marker = mMarkers.get(id);
                     if(marker.getPosition() != position){
-                        marker.setPosition(position);
+                        //marker.setPosition(position);
+                        animateMarker(marker, position, false);
+
+
                         Log.i(TAG,"Moving marker with id : "+id);
 
                         Location loc = new Location("");
@@ -383,7 +407,7 @@ public class HaystackMapFragment extends Fragment implements GoogleApiClient.Con
                     }
 
                     //marker.showInfoWindow();
-                }else{
+                }else if(!(id.equals(String.valueOf(getUserId())))){
                     MarkerOptions markerOptions = new MarkerOptions();
                     markerOptions.position(position);
 
@@ -395,13 +419,65 @@ public class HaystackMapFragment extends Fragment implements GoogleApiClient.Con
 
                     Log.i(TAG,"Adding marker with id : "+id+" to map.");
 
-                    marker.setTitle(id+"'s Position");
+                    String name = map.get(AppConstants.TAG_USER_NAME).toString();
+                    marker.setTitle(name+"'s Position");
                     marker.showInfoWindow();
 
                     mMarkers.put(id, marker);
                 }
             }
         }
+    }
+
+    public void animateMarker(final Marker marker, final LatLng toPosition,
+                              final boolean hideMarker) {
+        final Handler handler = new Handler();
+        final long start = SystemClock.uptimeMillis();
+        Projection proj = mMap.getProjection();
+        Point startPoint = proj.toScreenLocation(marker.getPosition());
+        final LatLng startLatLng = proj.fromScreenLocation(startPoint);
+        final long duration = 500;
+        final Interpolator interpolator = new LinearInterpolator();
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
+                long elapsed = SystemClock.uptimeMillis() - start;
+                float t = interpolator.getInterpolation((float) elapsed
+                        / duration);
+                double lng = t * toPosition.longitude + (1 - t)
+                        * startLatLng.longitude;
+                double lat = t * toPosition.latitude + (1 - t)
+                        * startLatLng.latitude;
+                marker.setPosition(new LatLng(lat, lng));
+                if (t < 1.0) {
+                    // Post again 16ms later.
+                    handler.postDelayed(this, 16);
+                } else {
+                    if (hideMarker) {
+                        marker.setVisible(false);
+                    } else {
+                        marker.setVisible(true);
+                    }
+                }
+            }
+        });
+    }
+
+    private void drawMarkerWithCircle(LatLng position){
+        double radiusInMeters = 10.0;
+        int strokeColor = getResources().getColor(R.color.primary);
+        int shadeColor = getResources().getColor(R.color.circleColor);
+
+        CircleOptions circleOptions = new CircleOptions().center(position).radius(radiusInMeters).fillColor(shadeColor).strokeColor(strokeColor).strokeWidth(8);
+        mCircle = mMap.addCircle(circleOptions);
+
+        MarkerOptions markerOptions = new MarkerOptions().position(position);
+        mMarker = mMap.addMarker(markerOptions);
+    }
+
+    private void updateMarkerWithCircle(LatLng position) {
+        mCircle.setCenter(position);
+        animateMarker(mMarker, position, false);
     }
 
     @Override
@@ -433,6 +509,10 @@ public class HaystackMapFragment extends Fragment implements GoogleApiClient.Con
     }
 
     public void postLocation(){
+        if(!mPostingLocationUpdates){
+            return;
+        }
+
         PostLocationParams params = new PostLocationParams(getActivity(), getUserName(), String.valueOf(getUserId()), mCurrentLocation, mCurrentPosition);
         new PostLocationTask(params).execute();
     }
@@ -445,6 +525,41 @@ public class HaystackMapFragment extends Fragment implements GoogleApiClient.Con
         }catch (Exception e){
 
         }
+    }
+
+    public void activateUser(){
+        ActivateUserParams params = new ActivateUserParams(getActivity(), String.valueOf(getUserId()), String.valueOf(haystack.getId()));
+
+        try{
+            ActivateUserResult result = new ActivateUserTask(params).execute().get();
+            isActivated = result.successCode == 1;
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
+    }
+
+    public void deactivateUser(){
+        ActivateUserParams params = new ActivateUserParams(getActivity(), String.valueOf(getUserId()), String.valueOf(haystack.getId()));
+
+        try{
+            ActivateUserResult result = new ActivateUserTask(params).execute().get();
+            isActivated = result.successCode == 1;
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
+    }
+
+    public void shareLocation(){
+        mPostingLocationUpdates = true;
+        activateUser();
+        postLocation();
+    }
+
+    public void stopSharingLocation(){
+        mPostingLocationUpdates = false;
+        deactivateUser();
     }
 
     private String getUserName(){
@@ -465,6 +580,10 @@ public class HaystackMapFragment extends Fragment implements GoogleApiClient.Con
         }
 
         return userId;
+    }
+
+    public Boolean isPostingLocationUpdates() {
+        return mPostingLocationUpdates;
     }
 
     public interface OnFragmentInteractionListener {

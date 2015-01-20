@@ -15,14 +15,14 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ActivateUserTask extends AsyncTask<Void, Void, TaskResult> {
-    private static final String ACTIVATE_USER_URL = AppConstants.PROJECT_URL + "activateUser.php";
-    private static final String TAG = "ActivateUserTask";
+public class DeactivateUserTask extends AsyncTask<Void, Void, TaskResult> {
+    private static final String DEACTIVATE_USER_URL = AppConstants.PROJECT_URL + "deactivateUser.php";
+    private static final String TAG = "DeactivateUserTask";
 
     private JSONParser jsonParser = new JSONParser();
-    private ActivateUserParams params;
+    private DeactivateUserParams params;
 
-    public ActivateUserTask(ActivateUserParams params){
+    public DeactivateUserTask(DeactivateUserParams params){
         this.params = params;
     }
 
@@ -42,8 +42,8 @@ public class ActivateUserTask extends AsyncTask<Void, Void, TaskResult> {
             requestParams.add(new BasicNameValuePair(AppConstants.TAG_USER_ID, params.userId));
             requestParams.add(new BasicNameValuePair(AppConstants.TAG_HAYSTACK_ID, params.haystackId));
 
-            Log.d(TAG, "Activating User...");
-            JSONObject json = jsonParser.makeHttpRequest(ACTIVATE_USER_URL, "POST", requestParams);
+            Log.d(TAG, "Deactivating User...");
+            JSONObject json = jsonParser.makeHttpRequest(DEACTIVATE_USER_URL, "POST", requestParams);
 
             success = json.getInt(AppConstants.TAG_SUCCESS);
             result.successCode = success;

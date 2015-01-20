@@ -48,13 +48,13 @@ public class RetrieveLocationsTask extends AsyncTask<Void, Void, RetrieveLocatio
             JSONObject json = jParser.makeHttpRequest(LOCATION_URL, "POST", requestParams);
             success = json.getInt(AppConstants.TAG_SUCCESS);
             result.successCode = success;
+            result.locationList = new ArrayList<HashMap<String, Object>>();
 
             if (success == 1) {
                 Log.d(TAG, "RetrieveLocationsTask success");
 
                 result.message = json.getString(AppConstants.TAG_MESSAGE);
                 result.locations = json.getJSONArray(AppConstants.TAG_LOCATIONS);
-                result.locationList = new ArrayList<HashMap<String, Object>>();
 
                 for (int i = 0; i < result.locations.length(); i++) {
                     JSONObject c = result.locations.getJSONObject(i);
@@ -76,6 +76,7 @@ public class RetrieveLocationsTask extends AsyncTask<Void, Void, RetrieveLocatio
                 return result;
             }else{
                 Log.d(TAG, "RetrieveLocationsTask failed : "+json.getString(AppConstants.TAG_MESSAGE));
+                return result;
             }
         } catch (JSONException e) {
             Log.e(TAG,"RetrieveLocationsTask JSON Error");

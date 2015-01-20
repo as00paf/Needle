@@ -4,10 +4,6 @@ import android.app.Activity;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.content.SharedPreferences;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
-import android.graphics.Paint;
 import android.graphics.Point;
 import android.location.Location;
 import android.net.Uri;
@@ -28,7 +24,6 @@ import android.view.animation.LinearInterpolator;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
@@ -47,14 +42,16 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.needletest.pafoid.needletest.AppConstants;
 import com.needletest.pafoid.needletest.R;
 import com.needletest.pafoid.needletest.haystack.task.ActivateUserParams;
-import com.needletest.pafoid.needletest.haystack.task.ActivateUserResult;
 import com.needletest.pafoid.needletest.haystack.task.ActivateUserTask;
+import com.needletest.pafoid.needletest.haystack.task.DeactivateUserParams;
+import com.needletest.pafoid.needletest.haystack.task.DeactivateUserTask;
 import com.needletest.pafoid.needletest.haystack.task.PostLocationParams;
 import com.needletest.pafoid.needletest.haystack.task.PostLocationTask;
 import com.needletest.pafoid.needletest.haystack.task.RetrieveLocationsParams;
 import com.needletest.pafoid.needletest.haystack.task.RetrieveLocationsResult;
 import com.needletest.pafoid.needletest.haystack.task.RetrieveLocationsTask;
 import com.needletest.pafoid.needletest.models.Haystack;
+import com.needletest.pafoid.needletest.models.TaskResult;
 import com.shamanland.fab.FloatingActionButton;
 
 import org.json.JSONArray;
@@ -63,13 +60,12 @@ import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 
 public class HaystackMapFragment extends Fragment implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener{
     public static final String TAG = "HaystackMapFragment";
     private static final double EARTH_RADIUS = 6378100.0;
 
-
-    private JSONArray mLocations = null;
     private ArrayList<HashMap<String, Object>> mLocationList = new ArrayList<HashMap<String, Object>>();
 
     private GoogleApiClient mGoogleApiClient;
@@ -427,6 +423,31 @@ public class HaystackMapFragment extends Fragment implements GoogleApiClient.Con
                 }
             }
         }
+
+        //Remove no longer active Markers
+        if(mMarkers != null){
+            Iterator markerIterator = mMarkers.keySet().iterator();
+            while(markerIterator.hasNext()) {
+                String markerId =(String) markerIterator.next();
+                Marker marker = (Marker) mMarkers.get(markerId);
+
+                Boolean isActive = false;
+
+                for (int i = 0; i < mLocationList.size(); i++) {
+                    HashMap<String, Object> map = mLocationList.get(i);
+                    String id = map.get(AppConstants.TAG_USER_ID).toString();
+
+                    if(id.equals(markerId)){
+                        isActive = true;
+                    }
+                }
+
+                if(!isActive){
+                    marker.remove();
+                    mMarkers.remove(marker);
+                }
+            }
+        }
     }
 
     public void animateMarker(final Marker marker, final LatLng toPosition,
@@ -523,32 +544,31 @@ public class HaystackMapFragment extends Fragment implements GoogleApiClient.Con
             RetrieveLocationsResult result = new RetrieveLocationsTask(params).execute().get();
             mLocationList = result.locationList;
         }catch (Exception e){
-
+            mLocationList = null;
         }
     }
 
     public void activateUser(){
         ActivateUserParams params = new ActivateUserParams(getActivity(), String.valueOf(getUserId()), String.valueOf(haystack.getId()));
+        isActivated = false;
 
         try{
-            ActivateUserResult result = new ActivateUserTask(params).execute().get();
+            TaskResult result = new ActivateUserTask(params).execute().get();
             isActivated = result.successCode == 1;
         }catch (Exception e){
             e.printStackTrace();
         }
-
     }
 
     public void deactivateUser(){
-        ActivateUserParams params = new ActivateUserParams(getActivity(), String.valueOf(getUserId()), String.valueOf(haystack.getId()));
+        DeactivateUserParams params = new DeactivateUserParams(getActivity(), String.valueOf(getUserId()), String.valueOf(haystack.getId()));
 
         try{
-            ActivateUserResult result = new ActivateUserTask(params).execute().get();
-            isActivated = result.successCode == 1;
+            TaskResult result = new DeactivateUserTask(params).execute().get();
+            isActivated = !(result.successCode == 1);
         }catch (Exception e){
             e.printStackTrace();
         }
-
     }
 
     public void shareLocation(){

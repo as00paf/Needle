@@ -19,7 +19,6 @@
     <string name="rememberMe">Remember Me</string>
     <string name="registerDialog">Creating User...</string>
 
-
     <!-- Haystack List Fragment -->
     <string name="publicHeader">Public Haystacks</string>
     <string name="privateHeader">Private Haystacks</string>
@@ -34,14 +33,11 @@
 
     <!-- Haystack Map Fragment -->
     <string name="map_view">Map View</string>
-
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
-
     <string name="action_example">Example action</string>
     <string name="action_settings">Settings</string>
     <string name="hello_blank_fragment">Hello blank fragment</string>
-
     <string name="name">Name</string>
     <string name="isPublic">Public</string>
     <string name="timeLimit">Time Limit</string>
@@ -51,13 +47,17 @@
     <string name="zone">Zone</string>
     <string name="picture">Picture</string>
     <string name="create_haystack">Create Haystack</string>
+    <string name="add_users">Add Users</string>
     <string name="privacy">Privacy</string>
     <string name="title_section1">Section 1</string>
     <string name="title_section2">Section 2</string>
     <string name="title_section3">Section 3</string>
-
     <string name="userList">User List</string>
     <string name="shareLocation">Share My Location</string>
     <string name="stopSharingLocation">Stop Sharing Location</string>
+    <string name="title_activity_haystack_user">HaystackUserActivity</string>
+    <string name="confirm">Confirm</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="addRemoveUsers">Add/Remove Users</string>
 
 </resources>

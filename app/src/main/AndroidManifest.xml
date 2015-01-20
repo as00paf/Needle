@@ -54,7 +54,12 @@
         <activity
             android:name=".settings.AppSettingsActivity"
             android:label="@string/title_activity_app_settings"
-            android:parentActivityName=".home.HomeActivity">
+            android:parentActivityName=".home.HomeActivity" >
+        </activity>
+        <activity
+            android:name=".haystack.HaystackUserActivity"
+            android:label="@string/title_activity_haystack_user"
+            android:theme="@style/AppTheme2">
         </activity>
     </application>
 

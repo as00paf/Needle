@@ -386,7 +386,7 @@ public class HaystackMapFragment extends Fragment implements GoogleApiClient.Con
 
                 if(mMarkers.containsKey(id)){
                     marker = mMarkers.get(id);
-                    if(marker.getPosition() != position){
+                    if(!marker.getPosition().equals(position)){
                         //marker.setPosition(position);
                         animateMarker(marker, position, false);
 
@@ -450,8 +450,7 @@ public class HaystackMapFragment extends Fragment implements GoogleApiClient.Con
         }
     }
 
-    public void animateMarker(final Marker marker, final LatLng toPosition,
-                              final boolean hideMarker) {
+    public void animateMarker(final Marker marker, final LatLng toPosition, final boolean hideMarker) {
         final Handler handler = new Handler();
         final long start = SystemClock.uptimeMillis();
         Projection proj = mMap.getProjection();
@@ -459,29 +458,41 @@ public class HaystackMapFragment extends Fragment implements GoogleApiClient.Con
         final LatLng startLatLng = proj.fromScreenLocation(startPoint);
         final long duration = 500;
         final Interpolator interpolator = new LinearInterpolator();
-        handler.post(new Runnable() {
-            @Override
-            public void run() {
-                long elapsed = SystemClock.uptimeMillis() - start;
-                float t = interpolator.getInterpolation((float) elapsed
-                        / duration);
-                double lng = t * toPosition.longitude + (1 - t)
-                        * startLatLng.longitude;
-                double lat = t * toPosition.latitude + (1 - t)
-                        * startLatLng.latitude;
-                marker.setPosition(new LatLng(lat, lng));
-                if (t < 1.0) {
-                    // Post again 16ms later.
-                    handler.postDelayed(this, 16);
-                } else {
-                    if (hideMarker) {
-                        marker.setVisible(false);
+
+        Location startLocation = new Location("");
+        startLocation.setLatitude(startLatLng.latitude);
+        startLocation.setLongitude(startLatLng.longitude);
+
+        Location endLocation = new Location("");
+        endLocation.setLatitude(toPosition.latitude);
+        endLocation.setLongitude(toPosition.longitude);
+
+        float distance = startLocation.distanceTo(endLocation);
+
+        if(distance > 1){
+            handler.post(new Runnable() {
+                @Override
+                public void run() {
+                    long elapsed = SystemClock.uptimeMillis() - start;
+                    float t = interpolator.getInterpolation((float) elapsed / duration);
+                    double lng = t * toPosition.longitude + (1 - t) * startLatLng.longitude;
+                    double lat = t * toPosition.latitude + (1 - t) * startLatLng.latitude;
+                    marker.setPosition(new LatLng(lat, lng));
+
+                    if (t < 1.0) {
+                        // Post again 16ms later.
+                        handler.postDelayed(this, 16);
                     } else {
-                        marker.setVisible(true);
+                        if (hideMarker) {
+                            marker.setVisible(false);
+                        } else {
+                            marker.setVisible(true);
+                        }
                     }
+
                 }
-            }
-        });
+            });
+        }
     }
 
     private void drawMarkerWithCircle(LatLng position){
@@ -497,8 +508,13 @@ public class HaystackMapFragment extends Fragment implements GoogleApiClient.Con
     }
 
     private void updateMarkerWithCircle(LatLng position) {
-        mCircle.setCenter(position);
-        animateMarker(mMarker, position, false);
+        if(!mCircle.getCenter().equals(position)){
+            mCircle.setCenter(position);
+        }
+
+        if(!mMarker.getPosition().equals(position)){
+            animateMarker(mMarker, position, false);
+        }
     }
 
     @Override

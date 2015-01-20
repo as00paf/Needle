@@ -5,12 +5,12 @@ import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.preference.PreferenceManager;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -21,6 +21,7 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.ToggleButton;
@@ -28,6 +29,8 @@ import android.widget.ToggleButton;
 import com.needletest.pafoid.needletest.AppConstants;
 import com.needletest.pafoid.needletest.R;
 import com.needletest.pafoid.needletest.haystack.HaystackActivity;
+import com.needletest.pafoid.needletest.haystack.HaystackUserActivity;
+import com.needletest.pafoid.needletest.haystack.HaystackUserListAdapter;
 import com.needletest.pafoid.needletest.home.task.CreateHaystackResult;
 import com.needletest.pafoid.needletest.home.task.CreateHaystackTask;
 import com.needletest.pafoid.needletest.home.task.CreateHaystackTaskParams;
@@ -42,8 +45,11 @@ import java.util.Locale;
 
 public class CreateHaystackFragment extends Fragment {
 
+    public static final int SELECT_USERS = 1;
+
     public static final String SQL_DATE_FORMAT = "yyyy-MM-dd";
     public static final String SQL_DATETIME_FORMAT = "yyyy-MM-dd HH:mm:ss";
+    public static final String TAG = "CreateHaystackFragment";
 
     private View rootView;
     private OnFragmentInteractionListener mListener;
@@ -53,7 +59,10 @@ public class CreateHaystackFragment extends Fragment {
     private ToggleButton toggleTimeButton;
     private Button changeTimeLimitButton;
     private Button createHaystackButton;
+    private Button addUsersButton;
     private TextView timeLimitText;
+    private ListView userListView;
+    private HaystackUserListAdapter userListAdapter;
 
     private Calendar calendar;
     private String dateLimit;
@@ -62,6 +71,7 @@ public class CreateHaystackFragment extends Fragment {
     private String userName;
     private Haystack haystack;
     private int userId = -1;
+    private ArrayList<User> userList = new ArrayList<User>();
 
     public static CreateHaystackFragment newInstance() {
         CreateHaystackFragment fragment = new CreateHaystackFragment();
@@ -143,6 +153,19 @@ public class CreateHaystackFragment extends Fragment {
             }
         });
 
+        userListAdapter = new HaystackUserListAdapter(getActionBar().getThemedContext(), R.layout.haystack_drawer_item, userList, inflater);
+
+        userListView = (ListView) rootView.findViewById(R.id.haystack_user_list);
+        userListView.setAdapter(userListAdapter);
+
+        addUsersButton = (Button) rootView.findViewById(R.id.add_users_button);
+        addUsersButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                addUsers();
+            }
+        });
+
         createHaystackButton = (Button) rootView.findViewById(R.id.create_haystack_button);
         createHaystackButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -169,6 +192,11 @@ public class CreateHaystackFragment extends Fragment {
     public void onDetach() {
         super.onDetach();
         mListener = null;
+    }
+
+    private void addUsers(){
+        Intent intent = new Intent(getActivity(), HaystackUserActivity.class);
+        startActivityForResult(intent, SELECT_USERS);
     }
 
     private void createHaystack(){
@@ -247,6 +275,29 @@ public class CreateHaystackFragment extends Fragment {
         }
 
         return userId;
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == SELECT_USERS) {
+            if (resultCode == getActivity().RESULT_OK) {
+                userList = data.getParcelableArrayListExtra("users");
+                updateUserList();
+            }
+        }
+    }
+
+    private void updateUserList(){
+        userListAdapter = new HaystackUserListAdapter(getActionBar().getThemedContext(), R.layout.haystack_drawer_item, userList, getLayoutInflater(null));
+        userListAdapter.notifyDataSetChanged();
+
+
+        userListView.setAdapter(userListAdapter);
+        userListView.invalidate();
+    }
+
+    private ActionBar getActionBar() {
+        return ((ActionBarActivity) getActivity()).getSupportActionBar();
     }
 
     public interface OnFragmentInteractionListener {

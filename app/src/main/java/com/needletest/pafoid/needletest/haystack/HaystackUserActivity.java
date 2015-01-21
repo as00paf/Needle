@@ -23,10 +23,16 @@ import java.util.ArrayList;
 
 public class HaystackUserActivity extends ActionBarActivity {
 
+    public static final int ADD_REMOVE_USERS = 0;
+    public static final int ADD_USERS = 1;
+    public static final int REMOVE_USERS = 2;
+    public static final int BAN_USERS = 3;
+
     private ListView listView;
     private Button confirmButton;
 
     private ArrayList<User> userList = new ArrayList<User>();
+    private ArrayList<User> addedUserList = new ArrayList<User>();
     private HaystackUserListAdapter userListAdapter;
 
     private int userId = -1;
@@ -36,9 +42,11 @@ public class HaystackUserActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_haystack_user);
 
+        addedUserList = getIntent().getParcelableArrayListExtra("addedUserList");
+
         listView =  (ListView) findViewById(R.id.userList);
         listView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
-        userListAdapter = new HaystackUserListAdapter(this, R.layout.haystack_drawer_item, userList, getLayoutInflater());
+        userListAdapter = new HaystackUserListAdapter(this, R.layout.haystack_drawer_item, userList, addedUserList, getLayoutInflater());
         listView.setAdapter(userListAdapter);
 
         confirmButton = (Button) findViewById(R.id.confirmButton);
@@ -90,7 +98,7 @@ public class HaystackUserActivity extends ActionBarActivity {
     }
 
     private void updateUserList(){
-        userListAdapter = new HaystackUserListAdapter(this, R.layout.haystack_drawer_item, userList, getLayoutInflater());
+        userListAdapter = new HaystackUserListAdapter(this, R.layout.haystack_drawer_item, userList, addedUserList, getLayoutInflater());
         listView.setAdapter(userListAdapter);
 
         userListAdapter.notifyDataSetChanged();

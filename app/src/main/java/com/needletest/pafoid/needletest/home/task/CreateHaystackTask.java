@@ -59,19 +59,19 @@ public class CreateHaystackTask extends AsyncTask<Void, Void, CreateHaystackResu
             ArrayList<User> haystackUsers = params.haystack.getUsers();
             for(i=0;i<haystackUsers.size();i++){
                 User user = haystackUsers.get(i);
-                requestParams.add(new BasicNameValuePair("haystack_user", String.valueOf(user.getUserId())));
+                requestParams.add(new BasicNameValuePair("haystack_user[]", String.valueOf(user.getUserId())));
             }
 
             ArrayList<User> haystackActiveUsers = params.haystack.getActiveUsers();
             for(i=0;i<haystackActiveUsers.size();i++){
                 User user = haystackActiveUsers.get(i);
-                requestParams.add(new BasicNameValuePair("haystack_active_user", String.valueOf(user.getUserId())));
+                requestParams.add(new BasicNameValuePair("haystack_active_user[]", String.valueOf(user.getUserId())));
             }
 
             ArrayList<User> haystackBannedUsers = params.haystack.getBannedUsers();
             for(i=0;i<haystackBannedUsers.size();i++){
                 User user = haystackBannedUsers.get(i);
-                requestParams.add(new BasicNameValuePair("haystack_banned_user", String.valueOf(user.getUserId())));
+                requestParams.add(new BasicNameValuePair("haystack_banned_user[]", String.valueOf(user.getUserId())));
             }
 
             Log.d(TAG, "Creating Haystack ...");
@@ -88,9 +88,11 @@ public class CreateHaystackTask extends AsyncTask<Void, Void, CreateHaystackResu
 
                 result.haystack = params.haystack;
                 result.message = json.getString(AppConstants.TAG_MESSAGE);;
+
+                Log.d(TAG, "Haystack Created Successfuly! " + json.getString(AppConstants.TAG_MESSAGE));
                 return result;
             }else{
-                Log.d("CreateHaystack Failure!", json.getString(AppConstants.TAG_MESSAGE));
+                Log.d(TAG, "CreateHaystack Failure! " + json.getString(AppConstants.TAG_MESSAGE));
 
                 result.message = json.getString(AppConstants.TAG_MESSAGE);
                 return result;

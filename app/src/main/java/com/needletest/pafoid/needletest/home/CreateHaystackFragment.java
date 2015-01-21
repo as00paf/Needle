@@ -21,6 +21,7 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.TimePicker;
@@ -44,23 +45,18 @@ import java.util.Date;
 import java.util.Locale;
 
 public class CreateHaystackFragment extends Fragment {
-
-    public static final int SELECT_USERS = 1;
-
     public static final String SQL_DATE_FORMAT = "yyyy-MM-dd";
     public static final String SQL_DATETIME_FORMAT = "yyyy-MM-dd HH:mm:ss";
+    public static final String SQL_TIME_FORMAT = "HH:mm";
     public static final String TAG = "CreateHaystackFragment";
 
     private View rootView;
     private OnFragmentInteractionListener mListener;
     private EditText txtName;
     private CheckBox isPublicCheckbox;
-    private ToggleButton toggleDateButton;
-    private ToggleButton toggleTimeButton;
-    private Button changeTimeLimitButton;
-    private Button createHaystackButton;
-    private Button addUsersButton;
-    private TextView timeLimitText;
+    private ImageButton changeDateLimitButton, changeTimeLimitButton;
+    private Button createHaystackButton, addRemoveUsersButton;
+    private TextView dateLimitText, timeLimitText;
     private ListView userListView;
     private HaystackUserListAdapter userListAdapter;
 
@@ -99,20 +95,6 @@ public class CreateHaystackFragment extends Fragment {
 
         txtName = (EditText) rootView.findViewById(R.id.new_haystack_name);
         isPublicCheckbox = (CheckBox) rootView.findViewById(R.id.new_haystack_isPublic_checkBox);
-        toggleDateButton = (ToggleButton) rootView.findViewById(R.id.new_haystack_toggleDate);
-        toggleDateButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                toggleTimeButton.setChecked(!toggleDateButton.isChecked());
-            }
-        });
-        toggleTimeButton = (ToggleButton) rootView.findViewById(R.id.new_haystack_toggleTime);
-        toggleTimeButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                toggleDateButton.setChecked(!toggleTimeButton.isChecked());
-            }
-        });
 
         calendar = Calendar.getInstance();
         year = calendar.get(Calendar.YEAR);
@@ -121,48 +103,61 @@ public class CreateHaystackFragment extends Fragment {
         hours = calendar.getTime().getHours()+1;
         minutes = calendar.getTime().getMinutes() + 10;
 
-        SimpleDateFormat sdf = new SimpleDateFormat(SQL_DATETIME_FORMAT, Locale.US);
+        SimpleDateFormat sdf = new SimpleDateFormat(SQL_TIME_FORMAT, Locale.US);
         timeLimit = sdf.format(new Date(year-1900, month, day, hours, minutes));
 
         timeLimitText = (TextView) rootView.findViewById(R.id.timeLimitText);
         timeLimitText.setText(timeLimit);
 
-        changeTimeLimitButton = (Button) rootView.findViewById(R.id.changeTimeLimitButton);
-        changeTimeLimitButton.setOnClickListener(new View.OnClickListener() {
+        dateLimitText = (TextView) rootView.findViewById(R.id.dateLimitText);
+        sdf = new SimpleDateFormat(SQL_DATE_FORMAT, Locale.US);
+        dateLimit = sdf.format(new Date(year-1900, month, day, hours, minutes));
+        dateLimitText.setText(dateLimit);
+
+        changeDateLimitButton = (ImageButton) rootView.findViewById(R.id.changeDateLimitButton);
+        changeDateLimitButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(toggleTimeButton.isChecked()){
-                    TimePickerDialog dialog = new TimePickerDialog(getActivity(), new TimePickerDialog.OnTimeSetListener() {
-                        @Override
-                        public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
-                            SimpleDateFormat sdf = new SimpleDateFormat(SQL_DATETIME_FORMAT, Locale.US);
-                            timeLimit = sdf.format(new Date(year, month, day, hourOfDay, minute));
-                        }
-                    }, hours, minutes, true);
-                    dialog.show();
-                }else{
-                    DatePickerDialog dialog = new DatePickerDialog(getActivity(), new DatePickerDialog.OnDateSetListener() {
-                        @Override
-                        public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
-                            SimpleDateFormat sdf = new SimpleDateFormat(SQL_DATE_FORMAT, Locale.US);
-                            dateLimit = sdf.format(new Date(year - 1900, month, day));
-                        }
-                    }, year, month, day);
-                    dialog.show();
-                }
+                DatePickerDialog dialog = new DatePickerDialog(getActivity(), new DatePickerDialog.OnDateSetListener() {
+                    @Override
+                    public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
+                        SimpleDateFormat sdf = new SimpleDateFormat(SQL_DATE_FORMAT, Locale.US);
+                        dateLimit = sdf.format(new Date(year - 1900, monthOfYear, dayOfMonth));
+                        dateLimitText.setText(dateLimit);
+                    }
+                }, year, month, day);
+
+                dialog.getDatePicker().setMinDate(System.currentTimeMillis() - 1000);
+                dialog.show();
             }
         });
 
-        userListAdapter = new HaystackUserListAdapter(getActionBar().getThemedContext(), R.layout.haystack_drawer_item, userList, inflater);
+        changeTimeLimitButton = (ImageButton) rootView.findViewById(R.id.changeTimeLimitButton);
+        changeTimeLimitButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                TimePickerDialog dialog = new TimePickerDialog(getActivity(), new TimePickerDialog.OnTimeSetListener() {
+                    @Override
+                    public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
+                        SimpleDateFormat sdf = new SimpleDateFormat(SQL_TIME_FORMAT, Locale.US);
+                        timeLimit = sdf.format(new Date(year, month, day, hourOfDay, minute));
+                        timeLimitText.setText(timeLimit);
+                    }
+                }, hours, minutes, true);
+                dialog.show();
+            }
+        });
+
+        userListAdapter = new HaystackUserListAdapter(getActionBar().getThemedContext(), R.layout.haystack_drawer_item, userList, null, inflater);
 
         userListView = (ListView) rootView.findViewById(R.id.haystack_user_list);
         userListView.setAdapter(userListAdapter);
 
-        addUsersButton = (Button) rootView.findViewById(R.id.add_users_button);
-        addUsersButton.setOnClickListener(new View.OnClickListener() {
+        addRemoveUsersButton = (Button) rootView.findViewById(R.id.add_remove_users_button);
+        addRemoveUsersButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                addUsers();
+                addRemoveUsers();
             }
         });
 
@@ -194,21 +189,17 @@ public class CreateHaystackFragment extends Fragment {
         mListener = null;
     }
 
-    private void addUsers(){
+    private void addRemoveUsers(){
         Intent intent = new Intent(getActivity(), HaystackUserActivity.class);
-        startActivityForResult(intent, SELECT_USERS);
+        intent.putParcelableArrayListExtra("addedUserList", userList);
+        startActivityForResult(intent, HaystackUserActivity.ADD_REMOVE_USERS);
     }
 
     private void createHaystack(){
         haystack = new Haystack();
         haystack.setName(txtName.getText().toString());
         haystack.setIsPublic(isPublicCheckbox.isChecked());
-        if(useDate()){
-            haystack.setTimeLimit(dateLimit);
-        }else{
-            haystack.setTimeLimit(timeLimit);
-        }
-
+        haystack.setTimeLimit(dateLimit + " " + timeLimit);
         haystack.setOwner(getUserId());
 
         //Current User
@@ -217,9 +208,8 @@ public class CreateHaystackFragment extends Fragment {
         user.setUserName(getUserName());
 
         //Users
-        ArrayList<User> users = new ArrayList<User>();
-        users.add(user);
-        haystack.setUsers(users);
+        userList.add(user);
+        haystack.setUsers(userList);
 
         //Active users
         ArrayList<User> activeUsers = new ArrayList<User>();
@@ -251,10 +241,6 @@ public class CreateHaystackFragment extends Fragment {
         }
     }
 
-    private Boolean useDate(){
-        return toggleDateButton.isChecked();
-    }
-
     private String getUserName(){
         if(userName == null){
             SharedPreferences sp = PreferenceManager
@@ -279,16 +265,14 @@ public class CreateHaystackFragment extends Fragment {
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == SELECT_USERS) {
-            if (resultCode == getActivity().RESULT_OK) {
-                userList = data.getParcelableArrayListExtra("users");
-                updateUserList();
-            }
+        if (resultCode == getActivity().RESULT_OK && requestCode == HaystackUserActivity.ADD_REMOVE_USERS) {
+            userList = data.getParcelableArrayListExtra("users");
+            updateUserList();
         }
     }
 
     private void updateUserList(){
-        userListAdapter = new HaystackUserListAdapter(getActionBar().getThemedContext(), R.layout.haystack_drawer_item, userList, getLayoutInflater(null));
+        userListAdapter = new HaystackUserListAdapter(getActionBar().getThemedContext(), R.layout.haystack_drawer_item, userList, userList, getLayoutInflater(null));
         userListAdapter.notifyDataSetChanged();
 
 

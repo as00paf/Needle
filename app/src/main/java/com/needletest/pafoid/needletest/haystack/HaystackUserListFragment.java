@@ -55,7 +55,7 @@ public class HaystackUserListFragment extends Fragment {
         listView = (ListView) rootView.findViewById(R.id.haystackUserList);
         userList = haystack.getUsers();
         if(userList != null){
-            listAdapter = new HaystackUserListAdapter(getActionBar().getThemedContext(), R.layout.haystack_drawer_item, userList, inflater);
+            listAdapter = new HaystackUserListAdapter(getActionBar().getThemedContext(), R.layout.haystack_drawer_item, userList, getSelectedUsers(), inflater);
             listView.setAdapter(listAdapter);
         }
 
@@ -88,6 +88,17 @@ public class HaystackUserListFragment extends Fragment {
     public void onDetach() {
         super.onDetach();
         mListener = null;
+    }
+
+    private ArrayList<User> getSelectedUsers(){
+        ArrayList<User> result = new ArrayList<User>();
+        for(int i = 0;i<listAdapter.getCount();i++){
+            if(listAdapter.getView(i, null, null).isSelected()){
+                result.add(listAdapter.getItem(i));
+            }
+        }
+
+        return result;
     }
 
     private ActionBar getActionBar() {

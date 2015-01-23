@@ -98,7 +98,7 @@ public class LoginTask extends AsyncTask<Void, Void, AuthenticationResult> {
     protected void onPostExecute(AuthenticationResult result) {
         dialog.dismiss();
         if(result.successCode == 0){
-            Toast.makeText(params.context, "An Error Occured\n Please Try Again!", Toast.LENGTH_SHORT);
+            Toast.makeText(params.context, "An Error Occured\n Please Try Again!", Toast.LENGTH_SHORT).show();
         }
     }
 

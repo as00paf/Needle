@@ -12,10 +12,14 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ListView;
 
+import com.needletest.pafoid.needletest.AppConstants;
 import com.needletest.pafoid.needletest.R;
+import com.needletest.pafoid.needletest.haystack.task.addUsers.AddUsersTask;
+import com.needletest.pafoid.needletest.haystack.task.addUsers.AddUsersTaskParams;
 import com.needletest.pafoid.needletest.haystack.task.retrieveUsers.RetrieveUsersParams;
 import com.needletest.pafoid.needletest.haystack.task.retrieveUsers.RetrieveUsersResult;
 import com.needletest.pafoid.needletest.haystack.task.retrieveUsers.RetrieveUsersTask;
+import com.needletest.pafoid.needletest.models.TaskResult;
 import com.needletest.pafoid.needletest.models.User;
 
 import java.util.ArrayList;
@@ -27,6 +31,7 @@ public class HaystackUserActivity extends ActionBarActivity {
     public static final int REMOVE_USERS = 2;
     public static final int BAN_USERS = 3;
 
+    private int requestCode;
     private ListView listView;
     private Button confirmButton;
 
@@ -35,13 +40,14 @@ public class HaystackUserActivity extends ActionBarActivity {
     private HaystackUserListAdapter userListAdapter;
 
     private int userId = -1;
+    private int haystackId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_haystack_user);
 
-        addedUserList = getIntent().getParcelableArrayListExtra("addedUserList");
+        addedUserList = getIntent().getParcelableArrayListExtra(AppConstants.TAG_ADDED_USERS);
 
         listView =  (ListView) findViewById(R.id.userList);
         listView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
@@ -56,7 +62,13 @@ public class HaystackUserActivity extends ActionBarActivity {
             }
         });
 
-        fetchAllUsers();
+        requestCode = getIntent().getIntExtra(AppConstants.TAG_REQUEST_CODE, -1);
+        if(requestCode == ADD_REMOVE_USERS){
+            fetchAllUsers();
+        }else if (requestCode == ADD_USERS){
+            haystackId = getIntent().getIntExtra(AppConstants.TAG_HAYSTACK_ID, -1);
+            fetchUsersNotInHaystack(haystackId);
+        }
     }
 
 
@@ -69,9 +81,6 @@ public class HaystackUserActivity extends ActionBarActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
@@ -85,6 +94,7 @@ public class HaystackUserActivity extends ActionBarActivity {
     private void fetchAllUsers(){
         RetrieveUsersParams params = new RetrieveUsersParams();
         params.userId = String.valueOf(getUserId());
+        params.type = RetrieveUsersParams.RetrieveUsersParamsType.TYPE_ALL_USERS;
 
         try{
             RetrieveUsersResult result =  new RetrieveUsersTask(params).execute().get();
@@ -93,7 +103,21 @@ public class HaystackUserActivity extends ActionBarActivity {
         } catch(Exception e){
             e.printStackTrace();
         }
+    }
 
+    private void fetchUsersNotInHaystack(int haystackId){
+        RetrieveUsersParams params = new RetrieveUsersParams();
+        params.userId = String.valueOf(getUserId());
+        params.haystackId = haystackId;
+        params.type = RetrieveUsersParams.RetrieveUsersParamsType.TYPE_USERS_NOT_IN_HAYSTACK;
+
+        try{
+            RetrieveUsersResult result =  new RetrieveUsersTask(params).execute().get();
+            userList = result.userList;
+            updateUserList();
+        } catch(Exception e){
+            e.printStackTrace();
+        }
     }
 
     private void updateUserList(){
@@ -115,19 +139,42 @@ public class HaystackUserActivity extends ActionBarActivity {
     }
 
     private void confirm(){
+        if(requestCode == ADD_REMOVE_USERS){
+            returnSelectedUserList();
+        }else if (requestCode == ADD_USERS){
+            addSelectedUsersToHaystack();
+        }
+    }
+
+    private ArrayList<User> getSelectedUsersList(){
         SparseBooleanArray checked = listView.getCheckedItemPositions();
-        ArrayList<User> selectedUserList = new ArrayList<User>();
+        ArrayList<User> selectedUsersList = new ArrayList<User>();
         for (int i = 0; i < checked.size(); i++) {
             // Item position in adapter
             int position = checked.keyAt(i);
             // Add sport if it is checked i.e.) == TRUE!
             if (checked.valueAt(i))
-                selectedUserList.add(userListAdapter.getItem(position));
+                selectedUsersList.add(userListAdapter.getItem(position));
         }
 
+        return selectedUsersList;
+    }
+
+    private void returnSelectedUserList(){
         Intent returnIntent = new Intent();
-        returnIntent.putParcelableArrayListExtra("users", selectedUserList);
+        returnIntent.putParcelableArrayListExtra(AppConstants.TAG_USERS, getSelectedUsersList());
         setResult(RESULT_OK, returnIntent);
         finish();
+    }
+
+    private void addSelectedUsersToHaystack(){
+        AddUsersTaskParams params = new AddUsersTaskParams(this, String.valueOf(haystackId), getSelectedUsersList());
+        try{
+            new AddUsersTask(params).execute();
+        }catch (Exception e){
+
+        }
+
+        returnSelectedUserList();
     }
 }

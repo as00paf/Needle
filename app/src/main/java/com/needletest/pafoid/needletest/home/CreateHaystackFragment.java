@@ -189,7 +189,8 @@ public class CreateHaystackFragment extends Fragment {
 
     private void addRemoveUsers(){
         Intent intent = new Intent(getActivity(), HaystackUserActivity.class);
-        intent.putParcelableArrayListExtra("addedUserList", userList);
+        intent.putParcelableArrayListExtra(AppConstants.TAG_ADDED_USERS, userList);
+        intent.putExtra(AppConstants.TAG_REQUEST_CODE, HaystackUserActivity.ADD_REMOVE_USERS);
         startActivityForResult(intent, HaystackUserActivity.ADD_REMOVE_USERS);
     }
 
@@ -263,7 +264,7 @@ public class CreateHaystackFragment extends Fragment {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (resultCode == getActivity().RESULT_OK && requestCode == HaystackUserActivity.ADD_REMOVE_USERS) {
-            userList = data.getParcelableArrayListExtra("users");
+            userList = data.getParcelableArrayListExtra(AppConstants.TAG_USERS);
             updateUserList();
         }
     }

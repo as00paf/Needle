@@ -91,11 +91,11 @@ public class HaystackListFragment extends Fragment {
             }
         });
 
-        if(haystackList == null){
+        /*if(haystackList == null){
             fetchHaystacks();
         }else {
             updateHaystackList();
-        }
+        }*/
 
         return rootView;
     }
@@ -143,6 +143,12 @@ public class HaystackListFragment extends Fragment {
 
         outState.putParcelableArrayList("publicHaystackList", publicHaystackList);
         outState.putParcelableArrayList("privateHaystackList", privateHaystackList);
+    }
+
+    @Override
+    public void onResume(){
+        super.onResume();
+        fetchHaystacks();
     }
 
     public void fetchHaystacks(){

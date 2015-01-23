@@ -67,6 +67,7 @@ public class CustomSupportMapFragment extends SupportMapFragment
     private Boolean mRequestingLocationUpdates = true;
     private Boolean mPostingLocationUpdates = false;
     private Boolean isActivated = false;
+    private Boolean locationUpdatesStarted = false;
 
     private GoogleMap mMap;
     private Marker mMarker;
@@ -193,12 +194,15 @@ public class CustomSupportMapFragment extends SupportMapFragment
 
     protected void startLocationUpdates() {
         LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
+        locationUpdatesStarted = true;
     }
 
     protected void stopLocationUpdates() {
         if(mGoogleApiClient != null && mGoogleApiClient.isConnected()){
             LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
         }
+
+        locationUpdatesStarted = false;
     }
 
     @Override
@@ -270,33 +274,37 @@ public class CustomSupportMapFragment extends SupportMapFragment
         mMarker = mMap.addMarker(markerOptions);
 
         //Add other user's markers back
-        Log.i(TAG,"Markers to add : "+mLocationList.size());
-        for (int i = 0; i < mLocationList.size(); i++) {
-            HashMap<String, Object> map = mLocationList.get(i);
-            String id = map.get(AppConstants.TAG_USER_ID).toString();
-            Double lat = (Double) map.get(AppConstants.TAG_LAT);
-            Double lng = (Double) map.get(AppConstants.TAG_LNG);
+        if(mLocationList!=null){
+            Log.i(TAG,"Markers to add : "+mLocationList.size());
+            for (int i = 0; i < mLocationList.size(); i++) {
+                HashMap<String, Object> map = mLocationList.get(i);
+                String id = map.get(AppConstants.TAG_USER_ID).toString();
+                Double lat = (Double) map.get(AppConstants.TAG_LAT);
+                Double lng = (Double) map.get(AppConstants.TAG_LNG);
 
-            if(!TextUtils.isEmpty(id) && !id.equals(getUserName())){
-                Marker marker;
-                LatLng position = new LatLng(lat, lng);
+                if(!TextUtils.isEmpty(id) && !id.equals(getUserName())){
+                    Marker marker;
+                    LatLng position = new LatLng(lat, lng);
 
-                markerOptions = new MarkerOptions();
-                markerOptions.position(position);
-                BitmapDescriptor icon = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_VIOLET);
-                markerOptions.icon(icon);
+                    markerOptions = new MarkerOptions();
+                    markerOptions.position(position);
+                    BitmapDescriptor icon = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_VIOLET);
+                    markerOptions.icon(icon);
 
-                marker = mMap.addMarker(markerOptions);
-                marker.setPosition(position);
+                    marker = mMap.addMarker(markerOptions);
+                    marker.setPosition(position);
 
-                Log.i(TAG,"Adding marker with id : "+id+" to map.");
+                    Log.i(TAG,"Adding marker with id : "+id+" to map.");
 
-                marker.setTitle(id+"'s Position");
-                marker.showInfoWindow();
+                    marker.setTitle(id+"'s Position");
+                    marker.showInfoWindow();
+                }
             }
         }
 
-        startLocationUpdates();
+        if(!locationUpdatesStarted)
+            startLocationUpdates();
+
         updateMap();
         moveCamera();
 

@@ -1,5 +1,6 @@
 package com.needletest.pafoid.needletest.haystack;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -10,7 +11,10 @@ import android.view.ViewGroup;
 import com.needletest.pafoid.needletest.AppConstants;
 import com.needletest.pafoid.needletest.R;
 import com.needletest.pafoid.needletest.models.Haystack;
+import com.needletest.pafoid.needletest.models.User;
 import com.shamanland.fab.FloatingActionButton;
+
+import java.util.ArrayList;
 
 
 public class HaystackMapFragment extends Fragment {
@@ -101,7 +105,18 @@ public class HaystackMapFragment extends Fragment {
     }
 
     private void addUsers(){
+        Intent intent = new Intent(getActivity(), HaystackUserActivity.class);
+        intent.putExtra(AppConstants.TAG_REQUEST_CODE, HaystackUserActivity.ADD_USERS);
+        intent.putExtra(AppConstants.TAG_HAYSTACK_ID, haystack.getId());
+        startActivityForResult(intent, HaystackUserActivity.ADD_USERS);
+    }
 
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (resultCode == getActivity().RESULT_OK && requestCode == HaystackUserActivity.ADD_USERS) {
+            ArrayList<User> addedUsers = data.getParcelableArrayListExtra(AppConstants.TAG_USERS);
+            haystack.getUsers().addAll(addedUsers);
+        }
     }
 
     private int getUserId(){

@@ -17,6 +17,8 @@ import java.util.List;
 
 public class RetrieveUsersTask extends AsyncTask<Void, Void, RetrieveUsersResult> {
     private static final String RETRIEVE_USERS_URL = AppConstants.PROJECT_URL + "retrieveAllUsers.php";
+    private static final String RETRIEVE_NOT_IN_HAYSTACK_USERS_URL = AppConstants.PROJECT_URL + "fetchUsersNotInHaystack.php";
+
     private static final String TAG = "RetrieveUsersTask";
 
     private RetrieveUsersParams params;
@@ -42,8 +44,21 @@ public class RetrieveUsersTask extends AsyncTask<Void, Void, RetrieveUsersResult
             requestParams.add(new BasicNameValuePair("userId", params.userId));
 
             Log.d(TAG, "Retrieving Users...");
+            String url;
+            switch (params.type){
+                case TYPE_ALL_USERS:
+                    url = RETRIEVE_USERS_URL;
+                    break;
+                case TYPE_USERS_NOT_IN_HAYSTACK:
+                    requestParams.add(new BasicNameValuePair(AppConstants.TAG_HAYSTACK_ID, String.valueOf(params.haystackId)));
+                    url = RETRIEVE_NOT_IN_HAYSTACK_USERS_URL;
+                    break;
+                default :
+                    url = RETRIEVE_USERS_URL;
+                    break;
+            }
 
-            JSONObject json = jParser.makeHttpRequest(RETRIEVE_USERS_URL, "POST", requestParams);
+            JSONObject json = jParser.makeHttpRequest(url, "POST", requestParams);
             success = json.getInt(AppConstants.TAG_SUCCESS);
             result.successCode = success;
             result.userList = new ArrayList<User>();

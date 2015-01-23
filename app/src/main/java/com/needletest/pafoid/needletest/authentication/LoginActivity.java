@@ -1,8 +1,10 @@
 package com.needletest.pafoid.needletest.authentication;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.text.TextUtils;
@@ -71,7 +73,11 @@ public class LoginActivity extends Activity implements OnClickListener{
 		//register listeners
 		mSubmit.setOnClickListener(this);
 		mRegister.setOnClickListener(this);
-		
+
+        //Test for connection refused
+        WifiManager wm = (WifiManager) getSystemService(Context.WIFI_SERVICE);
+        WifiManager.WifiLock wifiLock = wm.createWifiLock(WifiManager.WIFI_MODE_FULL , "MyWifiLock");
+        wifiLock.acquire();
 	}
 
     @Override

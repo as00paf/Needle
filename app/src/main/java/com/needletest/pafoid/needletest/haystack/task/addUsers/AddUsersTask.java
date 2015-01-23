@@ -1,11 +1,16 @@
 package com.needletest.pafoid.needletest.haystack.task.addUsers;
 
+import android.app.ProgressDialog;
 import android.os.AsyncTask;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.needletest.pafoid.needletest.AppConstants;
+import com.needletest.pafoid.needletest.R;
+import com.needletest.pafoid.needletest.authentication.task.AuthenticationResult;
 import com.needletest.pafoid.needletest.haystack.task.activate.ActivateUserParams;
 import com.needletest.pafoid.needletest.models.TaskResult;
+import com.needletest.pafoid.needletest.models.User;
 import com.needletest.pafoid.needletest.utils.JSONParser;
 
 import org.apache.http.NameValuePair;
@@ -17,19 +22,25 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class AddUsersTask extends AsyncTask<Void, Void, TaskResult> {
-    private static final String ACTIVATE_USER_URL = AppConstants.PROJECT_URL + "activateUser.php";
-    private static final String TAG = "ActivateUserTask";
+    private static final String ADD_USERS_URL = AppConstants.PROJECT_URL + "addUsers.php";
+    private static final String TAG = "AddUsersTask";
 
     private JSONParser jsonParser = new JSONParser();
-    private ActivateUserParams params;
+    private AddUsersTaskParams params;
+    private ProgressDialog dialog;
 
-    public AddUsersTask(ActivateUserParams params){
+    public AddUsersTask(AddUsersTaskParams params){
         this.params = params;
     }
 
     @Override
     protected void onPreExecute() {
         super.onPreExecute();
+        dialog = new ProgressDialog(params.context);
+        dialog.setMessage(params.context.getResources().getString(R.string.adding_users));
+        dialog.setIndeterminate(false);
+        dialog.setCancelable(true);
+        dialog.show();
     }
 
     @Override
@@ -40,11 +51,16 @@ public class AddUsersTask extends AsyncTask<Void, Void, TaskResult> {
 
         try {
             List<NameValuePair> requestParams = new ArrayList<NameValuePair>();
-            requestParams.add(new BasicNameValuePair(AppConstants.TAG_USER_ID, params.userId));
             requestParams.add(new BasicNameValuePair(AppConstants.TAG_HAYSTACK_ID, params.haystackId));
 
-            Log.d(TAG, "Activating User...");
-            JSONObject json = jsonParser.makeHttpRequest(ACTIVATE_USER_URL, "POST", requestParams);
+            int i;
+            for(i=0;i<params.users.size();i++){
+                User user = params.users.get(i);
+                requestParams.add(new BasicNameValuePair("users[]", String.valueOf(user.getUserId())));
+            }
+
+            Log.d(TAG, "Adding Users...");
+            JSONObject json = jsonParser.makeHttpRequest(ADD_USERS_URL, "POST", requestParams);
 
             success = json.getInt(AppConstants.TAG_SUCCESS);
             result.successCode = success;
@@ -63,6 +79,15 @@ public class AddUsersTask extends AsyncTask<Void, Void, TaskResult> {
         }
 
         return null;
+    }
+
+    protected void onPostExecute(TaskResult result) {
+        dialog.dismiss();
+        if(result.successCode == 0){
+            Toast.makeText(params.context, "An Error Occured Adding Users", Toast.LENGTH_SHORT).show();
+        }else{
+            Toast.makeText(params.context, "Users Successfuly Added", Toast.LENGTH_SHORT).show();
+        }
     }
 
 }

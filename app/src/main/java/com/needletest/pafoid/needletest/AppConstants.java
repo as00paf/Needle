@@ -19,6 +19,8 @@ public class AppConstants {
     public static final String TAG_LAT = "lat";
     public static final String TAG_LNG = "lng";
     public static final String TAG_USERS = "users";
+    public static final String TAG_ADDED_USERS = "addedUserList";
+    public static final String TAG_REQUEST_CODE = "requestCode";
 
     //Location updates
     public static final int MILLISECONDS_PER_SECOND = 1000;

@@ -60,5 +60,6 @@
     <string name="hello_world">Hello world!</string>
     <string name="addRemoveUsers">Add/Remove Users</string>
     <string name="add_pin">Add Pin</string>
+    <string name="adding_users">Adding Users...</string>
 
 </resources>

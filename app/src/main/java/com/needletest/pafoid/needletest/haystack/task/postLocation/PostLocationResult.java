@@ -1,4 +1,4 @@
-package com.needletest.pafoid.needletest.haystack.task;
+package com.needletest.pafoid.needletest.haystack.task.postLocation;
 
 
 public class PostLocationResult {

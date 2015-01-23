@@ -1,4 +1,4 @@
-package com.needletest.pafoid.needletest.haystack.task;
+package com.needletest.pafoid.needletest.haystack.task.retrieveLocations;
 
 import android.os.AsyncTask;
 import android.util.Log;
@@ -43,7 +43,7 @@ public class RetrieveLocationsTask extends AsyncTask<Void, Void, RetrieveLocatio
             requestParams.add(new BasicNameValuePair("userId", params.userId));
             requestParams.add(new BasicNameValuePair("haystackId", params.haystackId));
 
-            Log.d(TAG, "Retrieving Locations...");
+            if(params.verbose) Log.d(TAG, "Retrieving Locations...");
 
             JSONObject json = jParser.makeHttpRequest(LOCATION_URL, "POST", requestParams);
             success = json.getInt(AppConstants.TAG_SUCCESS);
@@ -51,7 +51,7 @@ public class RetrieveLocationsTask extends AsyncTask<Void, Void, RetrieveLocatio
             result.locationList = new ArrayList<HashMap<String, Object>>();
 
             if (success == 1) {
-                Log.d(TAG, "RetrieveLocationsTask success");
+                if(params.verbose) Log.d(TAG, "RetrieveLocationsTask success");
 
                 result.message = json.getString(AppConstants.TAG_MESSAGE);
                 result.locations = json.getJSONArray(AppConstants.TAG_LOCATIONS);
@@ -75,7 +75,7 @@ public class RetrieveLocationsTask extends AsyncTask<Void, Void, RetrieveLocatio
                 }
                 return result;
             }else{
-                Log.d(TAG, "RetrieveLocationsTask failed : "+json.getString(AppConstants.TAG_MESSAGE));
+                if(params.verbose) Log.d(TAG, "RetrieveLocationsTask failed : "+json.getString(AppConstants.TAG_MESSAGE));
                 return result;
             }
         } catch (JSONException e) {

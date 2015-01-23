@@ -13,10 +13,9 @@ import android.widget.Button;
 import android.widget.ListView;
 
 import com.needletest.pafoid.needletest.R;
-import com.needletest.pafoid.needletest.haystack.task.RetrieveUsersParams;
-import com.needletest.pafoid.needletest.haystack.task.RetrieveUsersResult;
-import com.needletest.pafoid.needletest.haystack.task.RetrieveUsersTask;
-import com.needletest.pafoid.needletest.home.HaystackListAdapter;
+import com.needletest.pafoid.needletest.haystack.task.retrieveUsers.RetrieveUsersParams;
+import com.needletest.pafoid.needletest.haystack.task.retrieveUsers.RetrieveUsersResult;
+import com.needletest.pafoid.needletest.haystack.task.retrieveUsers.RetrieveUsersTask;
 import com.needletest.pafoid.needletest.models.User;
 
 import java.util.ArrayList;

@@ -1,4 +1,4 @@
-package com.needletest.pafoid.needletest.haystack.task;
+package com.needletest.pafoid.needletest.haystack.task.retrieveUsers;
 
 import android.os.AsyncTask;
 import android.util.Log;
@@ -13,7 +13,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 public class RetrieveUsersTask extends AsyncTask<Void, Void, RetrieveUsersResult> {

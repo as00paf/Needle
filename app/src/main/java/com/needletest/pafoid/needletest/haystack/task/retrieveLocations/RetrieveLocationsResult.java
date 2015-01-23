@@ -1,4 +1,4 @@
-package com.needletest.pafoid.needletest.haystack.task;
+package com.needletest.pafoid.needletest.haystack.task.retrieveLocations;
 
 import org.json.JSONArray;
 

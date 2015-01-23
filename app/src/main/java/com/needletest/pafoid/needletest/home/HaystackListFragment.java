@@ -20,14 +20,13 @@ import android.widget.ProgressBar;
 import com.needletest.pafoid.needletest.AppConstants;
 import com.needletest.pafoid.needletest.R;
 import com.needletest.pafoid.needletest.haystack.HaystackActivity;
-import com.needletest.pafoid.needletest.home.task.FetchHaystacksParams;
-import com.needletest.pafoid.needletest.home.task.FetchHaystacksResult;
-import com.needletest.pafoid.needletest.home.task.FetchHaystacksTask;
+import com.needletest.pafoid.needletest.home.task.fetchHaystack.FetchHaystacksParams;
+import com.needletest.pafoid.needletest.home.task.fetchHaystack.FetchHaystacksResult;
+import com.needletest.pafoid.needletest.home.task.fetchHaystack.FetchHaystacksTask;
 import com.needletest.pafoid.needletest.models.Haystack;
 
 import com.shamanland.fab.FloatingActionButton;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 
 public class HaystackListFragment extends Fragment {

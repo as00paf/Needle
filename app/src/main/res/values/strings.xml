@@ -59,5 +59,6 @@
     <string name="confirm">Confirm</string>
     <string name="hello_world">Hello world!</string>
     <string name="addRemoveUsers">Add/Remove Users</string>
+    <string name="add_pin">Add Pin</string>
 
 </resources>

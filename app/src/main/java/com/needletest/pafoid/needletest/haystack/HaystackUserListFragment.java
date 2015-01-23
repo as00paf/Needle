@@ -12,6 +12,7 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
+import com.needletest.pafoid.needletest.AppConstants;
 import com.needletest.pafoid.needletest.R;
 import com.needletest.pafoid.needletest.models.Haystack;
 import com.needletest.pafoid.needletest.models.User;
@@ -25,11 +26,12 @@ public class HaystackUserListFragment extends Fragment {
     private HaystackUserListAdapter listAdapter;
     private ArrayList<User> userList;
 
-    private Haystack haystack;
+    public Haystack haystack;
 
     public static HaystackUserListFragment newInstance(Haystack haystack) {
         HaystackUserListFragment fragment = new HaystackUserListFragment();
         Bundle args = new Bundle();
+        args.putParcelable(AppConstants.HAYSTACK_DATA_KEY, haystack);
         fragment.setArguments(args);
 
         fragment.haystack = haystack;
@@ -43,12 +45,21 @@ public class HaystackUserListFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if(savedInstanceState!=null){
+            if(savedInstanceState.containsKey(AppConstants.HAYSTACK_DATA_KEY) && this.haystack == null){
+                this.haystack = savedInstanceState.getParcelable(AppConstants.HAYSTACK_DATA_KEY);
+            }
+        }
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
+    public void onSaveInstanceState(Bundle savedInstanceState) {
+        savedInstanceState.putParcelable(AppConstants.HAYSTACK_DATA_KEY, haystack);
+        super.onSaveInstanceState(savedInstanceState);
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         rootView = inflater.inflate(R.layout.fragment_haystack_user_list, container, false);
 
         //Populate list
@@ -92,11 +103,14 @@ public class HaystackUserListFragment extends Fragment {
 
     private ArrayList<User> getSelectedUsers(){
         ArrayList<User> result = new ArrayList<User>();
-        for(int i = 0;i<listAdapter.getCount();i++){
-            if(listAdapter.getView(i, null, null).isSelected()){
-                result.add(listAdapter.getItem(i));
+        if(listAdapter != null){
+            for(int i = 0;i<listAdapter.getCount();i++){
+                if(listAdapter.getView(i, null, null).isSelected()){
+                    result.add(listAdapter.getItem(i));
+                }
             }
         }
+
 
         return result;
     }

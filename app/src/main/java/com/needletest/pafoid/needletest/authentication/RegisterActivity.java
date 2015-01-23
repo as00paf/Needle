@@ -1,6 +1,7 @@
 package com.needletest.pafoid.needletest.authentication;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.KeyEvent;
@@ -10,10 +11,14 @@ import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.google.android.gms.internal.in;
 import com.needletest.pafoid.needletest.R;
+import com.needletest.pafoid.needletest.authentication.task.AuthenticationResult;
 import com.needletest.pafoid.needletest.authentication.task.RegisterTask;
 import com.needletest.pafoid.needletest.authentication.task.RegisterTaskParams;
+import com.needletest.pafoid.needletest.models.TaskResult;
 
 public class RegisterActivity extends Activity implements OnClickListener{
 	
@@ -55,7 +60,19 @@ public class RegisterActivity extends Activity implements OnClickListener{
     private void register() {
         if(validateCredentials()){
             RegisterTaskParams params = new RegisterTaskParams(userName, password, this);
-            new RegisterTask(params).execute();
+            try{
+                AuthenticationResult result = new RegisterTask(params).execute().get();
+                if(result.successCode == 1){
+                    Intent intent = new Intent(this, LoginActivity.class);
+                    startActivity(intent);
+                }else{
+                    Toast.makeText(this, "An error occured.", Toast.LENGTH_SHORT).show();
+                }
+            }catch(Exception e){
+                e.printStackTrace();
+            }
+
+
         }
     }
 

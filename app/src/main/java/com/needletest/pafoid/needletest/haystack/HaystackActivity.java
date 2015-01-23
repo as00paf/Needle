@@ -15,7 +15,7 @@ import com.needletest.pafoid.needletest.models.Haystack;
 
 
 public class HaystackActivity extends ActionBarActivity
-        implements HaystackNavigationDrawerFragment.NavigationDrawerCallbacks, HaystackMapFragment.OnFragmentInteractionListener,
+        implements HaystackNavigationDrawerFragment.NavigationDrawerCallbacks,
         HaystackUserListFragment.OnFragmentInteractionListener{
 
     private static final String TAG = "HaystackActivity";
@@ -24,28 +24,33 @@ public class HaystackActivity extends ActionBarActivity
     private CharSequence mTitle;
     private Haystack haystack;
 
-    private HaystackMapFragment haystackMapFragment;
+    public HaystackMapFragment haystackMapFragment;
     private HaystackUserListFragment haystackUserListFragment;
 
     //Lifecycle Methods
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        if(savedInstanceState == null){
+            haystack = getIntent().getExtras().getParcelable(AppConstants.HAYSTACK_DATA_KEY);
+        }else{
+            if (savedInstanceState.keySet().contains(AppConstants.HAYSTACK_DATA_KEY)) {
+                haystack = savedInstanceState.getParcelable(AppConstants.HAYSTACK_DATA_KEY);
+            }
+        }
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_haystack);
 
-        mNavigationDrawerFragment = (HaystackNavigationDrawerFragment) getSupportFragmentManager().findFragmentById(R.id.navigation_drawer);
+        mNavigationDrawerFragment = (HaystackNavigationDrawerFragment) getSupportFragmentManager().findFragmentById(R.id.haystack_navigation_drawer);
 
         // Set up the drawer.
-        mNavigationDrawerFragment.setUp(R.id.navigation_drawer, (DrawerLayout) findViewById(R.id.drawer_layout));
-        onNavigationDrawerItemSelected(0);
-
-        haystack = (Haystack) getIntent().getExtras().getParcelable(AppConstants.HAYSTACK_DATA_KEY);
-        mTitle = haystack.getName();
+        mNavigationDrawerFragment.setUp(R.id.haystack_navigation_drawer, (DrawerLayout) findViewById(R.id.haystack_layout));
     }
 
     @Override
-    public void onResume(){
-        super.onResume();
+    public void onSaveInstanceState(Bundle savedInstanceState) {
+        savedInstanceState.putParcelable(AppConstants.HAYSTACK_DATA_KEY, haystack);
+        super.onSaveInstanceState(savedInstanceState);
     }
 
     @Override
@@ -67,14 +72,7 @@ public class HaystackActivity extends ActionBarActivity
                 break;
             case 2:
             //Share location
-                if(getHaystackMapFragment().isPostingLocationUpdates()){
-                    getHaystackMapFragment().stopSharingLocation();
-                   mNavigationDrawerFragment.setLocationLabel(getResources().getString(R.string.shareLocation));
-                }else{
-                    getHaystackMapFragment().shareLocation();
-                    mNavigationDrawerFragment.setLocationLabel(getResources().getString(R.string.stopSharingLocation));
-                }
-
+                toggleLocationSharing();
                 break;
         }
 
@@ -91,9 +89,7 @@ public class HaystackActivity extends ActionBarActivity
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         if (!mNavigationDrawerFragment.isDrawerOpen()) {
-            // Only show items in the action bar relevant to this screen
-            // if the drawer is not showing. Otherwise, let the drawer
-            // decide what to show in the action bar.
+
             getMenuInflater().inflate(R.menu.haystack, menu);
             restoreActionBar();
             return true;
@@ -103,17 +99,26 @@ public class HaystackActivity extends ActionBarActivity
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
+        switch (id) {
+            case R.id.location_sharing:
+                toggleLocationSharing();
+                item.setIcon(haystackMapFragment.mMapFragment.isPostingLocationUpdates() ?
+                        getResources().getDrawable(R.drawable.ic_action_location_found) :
+                        getResources().getDrawable(R.drawable.ic_action_location_off));
+                return true;
+            case R.id.add_pin:
+                //addPin();
+                return true;
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private void toggleLocationSharing(){
+        haystackMapFragment.mMapFragment.toggleLocationSharing();
+        mNavigationDrawerFragment.setIsSharingLocation(haystackMapFragment.mMapFragment.isPostingLocationUpdates());
     }
 
     @Override
@@ -123,7 +128,8 @@ public class HaystackActivity extends ActionBarActivity
 
     public HaystackMapFragment getHaystackMapFragment() {
         if(haystackMapFragment==null){
-            haystackMapFragment = HaystackMapFragment.newInstance();
+            haystackMapFragment = HaystackMapFragment.newInstance(haystack);
+            haystackMapFragment.setRetainInstance(true);
         }
 
         return haystackMapFragment;
@@ -132,9 +138,9 @@ public class HaystackActivity extends ActionBarActivity
     public HaystackUserListFragment getHaystackUserListFragment() {
         if(haystackUserListFragment==null){
             haystackUserListFragment = HaystackUserListFragment.newInstance(haystack);
-            mTitle = haystack.getName();
-            restoreActionBar();
         }
+        mTitle = haystack.getName();
+        restoreActionBar();
 
         return haystackUserListFragment;
     }

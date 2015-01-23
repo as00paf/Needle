@@ -26,16 +26,13 @@ public class HomeActivity extends ActionBarActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
 
-        mNavigationDrawerFragment = (HomeNavigationDrawerFragment)
-                getSupportFragmentManager().findFragmentById(R.id.navigation_drawer);
+        mNavigationDrawerFragment = (HomeNavigationDrawerFragment) getSupportFragmentManager().findFragmentById(R.id.home_navigation_drawer);
         mTitle = getTitle();
 
-        // Set up the drawer.
-        mNavigationDrawerFragment.setUp(
-                R.id.navigation_drawer,
-                (DrawerLayout) findViewById(R.id.drawer_layout));
-
         haystackListFragment = HaystackListFragment.newInstance("","");
+
+        // Set up the drawer.
+        mNavigationDrawerFragment.setUp(R.id.home_navigation_drawer, (DrawerLayout) findViewById(R.id.home_layout));
         onNavigationDrawerItemSelected(0);
     }
 
@@ -79,7 +76,7 @@ public class HomeActivity extends ActionBarActivity
             // Only show items in the action bar relevant to this screen
             // if the drawer is not showing. Otherwise, let the drawer
             // decide what to show in the action bar.
-            getMenuInflater().inflate(R.menu.haystack, menu);
+            getMenuInflater().inflate(R.menu.home, menu);
             restoreActionBar();
             return true;
         }

@@ -1,9 +1,10 @@
-package com.needletest.pafoid.needletest.haystack.task;
+package com.needletest.pafoid.needletest.haystack.task.addUsers;
 
 import android.os.AsyncTask;
 import android.util.Log;
 
 import com.needletest.pafoid.needletest.AppConstants;
+import com.needletest.pafoid.needletest.haystack.task.activate.ActivateUserParams;
 import com.needletest.pafoid.needletest.models.TaskResult;
 import com.needletest.pafoid.needletest.utils.JSONParser;
 
@@ -15,14 +16,14 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
-public class DeactivateUserTask extends AsyncTask<Void, Void, TaskResult> {
-    private static final String DEACTIVATE_USER_URL = AppConstants.PROJECT_URL + "deactivateUser.php";
-    private static final String TAG = "DeactivateUserTask";
+public class AddUsersTask extends AsyncTask<Void, Void, TaskResult> {
+    private static final String ACTIVATE_USER_URL = AppConstants.PROJECT_URL + "activateUser.php";
+    private static final String TAG = "ActivateUserTask";
 
     private JSONParser jsonParser = new JSONParser();
-    private DeactivateUserParams params;
+    private ActivateUserParams params;
 
-    public DeactivateUserTask(DeactivateUserParams params){
+    public AddUsersTask(ActivateUserParams params){
         this.params = params;
     }
 
@@ -42,8 +43,8 @@ public class DeactivateUserTask extends AsyncTask<Void, Void, TaskResult> {
             requestParams.add(new BasicNameValuePair(AppConstants.TAG_USER_ID, params.userId));
             requestParams.add(new BasicNameValuePair(AppConstants.TAG_HAYSTACK_ID, params.haystackId));
 
-            Log.d(TAG, "Deactivating User...");
-            JSONObject json = jsonParser.makeHttpRequest(DEACTIVATE_USER_URL, "POST", requestParams);
+            Log.d(TAG, "Activating User...");
+            JSONObject json = jsonParser.makeHttpRequest(ACTIVATE_USER_URL, "POST", requestParams);
 
             success = json.getInt(AppConstants.TAG_SUCCESS);
             result.successCode = success;

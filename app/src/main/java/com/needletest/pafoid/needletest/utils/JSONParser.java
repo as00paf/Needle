@@ -16,6 +16,9 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.utils.URLEncodedUtils;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.params.BasicHttpParams;
+import org.apache.http.params.HttpConnectionParams;
+import org.apache.http.params.HttpParams;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -107,7 +110,13 @@ public class JSONParser {
             if(method == "POST"){
                 // request method is POST
                 // defaultHttpClient
-                DefaultHttpClient httpClient = new DefaultHttpClient();
+                HttpParams httpParams = new BasicHttpParams();
+                int timeoutConnection = 5000;
+                HttpConnectionParams.setConnectionTimeout(httpParams, timeoutConnection);
+                int timeoutSocket = 3000;
+                HttpConnectionParams.setSoTimeout(httpParams, timeoutSocket);
+
+                DefaultHttpClient httpClient = new DefaultHttpClient(httpParams);
                 HttpPost httpPost = new HttpPost(url);
                 httpPost.setEntity(new UrlEncodedFormEntity(params));
 
@@ -132,7 +141,8 @@ public class JSONParser {
         } catch (ClientProtocolException e) {
             e.printStackTrace();
         } catch (IOException e) {
-            e.printStackTrace();
+            Log.e("JSON Parser", "Error with request : " + e.getMessage());
+            //e.printStackTrace();
         }
 
         try {

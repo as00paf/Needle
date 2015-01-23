@@ -32,17 +32,34 @@ public class Haystack implements Serializable, Parcelable {
     public Haystack(Parcel in){
         this.id = in.readInt();
         this.name = in.readString();
-        this.isPublic = (Boolean) in.readValue(ClassLoader.getSystemClassLoader());
+        this.isPublic = (Boolean) in.readValue(Boolean.class.getClassLoader());
         this.timeLimit = in.readString();
-        this.users = new ArrayList<>();
-        in.readList(this.users, getClass().getClassLoader());
-        this.activeUsers = new ArrayList<>();
-        in.readList(this.activeUsers, getClass().getClassLoader());
-        this.bannedUsers = new ArrayList<>();
-        in.readList(this.bannedUsers, getClass().getClassLoader());
+        this.users = new ArrayList<User>();
+        in.readList(this.users, User.class.getClassLoader());
+        this.activeUsers = new ArrayList<User>();
+        in.readList(this.activeUsers, User.class.getClassLoader());
+        this.bannedUsers = new ArrayList<User>();
+        in.readList(this.bannedUsers, User.class.getClassLoader());
         this.pictureURL = in.readString();
         this.zone = in.readString();
         this.owner = in.readInt();
+    }
+
+    @Override
+    public void writeToParcel(Parcel parcel, int i) {
+        parcel.writeInt(id);
+        parcel.writeString(name);
+        parcel.writeValue(isPublic);
+        parcel.writeString(timeLimit);
+        if(users == null) users = new ArrayList<User>();
+        parcel.writeList(users);
+        if(activeUsers == null) users = new ArrayList<User>();
+        parcel.writeList(activeUsers);
+        if(bannedUsers == null) users = new ArrayList<User>();
+        parcel.writeList(bannedUsers);
+        parcel.writeString(pictureURL);
+        parcel.writeString(zone);
+        parcel.writeInt(owner);
     }
 
     public int getId() {
@@ -140,20 +157,6 @@ public class Haystack implements Serializable, Parcelable {
 
     public void setOwner(int owner) {
         this.owner = owner;
-    }
-
-    @Override
-    public void writeToParcel(Parcel parcel, int i) {
-        parcel.writeInt(id);
-        parcel.writeString(name);
-        parcel.writeValue(isPublic);
-        parcel.writeString(timeLimit);
-        parcel.writeList(users);
-        parcel.writeList(activeUsers);
-        parcel.writeList(bannedUsers);
-        parcel.writeString(pictureURL);
-        parcel.writeString(zone);
-        parcel.writeInt(owner);
     }
 
     public static final Parcelable.Creator<Haystack> CREATOR = new Parcelable.Creator<Haystack>() {

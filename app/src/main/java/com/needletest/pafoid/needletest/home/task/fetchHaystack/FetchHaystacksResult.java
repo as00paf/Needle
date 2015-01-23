@@ -1,4 +1,4 @@
-package com.needletest.pafoid.needletest.home.task;
+package com.needletest.pafoid.needletest.home.task.fetchHaystack;
 
 import com.needletest.pafoid.needletest.models.Haystack;
 

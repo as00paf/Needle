@@ -6,6 +6,7 @@ import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.preference.PreferenceManager;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.needletest.pafoid.needletest.AppConstants;
 import com.needletest.pafoid.needletest.home.HomeActivity;
@@ -51,7 +52,7 @@ public class LoginTask extends AsyncTask<Void, Void, AuthenticationResult> {
             requestParams.add(new BasicNameValuePair("username", params.userName));
             requestParams.add(new BasicNameValuePair("password", params.password));
 
-            Log.d(TAG, "Attempting Login");
+            if(params.verbose) Log.d(TAG, "Attempting Login");
             JSONObject json = jsonParser.makeHttpRequest(LOGIN_URL, "POST", requestParams);
 
             success = json.getInt(AppConstants.TAG_SUCCESS);
@@ -85,16 +86,20 @@ public class LoginTask extends AsyncTask<Void, Void, AuthenticationResult> {
                 return result;
 
             }
-        } catch (JSONException e) {
-            e.printStackTrace();
+        } catch (Exception e) {
+            //e.printStackTrace();
+            Log.d("Login Failure!", "Error : " + e.getMessage());
+            result.successCode = 0;
+            result.message = "Login Failure! Error : " + e.getMessage();
+            return result;
         }
-
-        return null;
-
     }
 
     protected void onPostExecute(AuthenticationResult result) {
         dialog.dismiss();
+        if(result.successCode == 0){
+            Toast.makeText(params.context, "An Error Occured\n Please Try Again!", Toast.LENGTH_SHORT);
+        }
     }
 
 }

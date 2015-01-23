@@ -96,7 +96,7 @@ public class LoginActivity extends Activity implements OnClickListener{
         if(TextUtils.isEmpty(username) || TextUtils.isEmpty(password)){
             Toast.makeText(LoginActivity.this, "You must enter a username and a password", Toast.LENGTH_LONG).show();
         }else{
-            LoginTaskParams params = new LoginTaskParams(username, password, this, rememberMeCheckBox.isChecked());
+            LoginTaskParams params = new LoginTaskParams(username, password, this, rememberMeCheckBox.isChecked(), false);
             new LoginTask(params).execute();
         }
     }

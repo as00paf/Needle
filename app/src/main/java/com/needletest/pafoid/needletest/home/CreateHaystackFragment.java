@@ -12,7 +12,6 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,16 +24,15 @@ import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.TimePicker;
-import android.widget.ToggleButton;
 
 import com.needletest.pafoid.needletest.AppConstants;
 import com.needletest.pafoid.needletest.R;
 import com.needletest.pafoid.needletest.haystack.HaystackActivity;
 import com.needletest.pafoid.needletest.haystack.HaystackUserActivity;
 import com.needletest.pafoid.needletest.haystack.HaystackUserListAdapter;
-import com.needletest.pafoid.needletest.home.task.CreateHaystackResult;
-import com.needletest.pafoid.needletest.home.task.CreateHaystackTask;
-import com.needletest.pafoid.needletest.home.task.CreateHaystackTaskParams;
+import com.needletest.pafoid.needletest.home.task.createHaystack.CreateHaystackResult;
+import com.needletest.pafoid.needletest.home.task.createHaystack.CreateHaystackTask;
+import com.needletest.pafoid.needletest.home.task.createHaystack.CreateHaystackTaskParams;
 import com.needletest.pafoid.needletest.models.Haystack;
 import com.needletest.pafoid.needletest.models.User;
 
@@ -213,7 +211,6 @@ public class CreateHaystackFragment extends Fragment {
 
         //Active users
         ArrayList<User> activeUsers = new ArrayList<User>();
-        activeUsers.add(user);
         haystack.setActiveUsers(activeUsers);
 
         //Banned users

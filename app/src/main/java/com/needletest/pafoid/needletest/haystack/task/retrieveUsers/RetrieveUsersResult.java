@@ -1,4 +1,4 @@
-package com.needletest.pafoid.needletest.haystack.task;
+package com.needletest.pafoid.needletest.haystack.task.retrieveUsers;
 
 import com.needletest.pafoid.needletest.models.User;
 

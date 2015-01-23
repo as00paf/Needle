@@ -1,4 +1,4 @@
-package com.needletest.pafoid.needletest.haystack.task;
+package com.needletest.pafoid.needletest.haystack.task.postLocation;
 
 import android.os.AsyncTask;
 import android.util.Log;
@@ -43,18 +43,18 @@ public class PostLocationTask extends AsyncTask<Void, Void, PostLocationResult> 
             requestParams.add(new BasicNameValuePair("lat", String.valueOf(params.position.latitude)));
             requestParams.add(new BasicNameValuePair("lng", String.valueOf(params.position.longitude)));
 
-            Log.d(TAG, "Posting Location...");
+            if(params.verbose) Log.d(TAG, "Posting Location...");
             JSONObject json = jsonParser.makeHttpRequest(POST_LOCATION_URL, "POST", requestParams);
 
             success = json.getInt(AppConstants.TAG_SUCCESS);
             result.successCode = success;
 
             if (success == 1) {
-                Log.d(TAG, json.toString());
+                if(params.verbose) Log.d(TAG, json.toString());
                 result.message = json.getString(AppConstants.TAG_MESSAGE);
                 return result;
             }else{
-                Log.e(TAG, json.getString(AppConstants.TAG_MESSAGE));
+                if(params.verbose) Log.e(TAG, json.getString(AppConstants.TAG_MESSAGE));
                 result.message = json.getString(AppConstants.TAG_MESSAGE);
                 return result;
             }

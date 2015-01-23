@@ -1,14 +1,11 @@
-package com.needletest.pafoid.needletest.home.task;
+package com.needletest.pafoid.needletest.home.task.createHaystack;
 
 import android.app.ProgressDialog;
-import android.content.Intent;
 import android.os.AsyncTask;
-import android.os.Parcelable;
 import android.util.Log;
 
 import com.needletest.pafoid.needletest.AppConstants;
 import com.needletest.pafoid.needletest.R;
-import com.needletest.pafoid.needletest.haystack.HaystackActivity;
 import com.needletest.pafoid.needletest.models.User;
 import com.needletest.pafoid.needletest.utils.JSONParser;
 
@@ -87,7 +84,7 @@ public class CreateHaystackTask extends AsyncTask<Void, Void, CreateHaystackResu
                 params.haystack.setBannedUsers(haystackBannedUsers);
 
                 result.haystack = params.haystack;
-                result.message = json.getString(AppConstants.TAG_MESSAGE);;
+                result.message = json.getString(AppConstants.TAG_MESSAGE);
 
                 Log.d(TAG, "Haystack Created Successfuly! " + json.getString(AppConstants.TAG_MESSAGE));
                 return result;

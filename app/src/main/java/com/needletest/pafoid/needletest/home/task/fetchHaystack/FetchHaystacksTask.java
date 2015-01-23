@@ -1,4 +1,4 @@
-package com.needletest.pafoid.needletest.home.task;
+package com.needletest.pafoid.needletest.home.task.fetchHaystack;
 
 import android.os.AsyncTask;
 import android.util.Log;
@@ -13,11 +13,9 @@ import com.needletest.pafoid.needletest.utils.JSONParser;
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class FetchHaystacksTask extends AsyncTask<Void, Void, FetchHaystacksResult> {
@@ -156,14 +154,48 @@ public class FetchHaystacksTask extends AsyncTask<Void, Void, FetchHaystacksResu
                     JSONObject haystackData = (JSONObject) privateHaystacks.getJSONObject(i);
                     Haystack haystack = new Haystack();
 
+                    haystack.setId(haystackData.getInt("id"));
                     haystack.setName(haystackData.getString("name"));
                     haystack.setIsPublic(haystackData.getInt("isPublic") == 1);
                     haystack.setOwner(haystackData.getInt("owner"));
                     haystack.setTimeLimit(haystackData.getString("timeLimit"));
 
-                       /* haystack.setActiveUsers(new ArrayList<String>(Arrays.asList(haystackData.getString("activeUsers").split(","))));
-                        haystack.setUsers(new ArrayList<String>(Arrays.asList(haystackData.getString("users").split(","))));
-                        haystack.setBannedUsers(new ArrayList<String>(Arrays.asList(haystackData.getString("bannedUsers").split(","))));*/
+                    ArrayList<User> users = new ArrayList<User>();
+                    JSONArray usersData = (JSONArray) haystackData.getJSONArray("users");
+                    for (int j = 0; j < usersData.length(); j++) {
+                        JSONObject userData =  (JSONObject) usersData.getJSONObject(j);
+                        User user = new User();
+                        try{
+                            user.setUserId(userData.getInt(AppConstants.TAG_USER_ID));
+                            user.setUserName(userData.getString("username"));
+                            //user.setPictureURL(userData.getString(AppConstants.TAG_PICTURE_URL));
+                        }catch(Exception e){
+                            Log.e(TAG, "Error with haystack user" );
+                            e.printStackTrace();
+                        }
+
+                        users.add(user);
+                    }
+
+                    ArrayList<User> activeUsers = new ArrayList<User>();
+                    JSONArray activeUsersData = (JSONArray) haystackData.getJSONArray("activeUsers");
+                    for (int j = 0; j < activeUsersData.length(); j++) {
+                        JSONObject activeUserData =  (JSONObject) activeUsersData.getJSONObject(j);
+                        User activeUser = new User();
+                        try{
+                            activeUser.setUserId(activeUserData.getInt(AppConstants.TAG_USER_ID));
+                            activeUser.setUserName(activeUserData.getString("username"));
+                            //activeUser.setPictureURL(activeUserData.getString(AppConstants.TAG_PICTURE_URL));
+                        }catch(Exception e){
+                            Log.e(TAG, "Error with haystack active user" );
+                            e.printStackTrace();
+                        }
+
+                        activeUsers.add(activeUser);
+                    }
+
+                    haystack.setActiveUsers(activeUsers);
+                    haystack.setUsers(users);
 
                     //Optionals
                     try{

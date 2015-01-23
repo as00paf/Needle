@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.util.SparseBooleanArray;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -27,6 +28,8 @@ import java.util.ArrayList;
 
 public class HaystackUserActivity extends ActionBarActivity implements AddUsersTask.AddUserResponseHandler,
         RetrieveUsersTask.RetrieveUsersResponseHandler{
+
+    private static final String TAG = "HaystackUserActivity";
 
     public static final int ADD_REMOVE_USERS = 0;
     public static final int ADD_USERS = 1;
@@ -151,10 +154,11 @@ public class HaystackUserActivity extends ActionBarActivity implements AddUsersT
     }
 
     private void addSelectedUsersToHaystack(){
-        AddUsersTaskParams params = new AddUsersTaskParams(getApplicationContext(), String.valueOf(haystackId), getSelectedUsersList());
+        AddUsersTaskParams params = new AddUsersTaskParams(this, String.valueOf(haystackId), getSelectedUsersList());
         try{
             new AddUsersTask(params, this).execute();
         }catch (Exception e){
+            Log.e(TAG, "Error adding users : " + e.getMessage());
             Toast.makeText(this, "An Error Occured Adding Users", Toast.LENGTH_SHORT).show();
         }
     }

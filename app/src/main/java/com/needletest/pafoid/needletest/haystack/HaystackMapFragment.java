@@ -12,7 +12,6 @@ import android.os.SystemClock;
 import android.preference.PreferenceManager;
 import android.text.TextUtils;
 import android.util.Log;
-import android.view.View;
 import android.view.animation.Interpolator;
 import android.view.animation.LinearInterpolator;
 import android.widget.Toast;
@@ -54,7 +53,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 
-public class CustomSupportMapFragment extends SupportMapFragment
+public class HaystackMapFragment extends SupportMapFragment
         implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener,
         LocationListener, RetrieveLocationsTask.RetrieveLocationsResponseHandler, ActivateUserTask.ActivateUserResponseHandler,
         DeactivateUserTask.DeactivateUserResponseHandler{
@@ -83,12 +82,12 @@ public class CustomSupportMapFragment extends SupportMapFragment
     private Boolean cameraUpdated = false;
 
     //Constructors
-    public static CustomSupportMapFragment newInstance() {
-        CustomSupportMapFragment fragment = new CustomSupportMapFragment();
+    public static HaystackMapFragment newInstance() {
+        HaystackMapFragment fragment = new HaystackMapFragment();
         return fragment;
     }
 
-    public CustomSupportMapFragment(){
+    public HaystackMapFragment(){
 
     }
 

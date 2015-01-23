@@ -30,6 +30,7 @@ public class AppConstants {
     public static final long FASTEST_INTERVAL = MILLISECONDS_PER_SECOND * FASTEST_INTERVAL_IN_SECONDS;
     public final static int CONNECTION_FAILURE_RESOLUTION_REQUEST = 9000;
     public final static String HAYSTACK_DATA_KEY = "data";
+    public final static String TAG_IS_OWNER = "isOwner";
 
     //SharedPref keys
     public static final String REQUESTING_LOCATION_UPDATES_KEY = "isRequestingLocationUpdates";

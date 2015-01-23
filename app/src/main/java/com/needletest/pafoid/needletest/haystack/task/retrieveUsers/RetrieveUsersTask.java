@@ -87,7 +87,7 @@ public class RetrieveUsersTask extends AsyncTask<Void, Void, RetrieveUsersResult
                 }
                 return result;
             }else{
-                Log.d(TAG, "RetrieveUsersTask failed : "+json.getString(AppConstants.TAG_MESSAGE));
+                Log.d(TAG, "RetrieveUsersTask failed");
                 result.successCode = 0;
                 result.message = "Error Retrieving Users";
                 return result;

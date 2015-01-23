@@ -1,16 +1,11 @@
-package com.needletest.pafoid.needletest.haystack.task.addUsers;
+package com.needletest.pafoid.needletest.haystack.task.leaveHaystack;
 
-import android.app.ProgressDialog;
 import android.os.AsyncTask;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.needletest.pafoid.needletest.AppConstants;
-import com.needletest.pafoid.needletest.R;
-import com.needletest.pafoid.needletest.authentication.task.AuthenticationResult;
 import com.needletest.pafoid.needletest.haystack.task.activate.ActivateUserParams;
 import com.needletest.pafoid.needletest.models.TaskResult;
-import com.needletest.pafoid.needletest.models.User;
 import com.needletest.pafoid.needletest.utils.JSONParser;
 
 import org.apache.http.NameValuePair;
@@ -21,16 +16,15 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
-public class AddUsersTask extends AsyncTask<Void, Void, TaskResult> {
-    private static final String ADD_USERS_URL = AppConstants.PROJECT_URL + "addUsers.php";
-    private static final String TAG = "AddUsersTask";
+public class LeaveHaystackTask extends AsyncTask<Void, Void, TaskResult> {
+    private static final String LEAVE_HAYSTACK_URL = AppConstants.PROJECT_URL + "leaveHaystack.php";
+    private static final String TAG = "LeaveHaystackTask";
 
-    private AddUserResponseHandler delegate;
+    private LeaveHaystackResponseHandler delegate;
     private JSONParser jsonParser = new JSONParser();
-    private AddUsersTaskParams params;
-    private ProgressDialog dialog;
+    private LeaveHaystackParams params;
 
-    public AddUsersTask(AddUsersTaskParams params, AddUserResponseHandler delegate){
+    public LeaveHaystackTask(LeaveHaystackParams params, LeaveHaystackResponseHandler delegate){
         this.params = params;
         this.delegate = delegate;
     }
@@ -38,11 +32,6 @@ public class AddUsersTask extends AsyncTask<Void, Void, TaskResult> {
     @Override
     protected void onPreExecute() {
         super.onPreExecute();
-        dialog = new ProgressDialog(params.context);
-        dialog.setMessage(params.context.getResources().getString(R.string.adding_users));
-        dialog.setIndeterminate(false);
-        dialog.setCancelable(true);
-        dialog.show();
     }
 
     @Override
@@ -53,16 +42,11 @@ public class AddUsersTask extends AsyncTask<Void, Void, TaskResult> {
 
         try {
             List<NameValuePair> requestParams = new ArrayList<NameValuePair>();
+            requestParams.add(new BasicNameValuePair(AppConstants.TAG_USER_ID, params.userId));
             requestParams.add(new BasicNameValuePair(AppConstants.TAG_HAYSTACK_ID, params.haystackId));
 
-            int i;
-            for(i=0;i<params.users.size();i++){
-                User user = params.users.get(i);
-                requestParams.add(new BasicNameValuePair("users[]", String.valueOf(user.getUserId())));
-            }
-
-            Log.d(TAG, "Adding Users...");
-            JSONObject json = jsonParser.makeHttpRequest(ADD_USERS_URL, "POST", requestParams);
+            Log.d(TAG, "Leaving Haystack...");
+            JSONObject json = jsonParser.makeHttpRequest(LEAVE_HAYSTACK_URL, "POST", requestParams);
 
             success = json.getInt(AppConstants.TAG_SUCCESS);
             result.successCode = success;
@@ -78,19 +62,17 @@ public class AddUsersTask extends AsyncTask<Void, Void, TaskResult> {
             }
         } catch (JSONException e) {
             //e.printStackTrace();
-            Log.d(TAG, "Error Adding Users : " + e.getMessage());
             result.successCode = 0;
-            result.message = "Add Users Failed";
+            result.message = "Error Leaving Haystack";
             return result;
         }
     }
 
     protected void onPostExecute(TaskResult result) {
-        dialog.dismiss();
-        delegate.onUsersAdded(result);
+        delegate.onHaystackLeft(result);
     }
 
-    public interface AddUserResponseHandler {
-        void onUsersAdded(TaskResult result);
+    public interface LeaveHaystackResponseHandler {
+        void onHaystackLeft(TaskResult result);
     }
 }

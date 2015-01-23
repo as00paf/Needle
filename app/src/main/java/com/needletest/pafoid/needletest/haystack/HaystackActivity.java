@@ -2,7 +2,6 @@ package com.needletest.pafoid.needletest.haystack;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.net.Uri;
 import android.preference.PreferenceManager;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBar;
@@ -12,10 +11,15 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.support.v4.widget.DrawerLayout;
 import android.view.View;
+import android.widget.Toast;
 
 import com.needletest.pafoid.needletest.AppConstants;
 import com.needletest.pafoid.needletest.R;
+import com.needletest.pafoid.needletest.haystack.task.leaveHaystack.LeaveHaystackParams;
+import com.needletest.pafoid.needletest.haystack.task.leaveHaystack.LeaveHaystackTask;
+import com.needletest.pafoid.needletest.home.HomeActivity;
 import com.needletest.pafoid.needletest.models.Haystack;
+import com.needletest.pafoid.needletest.models.TaskResult;
 import com.needletest.pafoid.needletest.models.User;
 import com.shamanland.fab.FloatingActionButton;
 
@@ -23,7 +27,7 @@ import java.util.ArrayList;
 
 
 public class HaystackActivity extends ActionBarActivity
-        implements HaystackNavigationDrawerFragment.NavigationDrawerCallbacks{
+        implements HaystackNavigationDrawerFragment.NavigationDrawerCallbacks, LeaveHaystackTask.LeaveHaystackResponseHandler{
 
     private static final String TAG = "HaystackActivity";
 
@@ -35,7 +39,7 @@ public class HaystackActivity extends ActionBarActivity
     private boolean isOwner;
 
     private HaystackUserListFragment haystackUserListFragment;
-    public CustomSupportMapFragment mMapFragment;
+    public HaystackMapFragment mMapFragment;
 
     //Lifecycle Methods
     @Override
@@ -45,6 +49,10 @@ public class HaystackActivity extends ActionBarActivity
         }else{
             if (savedInstanceState.keySet().contains(AppConstants.HAYSTACK_DATA_KEY)) {
                 haystack = savedInstanceState.getParcelable(AppConstants.HAYSTACK_DATA_KEY);
+            }
+
+            if (savedInstanceState.keySet().contains(AppConstants.TAG_IS_OWNER)) {
+                isOwner = savedInstanceState.getBoolean(AppConstants.TAG_IS_OWNER);
             }
         }
 
@@ -57,7 +65,7 @@ public class HaystackActivity extends ActionBarActivity
 
         //Floating Action Button
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab_add_users);
-        isOwner = haystack.getOwner() == getUserId();
+        isOwner = isOwner();
         if(isOwner){
             fab.setSize(FloatingActionButton.SIZE_NORMAL);
             fab.setColor(getResources().getColor(R.color.primary));
@@ -80,6 +88,7 @@ public class HaystackActivity extends ActionBarActivity
     @Override
     public void onSaveInstanceState(Bundle savedInstanceState) {
         savedInstanceState.putParcelable(AppConstants.HAYSTACK_DATA_KEY, haystack);
+        savedInstanceState.putBoolean(AppConstants.TAG_IS_OWNER, isOwner);
         super.onSaveInstanceState(savedInstanceState);
     }
 
@@ -89,6 +98,7 @@ public class HaystackActivity extends ActionBarActivity
 
         switch (position){
             case 0:
+                //Map View
                 fragmentManager.beginTransaction()
                         .replace(R.id.haystack_fragment_container, getHaystackMapFragment())
                         .commit();
@@ -104,6 +114,22 @@ public class HaystackActivity extends ActionBarActivity
             //Share location
                 toggleLocationSharing();
                 break;
+            case 3:
+                //Get Directions
+                getDirections();
+                break;
+            case 4:
+                if(isOwner()){//Add Users
+                    addUsers();
+                }else{//Leave Haystack
+                    leaveHaystack();
+                }
+                break;
+            case 5:
+                //Leave Haystack
+                leaveHaystack();
+                break;
+
         }
 
     }
@@ -167,10 +193,35 @@ public class HaystackActivity extends ActionBarActivity
         }
     }
 
+    private void getDirections(){
+
+    }
+
+    private void leaveHaystack(){
+        LeaveHaystackParams params = new LeaveHaystackParams(this, String.valueOf(userId), String.valueOf(haystack.getId()));
+        try{
+            LeaveHaystackTask task = new LeaveHaystackTask(params, this);
+            task.execute();
+        }catch(Exception e){
+            Toast.makeText(this, "Error Leaving Haystack", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    public void onHaystackLeft(TaskResult result){
+        if(result.successCode == 1){
+            Toast.makeText(this, "Haystack Left", Toast.LENGTH_SHORT).show();
+
+            Intent intent = new Intent(this, HomeActivity.class);
+            startActivity(intent);
+        }else{
+            Toast.makeText(this, "Error Leaving Haystack", Toast.LENGTH_SHORT).show();
+        }
+    }
+
     //Getters/Setters
-    public CustomSupportMapFragment getHaystackMapFragment() {
+    public HaystackMapFragment getHaystackMapFragment() {
         if(mMapFragment==null){
-            mMapFragment = CustomSupportMapFragment.newInstance();
+            mMapFragment = HaystackMapFragment.newInstance();
             mMapFragment.setRetainInstance(true);
         }
         mTitle = haystack.getName();
@@ -201,6 +252,15 @@ public class HaystackActivity extends ActionBarActivity
         }
 
         return userId;
+    }
+
+    public boolean isOwner(){
+        int userId = getUserId();
+        int ownerId = haystack.getOwner();
+
+        isOwner = userId == ownerId;
+
+        return isOwner;
     }
 
 }

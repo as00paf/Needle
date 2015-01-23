@@ -48,12 +48,14 @@
     <string name="picture">Picture</string>
     <string name="create_haystack">Create Haystack</string>
     <string name="add_users">Add Users</string>
+    <string name="leave_haystack">Leave Haystack</string>
     <string name="privacy">Privacy</string>
     <string name="title_section1">Section 1</string>
     <string name="title_section2">Section 2</string>
     <string name="title_section3">Section 3</string>
     <string name="userList">User List</string>
     <string name="shareLocation">Share My Location</string>
+    <string name="get_directions">Get Directions...</string>
     <string name="stopSharingLocation">Stop Sharing Location</string>
     <string name="title_activity_haystack_user">HaystackUserActivity</string>
     <string name="confirm">Confirm</string>

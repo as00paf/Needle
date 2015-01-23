@@ -66,6 +66,11 @@ public class HaystackNavigationDrawerFragment extends Fragment {
         dataList.add(new HaystackDrawerItem(HaystackDrawerItem.SimpleItem, getResources().getString(R.string.map_view), R.drawable.ic_action_map));
         dataList.add(new HaystackDrawerItem(HaystackDrawerItem.SimpleItem, getResources().getString(R.string.userList), R.drawable.ic_action_group));
         dataList.add(new HaystackDrawerItem(HaystackDrawerItem.SimpleItem, getResources().getString(R.string.shareLocation), R.drawable.ic_action_location_found));
+        dataList.add(new HaystackDrawerItem(HaystackDrawerItem.SimpleItem, getResources().getString(R.string.get_directions), R.drawable.ic_action_directions));
+        if(((HaystackActivity) getActivity()).isOwner()){
+            dataList.add(new HaystackDrawerItem(HaystackDrawerItem.SimpleItem, getResources().getString(R.string.add_users), R.drawable.ic_action_add_person));
+        }
+        dataList.add(new HaystackDrawerItem(HaystackDrawerItem.SimpleItem, getResources().getString(R.string.leave_haystack), R.drawable.ic_action_exit));
 
         selectItem(mCurrentSelectedPosition);
     }

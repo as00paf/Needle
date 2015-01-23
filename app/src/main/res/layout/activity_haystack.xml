@@ -3,14 +3,34 @@
     android:layout_width="match_parent" android:layout_height="match_parent"
     tools:context="com.needletest.pafoid.needletest.haystack.HaystackActivity">
 
-    <FrameLayout android:id="@+id/haystack_fragment_container" android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent">
+
+        <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/haystack_fragment_container">
+
+        </RelativeLayout>
+
+        <com.shamanland.fab.FloatingActionButton
+            android:id="@+id/fab_add_users"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"
+            android:layout_marginRight="16dp"
+            android:layout_marginBottom="20dp"
+            android:src="@drawable/ic_action_new"
+            />
+    </RelativeLayout>
 
     <fragment android:id="@+id/haystack_navigation_drawer"
         android:layout_width="@dimen/navigation_drawer_width" android:layout_height="match_parent"
         android:layout_gravity="start"
         android:name="com.needletest.pafoid.needletest.haystack.HaystackNavigationDrawerFragment"
         tools:layout="@layout/fragment_haystack_navigation_drawer" />
-
 
 </android.support.v4.widget.DrawerLayout>

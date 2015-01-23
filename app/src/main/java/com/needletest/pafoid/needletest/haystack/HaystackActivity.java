@@ -1,6 +1,9 @@
 package com.needletest.pafoid.needletest.haystack;
 
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
+import android.preference.PreferenceManager;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBar;
 import android.support.v4.app.FragmentManager;
@@ -8,10 +11,15 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.support.v4.widget.DrawerLayout;
+import android.view.View;
 
 import com.needletest.pafoid.needletest.AppConstants;
 import com.needletest.pafoid.needletest.R;
 import com.needletest.pafoid.needletest.models.Haystack;
+import com.needletest.pafoid.needletest.models.User;
+import com.shamanland.fab.FloatingActionButton;
+
+import java.util.ArrayList;
 
 
 public class HaystackActivity extends ActionBarActivity
@@ -23,9 +31,11 @@ public class HaystackActivity extends ActionBarActivity
     private CharSequence mTitle;
 
     private Haystack haystack;
+    private int userId = -1;
+    private boolean isOwner;
 
-    public HaystackMapFragment haystackMapFragment;
     private HaystackUserListFragment haystackUserListFragment;
+    public CustomSupportMapFragment mMapFragment;
 
     //Lifecycle Methods
     @Override
@@ -41,10 +51,30 @@ public class HaystackActivity extends ActionBarActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_haystack);
 
+        //Navigation Drawer
         mNavigationDrawerFragment = (HaystackNavigationDrawerFragment) getSupportFragmentManager().findFragmentById(R.id.haystack_navigation_drawer);
-
-        // Set up the drawer.
         mNavigationDrawerFragment.setUp(R.id.haystack_navigation_drawer, (DrawerLayout) findViewById(R.id.haystack_layout));
+
+        //Floating Action Button
+        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab_add_users);
+        isOwner = haystack.getOwner() == getUserId();
+        if(isOwner){
+            fab.setSize(FloatingActionButton.SIZE_NORMAL);
+            fab.setColor(getResources().getColor(R.color.primary));
+
+            fab.initBackground();
+            fab.setImageResource(R.drawable.ic_action_add_person);
+            fab.setVisibility(View.VISIBLE);
+
+            fab.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    addUsers();
+                }
+            });
+        }else{
+            fab.setVisibility(View.INVISIBLE);
+        }
     }
 
     @Override
@@ -104,7 +134,7 @@ public class HaystackActivity extends ActionBarActivity
         switch (id) {
             case R.id.location_sharing:
                 toggleLocationSharing();
-                item.setIcon(haystackMapFragment.mMapFragment.isPostingLocationUpdates() ?
+                item.setIcon(mMapFragment.isPostingLocationUpdates() ?
                         getResources().getDrawable(R.drawable.ic_action_location_found) :
                         getResources().getDrawable(R.drawable.ic_action_location_off));
                 return true;
@@ -116,18 +146,37 @@ public class HaystackActivity extends ActionBarActivity
         return super.onOptionsItemSelected(item);
     }
 
+    //Actions
     private void toggleLocationSharing(){
-        haystackMapFragment.mMapFragment.toggleLocationSharing();
-        mNavigationDrawerFragment.setIsSharingLocation(haystackMapFragment.mMapFragment.isPostingLocationUpdates());
+        mMapFragment.toggleLocationSharing();
+        mNavigationDrawerFragment.setIsSharingLocation(mMapFragment.isPostingLocationUpdates());
     }
 
-    public HaystackMapFragment getHaystackMapFragment() {
-        if(haystackMapFragment==null){
-            haystackMapFragment = HaystackMapFragment.newInstance();
-            haystackMapFragment.setRetainInstance(true);
-        }
+    private void addUsers(){
+        Intent intent = new Intent(this, HaystackUserActivity.class);
+        intent.putExtra(AppConstants.TAG_REQUEST_CODE, HaystackUserActivity.ADD_USERS);
+        intent.putExtra(AppConstants.TAG_HAYSTACK_ID, haystack.getId());
+        startActivityForResult(intent, HaystackUserActivity.ADD_USERS);
+    }
 
-        return haystackMapFragment;
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (resultCode == RESULT_OK && requestCode == HaystackUserActivity.ADD_USERS) {
+            ArrayList<User> addedUsers = data.getParcelableArrayListExtra(AppConstants.TAG_USERS);
+            haystack.getUsers().addAll(addedUsers);
+        }
+    }
+
+    //Getters/Setters
+    public CustomSupportMapFragment getHaystackMapFragment() {
+        if(mMapFragment==null){
+            mMapFragment = CustomSupportMapFragment.newInstance();
+            mMapFragment.setRetainInstance(true);
+        }
+        mTitle = haystack.getName();
+        restoreActionBar();
+
+        return mMapFragment;
     }
 
     public HaystackUserListFragment getHaystackUserListFragment() {
@@ -143,4 +192,15 @@ public class HaystackActivity extends ActionBarActivity
     public Haystack getHaystack() {
         return haystack;
     }
+
+    private int getUserId(){
+        if(userId==-1){
+            SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
+
+            userId = sp.getInt("userId", -1);
+        }
+
+        return userId;
+    }
+
 }

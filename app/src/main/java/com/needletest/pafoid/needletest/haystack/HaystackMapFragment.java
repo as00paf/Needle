@@ -27,13 +27,8 @@ public class HaystackMapFragment extends Fragment {
     private View rootView;
     public CustomSupportMapFragment mMapFragment;
 
-    public static HaystackMapFragment newInstance(Haystack haystack) {
+    public static HaystackMapFragment newInstance() {
         HaystackMapFragment fragment = new HaystackMapFragment();
-        Bundle args = new Bundle();
-        args.putParcelable(AppConstants.HAYSTACK_DATA_KEY, haystack);
-        fragment.setArguments(args);
-
-        fragment.haystack = haystack;
         return fragment;
     }
 
@@ -43,40 +38,14 @@ public class HaystackMapFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if(savedInstanceState!=null){
-            updateValuesFromBundle(savedInstanceState);
-        }
-    }
-
-    private void updateValuesFromBundle(Bundle savedInstanceState) {
-        if (savedInstanceState != null) {
-            if (savedInstanceState.keySet().contains(AppConstants.HAYSTACK_DATA_KEY)) {
-                haystack = savedInstanceState.getParcelable(AppConstants.HAYSTACK_DATA_KEY);
-            }
-        }else{
-            haystack = (Haystack) getActivity().getIntent().getExtras().get(AppConstants.HAYSTACK_DATA_KEY);
-        }
-    }
-
-    @Override
-    public void onSaveInstanceState(Bundle savedInstanceState) {
-        savedInstanceState.putParcelable(AppConstants.HAYSTACK_DATA_KEY, haystack);
-        super.onSaveInstanceState(savedInstanceState);
+        haystack = ((HaystackActivity) getActivity()).getHaystack();
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         rootView = inflater.inflate(R.layout.fragment_haystack_map, container, false);
 
-        updateValuesFromBundle(savedInstanceState);
-
-        //Map
-      /*  if (GooglePlayServicesUtil.isGooglePlayServicesAvailable(getActivity()) != ConnectionResult.SUCCESS) {
-            Toast.makeText(getActivity(), "Google Play Services Unavailable", Toast.LENGTH_SHORT).show();
-            Log.e(TAG, "Google Play Services Unavailable");
-        }*/
-
-        mMapFragment = CustomSupportMapFragment.newInstance(haystack);
+        mMapFragment = CustomSupportMapFragment.newInstance();
 
         getChildFragmentManager().beginTransaction().add(R.id.haystack_map_container, mMapFragment).commit();
         mMapFragment.setRetainInstance(true);
@@ -115,7 +84,8 @@ public class HaystackMapFragment extends Fragment {
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (resultCode == getActivity().RESULT_OK && requestCode == HaystackUserActivity.ADD_USERS) {
             ArrayList<User> addedUsers = data.getParcelableArrayListExtra(AppConstants.TAG_USERS);
-            haystack.getUsers().addAll(addedUsers);
+            ((HaystackActivity) getActivity()).getHaystack().getUsers().addAll(addedUsers);
+            haystack = ((HaystackActivity) getActivity()).getHaystack();
         }
     }
 

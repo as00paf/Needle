@@ -11,6 +11,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.needletest.pafoid.needletest.AppConstants;
 import com.needletest.pafoid.needletest.R;
@@ -24,7 +25,8 @@ import com.needletest.pafoid.needletest.models.User;
 
 import java.util.ArrayList;
 
-public class HaystackUserActivity extends ActionBarActivity {
+public class HaystackUserActivity extends ActionBarActivity implements AddUsersTask.AddUserResponseHandler,
+        RetrieveUsersTask.RetrieveUsersResponseHandler{
 
     public static final int ADD_REMOVE_USERS = 0;
     public static final int ADD_USERS = 1;
@@ -74,7 +76,6 @@ public class HaystackUserActivity extends ActionBarActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_haystack_user, menu);
         return true;
     }
@@ -83,7 +84,6 @@ public class HaystackUserActivity extends ActionBarActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
             return true;
         }
@@ -91,18 +91,23 @@ public class HaystackUserActivity extends ActionBarActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    //Actions
     private void fetchAllUsers(){
         RetrieveUsersParams params = new RetrieveUsersParams();
         params.userId = String.valueOf(getUserId());
         params.type = RetrieveUsersParams.RetrieveUsersParamsType.TYPE_ALL_USERS;
 
         try{
-            RetrieveUsersResult result =  new RetrieveUsersTask(params).execute().get();
-            userList = result.userList;
-            updateUserList();
+            RetrieveUsersTask task =  new RetrieveUsersTask(params, this);
+            task.execute();
         } catch(Exception e){
             e.printStackTrace();
         }
+    }
+
+    public void onUsersRetrieved(RetrieveUsersResult result){
+        userList = result.userList;
+        updateUserList();
     }
 
     private void fetchUsersNotInHaystack(int haystackId){
@@ -112,9 +117,8 @@ public class HaystackUserActivity extends ActionBarActivity {
         params.type = RetrieveUsersParams.RetrieveUsersParamsType.TYPE_USERS_NOT_IN_HAYSTACK;
 
         try{
-            RetrieveUsersResult result =  new RetrieveUsersTask(params).execute().get();
-            userList = result.userList;
-            updateUserList();
+            RetrieveUsersTask task =  new RetrieveUsersTask(params, this);
+            task.execute();
         } catch(Exception e){
             e.printStackTrace();
         }
@@ -146,6 +150,25 @@ public class HaystackUserActivity extends ActionBarActivity {
         }
     }
 
+    private void addSelectedUsersToHaystack(){
+        AddUsersTaskParams params = new AddUsersTaskParams(getApplicationContext(), String.valueOf(haystackId), getSelectedUsersList());
+        try{
+            new AddUsersTask(params, this).execute();
+        }catch (Exception e){
+            Toast.makeText(this, "An Error Occured Adding Users", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    public void onUsersAdded(TaskResult result){
+        if(result.successCode == 0){
+            Toast.makeText(this, "An Error Occured Adding Users", Toast.LENGTH_SHORT).show();
+        }else{
+            Toast.makeText(this, "Users Successfuly Added", Toast.LENGTH_SHORT).show();
+        }
+
+        returnSelectedUserList();
+    }
+
     private ArrayList<User> getSelectedUsersList(){
         SparseBooleanArray checked = listView.getCheckedItemPositions();
         ArrayList<User> selectedUsersList = new ArrayList<User>();
@@ -165,16 +188,5 @@ public class HaystackUserActivity extends ActionBarActivity {
         returnIntent.putParcelableArrayListExtra(AppConstants.TAG_USERS, getSelectedUsersList());
         setResult(RESULT_OK, returnIntent);
         finish();
-    }
-
-    private void addSelectedUsersToHaystack(){
-        AddUsersTaskParams params = new AddUsersTaskParams(this, String.valueOf(haystackId), getSelectedUsersList());
-        try{
-            new AddUsersTask(params).execute();
-        }catch (Exception e){
-
-        }
-
-        returnSelectedUserList();
     }
 }

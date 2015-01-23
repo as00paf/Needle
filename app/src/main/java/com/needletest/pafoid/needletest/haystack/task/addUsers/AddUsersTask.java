@@ -25,12 +25,14 @@ public class AddUsersTask extends AsyncTask<Void, Void, TaskResult> {
     private static final String ADD_USERS_URL = AppConstants.PROJECT_URL + "addUsers.php";
     private static final String TAG = "AddUsersTask";
 
+    private AddUserResponseHandler delegate;
     private JSONParser jsonParser = new JSONParser();
     private AddUsersTaskParams params;
     private ProgressDialog dialog;
 
-    public AddUsersTask(AddUsersTaskParams params){
+    public AddUsersTask(AddUsersTaskParams params, AddUserResponseHandler delegate){
         this.params = params;
+        this.delegate = delegate;
     }
 
     @Override
@@ -83,11 +85,10 @@ public class AddUsersTask extends AsyncTask<Void, Void, TaskResult> {
 
     protected void onPostExecute(TaskResult result) {
         dialog.dismiss();
-        if(result.successCode == 0){
-            Toast.makeText(params.context, "An Error Occured Adding Users", Toast.LENGTH_SHORT).show();
-        }else{
-            Toast.makeText(params.context, "Users Successfuly Added", Toast.LENGTH_SHORT).show();
-        }
+        delegate.onUsersAdded(result);
     }
 
+    public interface AddUserResponseHandler {
+        void onUsersAdded(TaskResult result);
+    }
 }

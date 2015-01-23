@@ -10,6 +10,7 @@ import android.widget.Toast;
 
 import com.needletest.pafoid.needletest.AppConstants;
 import com.needletest.pafoid.needletest.home.HomeActivity;
+import com.needletest.pafoid.needletest.home.task.fetchHaystack.FetchHaystacksResult;
 import com.needletest.pafoid.needletest.utils.JSONParser;
 
 import org.apache.http.NameValuePair;
@@ -24,12 +25,15 @@ public class LoginTask extends AsyncTask<Void, Void, AuthenticationResult> {
     private static final String LOGIN_URL = AppConstants.PROJECT_URL +"login.php";
     private static final String TAG = "LoginTask";
 
+    private LoginResponseHandler delegate;
+
     private LoginTaskParams params;
     private JSONParser jsonParser = new JSONParser();
     private ProgressDialog dialog;
 
-    public LoginTask(LoginTaskParams params){
+    public LoginTask(LoginTaskParams params, LoginResponseHandler delegate){
         this.params = params;
+        this.delegate = delegate;
     }
 
     @Override
@@ -75,9 +79,6 @@ public class LoginTask extends AsyncTask<Void, Void, AuthenticationResult> {
 
                 edit.commit();
 
-                Intent i = new Intent(params.context, HomeActivity.class);
-                params.context.startActivity(i);
-
                 result.message = json.getString(AppConstants.TAG_MESSAGE);
                 return result;
             }else{
@@ -87,7 +88,6 @@ public class LoginTask extends AsyncTask<Void, Void, AuthenticationResult> {
 
             }
         } catch (Exception e) {
-            //e.printStackTrace();
             Log.d("Login Failure!", "Error : " + e.getMessage());
             result.successCode = 0;
             result.message = "Login Failure! Error : " + e.getMessage();
@@ -97,9 +97,11 @@ public class LoginTask extends AsyncTask<Void, Void, AuthenticationResult> {
 
     protected void onPostExecute(AuthenticationResult result) {
         dialog.dismiss();
-        if(result.successCode == 0){
-            Toast.makeText(params.context, "An Error Occured\n Please Try Again!", Toast.LENGTH_SHORT).show();
-        }
+        delegate.onLoginComplete(result);
+    }
+
+    public interface LoginResponseHandler {
+        void onLoginComplete(AuthenticationResult result);
     }
 
 }

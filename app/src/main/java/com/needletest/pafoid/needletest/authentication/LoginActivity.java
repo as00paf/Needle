@@ -21,10 +21,12 @@ import android.widget.Toast;
 
 import com.needletest.pafoid.needletest.AppConstants;
 import com.needletest.pafoid.needletest.R;
+import com.needletest.pafoid.needletest.authentication.task.AuthenticationResult;
 import com.needletest.pafoid.needletest.authentication.task.LoginTask;
 import com.needletest.pafoid.needletest.authentication.task.LoginTaskParams;
+import com.needletest.pafoid.needletest.home.HomeActivity;
 
-public class LoginActivity extends Activity implements OnClickListener{
+public class LoginActivity extends Activity implements OnClickListener, LoginTask.LoginResponseHandler{
 	
 	private EditText user, pass;
 	private Button mSubmit, mRegister;
@@ -103,7 +105,16 @@ public class LoginActivity extends Activity implements OnClickListener{
             Toast.makeText(LoginActivity.this, "You must enter a username and a password", Toast.LENGTH_LONG).show();
         }else{
             LoginTaskParams params = new LoginTaskParams(username, password, this, rememberMeCheckBox.isChecked(), false);
-            new LoginTask(params).execute();
+            new LoginTask(params, this).execute();
+        }
+    }
+
+    public void onLoginComplete(AuthenticationResult result){
+        if(result.successCode == 1){
+            Intent i = new Intent(this, HomeActivity.class);
+            startActivity(i);
+        }else{
+            Toast.makeText(this, "An Error Occured\n Please Try Again!", Toast.LENGTH_SHORT).show();
         }
     }
 

@@ -1,6 +1,5 @@
 package com.needletest.pafoid.needletest.home;
 
-import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.content.Intent;
@@ -24,6 +23,7 @@ import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.TimePicker;
+import android.widget.Toast;
 
 import com.needletest.pafoid.needletest.AppConstants;
 import com.needletest.pafoid.needletest.R;
@@ -42,14 +42,13 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 
-public class CreateHaystackFragment extends Fragment {
+public class CreateHaystackFragment extends Fragment implements CreateHaystackTask.CreateHaystackResponseHandler {
     public static final String SQL_DATE_FORMAT = "yyyy-MM-dd";
     public static final String SQL_DATETIME_FORMAT = "yyyy-MM-dd HH:mm:ss";
     public static final String SQL_TIME_FORMAT = "HH:mm";
     public static final String TAG = "CreateHaystackFragment";
 
     private View rootView;
-    private OnFragmentInteractionListener mListener;
     private EditText txtName;
     private CheckBox isPublicCheckbox;
     private ImageButton changeDateLimitButton, changeTimeLimitButton;
@@ -170,23 +169,6 @@ public class CreateHaystackFragment extends Fragment {
         return rootView;
     }
 
-    @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-        try {
-            mListener = (OnFragmentInteractionListener) activity;
-        } catch (ClassCastException e) {
-            throw new ClassCastException(activity.toString()
-                    + " must implement OnFragmentInteractionListener");
-        }
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        mListener = null;
-    }
-
     private void addRemoveUsers(){
         Intent intent = new Intent(getActivity(), HaystackUserActivity.class);
         intent.putParcelableArrayListExtra(AppConstants.TAG_ADDED_USERS, userList);
@@ -220,22 +202,30 @@ public class CreateHaystackFragment extends Fragment {
 
         CreateHaystackTaskParams params = new CreateHaystackTaskParams(rootView.getContext(), haystack);
         try{
-            CreateHaystackResult result = new CreateHaystackTask(params).execute().get();
-            if(result.successCode == 0){
+            CreateHaystackTask task = new CreateHaystackTask(params, this);
+            task.execute();
 
-            }else{
-                FragmentManager manager = getActivity().getSupportFragmentManager();
-                FragmentTransaction trans = manager.beginTransaction();
-                trans.remove(this);
-                trans.commit();
-
-                ((HomeActivity) getActivity()).onNavigationDrawerItemSelected(0);
-
-                Intent intent = new Intent(params.context, HaystackActivity.class);
-                intent.putExtra(AppConstants.HAYSTACK_DATA_KEY, (Parcelable) haystack);
-                params.context.startActivity(intent);
-            }
         }catch (Exception e) {
+            Toast.makeText(getActivity(), "An error occured while creating Haystack", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    public void onHaystackCreated(CreateHaystackResult result){
+        if(result.successCode == 0){
+            Toast.makeText(getActivity(), "An error occured while creating Haystack", Toast.LENGTH_SHORT).show();
+        }else{
+            FragmentManager manager = getActivity().getSupportFragmentManager();
+            FragmentTransaction trans = manager.beginTransaction();
+            trans.remove(this);
+            trans.commit();
+
+            ((HomeActivity) getActivity()).onNavigationDrawerItemSelected(0);
+
+            Toast.makeText(getActivity(), getResources().getString(R.string.haystack_created), Toast.LENGTH_SHORT).show();
+
+            Intent intent = new Intent(getActivity(), HaystackActivity.class);
+            intent.putExtra(AppConstants.HAYSTACK_DATA_KEY, (Parcelable) haystack);
+            startActivity(intent);
         }
     }
 
@@ -273,7 +263,6 @@ public class CreateHaystackFragment extends Fragment {
         userListAdapter = new HaystackUserListAdapter(getActionBar().getThemedContext(), R.layout.haystack_drawer_item, userList, userList, getLayoutInflater(null));
         userListAdapter.notifyDataSetChanged();
 
-
         userListView.setAdapter(userListAdapter);
         userListView.invalidate();
     }
@@ -282,6 +271,4 @@ public class CreateHaystackFragment extends Fragment {
         return ((ActionBarActivity) getActivity()).getSupportActionBar();
     }
 
-    public interface OnFragmentInteractionListener {
-    }
 }

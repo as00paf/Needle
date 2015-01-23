@@ -23,6 +23,8 @@ public class FetchHaystacksTask extends AsyncTask<Void, Void, FetchHaystacksResu
     private static final String GET_HAYSTACKS_URL = AppConstants.PROJECT_URL +"getHaystacks.php";
     private static final String TAG = "FetchHaystacksTask";
 
+    private FetchHaystackResponseHandler delegate;
+
     private JSONParser jsonParser = new JSONParser();
     private FetchHaystacksParams params;
 
@@ -30,13 +32,15 @@ public class FetchHaystacksTask extends AsyncTask<Void, Void, FetchHaystacksResu
     private ArrayList<Haystack> publicHaystackList = null;
     private ArrayList<Haystack> privateHaystackList = null;
 
-    public FetchHaystacksTask(FetchHaystacksParams params){
+    public FetchHaystacksTask(FetchHaystacksParams params, FetchHaystackResponseHandler delegate){
         this.params = params;
+        this.delegate = delegate;
     }
 
     @Override
     protected void onPostExecute(FetchHaystacksResult result) {
         params.progressbar.setVisibility(View.GONE);
+        delegate.onHaystackFetched(result);
     }
 
     @Override
@@ -232,5 +236,9 @@ public class FetchHaystacksTask extends AsyncTask<Void, Void, FetchHaystacksResu
         }
 
         return result;
+    }
+
+    public interface FetchHaystackResponseHandler {
+        void onHaystackFetched(FetchHaystacksResult result);
     }
 }

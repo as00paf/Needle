@@ -4,6 +4,7 @@ import android.os.AsyncTask;
 import android.util.Log;
 
 import com.needletest.pafoid.needletest.AppConstants;
+import com.needletest.pafoid.needletest.authentication.task.AuthenticationResult;
 import com.needletest.pafoid.needletest.models.TaskResult;
 import com.needletest.pafoid.needletest.utils.JSONParser;
 
@@ -19,11 +20,13 @@ public class DeactivateUserTask extends AsyncTask<Void, Void, TaskResult> {
     private static final String DEACTIVATE_USER_URL = AppConstants.PROJECT_URL + "deactivateUser.php";
     private static final String TAG = "DeactivateUserTask";
 
+    private DeactivateUserResponseHandler delegate;
     private JSONParser jsonParser = new JSONParser();
     private DeactivateUserParams params;
 
-    public DeactivateUserTask(DeactivateUserParams params){
+    public DeactivateUserTask(DeactivateUserParams params, DeactivateUserResponseHandler delegate){
         this.params = params;
+        this.delegate = delegate;
     }
 
     @Override
@@ -58,10 +61,20 @@ public class DeactivateUserTask extends AsyncTask<Void, Void, TaskResult> {
                 return result;
             }
         } catch (JSONException e) {
-            e.printStackTrace();
-        }
+            //e.printStackTrace();
 
-        return null;
+            result.successCode = 0;
+            result.message = "Error Deactivating User";
+            return result;
+        }
+    }
+
+    protected void onPostExecute(TaskResult result) {
+        delegate.onUserDeactivated(result);
+    }
+
+    public interface DeactivateUserResponseHandler {
+        void onUserDeactivated(TaskResult result);
     }
 
 }

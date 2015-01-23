@@ -15,7 +15,7 @@ import com.needletest.pafoid.needletest.R;
 import com.needletest.pafoid.needletest.settings.AppSettingsActivity;
 
 public class HomeActivity extends ActionBarActivity
-        implements HomeNavigationDrawerFragment.NavigationDrawerCallbacks, HaystackListFragment.OnFragmentInteractionListener, CreateHaystackFragment.OnFragmentInteractionListener {
+        implements HomeNavigationDrawerFragment.NavigationDrawerCallbacks {
 
     private HomeNavigationDrawerFragment mNavigationDrawerFragment;
     private HaystackListFragment haystackListFragment;
@@ -29,7 +29,7 @@ public class HomeActivity extends ActionBarActivity
         mNavigationDrawerFragment = (HomeNavigationDrawerFragment) getSupportFragmentManager().findFragmentById(R.id.home_navigation_drawer);
         mTitle = getTitle();
 
-        haystackListFragment = HaystackListFragment.newInstance("","");
+        haystackListFragment = HaystackListFragment.newInstance();
 
         // Set up the drawer.
         mNavigationDrawerFragment.setUp(R.id.home_navigation_drawer, (DrawerLayout) findViewById(R.id.home_layout));
@@ -96,10 +96,5 @@ public class HomeActivity extends ActionBarActivity
         }
 
         return super.onOptionsItemSelected(item);
-    }
-
-    @Override
-    public void onFragmentInteraction(Uri uri) {
-
     }
 }

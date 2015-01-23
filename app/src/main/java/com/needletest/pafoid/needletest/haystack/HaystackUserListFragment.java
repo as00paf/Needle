@@ -20,7 +20,6 @@ import com.needletest.pafoid.needletest.models.User;
 import java.util.ArrayList;
 
 public class HaystackUserListFragment extends Fragment {
-    private OnFragmentInteractionListener mListener;
     private View rootView;
     private ListView listView;
     private HaystackUserListAdapter listAdapter;
@@ -73,32 +72,9 @@ public class HaystackUserListFragment extends Fragment {
         return rootView;
     }
 
-    public void onButtonPressed(Uri uri) {
-        if (mListener != null) {
-            mListener.onFragmentInteraction(uri);
-        }
-    }
-
     @Override
     public void onResume(){
         super.onResume();
-    }
-
-    @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-        try {
-            mListener = (OnFragmentInteractionListener) activity;
-        } catch (ClassCastException e) {
-            throw new ClassCastException(activity.toString()
-                    + " must implement OnFragmentInteractionListener");
-        }
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        mListener = null;
     }
 
     private ArrayList<User> getSelectedUsers(){
@@ -118,9 +94,4 @@ public class HaystackUserListFragment extends Fragment {
     private ActionBar getActionBar() {
         return ((ActionBarActivity) getActivity()).getSupportActionBar();
     }
-
-    public interface OnFragmentInteractionListener {
-        public void onFragmentInteraction(Uri uri);
-    }
-
 }

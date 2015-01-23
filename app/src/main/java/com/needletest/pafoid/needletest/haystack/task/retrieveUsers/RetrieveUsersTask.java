@@ -4,6 +4,8 @@ import android.os.AsyncTask;
 import android.util.Log;
 
 import com.needletest.pafoid.needletest.AppConstants;
+import com.needletest.pafoid.needletest.authentication.task.AuthenticationResult;
+import com.needletest.pafoid.needletest.haystack.task.retrieveLocations.RetrieveLocationsTask;
 import com.needletest.pafoid.needletest.models.User;
 import com.needletest.pafoid.needletest.utils.JSONParser;
 
@@ -21,11 +23,13 @@ public class RetrieveUsersTask extends AsyncTask<Void, Void, RetrieveUsersResult
 
     private static final String TAG = "RetrieveUsersTask";
 
+    private RetrieveUsersResponseHandler delegate;
     private RetrieveUsersParams params;
     private JSONParser jParser = new JSONParser();
 
-    public RetrieveUsersTask(RetrieveUsersParams params){
+    public RetrieveUsersTask(RetrieveUsersParams params, RetrieveUsersResponseHandler delegate){
         this.params = params;
+        this.delegate = delegate;
     }
 
     @Override
@@ -84,17 +88,27 @@ public class RetrieveUsersTask extends AsyncTask<Void, Void, RetrieveUsersResult
                 return result;
             }else{
                 Log.d(TAG, "RetrieveUsersTask failed : "+json.getString(AppConstants.TAG_MESSAGE));
+                result.successCode = 0;
+                result.message = "Error Retrieving Users";
                 return result;
             }
         } catch (JSONException e) {
-            Log.e(TAG,"JSON Error");
-            e.printStackTrace();
+            //Log.e(TAG,"JSON Error");
+           // e.printStackTrace();
+
+            result.successCode = 0;
+            result.message = "Error Retrieving Users";
+            return result;
         }
-        return null;
     }
 
     @Override
     protected void onPostExecute(RetrieveUsersResult result) {
         super.onPostExecute(result);
+        delegate.onUsersRetrieved(result);
+    }
+
+    public interface RetrieveUsersResponseHandler {
+        void onUsersRetrieved(RetrieveUsersResult result);
     }
 }

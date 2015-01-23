@@ -22,12 +22,15 @@ public class RegisterTask extends AsyncTask<Void, Void, AuthenticationResult> {
     private static final String LOGIN_URL = AppConstants.PROJECT_URL + "register.php";
     private static final String TAG = "RegisterTask";
 
+    private RegisterResponseHandler delegate;
+
     private JSONParser jsonParser = new JSONParser();
     private ProgressDialog dialog;
     private RegisterTaskParams params;
 
-    public RegisterTask(RegisterTaskParams params){
+    public RegisterTask(RegisterTaskParams params, RegisterResponseHandler delegate){
         this.params = params;
+        this.delegate = delegate;
     }
 
     @Override
@@ -76,5 +79,10 @@ public class RegisterTask extends AsyncTask<Void, Void, AuthenticationResult> {
 
     protected void onPostExecute(AuthenticationResult result) {
         dialog.dismiss();
+        delegate.onRegistrationComplete(result);
+    }
+
+    public interface RegisterResponseHandler {
+        void onRegistrationComplete(AuthenticationResult result);
     }
 }

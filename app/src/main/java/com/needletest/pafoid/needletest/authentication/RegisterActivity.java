@@ -20,8 +20,8 @@ import com.needletest.pafoid.needletest.authentication.task.RegisterTask;
 import com.needletest.pafoid.needletest.authentication.task.RegisterTaskParams;
 import com.needletest.pafoid.needletest.models.TaskResult;
 
-public class RegisterActivity extends Activity implements OnClickListener{
-	
+public class RegisterActivity extends Activity implements OnClickListener, RegisterTask.RegisterResponseHandler{
+
 	private EditText user, pass;
 	private Button  mRegister;
     private String userName, password;
@@ -61,18 +61,20 @@ public class RegisterActivity extends Activity implements OnClickListener{
         if(validateCredentials()){
             RegisterTaskParams params = new RegisterTaskParams(userName, password, this);
             try{
-                AuthenticationResult result = new RegisterTask(params).execute().get();
-                if(result.successCode == 1){
-                    Intent intent = new Intent(this, LoginActivity.class);
-                    startActivity(intent);
-                }else{
-                    Toast.makeText(this, "An error occured.", Toast.LENGTH_SHORT).show();
-                }
+                RegisterTask task = new RegisterTask(params, this);
+                task.execute();
             }catch(Exception e){
                 e.printStackTrace();
             }
+        }
+    }
 
-
+    public void onRegistrationComplete(AuthenticationResult result){
+        if(result.successCode == 1){
+            Intent intent = new Intent(this, LoginActivity.class);
+            startActivity(intent);
+        }else{
+            Toast.makeText(this, "An error occured.", Toast.LENGTH_SHORT).show();
         }
     }
 

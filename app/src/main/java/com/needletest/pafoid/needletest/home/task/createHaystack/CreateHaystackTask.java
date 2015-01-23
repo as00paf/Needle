@@ -21,12 +21,15 @@ public class CreateHaystackTask extends AsyncTask<Void, Void, CreateHaystackResu
     private static final String CREATE_HAYSTACK_URL = AppConstants.PROJECT_URL +"createHaystack.php";
     private static final String TAG = "CreateHaystackTask";
 
+    private CreateHaystackResponseHandler delegate;
+
     private CreateHaystackTaskParams params;
     private JSONParser jsonParser = new JSONParser();
     private ProgressDialog dialog;
 
-    public CreateHaystackTask(CreateHaystackTaskParams params){
+    public CreateHaystackTask(CreateHaystackTaskParams params, CreateHaystackResponseHandler delegate){
         this.params = params;
+        this.delegate = delegate;
     }
 
     @Override
@@ -108,4 +111,7 @@ public class CreateHaystackTask extends AsyncTask<Void, Void, CreateHaystackResu
         dialog.dismiss();
     }
 
+    public interface CreateHaystackResponseHandler {
+        void onHaystackCreated(CreateHaystackResult result);
+    }
 }

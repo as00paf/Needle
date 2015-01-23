@@ -18,6 +18,7 @@ import android.view.animation.LinearInterpolator;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
@@ -54,7 +55,9 @@ import java.util.HashMap;
 import java.util.Iterator;
 
 public class CustomSupportMapFragment extends SupportMapFragment
-        implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener {
+        implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener,
+        LocationListener, RetrieveLocationsTask.RetrieveLocationsResponseHandler, ActivateUserTask.ActivateUserResponseHandler,
+        DeactivateUserTask.DeactivateUserResponseHandler{
     public static final String TAG = "CustomSupportMapFragment";
 
     private ArrayList<HashMap<String, Object>> mLocationList = new ArrayList<HashMap<String, Object>>();
@@ -79,13 +82,9 @@ public class CustomSupportMapFragment extends SupportMapFragment
     private Circle mCircle;
     private Boolean cameraUpdated = false;
 
-    public static CustomSupportMapFragment newInstance(Haystack haystack) {
+    //Constructors
+    public static CustomSupportMapFragment newInstance() {
         CustomSupportMapFragment fragment = new CustomSupportMapFragment();
-        Bundle args = new Bundle();
-        args.putParcelable(AppConstants.HAYSTACK_DATA_KEY, haystack);
-        fragment.setArguments(args);
-
-        fragment.haystack = haystack;
         return fragment;
     }
 
@@ -93,11 +92,18 @@ public class CustomSupportMapFragment extends SupportMapFragment
 
     }
 
+    //Lifecycle methods
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if(savedInstanceState!=null){
+        if(savedInstanceState != null){
             updateValuesFromBundle(savedInstanceState);
+        }
+
+        //Map
+        if (GooglePlayServicesUtil.isGooglePlayServicesAvailable(getActivity()) != ConnectionResult.SUCCESS) {
+            Toast.makeText(getActivity(), "Google Play Services Unavailable", Toast.LENGTH_SHORT).show();
+            Log.e(TAG, "Google Play Services Unavailable");
         }
     }
 
@@ -115,15 +121,10 @@ public class CustomSupportMapFragment extends SupportMapFragment
             if (savedInstanceState.keySet().contains(AppConstants.LAST_UPDATED_TIME_STRING_KEY)) {
                 mLastUpdateTime = savedInstanceState.getString(AppConstants.LAST_UPDATED_TIME_STRING_KEY);
             }
-
-            if (savedInstanceState.keySet().contains(AppConstants.HAYSTACK_DATA_KEY)) {
-                haystack = savedInstanceState.getParcelable(AppConstants.HAYSTACK_DATA_KEY);
-            }
-        }else{
-            haystack = (Haystack) getActivity().getIntent().getExtras().get(AppConstants.HAYSTACK_DATA_KEY);
         }
 
-        if(haystack != null) haystackId = String.valueOf(haystack.getId());
+        haystack = ((HaystackActivity) getActivity()).getHaystack();
+        haystackId = String.valueOf(haystack.getId());
     }
 
     @Override
@@ -131,8 +132,6 @@ public class CustomSupportMapFragment extends SupportMapFragment
         savedInstanceState.putBoolean(AppConstants.REQUESTING_LOCATION_UPDATES_KEY, mRequestingLocationUpdates);
         savedInstanceState.putParcelable(AppConstants.LOCATION_KEY, mCurrentLocation);
         savedInstanceState.putString(AppConstants.LAST_UPDATED_TIME_STRING_KEY, mLastUpdateTime);
-        savedInstanceState.putParcelable(AppConstants.HAYSTACK_DATA_KEY, haystack);
-        //super.onSaveInstanceState(savedInstanceState);
     }
 
     @Override
@@ -163,17 +162,16 @@ public class CustomSupportMapFragment extends SupportMapFragment
         stopLocationUpdates();
     }
 
-    //Location Methods
-    public void setUpMapIfNeeded() {
-        if (mMap == null) {
-            mMap = getMap();
+    //Google Client Methods
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        switch (requestCode) {
+            case AppConstants.CONNECTION_FAILURE_RESOLUTION_REQUEST :
+                switch (resultCode) {
+                    case Activity.RESULT_OK :
 
-            if (mMap != null) {
-                Log.i(TAG, "Map set up");
-                connectToApiClient();
-            }
-        }else if(mGoogleApiClient.isConnected()){
-            resumeOperations();
+                        break;
+                }
         }
     }
 
@@ -183,6 +181,14 @@ public class CustomSupportMapFragment extends SupportMapFragment
             createLocationRequest();
             mGoogleApiClient.connect();
         }
+    }
+
+    protected synchronized void buildGoogleApiClient() {
+        mGoogleApiClient = new GoogleApiClient.Builder(getActivity())
+                .addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(this)
+                .addApi(LocationServices.API)
+                .build();
     }
 
     protected void createLocationRequest() {
@@ -221,8 +227,6 @@ public class CustomSupportMapFragment extends SupportMapFragment
 
             updateMap();
             moveCamera();
-
-            postLocation();
         }
 
         retrieveLocations();
@@ -246,6 +250,10 @@ public class CustomSupportMapFragment extends SupportMapFragment
         }
     }
 
+    private void showErrorDialog(int errorCode){
+        Toast.makeText(getActivity(), "Error encountered\nError # :"+errorCode, Toast.LENGTH_SHORT).show();
+    }
+
     @Override
     public void onLocationChanged(Location location) {
         mCurrentLocation = location;
@@ -262,6 +270,117 @@ public class CustomSupportMapFragment extends SupportMapFragment
 
         postLocation();
         retrieveLocations();
+    }
+
+    //Map methods
+    public void setUpMapIfNeeded() {
+        if (mMap == null) {
+            mMap = getMap();
+
+            if (mMap != null) {
+                Log.i(TAG, "Map set up");
+                connectToApiClient();
+            }
+        }else if(mGoogleApiClient.isConnected()){
+            resumeOperations();
+        }
+    }
+
+    public void updateMap() {
+        //Update user's marker
+        if(mCurrentLocation != null){
+            if(mMarker == null && mCircle == null){
+                MarkerOptions markerOptions = new MarkerOptions();
+                markerOptions.position(mCurrentPosition);
+                drawMarkerWithCircle(mCurrentPosition);
+            }else{
+                updateMarkerWithCircle(mCurrentPosition);
+            }
+
+            mMarker.setTitle("Your Position");
+        }
+
+        //Log.i(TAG,"Markers to add : "+mLocationList.size());
+        if(mLocationList != null){
+            for (int i = 0; i < mLocationList.size(); i++) {
+                HashMap<String, Object> map = mLocationList.get(i);
+                String id = map.get(AppConstants.TAG_USER_ID).toString();
+                Double lat = (Double) map.get(AppConstants.TAG_LAT);
+                Double lng = (Double) map.get(AppConstants.TAG_LNG);
+
+                if(!TextUtils.isEmpty(id) && !id.equals(getUserName())){
+                    Marker marker;
+                    LatLng position = new LatLng(lat, lng);
+
+                    if(mMarkers == null){
+                        mMarkers = new HashMap<String, Marker>();
+                    }
+
+                    if(mMarkers.containsKey(id)){
+                        marker = mMarkers.get(id);
+                        if(!marker.getPosition().equals(position)){
+                            //marker.setPosition(position);
+                            animateMarker(marker, position, false);
+
+
+                            //Log.i(TAG,"Moving marker with id : "+id);
+
+                        /*Location loc = new Location("");
+                        loc.setLatitude(lat);
+                        loc.setLongitude(lng);
+
+                        double distanceInMeters = Math.floor(mCurrentLocation.distanceTo(loc));
+
+                        marker.setSnippet("Distance to " + id + " :" + distanceInMeters + "m");*/
+                        }
+
+                        //marker.showInfoWindow();
+                    }else if(!(id.equals(String.valueOf(getUserId())))){
+                        MarkerOptions markerOptions = new MarkerOptions();
+                        markerOptions.position(position);
+
+                        BitmapDescriptor icon = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_VIOLET);
+                        markerOptions.icon(icon);
+
+                        marker = mMap.addMarker(markerOptions);
+                        marker.setPosition(position);
+
+                        //Log.i(TAG,"Adding marker with id : "+id+" to map.");
+
+                        String name = map.get(AppConstants.TAG_USER_NAME).toString();
+                        marker.setTitle(name+"'s Position");
+                        marker.showInfoWindow();
+
+                        mMarkers.put(id, marker);
+                    }
+                }
+            }
+        }
+
+        //Remove no longer active Markers
+        if(mMarkers != null){
+            Iterator markerIterator = mMarkers.keySet().iterator();
+            while(markerIterator.hasNext()) {
+                String markerId =(String) markerIterator.next();
+                Marker marker = (Marker) mMarkers.get(markerId);
+
+                Boolean isActive = false;
+
+                for (int i = 0; i < mLocationList.size(); i++) {
+                    HashMap<String, Object> map = mLocationList.get(i);
+                    String id = map.get(AppConstants.TAG_USER_ID).toString();
+
+                    if(id.equals(markerId)){
+                        isActive = true;
+                    }
+                }
+
+                if(!isActive){
+                    marker.remove();
+                    mMarkers.remove(marker);
+                }
+            }
+        }
     }
 
     private void resumeOperations(){
@@ -312,99 +431,9 @@ public class CustomSupportMapFragment extends SupportMapFragment
         retrieveLocations();
     }
 
-    public void updateMap() {
-        //Update user's marker
-        if(mCurrentLocation != null){
-            if(mMarker == null && mCircle == null){
-                MarkerOptions markerOptions = new MarkerOptions();
-                markerOptions.position(mCurrentPosition);
-                drawMarkerWithCircle(mCurrentPosition);
-            }else{
-                updateMarkerWithCircle(mCurrentPosition);
-            }
-
-            mMarker.setTitle("Your Position");
-        }
-
-        //Log.i(TAG,"Markers to add : "+mLocationList.size());
-        for (int i = 0; i < mLocationList.size(); i++) {
-            HashMap<String, Object> map = mLocationList.get(i);
-            String id = map.get(AppConstants.TAG_USER_ID).toString();
-            Double lat = (Double) map.get(AppConstants.TAG_LAT);
-            Double lng = (Double) map.get(AppConstants.TAG_LNG);
-
-            if(!TextUtils.isEmpty(id) && !id.equals(getUserName())){
-                Marker marker;
-                LatLng position = new LatLng(lat, lng);
-
-                if(mMarkers == null){
-                    mMarkers = new HashMap<String, Marker>();
-                }
-
-                if(mMarkers.containsKey(id)){
-                    marker = mMarkers.get(id);
-                    if(!marker.getPosition().equals(position)){
-                        //marker.setPosition(position);
-                        animateMarker(marker, position, false);
-
-
-                        //Log.i(TAG,"Moving marker with id : "+id);
-
-                        /*Location loc = new Location("");
-                        loc.setLatitude(lat);
-                        loc.setLongitude(lng);
-
-                        double distanceInMeters = Math.floor(mCurrentLocation.distanceTo(loc));
-
-                        marker.setSnippet("Distance to " + id + " :" + distanceInMeters + "m");*/
-                    }
-
-                    //marker.showInfoWindow();
-                }else if(!(id.equals(String.valueOf(getUserId())))){
-                    MarkerOptions markerOptions = new MarkerOptions();
-                    markerOptions.position(position);
-
-                    BitmapDescriptor icon = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_VIOLET);
-                    markerOptions.icon(icon);
-
-                    marker = mMap.addMarker(markerOptions);
-                    marker.setPosition(position);
-
-                    //Log.i(TAG,"Adding marker with id : "+id+" to map.");
-
-                    String name = map.get(AppConstants.TAG_USER_NAME).toString();
-                    marker.setTitle(name+"'s Position");
-                    marker.showInfoWindow();
-
-                    mMarkers.put(id, marker);
-                }
-            }
-        }
-
-        //Remove no longer active Markers
-        if(mMarkers != null){
-            Iterator markerIterator = mMarkers.keySet().iterator();
-            while(markerIterator.hasNext()) {
-                String markerId =(String) markerIterator.next();
-                Marker marker = (Marker) mMarkers.get(markerId);
-
-                Boolean isActive = false;
-
-                for (int i = 0; i < mLocationList.size(); i++) {
-                    HashMap<String, Object> map = mLocationList.get(i);
-                    String id = map.get(AppConstants.TAG_USER_ID).toString();
-
-                    if(id.equals(markerId)){
-                        isActive = true;
-                    }
-                }
-
-                if(!isActive){
-                    marker.remove();
-                    mMarkers.remove(marker);
-                }
-            }
-        }
+    public void moveCamera(){
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(mCurrentPosition, 100));
+        cameraUpdated = true;
     }
 
     public void animateMarker(final Marker marker, final LatLng toPosition, final boolean hideMarker) {
@@ -474,35 +503,7 @@ public class CustomSupportMapFragment extends SupportMapFragment
         }
     }
 
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        switch (requestCode) {
-            case AppConstants.CONNECTION_FAILURE_RESOLUTION_REQUEST :
-                switch (resultCode) {
-                    case Activity.RESULT_OK :
-
-                        break;
-                }
-        }
-    }
-
-    protected synchronized void buildGoogleApiClient() {
-        mGoogleApiClient = new GoogleApiClient.Builder(getActivity())
-                .addConnectionCallbacks(this)
-                .addOnConnectionFailedListener(this)
-                .addApi(LocationServices.API)
-                .build();
-    }
-
-    private void showErrorDialog(int errorCode){
-        Toast.makeText(getActivity(), "Error encountered\nError # :"+errorCode, Toast.LENGTH_SHORT).show();
-    }
-
-    public void moveCamera(){
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(mCurrentPosition, 100));
-        cameraUpdated = true;
-    }
-
+    //Actions
     public void postLocation(){
         if(!mPostingLocationUpdates){
             return;
@@ -515,10 +516,17 @@ public class CustomSupportMapFragment extends SupportMapFragment
     public void retrieveLocations(){
         RetrieveLocationsParams params = new RetrieveLocationsParams(getUserName(), String.valueOf(getUserId()), haystackId, false);
         try{
-            RetrieveLocationsResult result = new RetrieveLocationsTask(params).execute().get();
-            mLocationList = result.locationList;
+            RetrieveLocationsTask task = new RetrieveLocationsTask(params, this);
+            task.execute();
         }catch (Exception e){
             mLocationList = null;
+        }
+    }
+
+    public void onLocationsRetrieved(RetrieveLocationsResult result){
+        if(result.successCode == 1){
+            mLocationList = result.locationList;
+            updateMap();
         }
     }
 
@@ -527,22 +535,30 @@ public class CustomSupportMapFragment extends SupportMapFragment
         isActivated = false;
 
         try{
-            TaskResult result = new ActivateUserTask(params).execute().get();
-            isActivated = result.successCode == 1;
+            ActivateUserTask task = new ActivateUserTask(params, this);
+            task.execute();
         }catch (Exception e){
-            e.printStackTrace();
+            Toast.makeText(getActivity(), getString(R.string.sharing_location_error), Toast.LENGTH_SHORT).show();
         }
+    }
+
+    public void onUserActivated(TaskResult result){
+        isActivated = result.successCode == 1;
     }
 
     public void deactivateUser(){
         DeactivateUserParams params = new DeactivateUserParams(getActivity(), String.valueOf(getUserId()), String.valueOf(haystack.getId()));
 
         try{
-            TaskResult result = new DeactivateUserTask(params).execute().get();
-            isActivated = !(result.successCode == 1);
+            DeactivateUserTask task = new DeactivateUserTask(params, this);
+            task.execute();
         }catch (Exception e){
-            e.printStackTrace();
+            Toast.makeText(getActivity(), getString(R.string.unsharing_location_error), Toast.LENGTH_SHORT).show();
         }
+    }
+
+    public void onUserDeactivated(TaskResult result){
+        isActivated = !(result.successCode == 1);
     }
 
     public void shareLocation(){
@@ -564,6 +580,7 @@ public class CustomSupportMapFragment extends SupportMapFragment
         }
     }
 
+    //Getters/Setters
     private String getUserName(){
         if(username == ""){
             SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getActivity());

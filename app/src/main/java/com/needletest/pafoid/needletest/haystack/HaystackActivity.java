@@ -15,13 +15,13 @@ import com.needletest.pafoid.needletest.models.Haystack;
 
 
 public class HaystackActivity extends ActionBarActivity
-        implements HaystackNavigationDrawerFragment.NavigationDrawerCallbacks,
-        HaystackUserListFragment.OnFragmentInteractionListener{
+        implements HaystackNavigationDrawerFragment.NavigationDrawerCallbacks{
 
     private static final String TAG = "HaystackActivity";
 
     private HaystackNavigationDrawerFragment mNavigationDrawerFragment;
     private CharSequence mTitle;
+
     private Haystack haystack;
 
     public HaystackMapFragment haystackMapFragment;
@@ -121,14 +121,9 @@ public class HaystackActivity extends ActionBarActivity
         mNavigationDrawerFragment.setIsSharingLocation(haystackMapFragment.mMapFragment.isPostingLocationUpdates());
     }
 
-    @Override
-    public void onFragmentInteraction(Uri uri) {
-
-    }
-
     public HaystackMapFragment getHaystackMapFragment() {
         if(haystackMapFragment==null){
-            haystackMapFragment = HaystackMapFragment.newInstance(haystack);
+            haystackMapFragment = HaystackMapFragment.newInstance();
             haystackMapFragment.setRetainInstance(true);
         }
 
@@ -143,5 +138,9 @@ public class HaystackActivity extends ActionBarActivity
         restoreActionBar();
 
         return haystackUserListFragment;
+    }
+
+    public Haystack getHaystack() {
+        return haystack;
     }
 }

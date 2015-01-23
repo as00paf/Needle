@@ -4,6 +4,7 @@ import android.os.AsyncTask;
 import android.util.Log;
 
 import com.needletest.pafoid.needletest.AppConstants;
+import com.needletest.pafoid.needletest.authentication.task.AuthenticationResult;
 import com.needletest.pafoid.needletest.utils.JSONParser;
 
 import org.apache.http.NameValuePair;
@@ -19,11 +20,13 @@ public class RetrieveLocationsTask extends AsyncTask<Void, Void, RetrieveLocatio
     private static final String LOCATION_URL = AppConstants.PROJECT_URL + "locations.php";
     private static final String TAG = "RetrieveLocationsTask";
 
+    private RetrieveLocationsResponseHandler delegate;
     private RetrieveLocationsParams params;
     private JSONParser jParser = new JSONParser();
 
-    public RetrieveLocationsTask(RetrieveLocationsParams params){
+    public RetrieveLocationsTask(RetrieveLocationsParams params, RetrieveLocationsResponseHandler delegate){
         this.params = params;
+        this.delegate = delegate;
     }
 
     @Override
@@ -76,17 +79,26 @@ public class RetrieveLocationsTask extends AsyncTask<Void, Void, RetrieveLocatio
                 return result;
             }else{
                 if(params.verbose) Log.d(TAG, "RetrieveLocationsTask failed : "+json.getString(AppConstants.TAG_MESSAGE));
+                result.message = "Error Retrieving Locations";
                 return result;
             }
         } catch (JSONException e) {
             Log.e(TAG,"RetrieveLocationsTask JSON Error");
-            e.printStackTrace();
+            //e.printStackTrace();
+            result.successCode = 0;
+            result.message = "Error Retrieving Locations";
+            return  result;
         }
-        return null;
     }
 
     @Override
     protected void onPostExecute(RetrieveLocationsResult result) {
         super.onPostExecute(result);
+        delegate.onLocationsRetrieved(result);
     }
+
+    public interface RetrieveLocationsResponseHandler {
+        void onLocationsRetrieved(RetrieveLocationsResult result);
+    }
+
 }

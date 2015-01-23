@@ -4,6 +4,7 @@ import android.os.AsyncTask;
 import android.util.Log;
 
 import com.needletest.pafoid.needletest.AppConstants;
+import com.needletest.pafoid.needletest.authentication.task.AuthenticationResult;
 import com.needletest.pafoid.needletest.models.TaskResult;
 import com.needletest.pafoid.needletest.utils.JSONParser;
 
@@ -19,11 +20,13 @@ public class ActivateUserTask extends AsyncTask<Void, Void, TaskResult> {
     private static final String ACTIVATE_USER_URL = AppConstants.PROJECT_URL + "activateUser.php";
     private static final String TAG = "ActivateUserTask";
 
+    private ActivateUserResponseHandler delegate;
     private JSONParser jsonParser = new JSONParser();
     private ActivateUserParams params;
 
-    public ActivateUserTask(ActivateUserParams params){
+    public ActivateUserTask(ActivateUserParams params, ActivateUserResponseHandler delegate){
         this.params = params;
+        this.delegate = delegate;
     }
 
     @Override
@@ -58,10 +61,18 @@ public class ActivateUserTask extends AsyncTask<Void, Void, TaskResult> {
                 return result;
             }
         } catch (JSONException e) {
-            e.printStackTrace();
+            //e.printStackTrace();
+            result.successCode = 0;
+            result.message = "Error Activating User";
+            return result;
         }
-
-        return null;
     }
 
+    protected void onPostExecute(TaskResult result) {
+        delegate.onUserActivated(result);
+    }
+
+    public interface ActivateUserResponseHandler {
+        void onUserActivated(TaskResult result);
+    }
 }

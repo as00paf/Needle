@@ -4,6 +4,7 @@ import android.os.AsyncTask;
 import android.util.Log;
 
 import com.needletest.pafoid.needletest.AppConstants;
+import com.needletest.pafoid.needletest.authentication.task.AuthenticationResult;
 import com.needletest.pafoid.needletest.utils.JSONParser;
 
 import org.apache.http.NameValuePair;
@@ -64,5 +65,4 @@ public class PostLocationTask extends AsyncTask<Void, Void, PostLocationResult> 
 
         return null;
     }
-
 }

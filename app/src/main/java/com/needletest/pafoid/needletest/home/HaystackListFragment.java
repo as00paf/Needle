@@ -10,6 +10,7 @@ import android.os.SystemClock;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -30,7 +31,7 @@ import com.shamanland.fab.FloatingActionButton;
 
 import java.util.ArrayList;
 
-public class HaystackListFragment extends Fragment implements FetchHaystacksTask.FetchHaystackResponseHandler{
+public class HaystackListFragment extends Fragment implements FetchHaystacksTask.FetchHaystackResponseHandler, SwipeRefreshLayout.OnRefreshListener{
     private static final String TAG = "HaystackListFragment";
 
     private View rootView;
@@ -40,7 +41,8 @@ public class HaystackListFragment extends Fragment implements FetchHaystacksTask
     private ArrayList<Haystack> publicHaystackList = null;
     private ArrayList<Haystack> privateHaystackList = null;
     private ProgressBar progressbar = null;
-    FloatingActionButton fab = null;
+    private FloatingActionButton fab = null;
+    private SwipeRefreshLayout swipeLayout;
 
     private String userName;
     private int userId = -1;
@@ -90,6 +92,9 @@ public class HaystackListFragment extends Fragment implements FetchHaystacksTask
                 startActivity(intent);
             }
         });
+
+        swipeLayout = (SwipeRefreshLayout) rootView.findViewById(R.id.swipe_container);
+        swipeLayout.setOnRefreshListener(this);
 
         return rootView;
     }
@@ -156,11 +161,16 @@ public class HaystackListFragment extends Fragment implements FetchHaystacksTask
         }
     }
 
+    @Override public void onRefresh() {
+        fetchHaystacks();
+    }
+
     public void onHaystackFetched(FetchHaystacksResult result){
         haystackList = result.haystackList;
         publicHaystackList = result.publicHaystackList;
         privateHaystackList = result.privateHaystackList;
 
+        swipeLayout.setRefreshing(false);
         updateHaystackList();
     }
 

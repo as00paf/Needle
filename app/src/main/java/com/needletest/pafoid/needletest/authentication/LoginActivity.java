@@ -75,11 +75,6 @@ public class LoginActivity extends Activity implements OnClickListener, LoginTas
 		//register listeners
 		mSubmit.setOnClickListener(this);
 		mRegister.setOnClickListener(this);
-
-        //Test for connection refused
-        WifiManager wm = (WifiManager) getSystemService(Context.WIFI_SERVICE);
-        WifiManager.WifiLock wifiLock = wm.createWifiLock(WifiManager.WIFI_MODE_FULL , "MyWifiLock");
-        wifiLock.acquire();
 	}
 
     @Override
@@ -112,6 +107,7 @@ public class LoginActivity extends Activity implements OnClickListener, LoginTas
     public void onLoginComplete(AuthenticationResult result){
         if(result.successCode == 1){
             Intent i = new Intent(this, HomeActivity.class);
+            i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             startActivity(i);
         }else{
             Toast.makeText(this, "An Error Occured\n Please Try Again!", Toast.LENGTH_SHORT).show();

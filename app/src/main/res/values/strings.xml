@@ -61,10 +61,15 @@
     <string name="confirm">Confirm</string>
     <string name="hello_world">Hello world!</string>
     <string name="addRemoveUsers">Add/Remove Users</string>
+    <string name="get_directions_to_user">Get Directions To User</string>
     <string name="add_pin">Add Pin</string>
     <string name="adding_users">Adding Users...</string>
     <string name="haystack_created">Haystack Created</string>
     <string name="sharing_location_error">Error Sharing Your Location</string>
     <string name="unsharing_location_error">Error Removing Location Sharing</string>
+
+
+    <string name="quit_confirmation_title">Exit App Confirmation</string>
+    <string name="quit_confirmation_msg">Are you sure you want to quit Needle ?</string>
 
 </resources>

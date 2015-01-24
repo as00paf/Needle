@@ -11,6 +11,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.support.v4.widget.DrawerLayout;
 import android.view.View;
+import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import com.needletest.pafoid.needletest.AppConstants;
@@ -40,6 +42,8 @@ public class HaystackActivity extends ActionBarActivity
 
     private HaystackUserListFragment haystackUserListFragment;
     public HaystackMapFragment mMapFragment;
+    private Menu menu;
+    private ImageView directionsArrow;
 
     //Lifecycle Methods
     @Override
@@ -83,6 +87,11 @@ public class HaystackActivity extends ActionBarActivity
         }else{
             fab.setVisibility(View.INVISIBLE);
         }
+
+        directionsArrow = (ImageView) findViewById(R.id.directions_arrow);
+
+        RelativeLayout mapFragmentContainer = (RelativeLayout) findViewById(R.id.haystack_activity_container);
+        mapFragmentContainer.requestTransparentRegion(findViewById(R.id.haystack_fragment_container));
     }
 
     @Override
@@ -93,6 +102,16 @@ public class HaystackActivity extends ActionBarActivity
     }
 
     @Override
+    public void onBackPressed(){
+        FragmentManager fm = getSupportFragmentManager();
+        if (fm.getBackStackEntryCount() > 0) {
+            fm.popBackStack();
+        } else {
+            super.onBackPressed();
+        }
+    }
+
+    @Override
     public void onNavigationDrawerItemSelected(int position) {
         FragmentManager fragmentManager = getSupportFragmentManager();
 
@@ -100,13 +119,14 @@ public class HaystackActivity extends ActionBarActivity
             case 0:
                 //Map View
                 fragmentManager.beginTransaction()
-                        .replace(R.id.haystack_fragment_container, getHaystackMapFragment())
+                        .replace(R.id.haystack_fragment_container, getHaystackMapFragment(), HaystackMapFragment.TAG)
                         .commit();
                 break;
             case 1:
                 //User list
                 fragmentManager.beginTransaction()
                         .replace(R.id.haystack_fragment_container, getHaystackUserListFragment())
+                        .addToBackStack(HaystackMapFragment.TAG)
                         .commit();
 
                 break;
@@ -144,12 +164,15 @@ public class HaystackActivity extends ActionBarActivity
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
+        this.menu = menu;
+
         if (!mNavigationDrawerFragment.isDrawerOpen()) {
 
             getMenuInflater().inflate(R.menu.haystack, menu);
             restoreActionBar();
             return true;
         }
+
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -185,17 +208,31 @@ public class HaystackActivity extends ActionBarActivity
         startActivityForResult(intent, HaystackUserActivity.ADD_USERS);
     }
 
+    private void getDirections(){
+        Intent intent = new Intent(this, HaystackUserActivity.class);
+        intent.putExtra(AppConstants.TAG_REQUEST_CODE, HaystackUserActivity.SELECT_USER_FOR_DIRECTIONS);
+        intent.putExtra(AppConstants.TAG_HAYSTACK_ID, haystack.getId());
+        startActivityForResult(intent, HaystackUserActivity.SELECT_USER_FOR_DIRECTIONS);
+    }
+
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (resultCode == RESULT_OK && requestCode == HaystackUserActivity.ADD_USERS) {
-            ArrayList<User> addedUsers = data.getParcelableArrayListExtra(AppConstants.TAG_USERS);
-            haystack.getUsers().addAll(addedUsers);
+        if(resultCode == RESULT_OK){
+            if (requestCode == HaystackUserActivity.ADD_USERS) {
+                ArrayList<User> addedUsers = data.getParcelableArrayListExtra(AppConstants.TAG_USERS);
+                haystack.getUsers().addAll(addedUsers);
+            }else if(requestCode == HaystackUserActivity.SELECT_USER_FOR_DIRECTIONS){
+                ArrayList<User> users = data.getParcelableArrayListExtra(AppConstants.TAG_USERS);
+                User user = users.get(0);
+                getDirectionsToUser(user);
+            }
         }
     }
 
-    private void getDirections(){
-
+    private void getDirectionsToUser(User user){
+        directionsArrow.setVisibility(View.VISIBLE);
     }
+
 
     private void leaveHaystack(){
         LeaveHaystackParams params = new LeaveHaystackParams(this, String.valueOf(userId), String.valueOf(haystack.getId()));
@@ -261,6 +298,10 @@ public class HaystackActivity extends ActionBarActivity
         isOwner = userId == ownerId;
 
         return isOwner;
+    }
+
+    public Menu getMenu(){
+        return menu;
     }
 
 }

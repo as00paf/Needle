@@ -20,6 +20,7 @@ import java.util.List;
 public class RetrieveUsersTask extends AsyncTask<Void, Void, RetrieveUsersResult> {
     private static final String RETRIEVE_USERS_URL = AppConstants.PROJECT_URL + "retrieveAllUsers.php";
     private static final String RETRIEVE_NOT_IN_HAYSTACK_USERS_URL = AppConstants.PROJECT_URL + "fetchUsersNotInHaystack.php";
+    private static final String RETRIEVE_ACTIVE_USERS_URL = AppConstants.PROJECT_URL + "fetchHaystackActiveUsers.php";
 
     private static final String TAG = "RetrieveUsersTask";
 
@@ -56,6 +57,10 @@ public class RetrieveUsersTask extends AsyncTask<Void, Void, RetrieveUsersResult
                 case TYPE_USERS_NOT_IN_HAYSTACK:
                     requestParams.add(new BasicNameValuePair(AppConstants.TAG_HAYSTACK_ID, String.valueOf(params.haystackId)));
                     url = RETRIEVE_NOT_IN_HAYSTACK_USERS_URL;
+                    break;
+                case TYPE_HAYSTACK_ACTIVE_USERS:
+                    requestParams.add(new BasicNameValuePair("haystackId", String.valueOf(params.haystackId)));
+                    url = RETRIEVE_ACTIVE_USERS_URL;
                     break;
                 default :
                     url = RETRIEVE_USERS_URL;

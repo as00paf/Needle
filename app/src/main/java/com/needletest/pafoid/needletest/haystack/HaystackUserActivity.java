@@ -3,6 +3,7 @@ package com.needletest.pafoid.needletest.haystack;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -33,7 +34,7 @@ public class HaystackUserActivity extends ActionBarActivity implements AddUsersT
 
     public static final int ADD_REMOVE_USERS = 0;
     public static final int ADD_USERS = 1;
-    public static final int REMOVE_USERS = 2;
+    public static final int SELECT_USER_FOR_DIRECTIONS = 2;
     public static final int BAN_USERS = 3;
 
     private int requestCode;
@@ -55,7 +56,6 @@ public class HaystackUserActivity extends ActionBarActivity implements AddUsersT
         addedUserList = getIntent().getParcelableArrayListExtra(AppConstants.TAG_ADDED_USERS);
 
         listView =  (ListView) findViewById(R.id.userList);
-        listView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
         userListAdapter = new HaystackUserListAdapter(this, R.layout.haystack_drawer_item, userList, addedUserList, getLayoutInflater());
         listView.setAdapter(userListAdapter);
 
@@ -68,11 +68,27 @@ public class HaystackUserActivity extends ActionBarActivity implements AddUsersT
         });
 
         requestCode = getIntent().getIntExtra(AppConstants.TAG_REQUEST_CODE, -1);
-        if(requestCode == ADD_REMOVE_USERS){
-            fetchAllUsers();
-        }else if (requestCode == ADD_USERS){
-            haystackId = getIntent().getIntExtra(AppConstants.TAG_HAYSTACK_ID, -1);
-            fetchUsersNotInHaystack(haystackId);
+        ActionBar actionBar = getSupportActionBar();
+
+        switch(requestCode){
+            case ADD_REMOVE_USERS:
+                listView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
+                actionBar.setTitle(getString(R.string.addRemoveUsers));
+                fetchAllUsers();
+                break;
+            case ADD_USERS:
+                listView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
+                actionBar.setTitle(getString(R.string.add_users));
+                haystackId = getIntent().getIntExtra(AppConstants.TAG_HAYSTACK_ID, -1);
+                fetchUsersNotInHaystack(haystackId);
+            break;
+            case SELECT_USER_FOR_DIRECTIONS:
+                listView.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
+                actionBar.setTitle(getString(R.string.get_directions_to_user));
+                haystackId = getIntent().getIntExtra(AppConstants.TAG_HAYSTACK_ID, -1);
+                fetchHaystackActiveUsers(haystackId);
+            break;
+
         }
     }
 
@@ -108,11 +124,6 @@ public class HaystackUserActivity extends ActionBarActivity implements AddUsersT
         }
     }
 
-    public void onUsersRetrieved(RetrieveUsersResult result){
-        userList = result.userList;
-        updateUserList();
-    }
-
     private void fetchUsersNotInHaystack(int haystackId){
         RetrieveUsersParams params = new RetrieveUsersParams();
         params.userId = String.valueOf(getUserId());
@@ -125,6 +136,25 @@ public class HaystackUserActivity extends ActionBarActivity implements AddUsersT
         } catch(Exception e){
             e.printStackTrace();
         }
+    }
+
+    private void fetchHaystackActiveUsers(int haystackId){
+        RetrieveUsersParams params = new RetrieveUsersParams();
+        params.userId = String.valueOf(getUserId());
+        params.haystackId = haystackId;
+        params.type = RetrieveUsersParams.RetrieveUsersParamsType.TYPE_HAYSTACK_ACTIVE_USERS;
+
+        try{
+            RetrieveUsersTask task =  new RetrieveUsersTask(params, this);
+            task.execute();
+        } catch(Exception e){
+            e.printStackTrace();
+        }
+    }
+
+    public void onUsersRetrieved(RetrieveUsersResult result){
+        userList = result.userList;
+        updateUserList();
     }
 
     private void updateUserList(){
@@ -146,10 +176,16 @@ public class HaystackUserActivity extends ActionBarActivity implements AddUsersT
     }
 
     private void confirm(){
-        if(requestCode == ADD_REMOVE_USERS){
-            returnSelectedUserList();
-        }else if (requestCode == ADD_USERS){
-            addSelectedUsersToHaystack();
+        switch(requestCode){
+            case ADD_REMOVE_USERS:
+                returnSelectedUserList();
+                break;
+            case ADD_USERS:
+                addSelectedUsersToHaystack();
+                break;
+            case SELECT_USER_FOR_DIRECTIONS:
+                returnSelectedUserList();
+                break;
         }
     }
 

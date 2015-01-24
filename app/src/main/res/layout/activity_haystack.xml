@@ -5,14 +5,26 @@
 
     <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="fill_parent"
-        android:layout_height="fill_parent">
+        android:layout_height="fill_parent"
+        android:id="@+id/haystack_activity_container">
 
         <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:id="@+id/haystack_fragment_container">
+            android:id="@+id/haystack_fragment_container"
+            android:background="@android:color/transparent">
 
         </RelativeLayout>
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/directions_arrow"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
+            android:src="@drawable/arrow"
+            android:visibility="invisible"
+            />
 
         <com.shamanland.fab.FloatingActionButton
             android:id="@+id/fab_add_users"

@@ -75,7 +75,8 @@ public class HaystackUserListAdapter extends BaseAdapter {
             userItemHolder.icon.setImageDrawable(context.getResources().getDrawable(R.drawable.ic_action_person));
         }
 
-        ((ListView) parent).setItemChecked(position, wasAlreadyAdded(dItem));
+        if(parent != null)
+            ((ListView) parent).setItemChecked(position, wasAlreadyAdded(dItem));
 
         return view;
     }

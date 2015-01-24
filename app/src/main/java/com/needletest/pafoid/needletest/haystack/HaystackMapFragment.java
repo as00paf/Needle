@@ -12,6 +12,10 @@ import android.os.SystemClock;
 import android.preference.PreferenceManager;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
+import android.view.ViewGroup;
 import android.view.animation.Interpolator;
 import android.view.animation.LinearInterpolator;
 import android.widget.Toast;
@@ -77,7 +81,6 @@ public class HaystackMapFragment extends SupportMapFragment
     private String username = "";
     private int userId = -1;
     private Haystack haystack;
-    private String haystackId;
     private Circle mCircle;
     private Boolean cameraUpdated = false;
 
@@ -123,7 +126,6 @@ public class HaystackMapFragment extends SupportMapFragment
         }
 
         haystack = ((HaystackActivity) getActivity()).getHaystack();
-        haystackId = String.valueOf(haystack.getId());
     }
 
     @Override
@@ -137,6 +139,12 @@ public class HaystackMapFragment extends SupportMapFragment
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         setUpMapIfNeeded();
+    }
+
+    @Override
+    public void onResume() {
+        haystack = ((HaystackActivity) getActivity()).getHaystack();
+        super.onResume();
     }
 
     @Override
@@ -318,19 +326,15 @@ public class HaystackMapFragment extends SupportMapFragment
                     if(mMarkers.containsKey(id)){
                         marker = mMarkers.get(id);
                         if(!marker.getPosition().equals(position)){
-                            //marker.setPosition(position);
                             animateMarker(marker, position, false);
 
+                            Location loc = new Location("");
+                            loc.setLatitude(lat);
+                            loc.setLongitude(lng);
 
-                            //Log.i(TAG,"Moving marker with id : "+id);
+                            double distanceInMeters = Math.floor(mCurrentLocation.distanceTo(loc));
 
-                        /*Location loc = new Location("");
-                        loc.setLatitude(lat);
-                        loc.setLongitude(lng);
-
-                        double distanceInMeters = Math.floor(mCurrentLocation.distanceTo(loc));
-
-                        marker.setSnippet("Distance to " + id + " :" + distanceInMeters + "m");*/
+                            marker.setSnippet("Distance to " + id + " :" + distanceInMeters + "m");
                         }
 
                         //marker.showInfoWindow();
@@ -388,8 +392,14 @@ public class HaystackMapFragment extends SupportMapFragment
 
         //Add user's marker back
         MarkerOptions markerOptions = new MarkerOptions();
-        markerOptions.position(mCurrentPosition);
-        mMarker = mMap.addMarker(markerOptions);
+        if(mMarker == null && mCircle == null){
+            markerOptions.position(mCurrentPosition);
+            drawMarkerWithCircle(mCurrentPosition);
+        }else{
+            updateMarkerWithCircle(mCurrentPosition);
+        }
+
+        mMarker.setTitle("Your Position");
 
         //Add other user's markers back
         if(mLocationList!=null){
@@ -431,7 +441,7 @@ public class HaystackMapFragment extends SupportMapFragment
     }
 
     public void moveCamera(){
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(mCurrentPosition, 100));
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(mCurrentPosition, 19.0f));
         cameraUpdated = true;
     }
 
@@ -513,7 +523,7 @@ public class HaystackMapFragment extends SupportMapFragment
     }
 
     public void retrieveLocations(){
-        RetrieveLocationsParams params = new RetrieveLocationsParams(getUserName(), String.valueOf(getUserId()), haystackId, false);
+        RetrieveLocationsParams params = new RetrieveLocationsParams(getUserName(), String.valueOf(getUserId()), String.valueOf(haystack.getId()), false);
         try{
             RetrieveLocationsTask task = new RetrieveLocationsTask(params, this);
             task.execute();
@@ -543,6 +553,15 @@ public class HaystackMapFragment extends SupportMapFragment
 
     public void onUserActivated(TaskResult result){
         isActivated = result.successCode == 1;
+
+        MenuItem item = ((HaystackActivity) getActivity()).getMenu().findItem(R.id.location_sharing);
+        item.setIcon(isActivated ?
+                getResources().getDrawable(R.drawable.ic_action_location_found) :
+                getResources().getDrawable(R.drawable.ic_action_location_off));
+
+        if(!isActivated){
+            Toast.makeText(getActivity(), "Error Sharing Location", Toast.LENGTH_SHORT).show();
+        }
     }
 
     public void deactivateUser(){
@@ -558,6 +577,15 @@ public class HaystackMapFragment extends SupportMapFragment
 
     public void onUserDeactivated(TaskResult result){
         isActivated = !(result.successCode == 1);
+
+        MenuItem item = ((HaystackActivity) getActivity()).getMenu().findItem(R.id.location_sharing);
+        item.setIcon(isActivated ?
+                getResources().getDrawable(R.drawable.ic_action_location_found) :
+                getResources().getDrawable(R.drawable.ic_action_location_off));
+
+        if(isActivated){
+            Toast.makeText(getActivity(), "Error Stoping Location Sharing", Toast.LENGTH_SHORT).show();
+        }
     }
 
     public void shareLocation(){

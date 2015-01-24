@@ -15,10 +15,14 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.support.v4.app.Fragment;
+import android.view.animation.Animation;
+import android.view.animation.Transformation;
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -35,6 +39,7 @@ import com.needletest.pafoid.needletest.home.task.createHaystack.CreateHaystackT
 import com.needletest.pafoid.needletest.home.task.createHaystack.CreateHaystackTaskParams;
 import com.needletest.pafoid.needletest.models.Haystack;
 import com.needletest.pafoid.needletest.models.User;
+import com.needletest.pafoid.needletest.utils.AppAnimations;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -53,7 +58,7 @@ public class CreateHaystackFragment extends Fragment implements CreateHaystackTa
     private CheckBox isPublicCheckbox;
     private ImageButton changeDateLimitButton, changeTimeLimitButton;
     private Button createHaystackButton, addRemoveUsersButton;
-    private TextView dateLimitText, timeLimitText;
+    private TextView dateLimitText, timeLimitText, usersLabel;
     private ListView userListView;
     private HaystackUserListAdapter userListAdapter;
 
@@ -92,6 +97,20 @@ public class CreateHaystackFragment extends Fragment implements CreateHaystackTa
 
         txtName = (EditText) rootView.findViewById(R.id.new_haystack_name);
         isPublicCheckbox = (CheckBox) rootView.findViewById(R.id.new_haystack_isPublic_checkBox);
+        isPublicCheckbox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if(isChecked){
+                    AppAnimations.collapse(userListView);
+                    AppAnimations.collapse(addRemoveUsersButton);
+                    AppAnimations.collapse(usersLabel);
+                }else{
+                    AppAnimations.expand(userListView, 500);
+                    AppAnimations.expand(addRemoveUsersButton);
+                    AppAnimations.expand(usersLabel);
+                }
+            }
+        });
 
         calendar = Calendar.getInstance();
         year = calendar.get(Calendar.YEAR);
@@ -146,6 +165,8 @@ public class CreateHaystackFragment extends Fragment implements CreateHaystackTa
         });
 
         userListAdapter = new HaystackUserListAdapter(getActionBar().getThemedContext(), R.layout.haystack_drawer_item, userList, null, inflater);
+
+        usersLabel = (TextView) rootView.findViewById(R.id.new_haystack_users_label);
 
         userListView = (ListView) rootView.findViewById(R.id.haystack_user_list);
         userListView.setAdapter(userListAdapter);
@@ -269,6 +290,6 @@ public class CreateHaystackFragment extends Fragment implements CreateHaystackTa
 
     private ActionBar getActionBar() {
         return ((ActionBarActivity) getActivity()).getSupportActionBar();
-    }
 
+    }
 }

@@ -40,7 +40,8 @@
             android:layout_below="@id/new_haystack_name"
             android:text="@string/privacy"
             android:textColor="#000000"
-            android:paddingTop="10dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="10dp"
             android:textAppearance="?android:attr/textAppearanceMedium"/>
 
         <CheckBox
@@ -50,7 +51,8 @@
             android:layout_below="@id/new_haystack_privacy_label"
             android:text="@string/isPublic"
             android:checked="false"
-            android:paddingLeft="10dp"
+            android:padding="15dp"
+            android:layout_marginBottom="10dp"
             />
 
         <TextView

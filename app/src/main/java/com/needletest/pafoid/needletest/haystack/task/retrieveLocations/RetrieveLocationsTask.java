@@ -17,7 +17,7 @@ import java.util.HashMap;
 import java.util.List;
 
 public class RetrieveLocationsTask extends AsyncTask<Void, Void, RetrieveLocationsResult> {
-    private static final String LOCATION_URL = AppConstants.PROJECT_URL + "locations.php";
+    private static final String LOCATION_URL = AppConstants.PROJECT_URL + "retrieveLocations.php";
     private static final String TAG = "RetrieveLocationsTask";
 
     private RetrieveLocationsResponseHandler delegate;

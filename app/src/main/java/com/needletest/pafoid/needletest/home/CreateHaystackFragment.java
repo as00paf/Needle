@@ -240,8 +240,6 @@ public class CreateHaystackFragment extends Fragment implements CreateHaystackTa
             trans.remove(this);
             trans.commit();
 
-            ((HomeActivity) getActivity()).onNavigationDrawerItemSelected(0);
-
             Toast.makeText(getActivity(), getResources().getString(R.string.haystack_created), Toast.LENGTH_SHORT).show();
 
             Intent intent = new Intent(getActivity(), HaystackActivity.class);

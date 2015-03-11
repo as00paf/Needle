@@ -103,12 +103,13 @@ public class CreateHaystackTask extends AsyncTask<Void, Void, CreateHaystackResu
         }
 
         return null;
-
     }
 
     protected void onPostExecute(CreateHaystackResult result) {
         super.onPostExecute(result);
         dialog.dismiss();
+
+        delegate.onHaystackCreated(result);
     }
 
     public interface CreateHaystackResponseHandler {

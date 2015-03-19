@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:id="@+id/swipe_container"
-    tools:context="com.needletest.pafoid.needletest.home.HaystackListFragment">
+    tools:context="com.nemator.needle.home.HaystackListFragment">
 
     <RelativeLayout
         android:layout_width="match_parent"

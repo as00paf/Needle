@@ -8,6 +8,8 @@
     <string name="title_haystacks">Haystacks</string>
     <string name="title_activity_haystack">Haystacks</string>
     <string name="title_settings">Settings</string>
+    <string name="title_helpAndSupport">Help &amp; Support</string>
+    <string name="title_logOut">Log Out</string>
 
     <!-- App Settings Activity -->
     <string name="rememberMeSummary">Make the Needle remember your credentials</string>
@@ -35,9 +37,7 @@
     <string name="map_view">Map View</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
-    <string name="action_example">Example action</string>
     <string name="action_settings">Settings</string>
-    <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="name">Name</string>
     <string name="isPublic">Public</string>
     <string name="timeLimit">Time Limit</string>
@@ -50,16 +50,12 @@
     <string name="add_users">Add Users</string>
     <string name="leave_haystack">Leave Haystack</string>
     <string name="privacy">Privacy</string>
-    <string name="title_section1">Section 1</string>
-    <string name="title_section2">Section 2</string>
-    <string name="title_section3">Section 3</string>
     <string name="userList">User List</string>
     <string name="shareLocation">Share My Location</string>
     <string name="get_directions">Get Directions...</string>
     <string name="stopSharingLocation">Stop Sharing Location</string>
     <string name="title_activity_haystack_user">HaystackUserActivity</string>
     <string name="confirm">Confirm</string>
-    <string name="hello_world">Hello world!</string>
     <string name="addRemoveUsers">Add/Remove Users</string>
     <string name="get_directions_to_user">Get Directions To User</string>
     <string name="add_pin">Add Pin</string>
@@ -67,9 +63,10 @@
     <string name="haystack_created">Haystack Created</string>
     <string name="sharing_location_error">Error Sharing Your Location</string>
     <string name="unsharing_location_error">Error Removing Location Sharing</string>
-
-
     <string name="quit_confirmation_title">Exit App Confirmation</string>
     <string name="quit_confirmation_msg">Are you sure you want to quit Needle ?</string>
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="title_activity_haystacks">Haystacks</string>
+    <string name="hello_world">Hello world!</string>
 
 </resources>

@@ -1,10 +1,10 @@
 apply plugin: 'com.android.application'
 android {
     compileSdkVersion 21
-    buildToolsVersion "20.0.0"
+    buildToolsVersion '21.1.2'
 
     defaultConfig {
-        applicationId "com.needletest.pafoid.needletest"
+        applicationId "com.nemator.needle"
         minSdkVersion 15
         targetSdkVersion 21
         versionCode 1
@@ -24,4 +24,6 @@ dependencies {
     compile 'com.shamanland:fab:0.0.7'
     compile 'com.android.support:support-v4:21.0.3'
     compile 'com.sothree.slidinguppanel:library:3.0.0'
+    compile project(':MaterialNavigationDrawerModule')
+    compile project(':android-support-v4-preferencefragment-master')
 }

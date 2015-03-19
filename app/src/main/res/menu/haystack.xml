@@ -1,7 +1,7 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context="com.needletest.pafoid.needletest.haystack.HaystackActivity">
+    tools:context="com.nemator.needle.haystack.HaystackActivity">
 
     <item android:id="@+id/location_sharing" android:title="@string/shareLocation"
         app:showAsAction="always" android:icon="@drawable/ic_action_location_off"/>

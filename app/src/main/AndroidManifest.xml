@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.needletest.pafoid.needletest" >
+    package="com.nemator.needle" >
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
@@ -19,7 +19,7 @@
         android:allowBackup="true"
         android:icon="@drawable/icon"
         android:label="@string/app_name"
-        android:theme="@style/AppTheme" >
+        android:theme="@style/AppTheme2" >
         <meta-data
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
@@ -30,7 +30,20 @@
         <activity
             android:name=".authentication.LoginActivity"
             android:label="@string/app_name"
-            android:theme="@style/AppTheme2">
+            android:theme="@style/AppTheme2" >
+
+            <!--
+            Test
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+            -->
+        </activity>
+        <activity
+            android:name=".MainActivity"
+            android:label="@string/app_name"
+            android:theme="@style/AppTheme2" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -40,7 +53,7 @@
         <activity
             android:name=".authentication.RegisterActivity"
             android:label="@string/app_name"
-            android:theme="@style/AppTheme2">
+            android:theme="@style/AppTheme2" >
         </activity>
         <activity
             android:name=".home.HomeActivity"
@@ -55,11 +68,16 @@
             android:name=".settings.AppSettingsActivity"
             android:label="@string/title_activity_app_settings"
             android:parentActivityName=".home.HomeActivity"
-            android:theme="@style/AppTheme2">
+            android:theme="@style/AppTheme2" >
         </activity>
         <activity
             android:name=".haystack.HaystackUserActivity"
             android:label="@string/title_activity_haystack_user"
+            android:theme="@style/AppTheme2" >
+        </activity>
+        <activity
+            android:name=".home.HaystacksActivity"
+            android:label="@string/title_activity_haystacks"
             android:theme="@style/AppTheme2">
         </activity>
     </application>

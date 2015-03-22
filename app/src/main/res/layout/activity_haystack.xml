@@ -25,16 +25,16 @@
             />
 
         <com.shamanland.fab.FloatingActionButton
-            android:id="@+id/fab_add_users"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentRight="true"
-            android:layout_alignParentEnd="true"
-            android:layout_marginRight="16dp"
-            android:layout_marginBottom="20dp"
-            android:src="@drawable/ic_action_new"
-            />
+        android:id="@+id/fab_add_users"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginRight="16dp"
+        android:layout_marginBottom="20dp"
+        android:src="@drawable/ic_action_new"
+        />
     </RelativeLayout>
 
     <fragment android:id="@+id/haystack_navigation_drawer"

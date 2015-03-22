@@ -77,7 +77,7 @@ public class HaystackActivity extends MaterialNavigationDrawer
         this.addAccount(account);
 
         //Create Sections
-        this.addSection(newSection(haystack.getName(), R.drawable.ic_haystack, new HaystackMapFragment()));
+        this.addSection(newSection(haystack.getName(), R.drawable.ic_haystack, new HaystackFragment()));
         this.addSection(newSection(getString(R.string.title_haystacks), R.drawable.ic_haystack, new HaystackListFragment()));
         this.addSection(newSection(getString(R.string.title_settings), R.drawable.ic_action_settings, new SettingsFragment()));
         this.addSection(newSection(getString(R.string.title_helpAndSupport), R.drawable.ic_action_help, new LoginFragment()));
@@ -240,7 +240,7 @@ public class HaystackActivity extends MaterialNavigationDrawer
         //mNavigationDrawerFragment.setIsSharingLocation(mMapFragment.isPostingLocationUpdates());
     }
 
-    private void addUsers(){
+    public void addUsers(){
         Intent intent = new Intent(this, HaystackUserActivity.class);
         intent.putExtra(AppConstants.TAG_REQUEST_CODE, HaystackUserActivity.ADD_USERS);
         intent.putExtra(AppConstants.TAG_HAYSTACK_ID, haystack.getId());

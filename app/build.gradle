@@ -26,4 +26,9 @@ dependencies {
     compile 'com.sothree.slidinguppanel:library:3.0.0'
     compile project(':MaterialNavigationDrawerModule')
     compile project(':android-support-v4-preferencefragment-master')
+
+    repositories {
+        mavenCentral()
+    }
+    compile 'com.sothree.slidinguppanel:library:3.0.0'
 }

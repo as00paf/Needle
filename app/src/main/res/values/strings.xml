@@ -68,5 +68,9 @@
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="title_activity_haystacks">Haystacks</string>
     <string name="hello_world">Hello world!</string>
+    <string name="title_directions">Directions</string>
+    <string name="title_leave">Leave</string>
+    <string name="title_users">Users</string>
+    <string name="title_pins">Pins</string>
 
 </resources>

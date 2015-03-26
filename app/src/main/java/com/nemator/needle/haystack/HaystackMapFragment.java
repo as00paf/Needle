@@ -140,15 +140,6 @@ public class HaystackMapFragment extends SupportMapFragment
         savedInstanceState.putParcelable(AppConstants.LOCATION_KEY, mCurrentLocation);
         savedInstanceState.putString(AppConstants.LAST_UPDATED_TIME_STRING_KEY, mLastUpdateTime);
     }
-/*
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState){
-        View rootView = inflater.inflate(R.layout.fragment_haystack_list, container, false);
-
-
-
-        return mainView;
-    }*/
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {

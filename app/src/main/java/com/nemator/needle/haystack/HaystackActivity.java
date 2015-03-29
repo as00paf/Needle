@@ -35,8 +35,7 @@ import it.neokree.materialnavigationdrawer.elements.MaterialAccount;
 import it.neokree.materialnavigationdrawer.elements.MaterialSection;
 
 
-public class HaystackActivity extends MaterialNavigationDrawer
-        implements LeaveHaystackTask.LeaveHaystackResponseHandler{
+public class HaystackActivity extends MaterialNavigationDrawer{
 
     private static final String TAG = "HaystackActivity";
 
@@ -51,6 +50,7 @@ public class HaystackActivity extends MaterialNavigationDrawer
     private ImageView directionsArrow;
     private SharedPreferences mSharedPreferences;
     private HaystackMapFragment mMapFragment;
+    private HaystackFragment mHaystackFragment;
 
     @Override
     public void init(Bundle savedInstanceState) {
@@ -77,7 +77,8 @@ public class HaystackActivity extends MaterialNavigationDrawer
         this.addAccount(account);
 
         //Create Sections
-        this.addSection(newSection(haystack.getName(), R.drawable.ic_haystack, new HaystackFragment()));
+        mHaystackFragment = new HaystackFragment();
+        this.addSection(newSection(haystack.getName(), R.drawable.ic_haystack, mHaystackFragment));
         this.addSection(newSection(getString(R.string.title_haystacks), R.drawable.ic_haystack, new HaystackListFragment()));
         this.addSection(newSection(getString(R.string.title_settings), R.drawable.ic_action_settings, new SettingsFragment()));
         this.addSection(newSection(getString(R.string.title_helpAndSupport), R.drawable.ic_action_help, new LoginFragment()));
@@ -150,96 +151,30 @@ public class HaystackActivity extends MaterialNavigationDrawer
         }
     }
 
-   /* @Override
-    public void onNavigationDrawerItemSelected(int position) {
-        FragmentManager fragmentManager = getSupportFragmentManager();
-
-        switch (position){
-            case 0:
-                //Map View
-                fragmentManager.beginTransaction()
-                        .replace(R.id.haystack_fragment_container, getHaystackMapFragment(), HaystackMapFragment.TAG)
-                        .commit();
-                break;
-            case 1:
-                //User list
-                fragmentManager.beginTransaction()
-                        .replace(R.id.haystack_fragment_container, getHaystackUserListFragment())
-                        .addToBackStack(HaystackMapFragment.TAG)
-                        .commit();
-
-                break;
-            case 2:
-            //Share location
-                toggleLocationSharing();
-                break;
-            case 3:
-                //Get Directions
-                getDirections();
-                break;
-            case 4:
-                if(isOwner()){//Add Users
-                    addUsers();
-                }else{//Leave Haystack
-                    leaveHaystack();
-                }
-                break;
-            case 5:
-                //Leave Haystack
-                leaveHaystack();
-                break;
-
-        }
-
-    }
-*/
  /*   public void restoreActionBar() {
         ActionBar actionBar = getSupportActionBar();
         actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
         actionBar.setDisplayShowTitleEnabled(true);
         actionBar.setTitle(mTitle);
     }
-
+*/
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         this.menu = menu;
 
-        if (!mNavigationDrawerFragment.isDrawerOpen()) {
+        if (!isDrawerOpen() && getCurrentSection().getTitle().equals(haystack.getName())) {
 
             getMenuInflater().inflate(R.menu.haystack, menu);
-            restoreActionBar();
+            //restoreActionBar();
             return true;
         }
 
         return super.onCreateOptionsMenu(menu);
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-
-        switch (id) {
-            case R.id.location_sharing:
-                toggleLocationSharing();
-                item.setIcon(mMapFragment.isPostingLocationUpdates() ?
-                        getResources().getDrawable(R.drawable.ic_action_location_found) :
-                        getResources().getDrawable(R.drawable.ic_action_location_off));
-                return true;
-            case R.id.add_pin:
-                //addPin();
-                return true;
-        }
-
-        return super.onOptionsItemSelected(item);
-    }*/
 
     //Actions
-    private void toggleLocationSharing(){
-        mMapFragment.toggleLocationSharing();
-        //mNavigationDrawerFragment.setIsSharingLocation(mMapFragment.isPostingLocationUpdates());
-    }
-
     public void addUsers(){
         Intent intent = new Intent(this, HaystackUserActivity.class);
         intent.putExtra(AppConstants.TAG_REQUEST_CODE, HaystackUserActivity.ADD_USERS);
@@ -272,28 +207,6 @@ public class HaystackActivity extends MaterialNavigationDrawer
         directionsArrow.setVisibility(View.VISIBLE);
     }
 
-
-    private void leaveHaystack(){
-        LeaveHaystackParams params = new LeaveHaystackParams(this, String.valueOf(userId), String.valueOf(haystack.getId()));
-        try{
-            LeaveHaystackTask task = new LeaveHaystackTask(params, this);
-            task.execute();
-        }catch(Exception e){
-            Toast.makeText(this, "Error Leaving Haystack", Toast.LENGTH_SHORT).show();
-        }
-    }
-
-    public void onHaystackLeft(TaskResult result){
-        if(result.successCode == 1){
-            Toast.makeText(this, "Haystack Left", Toast.LENGTH_SHORT).show();
-
-            Intent intent = new Intent(this, HomeActivity.class);
-            startActivity(intent);
-        }else{
-            Toast.makeText(this, "Error Leaving Haystack", Toast.LENGTH_SHORT).show();
-        }
-    }
-
     //Getters/Setters
     public HaystackMapFragment getHaystackMapFragment() {
         if(mMapFragment==null){
@@ -320,7 +233,7 @@ public class HaystackActivity extends MaterialNavigationDrawer
         return haystack;
     }
 
-    private int getUserId(){
+    public int getUserId(){
         if(userId==-1){
             SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
 

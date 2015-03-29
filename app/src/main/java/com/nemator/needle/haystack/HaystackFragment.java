@@ -16,16 +16,25 @@ import android.text.Spanned;
 import android.text.style.ImageSpan;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import com.appcompat.view.slidingTab.SlidingTabLayout;
 import com.nemator.needle.AppConstants;
 import com.nemator.needle.R;
+import com.nemator.needle.haystack.task.retrieveUsers.RetrieveUsersParams;
+import com.nemator.needle.haystack.task.retrieveUsers.RetrieveUsersResult;
+import com.nemator.needle.haystack.task.retrieveUsers.RetrieveUsersTask;
 import com.nemator.needle.models.Haystack;
+import com.nemator.needle.models.User;
 import com.shamanland.fab.FloatingActionButton;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
+
+import java.util.ArrayList;
 
 
 public class HaystackFragment extends Fragment {
@@ -35,6 +44,7 @@ public class HaystackFragment extends Fragment {
     SlidingPanelPagerAdapter mSlidingPanelPagerAdapter;
     ViewPager slidingPanelViewPager;
     SlidingTabLayout mSlidingTabLayout;
+    private HaystackMapFragment mHaystackMapFragment;
 
     public static HaystackFragment newInstance() {
         HaystackFragment fragment = new HaystackFragment();
@@ -140,18 +150,35 @@ public class HaystackFragment extends Fragment {
         }
 
         @Override
-        public Fragment getItem(int i) {
-            Fragment fragment = new DemoObjectFragment();
+        public Fragment getItem(int position) {
+            Fragment fragment;
+
+            switch (position){
+                case 0://Pins tab
+                    fragment = new DemoObjectFragment();
+                    break;
+                case 1://Directions tab
+                    fragment = new DemoObjectFragment();
+                    break;
+                case 2://Users tab
+                    fragment = new UsersTabFragment();
+                    break;
+                default:
+                    fragment = new DemoObjectFragment();
+                    break;
+            }
+
             Bundle args = new Bundle();
             // Our object is just an integer :-P
-            args.putInt(DemoObjectFragment.ARG_OBJECT, i + 1);
+            args.putInt(DemoObjectFragment.ARG_OBJECT, position + 1);
             fragment.setArguments(args);
+
             return fragment;
         }
 
         @Override
         public int getCount() {
-            return 4;
+            return 3;
         }
 
         @Override
@@ -166,9 +193,6 @@ public class HaystackFragment extends Fragment {
                     break;
                 case 2:
                     title = getString(R.string.title_users);
-                    break;
-                case 3:
-                    title = getString(R.string.title_leave);
                     break;
                 default:
                     title = "tab " + String.valueOf(position);
@@ -189,9 +213,6 @@ public class HaystackFragment extends Fragment {
                     break;
                 case 2:
                     icon= getResources().getDrawable(R.drawable.ic_action_group);
-                    break;
-                case 3:
-                    icon= getResources().getDrawable(R.drawable.ic_action_exit);
                     break;
                 default:
                     icon = getResources().getDrawable(R.drawable.ic_action_directions);
@@ -216,6 +237,57 @@ public class HaystackFragment extends Fragment {
             ((TextView) rootView.findViewById(R.id.view_pager_label)).setText(
                     Integer.toString(args.getInt(ARG_OBJECT)));
             return rootView;
+        }
+    }
+
+    public static class UsersTabFragment extends Fragment implements RetrieveUsersTask.RetrieveUsersResponseHandler{
+        public static final String ARG_OBJECT = "object";
+
+        private ListView listView;
+
+        private ArrayList<User> userList = new ArrayList<User>();
+        private ArrayList<User> addedUserList = new ArrayList<User>();
+        private HaystackUserListAdapter userListAdapter;
+        private LayoutInflater mInflater;
+
+        @Override
+        public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+            mInflater = inflater;
+            View rootView = inflater.inflate(R.layout.fragment_users_tab, container, false);
+
+            listView =  (ListView) rootView.findViewById(R.id.userList);
+            userListAdapter = new HaystackUserListAdapter(getActivity(), R.layout.haystack_drawer_item, userList, addedUserList, inflater);
+            listView.setAdapter(userListAdapter);
+
+            fetchAllUsers();
+
+            return rootView;
+        }
+
+        private void fetchAllUsers(){
+            RetrieveUsersParams params = new RetrieveUsersParams();
+            params.userId = String.valueOf(((HaystackActivity) getActivity()).getUserId());
+            params.type = RetrieveUsersParams.RetrieveUsersParamsType.TYPE_ALL_USERS;
+
+            try{
+                RetrieveUsersTask task =  new RetrieveUsersTask(params, this);
+                task.execute();
+            } catch(Exception e){
+                e.printStackTrace();
+            }
+        }
+
+        public void onUsersRetrieved(RetrieveUsersResult result){
+            userList = result.userList;
+            updateUserList();
+        }
+
+        private void updateUserList(){
+            userListAdapter = new HaystackUserListAdapter(getActivity(), R.layout.haystack_drawer_item, userList, addedUserList, mInflater);
+            listView.setAdapter(userListAdapter);
+
+            userListAdapter.notifyDataSetChanged();
+            listView.invalidate();
         }
     }
 }

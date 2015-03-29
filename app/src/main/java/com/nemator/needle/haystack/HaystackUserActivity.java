@@ -73,18 +73,18 @@ public class HaystackUserActivity extends ActionBarActivity implements AddUsersT
         switch(requestCode){
             case ADD_REMOVE_USERS:
                 listView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
-                actionBar.setTitle(getString(R.string.addRemoveUsers));
+                //actionBar.setTitle(getString(R.string.addRemoveUsers));
                 fetchAllUsers();
                 break;
             case ADD_USERS:
                 listView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
-                actionBar.setTitle(getString(R.string.add_users));
+                //actionBar.setTitle(getString(R.string.add_users));
                 haystackId = getIntent().getIntExtra(AppConstants.TAG_HAYSTACK_ID, -1);
                 fetchUsersNotInHaystack(haystackId);
             break;
             case SELECT_USER_FOR_DIRECTIONS:
                 listView.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
-                actionBar.setTitle(getString(R.string.get_directions_to_user));
+               // actionBar.setTitle(getString(R.string.get_directions_to_user));
                 haystackId = getIntent().getIntExtra(AppConstants.TAG_HAYSTACK_ID, -1);
                 fetchHaystackActiveUsers(haystackId);
             break;

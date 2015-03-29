@@ -6,7 +6,12 @@
     <item android:id="@+id/location_sharing" android:title="@string/shareLocation"
         app:showAsAction="always" android:icon="@drawable/ic_action_location_off"/>
 
-    <item android:id="@+id/add_pin" android:title="@string/add_pin"
-        app:showAsAction="always" android:icon="@drawable/ic_action_place"/>
+    <item android:id="@+id/menu_option_leave" android:title="@string/leave_haystack"
+        app:showAsAction="never" android:icon="@drawable/ic_action_exit"/>
 
+    <item android:id="@+id/menu_option_settings" android:title="@string/action_settings"
+        app:showAsAction="never" android:icon="@drawable/ic_action_settings"/>
+
+    <item android:id="@+id/menu_option_help" android:title="@string/title_helpAndSupport"
+        app:showAsAction="never" android:icon="@drawable/ic_action_help"/>
 </menu>

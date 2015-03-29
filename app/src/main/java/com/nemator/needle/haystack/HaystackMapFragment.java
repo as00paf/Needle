@@ -15,6 +15,7 @@ import android.support.v4.app.FragmentTransaction;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -42,10 +43,13 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.nemator.needle.R;
 import com.nemator.needle.haystack.task.activate.ActivateUserTask;
+import com.nemator.needle.haystack.task.leaveHaystack.LeaveHaystackParams;
+import com.nemator.needle.haystack.task.leaveHaystack.LeaveHaystackTask;
 import com.nemator.needle.haystack.task.postLocation.PostLocationParams;
 import com.nemator.needle.haystack.task.postLocation.PostLocationTask;
 import com.nemator.needle.haystack.task.retrieveLocations.RetrieveLocationsResult;
 import com.nemator.needle.home.HaystackListFragment;
+import com.nemator.needle.home.HomeActivity;
 import com.nemator.needle.models.Haystack;
 import com.nemator.needle.models.TaskResult;
 import com.nemator.needle.AppConstants;
@@ -66,7 +70,7 @@ import it.neokree.materialnavigationdrawer.MaterialNavigationDrawer;
 public class HaystackMapFragment extends SupportMapFragment
         implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener,
         LocationListener, RetrieveLocationsTask.RetrieveLocationsResponseHandler, ActivateUserTask.ActivateUserResponseHandler,
-        DeactivateUserTask.DeactivateUserResponseHandler{
+        DeactivateUserTask.DeactivateUserResponseHandler, LeaveHaystackTask.LeaveHaystackResponseHandler{
     public static final String TAG = "CustomSupportMapFragment";
 
     private ArrayList<HashMap<String, Object>> mLocationList = new ArrayList<HashMap<String, Object>>();
@@ -113,6 +117,9 @@ public class HaystackMapFragment extends SupportMapFragment
             Toast.makeText(getActivity(), "Google Play Services Unavailable", Toast.LENGTH_SHORT).show();
             Log.e(TAG, "Google Play Services Unavailable");
         }
+
+        //Action Bar
+        setHasOptionsMenu(true);
     }
 
     private void updateValuesFromBundle(Bundle savedInstanceState) {
@@ -186,6 +193,31 @@ public class HaystackMapFragment extends SupportMapFragment
                         break;
                 }
         }
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+
+        switch (id) {
+            case R.id.location_sharing:
+                toggleLocationSharing();
+                item.setIcon(isPostingLocationUpdates() ?
+                        getResources().getDrawable(R.drawable.ic_action_location_found) :
+                        getResources().getDrawable(R.drawable.ic_action_location_off));
+                return true;
+            case R.id.menu_option_leave:
+                leaveHaystack();
+                return true;
+            case R.id.menu_option_settings:
+
+                return true;
+            case R.id.menu_option_help:
+
+                return true;
+        }
+
+        return super.onOptionsItemSelected(item);
     }
 
     private void connectToApiClient(){
@@ -591,6 +623,27 @@ public class HaystackMapFragment extends SupportMapFragment
 
         if(isActivated){
             Toast.makeText(getActivity(), "Error Stoping Location Sharing", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void leaveHaystack(){
+        LeaveHaystackParams params = new LeaveHaystackParams(getActivity(), String.valueOf(userId), String.valueOf(haystack.getId()));
+        try{
+            LeaveHaystackTask task = new LeaveHaystackTask(params, this);
+            task.execute();
+        }catch(Exception e){
+            Toast.makeText(getActivity(), "Error Leaving Haystack", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    public void onHaystackLeft(TaskResult result){
+        if(result.successCode == 1){
+            Toast.makeText(getActivity(), "Haystack Left", Toast.LENGTH_SHORT).show();
+
+            Intent intent = new Intent(getActivity(), HomeActivity.class);
+            startActivity(intent);
+        }else{
+            Toast.makeText(getActivity(), "Error Leaving Haystack", Toast.LENGTH_SHORT).show();
         }
     }
 

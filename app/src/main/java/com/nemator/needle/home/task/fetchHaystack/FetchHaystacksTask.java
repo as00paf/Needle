@@ -71,10 +71,10 @@ public class FetchHaystacksTask extends AsyncTask<Void, Void, FetchHaystacksResu
 
 
                 //Public haystacks
-                haystackList.add(params.context.getResources().getString(R.string.publicHeader));
+                //haystackList.add(params.context.getResources().getString(R.string.publicHeader));
                 int count = publicHaystacks.length();
                 if(count == 0){
-                    haystackList.add(params.context.getResources().getString(R.string.noHaystackAvailable));
+                    //haystackList.add(params.context.getResources().getString(R.string.noHaystackAvailable));
                 }
 
                 for (int i = 0; i < count; i++) {
@@ -148,10 +148,10 @@ public class FetchHaystacksTask extends AsyncTask<Void, Void, FetchHaystacksResu
                 }
 
                 //Private haystacks
-                haystackList.add(params.context.getResources().getString(R.string.privateHeader));
+                //haystackList.add(params.context.getResources().getString(R.string.privateHeader));
                 count = privateHaystacks.length();
                 if(count == 0){
-                    haystackList.add(params.context.getResources().getString(R.string.noHaystackAvailable));
+                    //haystackList.add(params.context.getResources().getString(R.string.noHaystackAvailable));
                 }
 
                 for (int i = 0; i < count; i++) {

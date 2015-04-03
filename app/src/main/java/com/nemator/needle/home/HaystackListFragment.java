@@ -1,29 +1,29 @@
 package com.nemator.needle.home;
 
 import android.app.Activity;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentStatePagerAdapter;
+import android.support.v4.view.ViewPager;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.ListView;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 
-import com.nemator.needle.haystack.HaystackMapFragment;
+import com.appcompat.view.slidingTab.SlidingTabLayout;
 import com.nemator.needle.home.task.fetchHaystack.FetchHaystacksResult;
 import com.nemator.needle.home.task.fetchHaystack.FetchHaystacksTask;
 import com.nemator.needle.models.Haystack;
-import com.nemator.needle.AppConstants;
 import com.nemator.needle.R;
-import com.nemator.needle.haystack.HaystackActivity;
 import com.nemator.needle.home.task.fetchHaystack.FetchHaystacksParams;
 
 import com.shamanland.fab.FloatingActionButton;
@@ -32,21 +32,15 @@ import java.util.ArrayList;
 
 import it.neokree.materialnavigationdrawer.MaterialNavigationDrawer;
 
-public class HaystackListFragment extends Fragment implements FetchHaystacksTask.FetchHaystackResponseHandler, SwipeRefreshLayout.OnRefreshListener{
+public class HaystackListFragment extends Fragment{
     private static final String TAG = "HaystackListFragment";
 
     private View rootView;
-    private ListView listView;
-    private HaystackListAdapter haystackListAdapter;
-    private ArrayList<Object> haystackList = null;
-    private ArrayList<Haystack> publicHaystackList = null;
-    private ArrayList<Haystack> privateHaystackList = null;
-    private ProgressBar progressbar = null;
     private FloatingActionButton fab = null;
-    private SwipeRefreshLayout swipeLayout;
 
-    private String userName;
-    private int userId = -1;
+    private ViewPager haystackListViewPager;
+    private SlidingTabLayout mSlidingTabLayout;
+    private HaystackListPagerAdapter mHaystackListPagerAdapter;
 
     public static HaystackListFragment newInstance() {
         HaystackListFragment fragment = new HaystackListFragment();
@@ -61,7 +55,6 @@ public class HaystackListFragment extends Fragment implements FetchHaystacksTask
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         rootView = inflater.inflate(R.layout.fragment_haystack_list, container, false);
-        progressbar = (ProgressBar) rootView.findViewById(R.id.progressBar);
 
         fab = (FloatingActionButton) rootView.findViewById(R.id.fab);
         fab.setColor(getResources().getColor(R.color.primary));
@@ -73,151 +66,23 @@ public class HaystackListFragment extends Fragment implements FetchHaystacksTask
         });
         fab.initBackground();
 
-        listView = (ListView) rootView.findViewById(R.id.haystack_list);
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        //View pager
+        mHaystackListPagerAdapter = new HaystackListPagerAdapter(getActivity().getSupportFragmentManager(), this);
+        haystackListViewPager = (ViewPager) rootView.findViewById(R.id.haystackListViewPager);
+        haystackListViewPager.setAdapter(mHaystackListPagerAdapter);
 
+        //Tabs
+        mSlidingTabLayout = (SlidingTabLayout) rootView.findViewById(R.id.haystack_list_sliding_tabs);
+        mSlidingTabLayout.setDistributeEvenly(true);
+        mSlidingTabLayout.setCustomTabColorizer(new SlidingTabLayout.TabColorizer() {
             @Override
-            public void onItemClick(AdapterView<?> a, View v, int position,	long id) {
-                Object o = listView.getItemAtPosition(position);
-                if(o instanceof String){
-                    //Header
-                    return;
-                }
-
-                Haystack haystackData = (Haystack) o;
-                Intent intent = new Intent(getActivity(), HaystackActivity.class);
-                intent.putExtra(AppConstants.HAYSTACK_DATA_KEY, (Parcelable) haystackData);
-                startActivity(intent);
+            public int getIndicatorColor(int position) {
+                return getResources().getColor(R.color.tabsScrollColor);
             }
         });
 
-        swipeLayout = (SwipeRefreshLayout) rootView.findViewById(R.id.swipe_container);
-        swipeLayout.setOnRefreshListener(this);
+        mSlidingTabLayout.setViewPager(haystackListViewPager);
 
         return rootView;
-    }
-
-    @Override
-    public void onCreate(Bundle savedInstanceState){
-        super.onCreate(savedInstanceState);
-
-        if(savedInstanceState != null){
-            publicHaystackList = savedInstanceState.getParcelableArrayList("publicHaystackList");
-            privateHaystackList = savedInstanceState.getParcelableArrayList("privateHaystackList");
-
-            if(haystackList == null && (publicHaystackList.size() >  0 || privateHaystackList.size() >  0 )){
-                haystackList = new ArrayList<Object>();
-                haystackList.add(getResources().getString(R.string.publicHeader));
-
-                int i;
-                int count = publicHaystackList.size();
-                if(count==0){
-                    haystackList.add(getResources().getString(R.string.noHaystackAvailable));
-                }
-
-                for(i=0;i<count;i++){
-                    haystackList.add(publicHaystackList.get(i));
-                }
-
-                haystackList.add(getResources().getString(R.string.privateHeader));
-                count = privateHaystackList.size();
-                if(count==0){
-                    haystackList.add(getResources().getString(R.string.noHaystackAvailable));
-                }
-
-                for(i=0;i<count;i++){
-                    haystackList.add(privateHaystackList.get(i));
-                }
-            }
-        }else {
-            updateHaystackList();
-        }
-    }
-
-    @Override
-    public void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-
-        outState.putParcelableArrayList("publicHaystackList", publicHaystackList);
-        outState.putParcelableArrayList("privateHaystackList", privateHaystackList);
-    }
-
-    @Override
-    public void onResume(){
-        super.onResume();
-        fetchHaystacks();
-    }
-
-    public void fetchHaystacks(){
-        FetchHaystacksParams params = new FetchHaystacksParams(getUserName(), String.valueOf(getUserId()), rootView.getContext(), progressbar);
-
-        try{
-            FetchHaystacksTask task = new FetchHaystacksTask(params, this);
-            task.execute();
-        }catch(Exception e){
-            Log.e(TAG, "fetchHaystacks exception : "+e.toString());
-        }
-    }
-
-    @Override public void onRefresh() {
-        fetchHaystacks();
-    }
-
-    public void onHaystackFetched(FetchHaystacksResult result){
-        haystackList = result.haystackList;
-        publicHaystackList = result.publicHaystackList;
-        privateHaystackList = result.privateHaystackList;
-
-        swipeLayout.setRefreshing(false);
-        updateHaystackList();
-    }
-
-
-    public void updateHaystackList() {
-        if(rootView == null || haystackList == null){
-            return;
-        }
-
-        haystackListAdapter = new HaystackListAdapter(rootView.getContext());
-        listView.setAdapter(haystackListAdapter);
-        haystackListAdapter.addAllItems(haystackList);
-
-        haystackListAdapter.notifyDataSetChanged();
-        listView.invalidate();
-
-        progressbar.setVisibility(View.GONE);
-        listView.setVisibility(View.VISIBLE);
-    }
-
-    private int getUserId(){
-        if(userId==-1){
-            SharedPreferences sp = PreferenceManager
-                    .getDefaultSharedPreferences(rootView.getContext());
-
-            userId = sp.getInt("userId", -1);
-        }
-
-        return userId;
-    }
-
-    private String getUserName(){
-        if(userName == null){
-            SharedPreferences sp = PreferenceManager
-                    .getDefaultSharedPreferences(rootView.getContext());
-
-            userName = sp.getString("username", null);
-        }
-
-        return userName;
-    }
-
-    @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
     }
 }

@@ -208,7 +208,7 @@ public class HomeNavigationDrawerFragment extends Fragment {
         if (item.getItemId() == R.id.action_refresh) {
             for(int i=0;i<getFragmentManager().getFragments().size();i++){
                 if(getFragmentManager().getFragments().get(i) instanceof HaystackListFragment){
-                    ((HaystackListFragment) getFragmentManager().getFragments().get(i)).fetchHaystacks();
+                    //((HaystackListFragment) getFragmentManager().getFragments().get(i)).fetchHaystacks();
                 }
             }
             return true;

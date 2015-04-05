@@ -1,12 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center_horizontal">
 
     <ListView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:id="@+id/userList"
-        android:background="@drawable/border_ui"/>
+        android:padding="10dp"
+        android:layout_marginBottom="20dp"/>
+
+    <Button
+        android:id="@+id/add_users_button"
+        android:layout_width="200dp"
+        android:layout_height="50dp"
+        android:text="@string/add_users"
+        android:gravity="center"
+        android:background="@android:color/white"
+        android:layout_margin="2dp"
+        android:elevation="8dp"/>
+
 
 </LinearLayout>

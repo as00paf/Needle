@@ -48,6 +48,7 @@
     <string name="picture">Picture</string>
     <string name="create_haystack">Create Haystack</string>
     <string name="add_users">Add Users</string>
+    <string name="remove_users">Remove Users</string>
     <string name="leave_haystack">Leave Haystack</string>
     <string name="privacy">Privacy</string>
     <string name="userList">User List</string>

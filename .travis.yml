@@ -1,3 +1,6 @@
 language: android
 script: 
     - ./gradlew build
+branches:
+  only:
+    - master

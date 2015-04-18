@@ -17,4 +17,8 @@
         >#F3E5F5</color>
 
     <color name="tabsScrollColor">#FFFFFF</color>
+
+
+    <color name="float_label">#999999</color>
+
 </resources>

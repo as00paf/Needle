@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <!-- Name -->
+    <com.appcompat.view.floatLabel.FloatLabelLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/new_haystack_name_floating_label"
+        app:floatLabelTextAppearance="@style/TextAppearance.Needle.FloatLabelLarge">
+
+        <EditText
+            android:id="@+id/new_haystack_name"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:textColor="@android:color/white"
+            android:textSize="42dp"
+            android:hint="@string/haystack_name_hint"
+            android:imeOptions="actionDone"
+            android:singleLine="true"
+            android:inputType="textNoSuggestions">
+        </EditText>
+    </com.appcompat.view.floatLabel.FloatLabelLayout>
+
+    <!-- Privacy -->
+    <TextView
+        android:id="@+id/new_haystack_privacy_label"
+        android:textStyle="bold"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/privacy"
+        android:textColor="#000000"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="10dp"
+        android:textAppearance="?android:attr/textAppearanceMedium"/>
+
+    <CheckBox
+        android:id="@+id/new_haystack_isPublic_checkBox"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/new_haystack_privacy_label"
+        android:text="@string/isPublic"
+        android:checked="false"
+        android:padding="15dp"
+        android:layout_marginBottom="10dp"
+        />
+
+    <TextView
+        android:id="@+id/new_haystack_timeLimit_label"
+        android:textStyle="bold"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/new_haystack_isPublic_checkBox"
+        android:text="@string/timeLimit"
+        android:textColor="#000000"
+        android:paddingTop="10dp"
+        android:paddingBottom="10dp"
+        android:textAppearance="?android:attr/textAppearanceMedium"/>
+
+    <!-- Expiration -->
+    <!-- Date -->
+    <TextView
+        android:id="@+id/new_haystack_date_label"
+        android:textStyle="bold"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/date"
+        android:textColor="#000000"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@id/new_haystack_timeLimit_label"
+        android:layout_marginLeft="5dp"
+        android:layout_marginTop="15dp"/>
+
+    <TextView
+        android:id="@+id/dateLimitText"
+        android:textStyle="bold"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="2015-01-14"
+        android:textAlignment="center"
+        android:textColor="#000000"
+        android:layout_below="@id/new_haystack_timeLimit_label"
+        android:layout_centerHorizontal="true"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:layout_marginTop="15dp"/>
+
+    <ImageButton
+        android:id="@+id/changeDateLimitButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/new_haystack_timeLimit_label"
+        android:layout_alignParentRight="true"
+        android:src="@drawable/ic_action_edit"/>
+
+    <!-- Time -->
+    <TextView
+        android:id="@+id/new_haystack_time_label"
+        android:textStyle="bold"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/time"
+        android:textColor="#000000"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@id/changeDateLimitButton"
+        android:layout_marginLeft="5dp"
+        android:layout_marginTop="15dp"/>
+
+    <TextView
+        android:id="@+id/timeLimitText"
+        android:textStyle="bold"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="00:00:00"
+        android:textAlignment="center"
+        android:textColor="#000000"
+        android:layout_below="@id/changeDateLimitButton"
+        android:layout_centerHorizontal="true"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:layout_marginTop="15dp"/>
+
+    <ImageButton
+        android:id="@+id/changeTimeLimitButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/changeDateLimitButton"
+        android:layout_alignParentRight="true"
+        android:src="@drawable/ic_action_edit"/>
+</LinearLayout>

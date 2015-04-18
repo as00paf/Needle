@@ -73,5 +73,7 @@
     <string name="title_leave">Leave</string>
     <string name="title_users">Users</string>
     <string name="title_pins">Pins</string>
+    <string name="haystack_name_hint">Haystack Name</string>
+    <string name="general_infos">General Infos</string>
 
 </resources>

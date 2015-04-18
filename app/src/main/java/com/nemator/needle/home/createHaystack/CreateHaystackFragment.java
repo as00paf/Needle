@@ -1,7 +1,5 @@
-package com.nemator.needle.home;
+package com.nemator.needle.home.createHaystack;
 
-import android.app.DatePickerDialog;
-import android.app.TimePickerDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -9,64 +7,64 @@ import android.os.Parcelable;
 import android.preference.PreferenceManager;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.view.LayoutInflater;
+import android.view.ScaleGestureDetector;
 import android.view.View;
 import android.view.ViewGroup;
 import android.support.v4.app.Fragment;
 import android.widget.Button;
-import android.widget.CheckBox;
-import android.widget.CompoundButton;
-import android.widget.DatePicker;
-import android.widget.EditText;
-import android.widget.ImageButton;
 import android.widget.ListView;
-import android.widget.TextView;
-import android.widget.TimePicker;
 import android.widget.Toast;
 
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.Projection;
+import com.google.android.gms.maps.model.LatLng;
 import com.nemator.needle.AppConstants;
 import com.nemator.needle.haystack.HaystackActivity;
 import com.nemator.needle.haystack.HaystackUserActivity;
 import com.nemator.needle.haystack.HaystackUserListAdapter;
 import com.nemator.needle.home.task.createHaystack.CreateHaystackResult;
-import com.nemator.needle.home.task.createHaystack.CreateHaystackTaskParams;
 import com.nemator.needle.models.Haystack;
 import com.nemator.needle.models.User;
-import com.nemator.needle.utils.AppAnimations;
 import com.nemator.needle.R;
 import com.nemator.needle.home.task.createHaystack.CreateHaystackTask;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.Locale;
 
-public class CreateHaystackFragment extends Fragment implements CreateHaystackTask.CreateHaystackResponseHandler {
+public class CreateHaystackFragment extends Fragment implements CreateHaystackTask.CreateHaystackResponseHandler{
     public static final String SQL_DATE_FORMAT = "yyyy-MM-dd";
     public static final String SQL_DATETIME_FORMAT = "yyyy-MM-dd HH:mm:ss";
     public static final String SQL_TIME_FORMAT = "HH:mm";
     public static final String TAG = "CreateHaystackFragment";
 
     private View rootView;
-    private EditText txtName;
-    private CheckBox isPublicCheckbox;
-    private ImageButton changeDateLimitButton, changeTimeLimitButton;
-    private Button createHaystackButton, addRemoveUsersButton;
-    private TextView dateLimitText, timeLimitText, usersLabel;
+
     private ListView userListView;
     private HaystackUserListAdapter userListAdapter;
 
-    private Calendar calendar;
-    private String dateLimit;
-    private int year, month, day, hours, minutes;
-    private String timeLimit;
     private String userName;
     private Haystack haystack;
     private int userId = -1;
     private ArrayList<User> userList = new ArrayList<User>();
+
+    Boolean mIsMapMoveable = false;
+    private GoogleMap mMap;
+    public static boolean mMapIsTouched = false;
+    Projection projection;
+    public double latitude;
+    public double longitude;
+    ArrayList<LatLng> val = new ArrayList<LatLng>();
+    private float mScaleFactor = 1.f;
+    private CreateHaystackMap mMapFragment;
+    private ScaleGestureDetector mScaleDetector;
+    private Boolean mIsCircle = true;
+
+    private ViewPager createHaystackViewPager;
+    private CreateHaystackPagerAdapter mCreateHaystackPagerAdapter;
+    private Button nextButton, backButton;
 
     public static CreateHaystackFragment newInstance() {
         CreateHaystackFragment fragment = new CreateHaystackFragment();
@@ -89,102 +87,43 @@ public class CreateHaystackFragment extends Fragment implements CreateHaystackTa
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         rootView = inflater.inflate(R.layout.fragment_create_haystack, container, false);
 
+        //ViewPager
+        mCreateHaystackPagerAdapter = new CreateHaystackPagerAdapter(getActivity().getSupportFragmentManager(), this);
+        createHaystackViewPager = (ViewPager) rootView.findViewById(R.id.haystackListViewPager);
+        createHaystackViewPager.setAdapter(mCreateHaystackPagerAdapter);
+
+        //Bottom Sheet Buttons
+        nextButton = (Button) rootView.findViewById(R.id.create_haystack_next_button);
+        nextButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                int newIndex = createHaystackViewPager.getCurrentItem() + 1;
+                createHaystackViewPager.setCurrentItem(newIndex);
+                backButton.setEnabled(true);
+                nextButton.setEnabled(newIndex != 2);
+            }
+        });
+
+        backButton = (Button) rootView.findViewById(R.id.create_haystack_back_button);
+        backButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                int newIndex = createHaystackViewPager.getCurrentItem() - 1;
+                createHaystackViewPager.setCurrentItem(newIndex);
+                backButton.setEnabled(newIndex != 0);
+            }
+        });
+
+        mMapFragment = ((CreateHaystackMap) getChildFragmentManager().findFragmentById(R.id.create_haystack_map));
+
         String title = getResources().getString(R.string.create_haystack);
         ((ActionBarActivity) getActivity()).getSupportActionBar().setTitle(title);
 
-        txtName = (EditText) rootView.findViewById(R.id.new_haystack_name);
-        isPublicCheckbox = (CheckBox) rootView.findViewById(R.id.new_haystack_isPublic_checkBox);
-        isPublicCheckbox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if(isChecked){
-                    AppAnimations.collapse(userListView);
-                    AppAnimations.collapse(addRemoveUsersButton);
-                    AppAnimations.collapse(usersLabel);
-                }else{
-                    AppAnimations.expand(userListView, 500);
-                    AppAnimations.expand(addRemoveUsersButton);
-                    AppAnimations.expand(usersLabel);
-                }
-            }
-        });
-
-        calendar = Calendar.getInstance();
-        year = calendar.get(Calendar.YEAR);
-        month = calendar.get(Calendar.MONTH);
-        day = calendar.get(Calendar.DAY_OF_MONTH);
-        hours = calendar.getTime().getHours()+1;
-        minutes = calendar.getTime().getMinutes() + 10;
-
-        SimpleDateFormat sdf = new SimpleDateFormat(SQL_TIME_FORMAT, Locale.US);
-        timeLimit = sdf.format(new Date(year-1900, month, day, hours, minutes));
-
-        timeLimitText = (TextView) rootView.findViewById(R.id.timeLimitText);
-        timeLimitText.setText(timeLimit);
-
-        dateLimitText = (TextView) rootView.findViewById(R.id.dateLimitText);
-        sdf = new SimpleDateFormat(SQL_DATE_FORMAT, Locale.US);
-        dateLimit = sdf.format(new Date(year-1900, month, day, hours, minutes));
-        dateLimitText.setText(dateLimit);
-
-        changeDateLimitButton = (ImageButton) rootView.findViewById(R.id.changeDateLimitButton);
-        changeDateLimitButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                DatePickerDialog dialog = new DatePickerDialog(getActivity(), new DatePickerDialog.OnDateSetListener() {
-                    @Override
-                    public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
-                        SimpleDateFormat sdf = new SimpleDateFormat(SQL_DATE_FORMAT, Locale.US);
-                        dateLimit = sdf.format(new Date(year - 1900, monthOfYear, dayOfMonth));
-                        dateLimitText.setText(dateLimit);
-                    }
-                }, year, month, day);
-
-                dialog.getDatePicker().setMinDate(System.currentTimeMillis() - 1000);
-                dialog.show();
-            }
-        });
-
-        changeTimeLimitButton = (ImageButton) rootView.findViewById(R.id.changeTimeLimitButton);
-        changeTimeLimitButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                TimePickerDialog dialog = new TimePickerDialog(getActivity(), new TimePickerDialog.OnTimeSetListener() {
-                    @Override
-                    public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
-                        SimpleDateFormat sdf = new SimpleDateFormat(SQL_TIME_FORMAT, Locale.US);
-                        timeLimit = sdf.format(new Date(year, month, day, hourOfDay, minute));
-                        timeLimitText.setText(timeLimit);
-                    }
-                }, hours, minutes, true);
-                dialog.show();
-            }
-        });
-
-        userListAdapter = new HaystackUserListAdapter(getActionBar().getThemedContext(), R.layout.haystack_drawer_item, userList, null, inflater);
-
-        usersLabel = (TextView) rootView.findViewById(R.id.new_haystack_users_label);
-
-        userListView = (ListView) rootView.findViewById(R.id.haystack_user_list);
-        userListView.setAdapter(userListAdapter);
-
-        addRemoveUsersButton = (Button) rootView.findViewById(R.id.add_remove_users_button);
-        addRemoveUsersButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                addRemoveUsers();
-            }
-        });
-
-        createHaystackButton = (Button) rootView.findViewById(R.id.create_haystack_button);
-        createHaystackButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                createHaystack();
-            }
-        });
-
         return rootView;
+    }
+
+    private void getMap(){
+        mMap = mMapFragment.getMap();
     }
 
     private void addRemoveUsers(){
@@ -194,7 +133,7 @@ public class CreateHaystackFragment extends Fragment implements CreateHaystackTa
         startActivityForResult(intent, HaystackUserActivity.ADD_REMOVE_USERS);
     }
 
-    private void createHaystack(){
+    /*private void createHaystack(){
         haystack = new Haystack();
         haystack.setName(txtName.getText().toString());
         haystack.setIsPublic(isPublicCheckbox.isChecked());
@@ -226,7 +165,7 @@ public class CreateHaystackFragment extends Fragment implements CreateHaystackTa
         }catch (Exception e) {
             Toast.makeText(getActivity(), "An error occured while creating Haystack", Toast.LENGTH_SHORT).show();
         }
-    }
+    }*/
 
     public void onHaystackCreated(CreateHaystackResult result){
         if(result.successCode == 0){
@@ -285,6 +224,9 @@ public class CreateHaystackFragment extends Fragment implements CreateHaystackTa
 
     private ActionBar getActionBar() {
         return ((ActionBarActivity) getActivity()).getSupportActionBar();
+    }
 
+    public Haystack getHaystack(){
+        return haystack;
     }
 }

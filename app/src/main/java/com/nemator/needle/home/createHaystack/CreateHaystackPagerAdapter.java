@@ -1,17 +1,26 @@
 package com.nemator.needle.home.createHaystack;
 
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
+import android.view.View;
 
 import com.nemator.needle.R;
 import com.nemator.needle.home.HaystackListTabFragment;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+import java.util.ListIterator;
 
 /**
  * Created by Alex on 12/04/2015.
  */
 public class CreateHaystackPagerAdapter extends FragmentStatePagerAdapter {
     private Fragment fragment;
+    private ArrayList<Fragment> fragmentList = new ArrayList<Fragment>();
 
     public CreateHaystackPagerAdapter(FragmentManager fm, Fragment frag) {
         super(fm);
@@ -27,7 +36,7 @@ public class CreateHaystackPagerAdapter extends FragmentStatePagerAdapter {
                 fragment = new CreateHaystackGeneralInfosFragment();
                 break;
             case 1://Map
-                fragment = new CreateHaystackMap();
+                fragment = new CreateHaystackMapFragment();
                 break;
             case 2://Users
                 fragment = new CreateHaystackUsersFragment();
@@ -36,6 +45,8 @@ public class CreateHaystackPagerAdapter extends FragmentStatePagerAdapter {
                 fragment = new HaystackListTabFragment();
                 break;
         }
+
+        fragmentList.add(position, fragment);
 
         return fragment;
     }
@@ -64,5 +75,15 @@ public class CreateHaystackPagerAdapter extends FragmentStatePagerAdapter {
         }
 
         return title;
+    }
+
+    @Override
+    public void destroyItem(View container, int position, Object object) {
+        super.destroyItem(container, position, object);
+        fragmentList.remove(position);
+    }
+
+    public Fragment getFragmentAt(int position){
+        return fragmentList.get(position);
     }
 }

@@ -8,7 +8,11 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:name="com.nemator.needle.home.createHaystack.CreateHaystackMap"
-        android:tag="MAP_FRAGMENT"/>
+        android:tag="MAP_FRAGMENT"
+        android:layout_marginTop="48dp"
+        android:layout_marginLeft="48dp"
+        android:layout_marginRight="48dp"
+        android:layout_marginBottom="148dp"/>
 
     <FrameLayout
         android:id="@+id/create_haystack_map_frame"

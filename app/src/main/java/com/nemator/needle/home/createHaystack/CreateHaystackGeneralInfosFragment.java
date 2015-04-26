@@ -2,24 +2,26 @@ package com.nemator.needle.home.createHaystack;
 
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
+import android.content.Intent;
+import android.graphics.Bitmap;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
+import android.support.v7.widget.SwitchCompat;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.ListView;
+import android.widget.ImageView;
+import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.TimePicker;
 
+import com.nemator.needle.AppConstants;
 import com.nemator.needle.R;
-import com.nemator.needle.haystack.HaystackUserListAdapter;
-import com.nemator.needle.utils.AppAnimations;
+import com.nemator.needle.haystack.HaystackUserActivity;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -39,15 +41,16 @@ public class CreateHaystackGeneralInfosFragment extends CreateHaystackBaseFragme
     private View rootView;
 
     //Children
-    private EditText txtName;
-    private CheckBox isPublicCheckbox;
-    private ImageButton changeDateLimitButton, changeTimeLimitButton;
-    private TextView dateLimitText, timeLimitText, usersLabel;
+    private EditText txtName, dateLimitEditText, timeLimitEditText;
+    private SwitchCompat isPublicSwitch;
+    private ImageButton changeTimeLimitButton;
+    private TextView timeLimitText, usersLabel, privacyLabel;
     private Calendar calendar;
 
     private String dateLimit;
     private int year, month, day, hours, minutes;
     private String timeLimit;
+    private ImageView photoView;
 
     public static CreateHaystackGeneralInfosFragment newInstance() {
         CreateHaystackGeneralInfosFragment fragment = new CreateHaystackGeneralInfosFragment();
@@ -70,10 +73,27 @@ public class CreateHaystackGeneralInfosFragment extends CreateHaystackBaseFragme
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         rootView = inflater.inflate(R.layout.fragment_create_haystack_general, container, false);
 
+        //Name
         txtName = (EditText) rootView.findViewById(R.id.new_haystack_name);
 
-        isPublicCheckbox = (CheckBox) rootView.findViewById(R.id.new_haystack_isPublic_checkBox);
+        //Privacy
+        isPublicSwitch = (SwitchCompat) rootView.findViewById(R.id.new_haystack_isPublic_switch);
+        isPublicSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if(isChecked){
+                    privacyLabel.setText(getString(R.string.isPublic));
+                    privacyLabel.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_lock_open_black_24dp, 0, 0, 0);
+                }else{
+                    privacyLabel.setText(getString(R.string.privateLabel));
+                    privacyLabel.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_lock_outline_black_24dp, 0, 0, 0);
+                }
+            }
+        });
 
+        privacyLabel = (TextView) rootView.findViewById(R.id.new_haystack_privacy_label);
+
+        //Date/Time Limit
         calendar = Calendar.getInstance();
         year = calendar.get(Calendar.YEAR);
         month = calendar.get(Calendar.MONTH);
@@ -84,16 +104,29 @@ public class CreateHaystackGeneralInfosFragment extends CreateHaystackBaseFragme
         SimpleDateFormat sdf = new SimpleDateFormat(SQL_TIME_FORMAT, Locale.US);
         timeLimit = sdf.format(new Date(year-1900, month, day, hours, minutes));
 
-        timeLimitText = (TextView) rootView.findViewById(R.id.timeLimitText);
-        timeLimitText.setText(timeLimit);
+        timeLimitEditText = (EditText) rootView.findViewById(R.id.timeLimitEditText);
+        timeLimitEditText.setText(timeLimit);
 
-        dateLimitText = (TextView) rootView.findViewById(R.id.dateLimitText);
+        timeLimitEditText.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                TimePickerDialog dialog = new TimePickerDialog(getActivity(), new TimePickerDialog.OnTimeSetListener() {
+                    @Override
+                    public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
+                        SimpleDateFormat sdf = new SimpleDateFormat(SQL_TIME_FORMAT, Locale.US);
+                        timeLimit = sdf.format(new Date(year, month, day, hourOfDay, minute));
+                        timeLimitEditText.setText(timeLimit);
+                    }
+                }, hours, minutes, true);
+                dialog.show();
+            }
+        });
+
+        dateLimitEditText = (EditText) rootView.findViewById(R.id.dateLimitEditText);
         sdf = new SimpleDateFormat(SQL_DATE_FORMAT, Locale.US);
         dateLimit = sdf.format(new Date(year-1900, month, day, hours, minutes));
-        dateLimitText.setText(dateLimit);
-
-        changeDateLimitButton = (ImageButton) rootView.findViewById(R.id.changeDateLimitButton);
-        changeDateLimitButton.setOnClickListener(new View.OnClickListener() {
+        dateLimitEditText.setText(dateLimit);
+        dateLimitEditText.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 DatePickerDialog dialog = new DatePickerDialog(getActivity(), new DatePickerDialog.OnDateSetListener() {
@@ -101,7 +134,7 @@ public class CreateHaystackGeneralInfosFragment extends CreateHaystackBaseFragme
                     public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
                         SimpleDateFormat sdf = new SimpleDateFormat(SQL_DATE_FORMAT, Locale.US);
                         dateLimit = sdf.format(new Date(year - 1900, monthOfYear, dayOfMonth));
-                        dateLimitText.setText(dateLimit);
+                        dateLimitEditText.setText(dateLimit);
                     }
                 }, year, month, day);
 
@@ -110,22 +143,12 @@ public class CreateHaystackGeneralInfosFragment extends CreateHaystackBaseFragme
             }
         });
 
-        changeTimeLimitButton = (ImageButton) rootView.findViewById(R.id.changeTimeLimitButton);
-        changeTimeLimitButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                TimePickerDialog dialog = new TimePickerDialog(getActivity(), new TimePickerDialog.OnTimeSetListener() {
-                    @Override
-                    public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
-                        SimpleDateFormat sdf = new SimpleDateFormat(SQL_TIME_FORMAT, Locale.US);
-                        timeLimit = sdf.format(new Date(year, month, day, hourOfDay, minute));
-                        timeLimitText.setText(timeLimit);
-                    }
-                }, hours, minutes, true);
-                dialog.show();
-            }
-        });
+        photoView = (ImageView) rootView.findViewById(R.id.new_haystack_photo);
 
         return rootView;
+    }
+
+    public void updatePhoto(Bitmap bitmap) {
+        photoView.setImageBitmap(bitmap);
     }
 }

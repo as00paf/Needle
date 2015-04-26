@@ -1,1 +1,2 @@
 include ':app', ':MaterialNavigationDrawerModule', ':android-support-v4-preferencefragment-master'
+include ':ViewPagerIndicator'

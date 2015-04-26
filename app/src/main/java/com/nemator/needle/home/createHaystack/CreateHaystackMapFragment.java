@@ -17,7 +17,7 @@ import com.nemator.needle.R;
 import java.util.ArrayList;
 
 public class CreateHaystackMapFragment extends CreateHaystackBaseFragment{
-    private View rootView;
+    public View rootView;
 
     private GoogleMap mMap;
 
@@ -53,6 +53,9 @@ public class CreateHaystackMapFragment extends CreateHaystackBaseFragment{
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         rootView = inflater.inflate(R.layout.fragment_create_haystack_map, container, false);
+
+        //Map Fragment
+        mMapFragment = (CreateHaystackMap) getChildFragmentManager().findFragmentById(R.id.create_haystack_map);
 
         mScaleDetector = new ScaleGestureDetector(getActivity(), new ScaleListener());
 

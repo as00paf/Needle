@@ -5,7 +5,7 @@ package com.nemator.needle;
  */
 public class AppConstants {
 
-    public static final String PROJECT_URL = "http://70.83.1.173:2772/Needle/";
+    public static final String PROJECT_URL = "http://173.176.76.40:2772/Needle/";
 
     //Json tags
     public static final String TAG_SUCCESS = "success";

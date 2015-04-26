@@ -1,131 +1,208 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/create_haystack_general_infos_fragment"
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <!-- Name -->
-    <com.appcompat.view.floatLabel.FloatLabelLayout
+    <LinearLayout
+        android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/new_haystack_name_floating_label"
-        app:floatLabelTextAppearance="@style/TextAppearance.Needle.FloatLabelLarge">
+        android:layout_height="match_parent"
+        android:paddingLeft="16dp"
+        android:paddingRight="16dp">
 
-        <EditText
-            android:id="@+id/new_haystack_name"
+        <!-- Name -->
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:textColor="@android:color/white"
-            android:textSize="42dp"
-            android:hint="@string/haystack_name_hint"
-            android:imeOptions="actionDone"
-            android:singleLine="true"
-            android:inputType="textNoSuggestions">
-        </EditText>
-    </com.appcompat.view.floatLabel.FloatLabelLayout>
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_gravity="bottom">
 
-    <!-- Privacy -->
-    <TextView
-        android:id="@+id/new_haystack_privacy_label"
-        android:textStyle="bold"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/privacy"
-        android:textColor="#000000"
-        android:layout_marginTop="10dp"
-        android:layout_marginBottom="10dp"
-        android:textAppearance="?android:attr/textAppearanceMedium"/>
+            <TextView
+                android:id="@+id/new_haystack_name_label"
+                android:textStyle="bold"
+                android:layout_width="140dp"
+                android:layout_height="match_parent"
+                android:textColor="@android:color/black"
+                android:text="@string/name"
+                android:textAppearance="@style/Base.TextAppearance.AppCompat.Medium"
+                android:layout_alignParentLeft="true"
+                android:layout_marginLeft="5dp"
+                android:layout_marginTop="15dp"
+                android:drawableLeft="@drawable/ic_label_outline_black_24dp"
+                android:drawablePadding="8dp"
+                android:gravity="center_vertical"
+                android:layout_gravity="bottom" />
 
-    <CheckBox
-        android:id="@+id/new_haystack_isPublic_checkBox"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/new_haystack_privacy_label"
-        android:text="@string/isPublic"
-        android:checked="false"
-        android:padding="15dp"
-        android:layout_marginBottom="10dp"
-        />
+            <com.appcompat.view.floatLabel.FloatLabelLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:id="@+id/new_haystack_name_floating_label"
+                android:layout_gravity="bottom"
+                app:floatLabelTextAppearance="@style/TextAppearance.Needle.FloatLabelSmall">
 
-    <TextView
-        android:id="@+id/new_haystack_timeLimit_label"
-        android:textStyle="bold"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/new_haystack_isPublic_checkBox"
-        android:text="@string/timeLimit"
-        android:textColor="#000000"
-        android:paddingTop="10dp"
-        android:paddingBottom="10dp"
-        android:textAppearance="?android:attr/textAppearanceMedium"/>
+                <EditText
+                    android:id="@+id/new_haystack_name"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:textAppearance="@style/Base.TextAppearance.AppCompat.Medium"
+                    android:hint="@string/haystack_name_hint"
+                    android:imeOptions="actionDone"
+                    android:singleLine="true"
+                    android:inputType="textNoSuggestions">
+                </EditText>
+            </com.appcompat.view.floatLabel.FloatLabelLayout>
 
-    <!-- Expiration -->
-    <!-- Date -->
-    <TextView
-        android:id="@+id/new_haystack_date_label"
-        android:textStyle="bold"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/date"
-        android:textColor="#000000"
-        android:layout_alignParentLeft="true"
-        android:layout_below="@id/new_haystack_timeLimit_label"
-        android:layout_marginLeft="5dp"
-        android:layout_marginTop="15dp"/>
+        </LinearLayout>
 
-    <TextView
-        android:id="@+id/dateLimitText"
-        android:textStyle="bold"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="2015-01-14"
-        android:textAlignment="center"
-        android:textColor="#000000"
-        android:layout_below="@id/new_haystack_timeLimit_label"
-        android:layout_centerHorizontal="true"
-        android:textAppearance="?android:attr/textAppearanceMedium"
-        android:layout_marginTop="15dp"/>
 
-    <ImageButton
-        android:id="@+id/changeDateLimitButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/new_haystack_timeLimit_label"
-        android:layout_alignParentRight="true"
-        android:src="@drawable/ic_action_edit"/>
+        <!-- Privacy -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_gravity="top"
+            android:gravity="top">
 
-    <!-- Time -->
-    <TextView
-        android:id="@+id/new_haystack_time_label"
-        android:textStyle="bold"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/time"
-        android:textColor="#000000"
-        android:layout_alignParentLeft="true"
-        android:layout_below="@id/changeDateLimitButton"
-        android:layout_marginLeft="5dp"
-        android:layout_marginTop="15dp"/>
+            <TextView
+                android:id="@+id/new_haystack_privacy_label"
+                android:textStyle="bold"
+                android:layout_width="140dp"
+                android:layout_height="wrap_content"
+                android:textColor="@android:color/black"
+                android:text="@string/privateLabel"
+                android:textAppearance="@style/Base.TextAppearance.AppCompat.Medium"
+                android:layout_alignParentLeft="true"
+                android:layout_marginLeft="5dp"
+                android:drawableLeft="@drawable/ic_lock_outline_black_24dp"
+                android:drawablePadding="8dp"
+                android:paddingBottom="16dp"
+                android:paddingTop="16dp"
+                android:gravity="center_vertical"
+                android:layout_gravity="top" />
 
-    <TextView
-        android:id="@+id/timeLimitText"
-        android:textStyle="bold"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="00:00:00"
-        android:textAlignment="center"
-        android:textColor="#000000"
-        android:layout_below="@id/changeDateLimitButton"
-        android:layout_centerHorizontal="true"
-        android:textAppearance="?android:attr/textAppearanceMedium"
-        android:layout_marginTop="15dp"/>
+            <android.support.v7.widget.SwitchCompat
+                android:id="@+id/new_haystack_isPublic_switch"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:layout_gravity="center_vertical"
+                android:checked="false"
+                app:showText="false"
+                android:paddingBottom="16dp"
+                android:paddingTop="12dp"
+                android:layout_marginTop="8dp" />
 
-    <ImageButton
-        android:id="@+id/changeTimeLimitButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/changeDateLimitButton"
-        android:layout_alignParentRight="true"
-        android:src="@drawable/ic_action_edit"/>
-</LinearLayout>
+        </LinearLayout>
+
+
+        <!-- Expiration -->
+        <!-- Date -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_gravity="center_vertical">
+
+            <TextView
+                android:id="@+id/new_haystack_date_label"
+                android:textStyle="bold"
+                android:layout_width="120dp"
+                android:layout_height="wrap_content"
+                android:text="@string/date"
+                android:textAppearance="@style/Base.TextAppearance.AppCompat.Medium"
+                android:textColor="@android:color/black"
+                android:gravity="center_vertical"
+                android:layout_alignParentLeft="true"
+                android:layout_marginLeft="5dp"
+                android:layout_marginTop="15dp"
+                android:drawableLeft="@drawable/ic_event_black_24dp"
+                android:drawablePadding="8dp"/>
+
+            <EditText
+                android:id="@+id/dateLimitEditText"
+                android:textStyle="bold"
+                android:editable="false"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:text="2015-01-14"
+                android:textAlignment="center"
+                android:textColor="@color/primary"
+                android:layout_centerHorizontal="true"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:layout_marginTop="15dp"
+                android:layout_marginLeft="16dp"
+                />
+
+        </LinearLayout>
+
+        <!-- Time -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_gravity="center_vertical">
+
+            <TextView
+                android:id="@+id/new_haystack_time_label"
+                android:textStyle="bold"
+                android:layout_width="120dp"
+                android:layout_height="wrap_content"
+                android:text="@string/time"
+                android:textAppearance="@style/Base.TextAppearance.AppCompat.Medium"
+                android:textColor="@android:color/black"
+                android:gravity="center_vertical"
+                android:layout_alignParentLeft="true"
+                android:layout_marginLeft="5dp"
+                android:layout_marginTop="15dp"
+                android:drawableLeft="@drawable/ic_timer_black_24dp"
+                android:drawablePadding="8dp"/>
+
+            <EditText
+                android:id="@+id/timeLimitEditText"
+                android:textStyle="bold"
+                android:editable="false"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:text="00:00:00"
+                android:textAlignment="center"
+                android:textColor="@color/primary"
+                android:layout_centerHorizontal="true"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:layout_marginTop="15dp"
+                android:layout_marginLeft="16dp"
+                />
+
+        </LinearLayout>
+
+        <!-- Picture -->
+        <TextView
+            android:id="@+id/new_haystack_picture_label"
+            android:textStyle="bold"
+            android:layout_width="120dp"
+            android:layout_height="wrap_content"
+            android:text="@string/picture"
+            android:textAppearance="@style/Base.TextAppearance.AppCompat.Medium"
+            android:textColor="@android:color/black"
+            android:gravity="center_vertical"
+            android:layout_alignParentLeft="true"
+            android:layout_marginLeft="5dp"
+            android:layout_marginTop="15dp"
+            android:drawableLeft="@drawable/ic_photo_black_24dp"
+            android:drawablePadding="8dp"/>
+
+        <ImageView
+            android:id="@+id/new_haystack_photo"
+            android:layout_width="300dp"
+            android:layout_height="300dp"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="24dp"
+            android:src="@drawable/placeholder"
+            android:background="@drawable/border_ui"/>
+    </LinearLayout>
+
+</ScrollView>
+

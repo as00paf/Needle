@@ -30,6 +30,7 @@ dependencies {
 
     compile project(':MaterialNavigationDrawerModule')
     compile project(':android-support-v4-preferencefragment-master')
+    compile project(':ViewPagerIndicator')
 
     repositories {
         mavenCentral()

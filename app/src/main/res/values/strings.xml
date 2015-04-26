@@ -43,6 +43,7 @@
     <string name="timeLimit">Time Limit</string>
     <string name="time">Time</string>
     <string name="date">Date</string>
+    <string name="privateLabel">Private</string>
     <string name="users">Users</string>
     <string name="zone">Zone</string>
     <string name="picture">Picture</string>

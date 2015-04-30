@@ -14,6 +14,7 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.ScaleGestureDetector;
 import android.view.View;
@@ -102,12 +103,43 @@ public class CreateHaystackFragment extends Fragment implements CreateHaystackTa
 
         //ViewPager
         mCreateHaystackPagerAdapter = new CreateHaystackPagerAdapter(getActivity().getSupportFragmentManager(), this);
-        createHaystackViewPager = (ViewPager) rootView.findViewById(R.id.haystackListViewPager);
+        createHaystackViewPager = (ViewPager) rootView.findViewById(R.id.create_haystack_view_pager);
         createHaystackViewPager.setAdapter(mCreateHaystackPagerAdapter);
 
         //ViewPagerIndicator
-        CirclePageIndicator viewPagerIndicator = (CirclePageIndicator) rootView.findViewById(R.id.view_pager_indicator);
+        final CirclePageIndicator viewPagerIndicator = (CirclePageIndicator) rootView.findViewById(R.id.view_pager_indicator);
         viewPagerIndicator.setViewPager(createHaystackViewPager);
+        viewPagerIndicator.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+                //Back/Next Button
+                backButton.setEnabled((position == 1 || position == 2));
+                nextButton.setEnabled((position == 0 || position == 1));
+
+                //ActionBar
+
+                //FAB
+                switch (position){
+                    case 0:
+                        fab.setImageDrawable(getResources().getDrawable( R.drawable.ic_photo_camera_black_24dp));
+                        break;
+                    case 1:
+                        fab.setImageDrawable(getResources().getDrawable( R.drawable.ic_action_location_found));
+                        break;
+                    case 2:
+                        fab.setImageDrawable(getResources().getDrawable( R.drawable.ic_action_add_person));
+                        break;
+                }
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+            }
+        });
 
         //FAB
         fab = (FloatingActionButton) rootView.findViewById(R.id.new_haystack_photo_fab);
@@ -115,8 +147,23 @@ public class CreateHaystackFragment extends Fragment implements CreateHaystackTa
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                startActivityForResult(intent, TAKE_PICTURE);
+                int position = createHaystackViewPager.getCurrentItem();
+                switch(position){
+                    case 0:
+                        //Take Picture
+                        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                        startActivityForResult(intent, TAKE_PICTURE);
+                        break;
+                    case 1:
+                        //Focus Camera on current position
+
+                        break;
+                    case 2:
+                        //Done button
+
+                        break;
+                }
+
             }
         });
         fab.initBackground();

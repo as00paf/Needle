@@ -28,7 +28,7 @@
                 android:layout_height="match_parent"
                 android:textColor="@android:color/black"
                 android:text="@string/name"
-                android:textAppearance="@style/Base.TextAppearance.AppCompat.Medium"
+                android:textAppearance="@style/Base.TextAppearance.AppCompat.Large"
                 android:layout_alignParentLeft="true"
                 android:layout_marginLeft="5dp"
                 android:layout_marginTop="15dp"
@@ -64,8 +64,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:layout_gravity="top"
-            android:gravity="top">
+            android:layout_gravity="center_vertical"
+            android:gravity="center_vertical">
 
             <TextView
                 android:id="@+id/new_haystack_privacy_label"
@@ -79,10 +79,7 @@
                 android:layout_marginLeft="5dp"
                 android:drawableLeft="@drawable/ic_lock_outline_black_24dp"
                 android:drawablePadding="8dp"
-                android:paddingBottom="16dp"
-                android:paddingTop="16dp"
-                android:gravity="center_vertical"
-                android:layout_gravity="top" />
+                android:gravity="center_vertical"/>
 
             <android.support.v7.widget.SwitchCompat
                 android:id="@+id/new_haystack_isPublic_switch"
@@ -93,8 +90,7 @@
                 android:checked="false"
                 app:showText="false"
                 android:paddingBottom="16dp"
-                android:paddingTop="12dp"
-                android:layout_marginTop="8dp" />
+                android:paddingTop="10dp" />
 
         </LinearLayout>
 
@@ -105,7 +101,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:layout_gravity="center_vertical">
+            android:layout_gravity="center_vertical"
+            android:gravity="center_vertical">
 
             <TextView
                 android:id="@+id/new_haystack_date_label"
@@ -118,7 +115,6 @@
                 android:gravity="center_vertical"
                 android:layout_alignParentLeft="true"
                 android:layout_marginLeft="5dp"
-                android:layout_marginTop="15dp"
                 android:drawableLeft="@drawable/ic_event_black_24dp"
                 android:drawablePadding="8dp"/>
 
@@ -127,15 +123,13 @@
                 android:textStyle="bold"
                 android:editable="false"
                 android:layout_width="wrap_content"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 android:text="2015-01-14"
                 android:textAlignment="center"
                 android:textColor="@color/primary"
                 android:layout_centerHorizontal="true"
                 android:textAppearance="?android:attr/textAppearanceMedium"
-                android:layout_marginTop="15dp"
-                android:layout_marginLeft="16dp"
-                />
+                android:layout_marginLeft="16dp" />
 
         </LinearLayout>
 
@@ -144,7 +138,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:layout_gravity="center_vertical">
+            android:layout_gravity="center_vertical"
+            android:gravity="center_vertical">
 
             <TextView
                 android:id="@+id/new_haystack_time_label"
@@ -154,25 +149,24 @@
                 android:text="@string/time"
                 android:textAppearance="@style/Base.TextAppearance.AppCompat.Medium"
                 android:textColor="@android:color/black"
-                android:gravity="center_vertical"
                 android:layout_alignParentLeft="true"
                 android:layout_marginLeft="5dp"
-                android:layout_marginTop="15dp"
+                android:layout_marginTop="0dp"
                 android:drawableLeft="@drawable/ic_timer_black_24dp"
-                android:drawablePadding="8dp"/>
+                android:drawablePadding="8dp"
+                android:gravity="center_vertical" />
 
             <EditText
                 android:id="@+id/timeLimitEditText"
                 android:textStyle="bold"
                 android:editable="false"
                 android:layout_width="wrap_content"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 android:text="00:00:00"
                 android:textAlignment="center"
                 android:textColor="@color/primary"
                 android:layout_centerHorizontal="true"
                 android:textAppearance="?android:attr/textAppearanceMedium"
-                android:layout_marginTop="15dp"
                 android:layout_marginLeft="16dp"
                 />
 
@@ -190,7 +184,6 @@
             android:gravity="center_vertical"
             android:layout_alignParentLeft="true"
             android:layout_marginLeft="5dp"
-            android:layout_marginTop="15dp"
             android:drawableLeft="@drawable/ic_photo_black_24dp"
             android:drawablePadding="8dp"/>
 
@@ -201,7 +194,9 @@
             android:layout_gravity="center_horizontal"
             android:layout_marginTop="24dp"
             android:src="@drawable/placeholder"
-            android:background="@drawable/border_ui"/>
+            android:background="@drawable/border_ui"
+            android:layout_marginBottom="100dp"
+            android:elevation="8dp"/>
     </LinearLayout>
 
 </ScrollView>

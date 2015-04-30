@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -9,35 +12,39 @@
         android:layout_height="match_parent"
         android:name="com.nemator.needle.home.createHaystack.CreateHaystackMap"
         android:tag="MAP_FRAGMENT"
-        android:layout_marginTop="48dp"
-        android:layout_marginLeft="48dp"
-        android:layout_marginRight="48dp"
-        android:layout_marginBottom="148dp"/>
+        android:layout_marginBottom="72dp"/>
 
     <FrameLayout
         android:id="@+id/create_haystack_map_frame"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:padding="50dp">
+        android:layout_marginBottom="72dp"
+        android:measureAllChildren="true">
 
-        <Button
+        <!-- Map Buttons -->
+        <!-- Draw State Button -->
+        <ImageButton
             android:id="@+id/btn_draw_State"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Lock Map"
-            android:layout_gravity="top|left"
-            android:layout_marginTop="4dp"
-            android:layout_marginRight="4dp"/>
+            android:layout_gravity="bottom|right"
+            android:background="@drawable/map_button_skin"
+            android:src="@drawable/ic_vpn_lock_black_24dp"
+            android:layout_marginBottom="64dp"
+            android:elevation="4dp"
+            android:layout_marginRight="16dp" />
 
-        <Button
+        <ImageButton
             android:id="@+id/btn_polygon"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="[]"
-            android:layout_gravity="top|right"
-            android:layout_marginTop="4dp"
-            android:layout_marginRight="4dp"/>
+            android:background="@drawable/map_button_skin"
+            android:layout_gravity="bottom|right"
+            android:src="@drawable/square24"
+            android:elevation="4dp"
+            android:layout_marginRight="16dp"
+            android:layout_marginBottom="136dp" />
 
     </FrameLayout>
-
 </FrameLayout>
+

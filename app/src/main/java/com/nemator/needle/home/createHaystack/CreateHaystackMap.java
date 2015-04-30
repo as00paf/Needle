@@ -39,6 +39,7 @@ import com.google.android.gms.maps.model.Polygon;
 import com.google.android.gms.maps.model.PolygonOptions;
 import com.nemator.needle.AppConstants;
 import com.nemator.needle.R;
+import com.nemator.needle.utils.SphericalUtil;
 
 import java.text.DateFormat;
 import java.util.ArrayList;
@@ -48,7 +49,7 @@ import java.util.HashMap;
 public class CreateHaystackMap extends SupportMapFragment
         implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener,
         LocationListener{
-    public static final String TAG = "CreateHaystackMapFragment";
+    public static final String TAG = "CreateHSMapFragment";
 
     private GoogleApiClient mGoogleApiClient;
     private Location mCurrentLocation;
@@ -385,7 +386,7 @@ public class CreateHaystackMap extends SupportMapFragment
     }
 
     private void drawMarkerWithCircle(LatLng position){
-        double radiusInMeters = 40.0 * mScaleFactor; //40 meters is max for now
+        double radiusInMeters = 50.0 * mScaleFactor; //50 meters is max for now
         int strokeColor = getResources().getColor(R.color.primary);
         int shadeColor = getResources().getColor(R.color.circleColor);
 
@@ -396,6 +397,10 @@ public class CreateHaystackMap extends SupportMapFragment
 
         if(mPolygon != null){
             mPolygon.remove();
+        }
+
+        if(mMarker != null){
+            mMarker.remove();
         }
 
         CircleOptions circleOptions = new CircleOptions().center(position).radius(radiusInMeters).fillColor(shadeColor).strokeColor(strokeColor).strokeWidth(8);
@@ -419,8 +424,8 @@ public class CreateHaystackMap extends SupportMapFragment
     }
 
     private void drawMarkerWithPolygon(LatLng position){
-        double scale = (40.0 * mScaleFactor)/2;
-        double radiusInMeters = (scale / 6378) * (180 / Math.PI); //40 meters is max for now
+        double sizeInMeters = 50.0 * mScaleFactor;
+
         int strokeColor = getResources().getColor(R.color.primary);
         int shadeColor = getResources().getColor(R.color.circleColor);
 
@@ -433,11 +438,15 @@ public class CreateHaystackMap extends SupportMapFragment
             mPolygon.remove();
         }
 
+        if(mMarker != null){
+            mMarker.remove();
+        }
+
         ArrayList<LatLng> vertices = new ArrayList<>(4);
-        vertices.add(0, new LatLng(position.latitude - radiusInMeters, position.longitude - radiusInMeters));
-        vertices.add(1, new LatLng(position.latitude - radiusInMeters, position.longitude + radiusInMeters));
-        vertices.add(2, new LatLng(position.latitude + radiusInMeters, position.longitude + radiusInMeters));
-        vertices.add(3, new LatLng(position.latitude + radiusInMeters, position.longitude - radiusInMeters));
+        vertices.add(0, SphericalUtil.computeOffset(position, sizeInMeters, 0));
+        vertices.add(1, SphericalUtil.computeOffset(position, sizeInMeters, 90));
+        vertices.add(2, SphericalUtil.computeOffset(position, sizeInMeters, 180));
+        vertices.add(3, SphericalUtil.computeOffset(position, sizeInMeters, 270));
 
         PolygonOptions polygonOptions = new PolygonOptions().fillColor(shadeColor).strokeColor(strokeColor).strokeWidth(8).addAll(vertices);
         mPolygon = mMap.addPolygon(polygonOptions);
@@ -447,14 +456,13 @@ public class CreateHaystackMap extends SupportMapFragment
     }
 
     private void updateMarkerWithPolygon(LatLng position) {
-        double scale = (40.0 * mScaleFactor)/2;
-        double radiusInMeters = (scale / 6378) * (180 / Math.PI); //40 meters is max for now
+        double scale = 50.0 * mScaleFactor;
 
         ArrayList<LatLng> vertices = new ArrayList<>(4);
-        vertices.add(0, new LatLng(position.latitude - radiusInMeters, position.longitude - radiusInMeters));
-        vertices.add(1, new LatLng(position.latitude - radiusInMeters, position.longitude + radiusInMeters));
-        vertices.add(2, new LatLng(position.latitude + radiusInMeters, position.longitude + radiusInMeters));
-        vertices.add(3, new LatLng(position.latitude + radiusInMeters, position.longitude - radiusInMeters));
+        vertices.add(0, SphericalUtil.computeOffset(position, scale, 0));
+        vertices.add(1, SphericalUtil.computeOffset(position, scale, 90));
+        vertices.add(2, SphericalUtil.computeOffset(position, scale, 180));
+        vertices.add(3, SphericalUtil.computeOffset(position, scale, 270));
 
         mPolygon.setPoints(vertices);
 

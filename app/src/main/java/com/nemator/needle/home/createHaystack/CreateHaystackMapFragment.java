@@ -8,6 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.FrameLayout;
+import android.widget.ImageButton;
 
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.Projection;
@@ -73,31 +74,32 @@ public class CreateHaystackMapFragment extends CreateHaystackBaseFragment{
             }
             });
 
-        Button btn_draw_State = (Button) rootView.findViewById(R.id.btn_draw_State);
+        ImageButton btn_draw_State = (ImageButton) rootView.findViewById(R.id.btn_draw_State);
         btn_draw_State.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (mIsMapMoveable != true) {
                     mIsMapMoveable = true;
-                    ((Button) v).setText("Move Map");
+                    ((ImageButton) v).setImageDrawable(getResources().getDrawable(R.drawable.ic_edit_black_24dp));
                 } else {
                     mIsMapMoveable = false;
-                    ((Button) v).setText("Free Draw");
+                  //  ((Button) v).setText("Free Draw");
+                    ((ImageButton) v).setImageDrawable(getResources().getDrawable(R.drawable.ic_vpn_lock_black_24dp));
                 }
 
             }
         });
 
-        Button btnPolygon = (Button) rootView.findViewById(R.id.btn_polygon);
+        ImageButton btnPolygon = (ImageButton) rootView.findViewById(R.id.btn_polygon);
         btnPolygon.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (mIsCircle != true) {
                     mIsCircle = true;
-                    ((Button) v).setText("[]");
+                    ((ImageButton) v).setImageDrawable(getResources().getDrawable(R.drawable.square24));
                 } else {
                     mIsCircle = false;
-                    ((Button) v).setText("O");
+                    ((ImageButton) v).setImageDrawable(getResources().getDrawable(R.drawable.circle24));
                 }
 
                 mMapFragment.setIsPolygonCircle(mIsCircle);

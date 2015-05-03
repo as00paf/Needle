@@ -1,6 +1,8 @@
 package com.nemator.needle.home.createHaystack;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.speech.RecognizerIntent;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
@@ -9,15 +11,19 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
+import android.widget.Toast;
 
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.Projection;
 import com.google.android.gms.maps.model.LatLng;
 import com.nemator.needle.R;
+import com.quinny898.library.persistentsearch.SearchBox;
 
 import java.util.ArrayList;
 
 public class CreateHaystackMapFragment extends CreateHaystackBaseFragment{
+    public static String TAG = "CreateHaystackMapFragment";
+
     public View rootView;
 
     private GoogleMap mMap;
@@ -33,6 +39,7 @@ public class CreateHaystackMapFragment extends CreateHaystackBaseFragment{
     private CreateHaystackMap mMapFragment;
     private ScaleGestureDetector mScaleDetector;
     private Boolean mIsCircle = true;
+    private SearchBox searchBox;
 
     public static CreateHaystackMapFragment newInstance() {
         CreateHaystackMapFragment fragment = new CreateHaystackMapFragment();
@@ -74,6 +81,39 @@ public class CreateHaystackMapFragment extends CreateHaystackBaseFragment{
             }
             });
 
+        //Search Box
+        searchBox = (SearchBox) rootView.findViewById(R.id.create_haystack_search_box);
+        searchBox.enableVoiceRecognition(this);
+        searchBox.setSearchListener(new SearchBox.SearchListener() {
+            @Override
+            public void onSearchOpened() {
+                //Use this to tint the screen
+            }
+
+            @Override
+            public void onSearchClosed() {
+                //Use this to un-tint the screen
+            }
+
+            @Override
+            public void onSearchTermChanged() {
+                //React to the search term changing
+                //Called after it has updated results
+            }
+
+            @Override
+            public void onSearch(String searchTerm) {
+                Toast.makeText(getActivity(), searchTerm + " Searched", Toast.LENGTH_LONG).show();
+
+            }
+
+            @Override
+            public void onSearchCleared() {
+
+            }
+        });
+
+        //Map Buttons
         ImageButton btn_draw_State = (ImageButton) rootView.findViewById(R.id.btn_draw_State);
         btn_draw_State.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -107,6 +147,20 @@ public class CreateHaystackMapFragment extends CreateHaystackBaseFragment{
         });
 
         return rootView;
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (isAdded() && requestCode == SearchBox.VOICE_RECOGNITION_CODE && resultCode == getActivity().RESULT_OK) {
+            ArrayList<String> matches = data
+                    .getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
+            searchBox.populateEditText(matches);
+        }
+        super.onActivityResult(requestCode, resultCode, data);
+    }
+
+    public CreateHaystackMap getMap(){
+        return mMapFragment;
     }
 
     private class ScaleListener extends ScaleGestureDetector.SimpleOnScaleGestureListener {

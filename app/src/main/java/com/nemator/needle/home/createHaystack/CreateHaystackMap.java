@@ -26,6 +26,7 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.Projection;
@@ -336,8 +337,17 @@ public class CreateHaystackMap extends SupportMapFragment
     }
 
     public void moveCamera(){
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(mCurrentPosition, 17.0f));
+        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(mCurrentPosition, 17.0f));
         cameraUpdated = true;
+    }
+
+    public void focusCamera(float zoom){
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(mCurrentPosition, zoom));
+    }
+
+    //TODO : make async task ?
+    public void focusCamera(){
+        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(mCurrentPosition, 17.0f));
     }
 
     public void animateMarker(final Marker marker, final LatLng toPosition, final boolean hideMarker) {

@@ -156,7 +156,8 @@ public class CreateHaystackFragment extends Fragment implements CreateHaystackTa
                         break;
                     case 1:
                         //Focus Camera on current position
-
+                        mMapFragment = ((CreateHaystackMapFragment) getFragmentManager().getFragments().get(4)).getMap();
+                        mMapFragment.focusCamera();
                         break;
                     case 2:
                         //Done button
@@ -188,8 +189,6 @@ public class CreateHaystackFragment extends Fragment implements CreateHaystackTa
                 updateButtonsState();
             }
         });
-
-        mMapFragment = ((CreateHaystackMap) getChildFragmentManager().findFragmentById(R.id.create_haystack_map));
 
         String title = getResources().getString(R.string.create_haystack);
         ((ActionBarActivity) getActivity()).getSupportActionBar().setTitle(title);

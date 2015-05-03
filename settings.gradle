@@ -1,2 +1,2 @@
-include ':app', ':MaterialNavigationDrawerModule', ':android-support-v4-preferencefragment-master', 'android-maps-utils'
+include ':app', ':MaterialNavigationDrawerModule', ':android-support-v4-preferencefragment-master', 'android-maps-utils', 'PersistentSearch'
 include ':ViewPagerIndicator'

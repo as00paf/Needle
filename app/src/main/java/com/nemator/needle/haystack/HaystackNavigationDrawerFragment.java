@@ -93,7 +93,7 @@ public class HaystackNavigationDrawerFragment extends Fragment {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {selectItem(position);}
         });
-        mDrawerListAdapter = new HaystackNavigationDrawerAdapter(getActionBar().getThemedContext(), R.layout.haystack_drawer_item, dataList, inflater);
+        mDrawerListAdapter = new HaystackNavigationDrawerAdapter(getActivity(), R.layout.haystack_drawer_item, dataList, inflater);
         mDrawerListView.setAdapter(mDrawerListAdapter);
         mDrawerListView.setItemChecked(mCurrentSelectedPosition, true);
 

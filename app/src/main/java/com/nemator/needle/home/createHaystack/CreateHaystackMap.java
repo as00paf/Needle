@@ -502,7 +502,7 @@ public class CreateHaystackMap extends SupportMapFragment
         return userId;
     }
 
-    public void scaleFactor(Float scaleFactor){
+    public void setScaleFactor(Float scaleFactor){
         mScaleFactor = scaleFactor;
 
         if(mIsPolygonCircle){
@@ -520,5 +520,13 @@ public class CreateHaystackMap extends SupportMapFragment
         }else{
             drawMarkerWithPolygon(mCurrentPosition);
         }
+    }
+
+    public int getZoneRadius(){
+        return (int) Math.round(mScaleFactor * 50.0);
+    }
+
+    public LatLng getPosition(){
+        return mCurrentPosition;
     }
 }

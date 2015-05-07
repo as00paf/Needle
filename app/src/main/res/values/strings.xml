@@ -48,6 +48,9 @@
     <string name="users">Users</string>
     <string name="lock_map">Lock Map</string>
     <string name="move_map">Move Map</string>
+    <string name="search_for_places">Search for Places</string>
+    <string name="search_for_friends">Search for Friends</string>
+    <string name="done">Done</string>
     <string name="circle">Circle</string>
     <string name="rectangle">Rectangle</string>
     <string name="zone">Zone</string>

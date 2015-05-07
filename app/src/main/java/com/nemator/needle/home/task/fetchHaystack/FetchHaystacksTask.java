@@ -4,6 +4,7 @@ import android.os.AsyncTask;
 import android.util.Log;
 import android.view.View;
 
+import com.google.android.gms.maps.model.LatLng;
 import com.nemator.needle.models.Haystack;
 import com.nemator.needle.AppConstants;
 import com.nemator.needle.R;
@@ -49,17 +50,18 @@ public class FetchHaystacksTask extends AsyncTask<Void, Void, FetchHaystacksResu
         int success;
 
         try {
+            //Params
             List<NameValuePair> requestParams = new ArrayList<NameValuePair>();
             requestParams.add(new BasicNameValuePair("userId", params.userId));
 
-            Log.d(TAG, "starting with userId : SELECT * FROM haystack INNER JOIN haystack_users ON haystack.id = haystack_users.haystackId AND haystack_users.userId = " + params.userId + " WHERE haystack.isPublic = 0");
-
+            //Request
             JSONObject json = jsonParser.makeHttpRequest(GET_HAYSTACKS_URL, "POST", requestParams);
 
+            //Results
             success = json.getInt(AppConstants.TAG_SUCCESS);
             result.successCode = success;
 
-            Log.d("FetchHaystacks Successful!", json.toString());
+            Log.d(TAG, "FetchHaystacks Successful!\n" + json.toString());
 
             JSONArray publicHaystacks = json.getJSONArray("public_haystacks");
             JSONArray privateHaystacks = json.getJSONArray("private_haystacks");
@@ -71,26 +73,24 @@ public class FetchHaystacksTask extends AsyncTask<Void, Void, FetchHaystacksResu
 
 
                 //Public haystacks
-                //haystackList.add(params.context.getResources().getString(R.string.publicHeader));
                 int count = publicHaystacks.length();
-                if(count == 0){
-                    //haystackList.add(params.context.getResources().getString(R.string.noHaystackAvailable));
-                }
-
                 for (int i = 0; i < count; i++) {
-                    JSONObject haystackData = (JSONObject) publicHaystacks.getJSONObject(i);
+                    JSONObject haystackData = publicHaystacks.getJSONObject(i);
                     Haystack haystack = new Haystack();
 
                     haystack.setId(haystackData.getInt("id"));
                     haystack.setName(haystackData.getString("name"));
-                    haystack.setIsPublic(haystackData.getInt("isPublic") == 1);
                     haystack.setOwner(haystackData.getInt("owner"));
+                    haystack.setIsPublic(haystackData.getInt("isPublic") == 1);
+                    haystack.setZoneRadius(haystackData.getInt("zoneRadius"));
+                    haystack.setIsCircle(haystackData.getInt("isCircle") == 1);
+                    haystack.setPosition(new LatLng(haystackData.getDouble("lat"), haystackData.getDouble("lng")));
                     haystack.setTimeLimit(haystackData.getString("timeLimit"));
 
                     ArrayList<User> users = new ArrayList<User>();
-                    JSONArray usersData = (JSONArray) haystackData.getJSONArray("users");
+                    JSONArray usersData = haystackData.getJSONArray("users");
                     for (int j = 0; j < usersData.length(); j++) {
-                        JSONObject userData =  (JSONObject) usersData.getJSONObject(j);
+                        JSONObject userData =  usersData.getJSONObject(j);
                         User user = new User();
                         try{
                             user.setUserId(userData.getInt(AppConstants.TAG_USER_ID));
@@ -105,9 +105,9 @@ public class FetchHaystacksTask extends AsyncTask<Void, Void, FetchHaystacksResu
                     }
 
                     ArrayList<User> activeUsers = new ArrayList<User>();
-                    JSONArray activeUsersData = (JSONArray) haystackData.getJSONArray("activeUsers");
+                    JSONArray activeUsersData = haystackData.getJSONArray("activeUsers");
                     for (int j = 0; j < activeUsersData.length(); j++) {
-                        JSONObject activeUserData =  (JSONObject) activeUsersData.getJSONObject(j);
+                        JSONObject activeUserData =  activeUsersData.getJSONObject(j);
                         User activeUser = new User();
                         try{
                             activeUser.setUserId(activeUserData.getInt(AppConstants.TAG_USER_ID));
@@ -134,40 +134,30 @@ public class FetchHaystacksTask extends AsyncTask<Void, Void, FetchHaystacksResu
                         Log.e("parseJson", "No pictureURL for #" + i );
                     }
 
-                    try{
-                        String zone = haystackData.getString("zoneString");
-                        if (zone != null)
-                            haystack.setZone(zone);
-                    }catch(Exception e){
-                        Log.e("parseJson", "No zone for #" + i );
-                    }
-
                     Log.e("parseJson", "Adding Haystack # "+i );
                     publicHaystackList.add(haystack);
                     haystackList.add(haystack);
                 }
 
                 //Private haystacks
-                //haystackList.add(params.context.getResources().getString(R.string.privateHeader));
                 count = privateHaystacks.length();
-                if(count == 0){
-                    //haystackList.add(params.context.getResources().getString(R.string.noHaystackAvailable));
-                }
-
                 for (int i = 0; i < count; i++) {
-                    JSONObject haystackData = (JSONObject) privateHaystacks.getJSONObject(i);
+                    JSONObject haystackData = privateHaystacks.getJSONObject(i);
                     Haystack haystack = new Haystack();
 
                     haystack.setId(haystackData.getInt("id"));
                     haystack.setName(haystackData.getString("name"));
-                    haystack.setIsPublic(haystackData.getInt("isPublic") == 1);
                     haystack.setOwner(haystackData.getInt("owner"));
+                    haystack.setIsPublic(haystackData.getInt("isPublic") == 1);
+                    haystack.setZoneRadius(haystackData.getInt("zoneRadius"));
+                    haystack.setIsCircle(haystackData.getInt("isCircle") == 1);
+                    haystack.setPosition(new LatLng(haystackData.getDouble("lat"), haystackData.getDouble("lng")));
                     haystack.setTimeLimit(haystackData.getString("timeLimit"));
 
                     ArrayList<User> users = new ArrayList<User>();
-                    JSONArray usersData = (JSONArray) haystackData.getJSONArray("users");
+                    JSONArray usersData = haystackData.getJSONArray("users");
                     for (int j = 0; j < usersData.length(); j++) {
-                        JSONObject userData =  (JSONObject) usersData.getJSONObject(j);
+                        JSONObject userData =  usersData.getJSONObject(j);
                         User user = new User();
                         try{
                             user.setUserId(userData.getInt(AppConstants.TAG_USER_ID));
@@ -208,14 +198,6 @@ public class FetchHaystacksTask extends AsyncTask<Void, Void, FetchHaystacksResu
                             haystack.setPictureURL(pictureURL);
                     }catch(Exception e){
                         Log.e("parseJson", "No pictureURL for #" + i );
-                    }
-
-                    try{
-                        String zone = haystackData.getString("zoneString");
-                        if (zone != null)
-                            haystack.setZone(zone);
-                    }catch(Exception e){
-                        Log.e("parseJson", "No zone for #" + i );
                     }
 
                     Log.e("parseJson", "Adding Haystack # "+i );

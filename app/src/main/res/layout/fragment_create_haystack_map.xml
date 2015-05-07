@@ -23,9 +23,9 @@
 
         <!-- Search Box -->
         <com.quinny898.library.persistentsearch.SearchBox
+            android:id="@+id/create_haystack_map_search_box"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/create_haystack_search_box"
             android:layout_gravity="top|center_horizontal"
             />
 

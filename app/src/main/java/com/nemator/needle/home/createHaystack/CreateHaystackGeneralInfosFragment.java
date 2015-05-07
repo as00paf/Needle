@@ -51,6 +51,7 @@ public class CreateHaystackGeneralInfosFragment extends CreateHaystackBaseFragme
     private int year, month, day, hours, minutes;
     private String timeLimit;
     private ImageView photoView;
+    private Bitmap mBitmap;
 
     public static CreateHaystackGeneralInfosFragment newInstance() {
         CreateHaystackGeneralInfosFragment fragment = new CreateHaystackGeneralInfosFragment();
@@ -149,6 +150,27 @@ public class CreateHaystackGeneralInfosFragment extends CreateHaystackBaseFragme
     }
 
     public void updatePhoto(Bitmap bitmap) {
-        photoView.setImageBitmap(bitmap);
+        mBitmap = bitmap;
+        photoView.setImageBitmap(mBitmap);
+    }
+
+    public String getHaystackName(){
+        return txtName.getEditableText().toString();
+    }
+
+    public Boolean getIsPublic(){
+        return isPublicSwitch.isChecked();
+    }
+
+    public String getDateLimit(){
+        return dateLimitEditText.getText().toString();
+    }
+
+    public String getTimeLimit(){
+        return timeLimitEditText.getText().toString();
+    }
+
+    public Bitmap getPicture(){
+        return mBitmap;
     }
 }

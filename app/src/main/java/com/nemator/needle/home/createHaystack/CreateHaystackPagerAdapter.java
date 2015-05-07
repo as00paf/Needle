@@ -86,4 +86,12 @@ public class CreateHaystackPagerAdapter extends FragmentStatePagerAdapter {
     public Fragment getFragmentAt(int position){
         return fragmentList.get(position);
     }
+
+    public Fragment getFragmentByType(Class type){
+        for (int i = 0; i < fragmentList.size() ; i++) {
+            if(type.isInstance(fragmentList.get(i))) return fragmentList.get(i);
+        }
+
+        return null;
+    }
 }

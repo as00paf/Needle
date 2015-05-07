@@ -2,6 +2,7 @@ package com.nemator.needle.home.createHaystack;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.graphics.Bitmap;
@@ -16,6 +17,7 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.ScaleGestureDetector;
 import android.view.View;
 import android.view.ViewGroup;
@@ -33,6 +35,10 @@ import com.nemator.needle.haystack.HaystackActivity;
 import com.nemator.needle.haystack.HaystackUserActivity;
 import com.nemator.needle.haystack.HaystackUserListAdapter;
 import com.nemator.needle.home.task.createHaystack.CreateHaystackResult;
+import com.nemator.needle.home.task.createHaystack.CreateHaystackTaskParams;
+import com.nemator.needle.home.task.imageUploader.ImageUploadParams;
+import com.nemator.needle.home.task.imageUploader.ImageUploadResult;
+import com.nemator.needle.home.task.imageUploader.ImageUploaderTask;
 import com.nemator.needle.models.Haystack;
 import com.nemator.needle.models.User;
 import com.nemator.needle.R;
@@ -45,40 +51,48 @@ import java.util.List;
 
 import it.neokree.materialnavigationdrawer.MaterialNavigationDrawer;
 
-public class CreateHaystackFragment extends Fragment implements CreateHaystackTask.CreateHaystackResponseHandler{
+public class CreateHaystackFragment extends Fragment implements CreateHaystackTask.CreateHaystackResponseHandler, ImageUploaderTask.ImageUploadResponseHandler{
     public static final String SQL_DATE_FORMAT = "yyyy-MM-dd";
     public static final String SQL_DATETIME_FORMAT = "yyyy-MM-dd HH:mm:ss";
     public static final String SQL_TIME_FORMAT = "HH:mm";
     public static final String TAG = "CreateHaystackFragment";
 
+    //Activity Results
     public static int TAKE_PICTURE = 1;
 
+    //View
     private View rootView;
+    private Button nextButton, backButton;
+    private FloatingActionButton fab;
+    private CirclePageIndicator viewPagerIndicator;
 
-    private ListView userListView;
+    private CreateHaystackGeneralInfosFragment mCreateHaystackGenInfosFragment;
+    private CreateHaystackMapFragment mCreateHaystackMapFragment;
+    private CreateHaystackUsersFragment mCreateHaystackUsersFragment;
+
+    private CreateHaystackMap mMap;
+
+    //Data
     private HaystackUserListAdapter userListAdapter;
-
     private String userName;
     private Haystack haystack;
     private int userId = -1;
     private ArrayList<User> userList = new ArrayList<User>();
 
     Boolean mIsMapMoveable = false;
-    private GoogleMap mMap;
     public static boolean mMapIsTouched = false;
     Projection projection;
     public double latitude;
     public double longitude;
     ArrayList<LatLng> val = new ArrayList<LatLng>();
     private float mScaleFactor = 1.f;
-    private CreateHaystackMap mMapFragment;
+
     private ScaleGestureDetector mScaleDetector;
     private Boolean mIsCircle = true;
 
     private ViewPager createHaystackViewPager;
     private CreateHaystackPagerAdapter mCreateHaystackPagerAdapter;
-    private Button nextButton, backButton;
-    private FloatingActionButton fab;
+
 
     public static CreateHaystackFragment newInstance() {
         CreateHaystackFragment fragment = new CreateHaystackFragment();
@@ -93,6 +107,8 @@ public class CreateHaystackFragment extends Fragment implements CreateHaystackTa
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
+
         if (getArguments() != null) {
         }
     }
@@ -107,7 +123,7 @@ public class CreateHaystackFragment extends Fragment implements CreateHaystackTa
         createHaystackViewPager.setAdapter(mCreateHaystackPagerAdapter);
 
         //ViewPagerIndicator
-        final CirclePageIndicator viewPagerIndicator = (CirclePageIndicator) rootView.findViewById(R.id.view_pager_indicator);
+        viewPagerIndicator  = (CirclePageIndicator) rootView.findViewById(R.id.view_pager_indicator);
         viewPagerIndicator.setViewPager(createHaystackViewPager);
         viewPagerIndicator.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
@@ -152,15 +168,16 @@ public class CreateHaystackFragment extends Fragment implements CreateHaystackTa
                     case 0:
                         //Take Picture
                         Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                        intent.putExtra(MediaStore.EXTRA_SCREEN_ORIENTATION, ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
                         startActivityForResult(intent, TAKE_PICTURE);
                         break;
                     case 1:
                         //Focus Camera on current position
-                        mMapFragment = ((CreateHaystackMapFragment) getFragmentManager().getFragments().get(4)).getMap();
-                        mMapFragment.focusCamera();
+                        mMap = ((CreateHaystackMapFragment) getFragmentManager().getFragments().get(4)).getMap();
+                        mMap.focusCamera();
                         break;
                     case 2:
-                        //Done button
+                        //Invite Friend
 
                         break;
                 }
@@ -196,6 +213,18 @@ public class CreateHaystackFragment extends Fragment implements CreateHaystackTa
         return rootView;
     }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+
+        if (id == R.id.create_haystack_action_done) {
+            createHaystack();
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
     // method to check if you have a Camera
     private boolean hasCamera(){
         return getActivity().getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA);
@@ -216,23 +245,21 @@ public class CreateHaystackFragment extends Fragment implements CreateHaystackTa
         nextButton.setEnabled(currentItemIndex != 2);
     }
 
-    private void getMap(){
-        mMap = mMapFragment.getMap();
-    }
-
-    private void addRemoveUsers(){
-        Intent intent = new Intent(getActivity(), HaystackUserActivity.class);
-        intent.putParcelableArrayListExtra(AppConstants.TAG_ADDED_USERS, userList);
-        intent.putExtra(AppConstants.TAG_REQUEST_CODE, HaystackUserActivity.ADD_REMOVE_USERS);
-        startActivityForResult(intent, HaystackUserActivity.ADD_REMOVE_USERS);
-    }
-
-    /*private void createHaystack(){
+    private void createHaystack(){
         haystack = new Haystack();
-        haystack.setName(txtName.getText().toString());
-        haystack.setIsPublic(isPublicCheckbox.isChecked());
-        haystack.setTimeLimit(dateLimit + " " + timeLimit);
+        mCreateHaystackGenInfosFragment = (CreateHaystackGeneralInfosFragment) mCreateHaystackPagerAdapter.getFragmentByType(CreateHaystackGeneralInfosFragment.class);
+        mCreateHaystackMapFragment = (CreateHaystackMapFragment) mCreateHaystackPagerAdapter.getFragmentByType(CreateHaystackMapFragment.class);
+        mCreateHaystackUsersFragment = (CreateHaystackUsersFragment) mCreateHaystackPagerAdapter.getFragmentByType(CreateHaystackUsersFragment.class);
+
+        //General Infos
+        haystack.setName(mCreateHaystackGenInfosFragment.getHaystackName());
         haystack.setOwner(getUserId());
+        haystack.setIsPublic(mCreateHaystackGenInfosFragment.getIsPublic());
+        haystack.setTimeLimit(mCreateHaystackGenInfosFragment.getDateLimit() + " " + mCreateHaystackGenInfosFragment.getTimeLimit());
+
+        //Location
+        haystack.setZoneRadius(mCreateHaystackMapFragment.getZoneRadius());
+        haystack.setPosition(mCreateHaystackMapFragment.getPosition());
 
         //Current User
         User user = new User();
@@ -241,6 +268,7 @@ public class CreateHaystackFragment extends Fragment implements CreateHaystackTa
 
         //Users
         userList.add(user);
+        userList.addAll(mCreateHaystackUsersFragment.getSelectedUsers());
         haystack.setUsers(userList);
 
         //Active users
@@ -251,15 +279,56 @@ public class CreateHaystackFragment extends Fragment implements CreateHaystackTa
         ArrayList<User> bannedUsers = new ArrayList<User>();
         haystack.setBannedUsers(bannedUsers);
 
-        CreateHaystackTaskParams params = new CreateHaystackTaskParams(rootView.getContext(), haystack);
-        try{
-            CreateHaystackTask task = new CreateHaystackTask(params, this);
-            task.execute();
-
-        }catch (Exception e) {
-            Toast.makeText(getActivity(), "An error occured while creating Haystack", Toast.LENGTH_SHORT).show();
+        if(!validateHaystack(haystack)){
+            Toast.makeText(getActivity(), "Haystack Invalid !", Toast.LENGTH_SHORT);
+            return;
         }
-    }*/
+
+        //File Upload
+        Bitmap image = mCreateHaystackGenInfosFragment.getPicture();
+        if(image != null){
+            ImageUploadParams uploadParams = new ImageUploadParams(image, haystack.getName(), rootView.getContext());
+            try{
+                ImageUploaderTask uploadTask = new ImageUploaderTask(uploadParams, this);
+                uploadTask.execute();
+            }catch (Exception e) {
+                Toast.makeText(getActivity(), "An error occured while uploading Haystack's Image", Toast.LENGTH_SHORT).show();
+            }
+        }else{
+            //Create Haystack
+            CreateHaystackTaskParams params = new CreateHaystackTaskParams(rootView.getContext(), haystack);
+            try{
+                CreateHaystackTask task = new CreateHaystackTask(params, this);
+                task.execute();
+
+            }catch (Exception e) {
+                Toast.makeText(getActivity(), "An error occured while creating Haystack", Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
+    //TODO: finish validation
+    private Boolean validateHaystack(Haystack haystack){
+        if(haystack.getName().isEmpty()) return false;
+
+        return true;
+    }
+
+    public void onImageUploaded(ImageUploadResult result)
+    {
+        if(result.successCode == 1){
+            haystack.setPictureURL(result.imageURL);
+            //Create Haystack
+            CreateHaystackTaskParams params = new CreateHaystackTaskParams(rootView.getContext(), haystack);
+            try{
+                CreateHaystackTask task = new CreateHaystackTask(params, this);
+                task.execute();
+
+            }catch (Exception e) {
+                Toast.makeText(getActivity(), "An error occured while creating Haystack", Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
 
     public void onHaystackCreated(CreateHaystackResult result){
         if(result.successCode == 0){
@@ -302,29 +371,13 @@ public class CreateHaystackFragment extends Fragment implements CreateHaystackTa
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (resultCode == getActivity().RESULT_OK && requestCode == HaystackUserActivity.ADD_REMOVE_USERS) {
-            userList = data.getParcelableArrayListExtra(AppConstants.TAG_USERS);
-            updateUserList();
-        }
-        else if (requestCode == CreateHaystackFragment.TAKE_PICTURE && resultCode== getActivity().RESULT_OK && data != null){
+        if (requestCode == CreateHaystackFragment.TAKE_PICTURE && resultCode== getActivity().RESULT_OK && data != null){
             Bundle extras = data.getExtras();
 
             Bitmap bitmap = (Bitmap) extras.get("data");
             CreateHaystackGeneralInfosFragment fragment = (CreateHaystackGeneralInfosFragment) mCreateHaystackPagerAdapter.getFragmentAt(0);
             fragment.updatePhoto(bitmap);
         }
-    }
-
-    private void updateUserList(){
-        userListAdapter = new HaystackUserListAdapter(getActionBar().getThemedContext(), R.layout.haystack_drawer_item, userList, userList, getLayoutInflater(null));
-        userListAdapter.notifyDataSetChanged();
-
-        userListView.setAdapter(userListAdapter);
-        userListView.invalidate();
-    }
-
-    private ActionBar getActionBar() {
-        return ((ActionBarActivity) getActivity()).getSupportActionBar();
     }
 
     public Haystack getHaystack(){

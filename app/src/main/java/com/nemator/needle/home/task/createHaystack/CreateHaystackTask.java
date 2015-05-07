@@ -52,7 +52,10 @@ public class CreateHaystackTask extends AsyncTask<Void, Void, CreateHaystackResu
             requestParams.add(new BasicNameValuePair("owner", String.valueOf(params.haystack.getOwner())));
             requestParams.add(new BasicNameValuePair("isPublic", (params.haystack.getIsPublic()) ? "1" : "0"));
             requestParams.add(new BasicNameValuePair("timeLimit", params.haystack.getTimeLimit()));
-            requestParams.add(new BasicNameValuePair("zone", params.haystack.getZone()));
+            requestParams.add(new BasicNameValuePair("zoneRadius", String.valueOf(params.haystack.getZoneRadius())));
+            requestParams.add(new BasicNameValuePair("isCircle", (params.haystack.getIsPublic()) ? "1" : "0"));
+            requestParams.add(new BasicNameValuePair("lat", String.valueOf(params.haystack.getPosition().latitude)));
+            requestParams.add(new BasicNameValuePair("lng", String.valueOf(params.haystack.getPosition().longitude)));
             requestParams.add(new BasicNameValuePair("pictureURL", params.haystack.getPictureURL()));
 
             int i;

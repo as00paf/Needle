@@ -40,7 +40,7 @@ public class ImageDownloaderTask extends AsyncTask<String, Void, Bitmap> {
 		Bitmap result = downloadBitmap(params[0]);
 		
 		//Scale the image
-		/*if(scaleFactor != 1){
+		/*if(setScaleFactor != 1){
 			byte[] imageAsBytes=null;
 			try {
 			    imageAsBytes = Base64.decode(result.get);

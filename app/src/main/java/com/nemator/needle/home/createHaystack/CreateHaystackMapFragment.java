@@ -8,7 +8,6 @@ import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.Toast;
@@ -82,8 +81,9 @@ public class CreateHaystackMapFragment extends CreateHaystackBaseFragment{
             });
 
         //Search Box
-        searchBox = (SearchBox) rootView.findViewById(R.id.create_haystack_search_box);
+        searchBox = (SearchBox) rootView.findViewById(R.id.create_haystack_map_search_box);
         searchBox.enableVoiceRecognition(this);
+        searchBox.setLogoText(getString(R.string.search_for_places));
         searchBox.setSearchListener(new SearchBox.SearchListener() {
             @Override
             public void onSearchOpened() {
@@ -149,6 +149,18 @@ public class CreateHaystackMapFragment extends CreateHaystackBaseFragment{
         return rootView;
     }
 
+    public int getZoneRadius(){
+        return mMapFragment.getZoneRadius();
+    }
+
+    public Boolean getIsCircle(){
+        return mIsCircle;
+    }
+
+    public LatLng getPosition(){
+        return  mMapFragment.getPosition();
+    }
+
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (isAdded() && requestCode == SearchBox.VOICE_RECOGNITION_CODE && resultCode == getActivity().RESULT_OK) {
@@ -171,7 +183,7 @@ public class CreateHaystackMapFragment extends CreateHaystackBaseFragment{
             // Don't let the object get too small or too large.
             mScaleFactor = Math.max(0.1f, Math.min(mScaleFactor, 5.0f));
 
-            mMapFragment.scaleFactor(mScaleFactor);
+            mMapFragment.setScaleFactor(mScaleFactor);
             return true;
         }
     }

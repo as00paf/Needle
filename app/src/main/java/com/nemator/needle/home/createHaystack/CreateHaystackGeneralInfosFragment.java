@@ -1,5 +1,6 @@
 package com.nemator.needle.home.createHaystack;
 
+import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.content.Intent;
@@ -21,7 +22,9 @@ import android.widget.TimePicker;
 
 import com.nemator.needle.AppConstants;
 import com.nemator.needle.R;
+import com.nemator.needle.haystack.HaystackActivity;
 import com.nemator.needle.haystack.HaystackUserActivity;
+import com.nemator.needle.home.HaystacksActivity;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -53,6 +56,8 @@ public class CreateHaystackGeneralInfosFragment extends CreateHaystackBaseFragme
     private ImageView photoView;
     private Bitmap mBitmap;
 
+    private OnPrivacySettingsUpdatedListener privacySettingsCallback;
+
     public static CreateHaystackGeneralInfosFragment newInstance() {
         CreateHaystackGeneralInfosFragment fragment = new CreateHaystackGeneralInfosFragment();
         Bundle args = new Bundle();
@@ -68,7 +73,7 @@ public class CreateHaystackGeneralInfosFragment extends CreateHaystackBaseFragme
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
         }
-
+        setHasOptionsMenu(true);
         this.setRetainInstance(true);
     }
 
@@ -91,6 +96,9 @@ public class CreateHaystackGeneralInfosFragment extends CreateHaystackBaseFragme
                     privacyLabel.setText(getString(R.string.privateLabel));
                     privacyLabel.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_lock_outline_black_24dp, 0, 0, 0);
                 }
+
+                //Remove/Restore Users Fragment
+                privacySettingsCallback.onPrivacySettingsChanged(isChecked);
             }
         });
 
@@ -151,6 +159,18 @@ public class CreateHaystackGeneralInfosFragment extends CreateHaystackBaseFragme
         return rootView;
     }
 
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+
+        try {
+            privacySettingsCallback = (OnPrivacySettingsUpdatedListener) ((HaystacksActivity) activity).getSupportFragmentManager().getFragments().get(0);
+        } catch (ClassCastException e) {
+            throw new ClassCastException(activity.toString()
+                    + " must implement OnHeadlineSelectedListener");
+        }
+    }
+
     public void updatePhoto(Bitmap bitmap) {
         mBitmap = bitmap;
         photoView.setImageBitmap(mBitmap);
@@ -174,5 +194,9 @@ public class CreateHaystackGeneralInfosFragment extends CreateHaystackBaseFragme
 
     public Bitmap getPicture(){
         return mBitmap;
+    }
+
+    public interface OnPrivacySettingsUpdatedListener{
+        public void onPrivacySettingsChanged(Boolean isPublic);
     }
 }

@@ -17,12 +17,15 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.ScaleGestureDetector;
 import android.view.View;
 import android.view.ViewGroup;
 import android.support.v4.app.Fragment;
 import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.Toast;
@@ -51,7 +54,7 @@ import java.util.List;
 
 import it.neokree.materialnavigationdrawer.MaterialNavigationDrawer;
 
-public class CreateHaystackFragment extends Fragment implements CreateHaystackTask.CreateHaystackResponseHandler, ImageUploaderTask.ImageUploadResponseHandler{
+public class CreateHaystackFragment extends Fragment implements CreateHaystackTask.CreateHaystackResponseHandler, ImageUploaderTask.ImageUploadResponseHandler, CreateHaystackGeneralInfosFragment.OnPrivacySettingsUpdatedListener{
     public static final String SQL_DATE_FORMAT = "yyyy-MM-dd";
     public static final String SQL_DATETIME_FORMAT = "yyyy-MM-dd HH:mm:ss";
     public static final String SQL_TIME_FORMAT = "HH:mm";
@@ -92,6 +95,7 @@ public class CreateHaystackFragment extends Fragment implements CreateHaystackTa
 
     private ViewPager createHaystackViewPager;
     private CreateHaystackPagerAdapter mCreateHaystackPagerAdapter;
+    private Boolean isPublic = false;
 
 
     public static CreateHaystackFragment newInstance() {
@@ -134,7 +138,7 @@ public class CreateHaystackFragment extends Fragment implements CreateHaystackTa
             public void onPageSelected(int position) {
                 //Back/Next Button
                 backButton.setEnabled((position == 1 || position == 2));
-                nextButton.setEnabled((position == 0 || position == 1));
+                nextButton.setEnabled((position == 0 || (position == 1 && isPublic == false)));
 
                 //ActionBar
 
@@ -214,6 +218,26 @@ public class CreateHaystackFragment extends Fragment implements CreateHaystackTa
     }
 
     @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        int position = createHaystackViewPager.getCurrentItem();
+        switch(position){
+            case 0:
+                super.onCreateOptionsMenu(menu, inflater);
+                break;
+            case 1:
+                if(isPublic){
+                    inflater.inflate(R.menu.menu_create_haystack_done, menu);
+                }else{
+                    super.onCreateOptionsMenu(menu, inflater);
+                }
+                break;
+            case 2:
+                inflater.inflate(R.menu.menu_create_haystack_done, menu);
+                break;
+        }
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
 
@@ -242,7 +266,7 @@ public class CreateHaystackFragment extends Fragment implements CreateHaystackTa
     private void updateButtonsState(){
         int currentItemIndex = createHaystackViewPager.getCurrentItem();
         backButton.setEnabled(currentItemIndex != 0);
-        nextButton.setEnabled(currentItemIndex != 2);
+        nextButton.setEnabled((currentItemIndex == 0 || (currentItemIndex == 1 && isPublic == false)));
     }
 
     private void createHaystack(){
@@ -383,5 +407,13 @@ public class CreateHaystackFragment extends Fragment implements CreateHaystackTa
 
     public Haystack getHaystack(){
         return haystack;
+    }
+
+    @Override
+    public void onPrivacySettingsChanged(Boolean isPublic) {
+        mCreateHaystackPagerAdapter.setIsPublic(isPublic);
+        viewPagerIndicator.notifyDataSetChanged();
+
+        this.isPublic = isPublic;
     }
 }

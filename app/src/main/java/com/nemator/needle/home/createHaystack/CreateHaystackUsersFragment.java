@@ -6,25 +6,17 @@ import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
-import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ProgressBar;
-import android.widget.Toast;
 
 import com.nemator.needle.R;
-import com.nemator.needle.haystack.HaystackUserListAdapter;
 import com.nemator.needle.haystack.task.retrieveUsers.RetrieveUsersParams;
 import com.nemator.needle.haystack.task.retrieveUsers.RetrieveUsersResult;
 import com.nemator.needle.haystack.task.retrieveUsers.RetrieveUsersTask;
-import com.nemator.needle.home.HaystackListCardAdapter;
-import com.nemator.needle.models.Haystack;
 import com.nemator.needle.models.User;
 import com.quinny898.library.persistentsearch.SearchBox;
 
@@ -115,11 +107,6 @@ public class CreateHaystackUsersFragment extends Fragment implements SwipeRefres
         swipeLayout.setOnRefreshListener(this);
 
         return rootView;
-    }
-
-    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.menu_create_haystack_user, menu);
     }
 
     @Override

@@ -22,6 +22,8 @@ public class CreateHaystackPagerAdapter extends FragmentStatePagerAdapter {
     private Fragment fragment;
     private ArrayList<Fragment> fragmentList = new ArrayList<Fragment>();
 
+    private Boolean isPublic = false;
+
     public CreateHaystackPagerAdapter(FragmentManager fm, Fragment frag) {
         super(fm);
         fragment = frag;
@@ -53,7 +55,7 @@ public class CreateHaystackPagerAdapter extends FragmentStatePagerAdapter {
 
     @Override
     public int getCount() {
-        return 3;
+        return (isPublic) ? 2 : 3;
     }
 
     @Override
@@ -75,6 +77,15 @@ public class CreateHaystackPagerAdapter extends FragmentStatePagerAdapter {
         }
 
         return title;
+    }
+
+    public Boolean getIsPublic() {
+        return isPublic;
+    }
+
+    public void setIsPublic(Boolean isPublic) {
+        this.isPublic = isPublic;
+        this.notifyDataSetChanged();
     }
 
     @Override

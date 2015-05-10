@@ -4,6 +4,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.speech.RecognizerIntent;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import android.view.View;
@@ -39,6 +41,7 @@ public class CreateHaystackMapFragment extends CreateHaystackBaseFragment{
     private ScaleGestureDetector mScaleDetector;
     private Boolean mIsCircle = true;
     private SearchBox searchBox;
+    private Boolean isPublic = false;
 
     public static CreateHaystackMapFragment newInstance() {
         CreateHaystackMapFragment fragment = new CreateHaystackMapFragment();
@@ -55,6 +58,8 @@ public class CreateHaystackMapFragment extends CreateHaystackBaseFragment{
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
         }
+
+        setHasOptionsMenu(true);
         this.setRetainInstance(true);
     }
 

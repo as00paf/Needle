@@ -55,6 +55,7 @@ public class CreateHaystackMapFragment extends CreateHaystackBaseFragment{
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
         }
+        this.setRetainInstance(true);
     }
 
     @Override

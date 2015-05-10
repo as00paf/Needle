@@ -45,6 +45,7 @@ public class CreateHaystackTask extends AsyncTask<Void, Void, CreateHaystackResu
     @Override
     protected CreateHaystackResult doInBackground(Void... args) {
         CreateHaystackResult result = new CreateHaystackResult();
+        result.params = this.params;
         int success;
         try {
             List<NameValuePair> requestParams = new ArrayList<NameValuePair>();

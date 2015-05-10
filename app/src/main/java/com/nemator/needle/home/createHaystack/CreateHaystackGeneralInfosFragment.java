@@ -68,6 +68,8 @@ public class CreateHaystackGeneralInfosFragment extends CreateHaystackBaseFragme
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
         }
+
+        this.setRetainInstance(true);
     }
 
     @Override

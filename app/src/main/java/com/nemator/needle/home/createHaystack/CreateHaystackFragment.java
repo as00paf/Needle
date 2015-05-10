@@ -260,6 +260,7 @@ public class CreateHaystackFragment extends Fragment implements CreateHaystackTa
         //Location
         haystack.setZoneRadius(mCreateHaystackMapFragment.getZoneRadius());
         haystack.setPosition(mCreateHaystackMapFragment.getPosition());
+        haystack.setIsCircle(mCreateHaystackMapFragment.getIsCircle());
 
         //Current User
         User user = new User();

@@ -46,12 +46,16 @@ public class Haystack implements Serializable, Parcelable {
         this.pictureURL = in.readString();
         this.position = new LatLng(in.readDouble(), in.readDouble());
 
-        this.users = new ArrayList<User>();
-        in.readList(this.users, User.class.getClassLoader());
-        this.activeUsers = new ArrayList<User>();
-        in.readList(this.activeUsers, User.class.getClassLoader());
-        this.bannedUsers = new ArrayList<User>();
-        in.readList(this.bannedUsers, User.class.getClassLoader());
+        try{
+            this.users = new ArrayList<User>();
+            in.readList(this.users, User.class.getClassLoader());
+            this.activeUsers = new ArrayList<User>();
+            in.readList(this.activeUsers, User.class.getClassLoader());
+            this.bannedUsers = new ArrayList<User>();
+            in.readList(this.bannedUsers, User.class.getClassLoader());
+        }catch(Exception e){
+
+        }
     }
 
     @Override

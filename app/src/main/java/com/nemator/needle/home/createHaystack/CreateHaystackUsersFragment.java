@@ -62,6 +62,8 @@ public class CreateHaystackUsersFragment extends Fragment implements SwipeRefres
         setHasOptionsMenu(true);
         if (getArguments() != null) {
         }
+
+        this.setRetainInstance(true);
     }
 
     @Override
@@ -105,7 +107,6 @@ public class CreateHaystackUsersFragment extends Fragment implements SwipeRefres
         //Recycler View
         mRecyclerView = (RecyclerView) rootView.findViewById(R.id.create_haystack_users_list);
         mRecyclerView.setHasFixedSize(true);
-
         mLayoutManager = new GridLayoutManager(getActivity(), 2);
         mRecyclerView.setLayoutManager(mLayoutManager);
 

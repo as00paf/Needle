@@ -3,14 +3,14 @@ package com.nemator.needle.home;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
-import android.view.Menu;
-import android.view.MenuItem;
 
 import com.nemator.needle.MainActivity;
 import com.nemator.needle.R;
 import com.nemator.needle.authentication.LoginFragment;
+import com.nemator.needle.home.createHaystack.CreateHaystackFragment;
+import com.nemator.needle.home.createHaystack.HomeActivityState;
+import com.nemator.needle.home.createHaystack.OnActivityStateChangeListener;
 import com.nemator.needle.settings.SettingsFragment;
 
 import it.neokree.materialnavigationdrawer.MaterialNavigationDrawer;
@@ -18,8 +18,9 @@ import it.neokree.materialnavigationdrawer.elements.MaterialAccount;
 import it.neokree.materialnavigationdrawer.elements.MaterialSection;
 import it.neokree.materialnavigationdrawer.elements.listeners.MaterialSectionListener;
 
-public class HaystacksActivity extends MaterialNavigationDrawer implements MaterialSectionListener{
+public class HaystacksActivity extends MaterialNavigationDrawer implements MaterialSectionListener, OnActivityStateChangeListener{
     private SharedPreferences mSharedPreferences;
+    private int currentState = HomeActivityState.PUBLIC_HAYSTACK_TAB;
 
     @Override
     public void init(Bundle savedInstanceState) {
@@ -51,6 +52,9 @@ public class HaystacksActivity extends MaterialNavigationDrawer implements Mater
             edit.putBoolean("firstNavDrawerLearned", true);
             edit.commit();
         }
+
+        //Back-Stack
+        this.setBackPattern(MaterialNavigationDrawer.BACKPATTERN_NONE);
     }
 
     @Override
@@ -65,28 +69,41 @@ public class HaystacksActivity extends MaterialNavigationDrawer implements Mater
         }
     }
 
-    /*
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_haystacks, menu);
-        return true;
+    public void onBackPressed() {
+        switch (currentState){
+            case HomeActivityState.PUBLIC_HAYSTACK_TAB:
+                //Goto Login Activity
+                Intent i = new Intent(this, MainActivity.class);
+                i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                i.putExtra("autoLogin", false);
+                startActivity(i);
+                break;
+            case HomeActivityState.PRIVATE_HAYSTACK_TAB:
+                //Goto Public tab
+                ((HaystackListFragment) getSupportFragmentManager().getFragments().get(0)).goToTab(0);
+                break;
+            case HomeActivityState.CREATE_HAYSTACK_GENERAL_INFOS:
+                //Goto Haystack List
+                setFragment(HaystackListFragment.newInstance(), getString(R.string.title_haystacks));
+                currentState = HomeActivityState.PUBLIC_HAYSTACK_TAB;
+                break;
+            case HomeActivityState.CREATE_HAYSTACK_MAP:
+                //Goto General Infos
+                ((CreateHaystackFragment) getSupportFragmentManager().getFragments().get(0)).goToPage(0);
+                break;
+            case HomeActivityState.CREATE_HAYSTACK_USERS:
+                //Goto Map
+                ((CreateHaystackFragment) getSupportFragmentManager().getFragments().get(0)).goToPage(1);
+                break;
+            default:
+                super.onBackPressed();
+                break;
+        }
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
-    }*/
-
-
+    public void onStateChange(int state) {
+        currentState = state;
+    }
 }

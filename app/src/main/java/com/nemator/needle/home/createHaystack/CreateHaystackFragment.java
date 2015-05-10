@@ -1,11 +1,13 @@
 package com.nemator.needle.home.createHaystack;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.graphics.Bitmap;
+import android.graphics.Matrix;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.preference.PreferenceManager;
@@ -13,9 +15,7 @@ import android.provider.MediaStore;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -25,17 +25,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.support.v4.app.Fragment;
 import android.widget.Button;
-import android.widget.CompoundButton;
-import android.widget.ImageView;
-import android.widget.ListView;
 import android.widget.Toast;
 
-import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.Projection;
 import com.google.android.gms.maps.model.LatLng;
 import com.nemator.needle.AppConstants;
 import com.nemator.needle.haystack.HaystackActivity;
-import com.nemator.needle.haystack.HaystackUserActivity;
 import com.nemator.needle.haystack.HaystackUserListAdapter;
 import com.nemator.needle.home.task.createHaystack.CreateHaystackResult;
 import com.nemator.needle.home.task.createHaystack.CreateHaystackTaskParams;
@@ -51,8 +46,6 @@ import com.viewpagerindicator.CirclePageIndicator;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import it.neokree.materialnavigationdrawer.MaterialNavigationDrawer;
 
 public class CreateHaystackFragment extends Fragment implements CreateHaystackTask.CreateHaystackResponseHandler, ImageUploaderTask.ImageUploadResponseHandler, CreateHaystackGeneralInfosFragment.OnPrivacySettingsUpdatedListener{
     public static final String SQL_DATE_FORMAT = "yyyy-MM-dd";
@@ -96,7 +89,7 @@ public class CreateHaystackFragment extends Fragment implements CreateHaystackTa
     private ViewPager createHaystackViewPager;
     private CreateHaystackPagerAdapter mCreateHaystackPagerAdapter;
     private Boolean isPublic = false;
-
+    private OnActivityStateChangeListener stateChangeCallback;
 
     public static CreateHaystackFragment newInstance() {
         CreateHaystackFragment fragment = new CreateHaystackFragment();
@@ -140,18 +133,19 @@ public class CreateHaystackFragment extends Fragment implements CreateHaystackTa
                 backButton.setEnabled((position == 1 || position == 2));
                 nextButton.setEnabled((position == 0 || (position == 1 && isPublic == false)));
 
-                //ActionBar
-
-                //FAB
+                //FAB & Back-Stack
                 switch (position){
                     case 0:
                         fab.setImageDrawable(getResources().getDrawable( R.drawable.ic_photo_camera_black_24dp));
+                        stateChangeCallback.onStateChange(HomeActivityState.CREATE_HAYSTACK_GENERAL_INFOS);
                         break;
                     case 1:
                         fab.setImageDrawable(getResources().getDrawable( R.drawable.ic_action_location_found));
+                        stateChangeCallback.onStateChange(HomeActivityState.CREATE_HAYSTACK_MAP);
                         break;
                     case 2:
                         fab.setImageDrawable(getResources().getDrawable( R.drawable.ic_action_add_person));
+                        stateChangeCallback.onStateChange(HomeActivityState.CREATE_HAYSTACK_USERS);
                         break;
                 }
             }
@@ -173,6 +167,7 @@ public class CreateHaystackFragment extends Fragment implements CreateHaystackTa
                         //Take Picture
                         Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
                         intent.putExtra(MediaStore.EXTRA_SCREEN_ORIENTATION, ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+
                         startActivityForResult(intent, TAKE_PICTURE);
                         break;
                     case 1:
@@ -247,6 +242,18 @@ public class CreateHaystackFragment extends Fragment implements CreateHaystackTa
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+
+        try {
+            stateChangeCallback = (OnActivityStateChangeListener) getActivity();
+        } catch (ClassCastException e) {
+            throw new ClassCastException(activity.toString()
+                    + " must implement OnActivityStateChangeListener");
+        }
     }
 
     // method to check if you have a Camera
@@ -400,6 +407,12 @@ public class CreateHaystackFragment extends Fragment implements CreateHaystackTa
             Bundle extras = data.getExtras();
 
             Bitmap bitmap = (Bitmap) extras.get("data");
+            //Rotate if portrait
+            if(bitmap.getHeight() > bitmap.getWidth()){
+                Matrix matrix = new Matrix();
+                matrix.postRotate(90);
+                bitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
+            }
             CreateHaystackGeneralInfosFragment fragment = (CreateHaystackGeneralInfosFragment) mCreateHaystackPagerAdapter.getFragmentAt(0);
             fragment.updatePhoto(bitmap);
         }
@@ -415,5 +428,9 @@ public class CreateHaystackFragment extends Fragment implements CreateHaystackTa
         viewPagerIndicator.notifyDataSetChanged();
 
         this.isPublic = isPublic;
+    }
+
+    public void goToPage(int page){
+        createHaystackViewPager.setCurrentItem(page);
     }
 }

@@ -5,6 +5,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
@@ -16,6 +17,8 @@ import it.neokree.materialnavigationdrawer.MaterialNavigationDrawer;
 import it.neokree.materialnavigationdrawer.elements.MaterialAccount;
 
 public class MainActivity extends MaterialNavigationDrawer {
+    public static String TAG = "MainActivity";
+
     private SharedPreferences mSharedPreferences;
     public boolean autoLogin = true;
 
@@ -24,6 +27,10 @@ public class MainActivity extends MaterialNavigationDrawer {
         //Auto-Login
         if(savedInstanceState != null){
             autoLogin = savedInstanceState.getBoolean("autoLogin", true);
+        }
+
+        if(getIntent().getExtras() != null){
+            autoLogin = getIntent().getExtras().getBoolean("autoLogin");
         }
 
         mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);

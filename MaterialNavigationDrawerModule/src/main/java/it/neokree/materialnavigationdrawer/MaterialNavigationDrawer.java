@@ -71,6 +71,7 @@ public abstract class MaterialNavigationDrawer<Fragment> extends ActionBarActivi
     public static final int BACKPATTERN_BACK_ANYWHERE = 0;
     public static final int BACKPATTERN_BACK_TO_FIRST = 1;
     public static final int BACKPATTERN_CUSTOM = 2;
+    public static final int BACKPATTERN_NONE = 3;
 
     private static final int DRAWERHEADER_ACCOUNTS = 0;
     private static final int DRAWERHEADER_IMAGE = 1;
@@ -871,6 +872,9 @@ public abstract class MaterialNavigationDrawer<Fragment> extends ActionBarActivi
                         afterFragmentSetted((Fragment) backedSection.getTargetFragment(),backedSection.getTitle());
                         syncSectionsState(backedSection);
                     }
+                    break;
+                case BACKPATTERN_NONE:
+                    super.onBackPressed();
                     break;
             }
         }

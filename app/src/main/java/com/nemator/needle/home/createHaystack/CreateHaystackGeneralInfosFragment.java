@@ -173,6 +173,7 @@ public class CreateHaystackGeneralInfosFragment extends CreateHaystackBaseFragme
 
     public void updatePhoto(Bitmap bitmap) {
         mBitmap = bitmap;
+        photoView.setScaleType(ImageView.ScaleType.CENTER_CROP);
         photoView.setImageBitmap(mBitmap);
     }
 

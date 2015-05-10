@@ -6,6 +6,7 @@ import android.support.v7.app.ActionBar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.support.v4.widget.DrawerLayout;
@@ -15,6 +16,8 @@ import com.nemator.needle.settings.AppSettingsActivity;
 
 public class HomeActivity extends ActionBarActivity
         implements HomeNavigationDrawerFragment.NavigationDrawerCallbacks {
+
+    public static String TAG = "HomeActivity";
 
     private HomeNavigationDrawerFragment mNavigationDrawerFragment;
     private HaystackListFragment haystackListFragment;
@@ -96,18 +99,4 @@ public class HomeActivity extends ActionBarActivity
 
         return super.onOptionsItemSelected(item);
     }
-
-    @Override
-    public void onBackPressed(){
-        FragmentManager fm = getSupportFragmentManager();
-        if (fm.getBackStackEntryCount() > 0) {
-            fm.popBackStack();
-        } else {
-            Intent intent = new Intent(Intent.ACTION_MAIN);
-            intent.addCategory(Intent.CATEGORY_HOME);
-            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            startActivity(intent);
-        }
-    }
-
 }

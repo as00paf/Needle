@@ -1,5 +1,6 @@
 package com.nemator.needle.home;
 
+import android.app.Activity;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
@@ -11,6 +12,8 @@ import com.appcompat.view.slidingTab.SlidingTabLayout;
 import com.nemator.needle.home.createHaystack.CreateHaystackFragment;
 import com.nemator.needle.R;
 
+import com.nemator.needle.home.createHaystack.HomeActivityState;
+import com.nemator.needle.home.createHaystack.OnActivityStateChangeListener;
 import com.shamanland.fab.FloatingActionButton;
 
 import it.neokree.materialnavigationdrawer.MaterialNavigationDrawer;
@@ -24,6 +27,8 @@ public class HaystackListFragment extends Fragment{
     private ViewPager haystackListViewPager;
     private SlidingTabLayout mSlidingTabLayout;
     private HaystackListPagerAdapter mHaystackListPagerAdapter;
+
+    private OnActivityStateChangeListener stateChangeCallback;
 
     public static HaystackListFragment newInstance() {
         HaystackListFragment fragment = new HaystackListFragment();
@@ -45,6 +50,7 @@ public class HaystackListFragment extends Fragment{
             @Override
             public void onClick(View v) {
                 ((MaterialNavigationDrawer) getActivity()).setFragment(CreateHaystackFragment.newInstance(), getString(R.string.create_haystack));
+                stateChangeCallback.onStateChange(HomeActivityState.CREATE_HAYSTACK_GENERAL_INFOS);
             }
         });
         fab.initBackground();
@@ -65,7 +71,46 @@ public class HaystackListFragment extends Fragment{
         });
 
         mSlidingTabLayout.setViewPager(haystackListViewPager);
+        mSlidingTabLayout.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+                switch(position){
+                    case 0:
+                        stateChangeCallback.onStateChange(HomeActivityState.PUBLIC_HAYSTACK_TAB);
+                        break;
+                    case 1:
+                        stateChangeCallback.onStateChange(HomeActivityState.PRIVATE_HAYSTACK_TAB);
+                        break;
+                }
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+
+            }
+        });
 
         return rootView;
+    }
+
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+
+        try {
+            stateChangeCallback = (OnActivityStateChangeListener) getActivity();
+        } catch (ClassCastException e) {
+            throw new ClassCastException(activity.toString()
+                    + " must implement OnActivityStateChangeListener");
+        }
+    }
+
+    public void goToTab(int tab){
+        haystackListViewPager.setCurrentItem(tab);
     }
 }

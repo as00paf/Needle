@@ -231,4 +231,7 @@ public class HomeNavigationDrawerFragment extends Fragment {
     public static interface NavigationDrawerCallbacks {
         void onNavigationDrawerItemSelected(int position);
     }
+
+
+
 }

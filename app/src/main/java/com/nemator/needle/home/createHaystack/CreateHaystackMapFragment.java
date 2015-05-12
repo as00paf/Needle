@@ -37,7 +37,7 @@ public class CreateHaystackMapFragment extends CreateHaystackBaseFragment{
     public double longitude;
     ArrayList<LatLng> val = new ArrayList<LatLng>();
     private float mScaleFactor = 1.f;
-    private CreateHaystackMap mMapFragment;
+    public CreateHaystackMap mMapFragment;
     private ScaleGestureDetector mScaleDetector;
     private Boolean mIsCircle = true;
     private SearchBox searchBox;
@@ -105,6 +105,8 @@ public class CreateHaystackMapFragment extends CreateHaystackBaseFragment{
             public void onSearchTermChanged() {
                 //React to the search term changing
                 //Called after it has updated results
+
+
             }
 
             @Override

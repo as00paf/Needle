@@ -2,6 +2,7 @@ package com.nemator.needle.home.createHaystack;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.IntentSender;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
@@ -16,6 +17,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBarActivity;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -27,6 +29,10 @@ import android.support.v4.app.Fragment;
 import android.widget.Button;
 import android.widget.Toast;
 
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GooglePlayServicesUtil;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.Projection;
 import com.google.android.gms.maps.model.LatLng;
 import com.nemator.needle.AppConstants;
@@ -47,10 +53,9 @@ import com.viewpagerindicator.CirclePageIndicator;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CreateHaystackFragment extends Fragment implements CreateHaystackTask.CreateHaystackResponseHandler, ImageUploaderTask.ImageUploadResponseHandler, CreateHaystackGeneralInfosFragment.OnPrivacySettingsUpdatedListener{
-    public static final String SQL_DATE_FORMAT = "yyyy-MM-dd";
-    public static final String SQL_DATETIME_FORMAT = "yyyy-MM-dd HH:mm:ss";
-    public static final String SQL_TIME_FORMAT = "HH:mm";
+public class CreateHaystackFragment extends Fragment implements CreateHaystackTask.CreateHaystackResponseHandler,
+        ImageUploaderTask.ImageUploadResponseHandler, CreateHaystackGeneralInfosFragment.OnPrivacySettingsUpdatedListener,
+        GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener{
     public static final String TAG = "CreateHaystackFragment";
 
     //Activity Results
@@ -69,27 +74,17 @@ public class CreateHaystackFragment extends Fragment implements CreateHaystackTa
     private CreateHaystackMap mMap;
 
     //Data
-    private HaystackUserListAdapter userListAdapter;
     private String userName;
     private Haystack haystack;
     private int userId = -1;
     private ArrayList<User> userList = new ArrayList<User>();
 
-    Boolean mIsMapMoveable = false;
-    public static boolean mMapIsTouched = false;
-    Projection projection;
-    public double latitude;
-    public double longitude;
-    ArrayList<LatLng> val = new ArrayList<LatLng>();
-    private float mScaleFactor = 1.f;
-
-    private ScaleGestureDetector mScaleDetector;
-    private Boolean mIsCircle = true;
-
     private ViewPager createHaystackViewPager;
     private CreateHaystackPagerAdapter mCreateHaystackPagerAdapter;
     private Boolean isPublic = false;
     private OnActivityStateChangeListener stateChangeCallback;
+
+    public static GoogleApiClient mGoogleApiClient;
 
     public static CreateHaystackFragment newInstance() {
         CreateHaystackFragment fragment = new CreateHaystackFragment();
@@ -108,6 +103,31 @@ public class CreateHaystackFragment extends Fragment implements CreateHaystackTa
 
         if (getArguments() != null) {
         }
+
+        //Google API Client
+        if (GooglePlayServicesUtil.isGooglePlayServicesAvailable(getActivity()) != ConnectionResult.SUCCESS) {
+            Toast.makeText(getActivity(), "Google Play Services Unavailable", Toast.LENGTH_SHORT).show();
+            Log.e(TAG, "Google Play Services Unavailable");
+        }else{
+            connectToApiClient();
+        }
+    }
+
+    private void connectToApiClient(){
+        if(mGoogleApiClient == null){
+            buildGoogleApiClient();
+            mGoogleApiClient.connect();
+        }else if(!mGoogleApiClient.isConnected()){
+            mGoogleApiClient.connect();
+        }
+    }
+
+    protected synchronized void buildGoogleApiClient() {
+        mGoogleApiClient = new GoogleApiClient.Builder(getActivity())
+                .addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(this)
+                .addApi(LocationServices.API)
+                .build();
     }
 
     @Override
@@ -432,5 +452,39 @@ public class CreateHaystackFragment extends Fragment implements CreateHaystackTa
 
     public void goToPage(int page){
         createHaystackViewPager.setCurrentItem(page);
+    }
+
+    @Override
+    public void onConnected(Bundle connectionHint) {
+        //Toast.makeText(getActivity(), "Connected", Toast.LENGTH_SHORT).show();
+        mCreateHaystackMapFragment = (CreateHaystackMapFragment) mCreateHaystackPagerAdapter.getFragmentByType(CreateHaystackMapFragment.class);
+        mCreateHaystackMapFragment.mMapFragment.onConnected(connectionHint);
+
+    }
+
+    @Override
+    public void onConnectionSuspended(int i) {
+
+    }
+
+    @Override
+    public void onConnectionFailed(ConnectionResult connectionResult) {
+        if (connectionResult.hasResolution()) {
+            try {
+                connectionResult.startResolutionForResult(getActivity(), AppConstants.CONNECTION_FAILURE_RESOLUTION_REQUEST);
+            } catch (IntentSender.SendIntentException e) {
+                e.printStackTrace();
+            }
+        } else {
+            showErrorDialog(connectionResult.getErrorCode());
+        }
+    }
+
+    private void showErrorDialog(int errorCode){
+        Toast.makeText(getActivity(), "Error encountered\nError # :"+errorCode, Toast.LENGTH_SHORT).show();
+    }
+
+    public static GoogleApiClient getGoogleApiClient() {
+        return mGoogleApiClient;
     }
 }

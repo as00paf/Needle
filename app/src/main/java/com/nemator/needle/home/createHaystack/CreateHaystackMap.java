@@ -89,12 +89,6 @@ public class CreateHaystackMap extends SupportMapFragment
             updateValuesFromBundle(savedInstanceState);
         }
 
-        //Map
-        if (GooglePlayServicesUtil.isGooglePlayServicesAvailable(getActivity()) != ConnectionResult.SUCCESS) {
-            Toast.makeText(getActivity(), "Google Play Services Unavailable", Toast.LENGTH_SHORT).show();
-            Log.e(TAG, "Google Play Services Unavailable");
-        }
-
         //Action Bar
         setHasOptionsMenu(true);
     }
@@ -187,18 +181,10 @@ public class CreateHaystackMap extends SupportMapFragment
 
     private void connectToApiClient(){
         if(mGoogleApiClient == null){
-            buildGoogleApiClient();
+            mGoogleApiClient = ((CreateHaystackFragment) getParentFragment().getParentFragment()).getGoogleApiClient();
             createLocationRequest();
-            mGoogleApiClient.connect();
+            setUpMapIfNeeded();
         }
-    }
-
-    protected synchronized void buildGoogleApiClient() {
-        mGoogleApiClient = new GoogleApiClient.Builder(getActivity())
-                .addConnectionCallbacks(this)
-                .addOnConnectionFailedListener(this)
-                .addApi(LocationServices.API)
-                .build();
     }
 
     protected void createLocationRequest() {

@@ -1,6 +1,8 @@
 package com.nemator.needle.home.createHaystack;
 
 import android.content.Intent;
+import android.location.Address;
+import android.location.Geocoder;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.speech.RecognizerIntent;
@@ -34,8 +36,10 @@ import com.nemator.needle.utils.SphericalUtil;
 import com.quinny898.library.persistentsearch.SearchBox;
 import com.quinny898.library.persistentsearch.SearchResult;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 public class CreateHaystackMapFragment extends CreateHaystackBaseFragment{
@@ -128,6 +132,9 @@ public class CreateHaystackMapFragment extends CreateHaystackBaseFragment{
             @Override
             public void onSearchClosed() {
                 //Use this to un-tint the screen
+                if(autoCompleteTask != null){
+                    autoCompleteTask.cancel(true);
+                }
             }
 
             @Override
@@ -138,6 +145,8 @@ public class CreateHaystackMapFragment extends CreateHaystackBaseFragment{
                     autoCompleteTask.cancel(true);
                 }
 
+                searchBox.clearSearchable();
+
                 autoCompleteTask = new GetAutoCompleteResultsTask();
                 autoCompleteTask.execute(searchBox.getSearchText());
             }
@@ -145,12 +154,21 @@ public class CreateHaystackMapFragment extends CreateHaystackBaseFragment{
             @Override
             public void onSearch(String searchTerm) {
                 Toast.makeText(getActivity(), searchTerm + " Searched", Toast.LENGTH_LONG).show();
-
+                Geocoder geocoder = new Geocoder(getActivity());
+                try {
+                    List<Address> addresses = geocoder.getFromLocationName(searchTerm, 2);
+                    LatLng location = new LatLng(addresses.get(0).getLatitude(), addresses.get(0).getLongitude());
+                    mMapFragment.moveCameraTo(location);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
 
             @Override
             public void onSearchCleared() {
-
+                if(autoCompleteTask != null){
+                    autoCompleteTask.cancel(true);
+                }
             }
         });
 
@@ -284,7 +302,9 @@ public class CreateHaystackMapFragment extends CreateHaystackBaseFragment{
                 for (int i = 0; i < autoCompleteResults.size(); i++) {
                     String searchTerm = autoCompleteResults.get(i).description.toString();
                     SearchResult searchResult = new SearchResult(searchTerm, getResources().getDrawable(R.drawable.ic_action_place));
-                    searchBox.addSearchable(searchResult);
+                    if(!searchBox.getSearchables().contains(searchResult)){
+                        searchBox.addSearchable(searchResult);
+                    }
                 }
 
                 return null;

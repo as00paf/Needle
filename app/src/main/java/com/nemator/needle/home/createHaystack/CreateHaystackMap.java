@@ -327,6 +327,16 @@ public class CreateHaystackMap extends SupportMapFragment
         cameraUpdated = true;
     }
 
+    public void moveCameraTo(LatLng position){
+        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(position, 17.0f));
+        cameraUpdated = true;
+    }
+
+    public void moveCameraTo(LatLng position, float zoom){
+        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(position, zoom));
+        cameraUpdated = true;
+    }
+
     public void focusCamera(float zoom){
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(mCurrentPosition, zoom));
     }
@@ -399,11 +409,13 @@ public class CreateHaystackMap extends SupportMapFragment
             mMarker.remove();
         }
 
-        CircleOptions circleOptions = new CircleOptions().center(position).radius(radiusInMeters).fillColor(shadeColor).strokeColor(strokeColor).strokeWidth(8);
-        mCircle = mMap.addCircle(circleOptions);
+        if(mMap != null){
+            CircleOptions circleOptions = new CircleOptions().center(position).radius(radiusInMeters).fillColor(shadeColor).strokeColor(strokeColor).strokeWidth(8);
+            mCircle = mMap.addCircle(circleOptions);
 
-        MarkerOptions markerOptions = new MarkerOptions().position(position);
-        mMarker = mMap.addMarker(markerOptions);
+            MarkerOptions markerOptions = new MarkerOptions().position(position);
+            mMarker = mMap.addMarker(markerOptions);
+        }
     }
 
     private void updateMarkerWithCircle(LatLng position) {

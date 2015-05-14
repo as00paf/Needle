@@ -20,6 +20,7 @@ import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.TimePicker;
 
+import com.google.android.gms.common.api.GoogleApiClient;
 import com.nemator.needle.AppConstants;
 import com.nemator.needle.R;
 import com.nemator.needle.haystack.HaystackActivity;
@@ -57,6 +58,7 @@ public class CreateHaystackGeneralInfosFragment extends CreateHaystackBaseFragme
     private Bitmap mBitmap;
 
     private OnPrivacySettingsUpdatedListener privacySettingsCallback;
+    private GoogleApiClient mGoogleApiClient;
 
     public static CreateHaystackGeneralInfosFragment newInstance() {
         CreateHaystackGeneralInfosFragment fragment = new CreateHaystackGeneralInfosFragment();
@@ -73,8 +75,11 @@ public class CreateHaystackGeneralInfosFragment extends CreateHaystackBaseFragme
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
         }
+
         setHasOptionsMenu(true);
         this.setRetainInstance(true);
+
+        connectToApiClient();
     }
 
     @Override
@@ -175,6 +180,12 @@ public class CreateHaystackGeneralInfosFragment extends CreateHaystackBaseFragme
         mBitmap = bitmap;
         photoView.setScaleType(ImageView.ScaleType.CENTER_CROP);
         photoView.setImageBitmap(mBitmap);
+    }
+
+    private void connectToApiClient(){
+        if(mGoogleApiClient == null){
+            mGoogleApiClient = ((CreateHaystackFragment) getParentFragment()).getGoogleApiClient();
+        }
     }
 
     public String getHaystackName(){

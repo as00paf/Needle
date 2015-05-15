@@ -1,17 +1,11 @@
 package com.nemator.needle;
 
 import android.content.SharedPreferences;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.widget.ImageView;
 
-import com.nemator.needle.authentication.LoginFragment;
-import com.nemator.needle.settings.SettingsFragment;
+import com.nemator.needle.view.authentication.LoginFragment;
+import com.nemator.needle.view.settings.SettingsFragment;
 
 import it.neokree.materialnavigationdrawer.MaterialNavigationDrawer;
 import it.neokree.materialnavigationdrawer.elements.MaterialAccount;

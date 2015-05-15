@@ -16,7 +16,7 @@
         android:id="@+id/map"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:name="com.nemator.needle.haystack.HaystackMapFragment"
+        android:name="com.nemator.needle.view.haystack.HaystackMapFragment"
         android:tag="MAP_FRAGMENT"/>
 
     <!-- SLIDING LAYOUT -->

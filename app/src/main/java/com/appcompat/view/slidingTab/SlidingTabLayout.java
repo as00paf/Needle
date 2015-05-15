@@ -32,7 +32,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.nemator.needle.haystack.HaystackFragment;
+import com.nemator.needle.view.haystack.HaystackFragment;
 
 /**
  * To be used with ViewPager to provide a tab indicator component which give constant feedback as to

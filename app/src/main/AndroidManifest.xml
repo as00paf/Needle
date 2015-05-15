@@ -32,7 +32,7 @@
             android:value="@string/google_maps_key" />
 
         <activity
-            android:name=".authentication.LoginActivity"
+            android:name=".view.authentication.LoginActivity"
             android:label="@string/app_name"
             android:theme="@style/AppTheme2" >
 
@@ -55,32 +55,32 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".authentication.RegisterActivity"
+            android:name=".view.authentication.RegisterActivity"
             android:label="@string/app_name"
             android:theme="@style/AppTheme2" >
         </activity>
         <activity
-            android:name=".home.HomeActivity"
+            android:name=".view.home.HomeActivity"
             android:label="@string/title_activity_haystack"
             android:theme="@style/AppTheme2" >
         </activity>
         <activity
-            android:name=".haystack.HaystackActivity"
+            android:name=".view.haystack.HaystackActivity"
             android:theme="@style/AppTheme2" >
         </activity>
         <activity
-            android:name=".settings.AppSettingsActivity"
+            android:name=".view.settings.AppSettingsActivity"
             android:label="@string/title_activity_app_settings"
-            android:parentActivityName=".home.HomeActivity"
+            android:parentActivityName=".view.home.HomeActivity"
             android:theme="@style/AppTheme2" >
         </activity>
         <activity
-            android:name=".haystack.HaystackUserActivity"
+            android:name=".view.haystack.HaystackUserActivity"
             android:label="@string/title_activity_haystack_user"
             android:theme="@style/AppTheme2" >
         </activity>
         <activity
-            android:name=".home.HaystacksActivity"
+            android:name=".view.home.HaystacksActivity"
             android:label="@string/title_activity_haystacks"
             android:theme="@style/AppTheme2">
         </activity>

@@ -1,5 +1,6 @@
 package com.nemator.needle.view.home.createHaystack;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.location.Address;
 import android.location.Geocoder;
@@ -27,8 +28,8 @@ import com.google.android.gms.maps.Projection;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.nemator.needle.R;
-import com.nemator.needle.tasks.GetAutoCompleteResultsTask.GetAutoCompleteResultsParams;
-import com.nemator.needle.tasks.GetAutoCompleteResultsTask.GetAutoCompleteResultsTask;
+import com.nemator.needle.tasks.getAutoCompleteResultsTask.GetAutoCompleteResultsParams;
+import com.nemator.needle.tasks.getAutoCompleteResultsTask.GetAutoCompleteResultsTask;
 import com.quinny898.library.persistentsearch.SearchBox;
 import com.quinny898.library.persistentsearch.SearchResult;
 
@@ -61,6 +62,7 @@ public class CreateHaystackMapFragment extends CreateHaystackBaseFragment{
     private LatLngBounds mBounds;
     private AutocompleteFilter mPlaceFilter;
     private GetAutoCompleteResultsTask autoCompleteTask;
+    private OnActivityStateChangeListener stateChangeCallback;
 
     public static CreateHaystackMapFragment newInstance() {
         CreateHaystackMapFragment fragment = new CreateHaystackMapFragment();
@@ -70,6 +72,18 @@ public class CreateHaystackMapFragment extends CreateHaystackBaseFragment{
     }
 
     public CreateHaystackMapFragment() {
+    }
+
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+
+        try {
+            stateChangeCallback = (OnActivityStateChangeListener) getActivity();
+        } catch (ClassCastException e) {
+            throw new ClassCastException(activity.toString()
+                    + " must implement OnActivityStateChangeListener");
+        }
     }
 
     @Override
@@ -121,7 +135,11 @@ public class CreateHaystackMapFragment extends CreateHaystackBaseFragment{
             @Override
             public void onSearchOpened() {
                 //Use this to tint the screen
+                stateChangeCallback.onStateChange(HomeActivityState.CREATE_HAYSTACK_MAP_SEARCH_OPEN);
 
+                if(searchBox.getSearchables().size() == 0){
+                    addPlaceSuggestion();
+                }
             }
 
             @Override
@@ -130,6 +148,8 @@ public class CreateHaystackMapFragment extends CreateHaystackBaseFragment{
                 if (autoCompleteTask != null) {
                     autoCompleteTask.cancel(true);
                 }
+
+                stateChangeCallback.onStateChange(HomeActivityState.CREATE_HAYSTACK_MAP);
             }
 
             @Override
@@ -150,12 +170,14 @@ public class CreateHaystackMapFragment extends CreateHaystackBaseFragment{
 
             @Override
             public void onSearch(String searchTerm) {
+                stateChangeCallback.onStateChange(HomeActivityState.CREATE_HAYSTACK_MAP);
+
                 Toast.makeText(getActivity(), searchTerm + " Searched", Toast.LENGTH_LONG).show();
                 Geocoder geocoder = new Geocoder(getActivity());
                 try {
                     List<Address> addresses = geocoder.getFromLocationName(searchTerm, 2);
                     LatLng location = new LatLng(addresses.get(0).getLatitude(), addresses.get(0).getLongitude());
-                    mMapFragment.moveCameraTo(location);
+                    mMapFragment.moveUserTo(location);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -169,23 +191,7 @@ public class CreateHaystackMapFragment extends CreateHaystackBaseFragment{
             }
         });
 
-        PendingResult<PlaceLikelihoodBuffer> result = Places.PlaceDetectionApi
-                .getCurrentPlace(mGoogleApiClient, null);
-        result.setResultCallback(new ResultCallback<PlaceLikelihoodBuffer>() {
-            @Override
-            public void onResult(PlaceLikelihoodBuffer likelyPlaces) {
-                searchBox.clearSearchable();
-                for (PlaceLikelihood placeLikelihood : likelyPlaces) {
-                    searchBox.addSearchable(new SearchResult(placeLikelihood.getPlace().getName().toString(), getResources().getDrawable(R.drawable.ic_action_place)));
-
-                    Log.i(TAG, String.format("Place '%s' has likelihood: %g",
-                            placeLikelihood.getPlace().getName(),
-                            placeLikelihood.getLikelihood()));
-                }
-
-                likelyPlaces.release();
-            }
-        });
+        addPlaceSuggestion();
 
         //Map Buttons
         ImageButton btn_draw_State = (ImageButton) rootView.findViewById(R.id.btn_draw_State);
@@ -221,6 +227,31 @@ public class CreateHaystackMapFragment extends CreateHaystackBaseFragment{
         });
 
         return rootView;
+    }
+
+    private void addPlaceSuggestion(){
+        PendingResult<PlaceLikelihoodBuffer> result = Places.PlaceDetectionApi
+                .getCurrentPlace(mGoogleApiClient, null);
+        result.setResultCallback(new ResultCallback<PlaceLikelihoodBuffer>() {
+            @Override
+            public void onResult(PlaceLikelihoodBuffer likelyPlaces) {
+                searchBox.clearSearchable();
+                for (PlaceLikelihood placeLikelihood : likelyPlaces) {
+                    searchBox.addSearchable(new SearchResult(placeLikelihood.getPlace().getName().toString(), getResources().getDrawable(R.drawable.ic_action_place)));
+
+                    Log.i(TAG, String.format("Place '%s' has likelihood: %g",
+                            placeLikelihood.getPlace().getName(),
+                            placeLikelihood.getLikelihood()));
+                }
+
+                likelyPlaces.release();
+            }
+        });
+
+    }
+
+    public void closeSearchResults(){
+        searchBox.toggleSearch();
     }
 
     public int getZoneRadius(){

@@ -192,7 +192,7 @@ public class CreateHaystackFragment extends Fragment implements CreateHaystackTa
                     case 1:
                         //Focus Camera on current position
                         mMap = ((CreateHaystackMapFragment) getFragmentManager().getFragments().get(4)).getMap();
-                        mMap.focusCamera();
+                        mMap.moveUserToCurrentPosition();
                         break;
                     case 2:
                         //Invite Friend

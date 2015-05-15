@@ -67,6 +67,9 @@ public class CreateHaystackMap extends SupportMapFragment
     private Boolean cameraUpdated = false;
     private Boolean mIsPolygonCircle = true;
     private Float mScaleFactor = 1.0f;
+    private LatLng mCustomPosition;
+    private Boolean mUseCustomPosition = false;
+
 
     //Constructors
     public static CreateHaystackMap newInstance() {
@@ -108,9 +111,13 @@ public class CreateHaystackMap extends SupportMapFragment
             }
             if (savedInstanceState.keySet().contains(AppConstants.LOCATION_KEY)) {
                 mCurrentLocation = savedInstanceState.getParcelable(AppConstants.LOCATION_KEY);
-                Double lat = mCurrentLocation.getLatitude();
-                Double lng = mCurrentLocation.getLongitude();
-                mCurrentPosition = new LatLng(lat, lng);
+                if(mCurrentLocation != null){
+                    Double lat = mCurrentLocation.getLatitude();
+                    Double lng = mCurrentLocation.getLongitude();
+                    mCurrentPosition = new LatLng(lat, lng);
+                }
+
+                mCustomPosition = savedInstanceState.getParcelable(AppConstants.CUSTOM_LOCATION_KEY);
             }
             if (savedInstanceState.keySet().contains(AppConstants.LAST_UPDATED_TIME_STRING_KEY)) {
                 mLastUpdateTime = savedInstanceState.getString(AppConstants.LAST_UPDATED_TIME_STRING_KEY);
@@ -122,6 +129,7 @@ public class CreateHaystackMap extends SupportMapFragment
     public void onSaveInstanceState(Bundle savedInstanceState) {
         savedInstanceState.putBoolean(AppConstants.REQUESTING_LOCATION_UPDATES_KEY, mRequestingLocationUpdates);
         savedInstanceState.putParcelable(AppConstants.LOCATION_KEY, mCurrentLocation);
+        savedInstanceState.putParcelable(AppConstants.CUSTOM_LOCATION_KEY, mCustomPosition);
         savedInstanceState.putString(AppConstants.LAST_UPDATED_TIME_STRING_KEY, mLastUpdateTime);
     }
 
@@ -261,20 +269,21 @@ public class CreateHaystackMap extends SupportMapFragment
 
     public void updateMap() {
         //Update user's marker
-        if(mCurrentLocation != null){
+        LatLng position = (mUseCustomPosition) ? mCustomPosition : mCurrentPosition;
+        if(position != null){
             if(mMarker == null && mCircle == null){
                 MarkerOptions markerOptions = new MarkerOptions();
-                markerOptions.position(mCurrentPosition);
+                markerOptions.position(position);
                 if(mIsPolygonCircle){
-                    drawMarkerWithCircle(mCurrentPosition);
+                    drawMarkerWithCircle(position);
                 }else{
-                    drawMarkerWithPolygon(mCurrentPosition);
+                    drawMarkerWithPolygon(position);
                 }
             }else{
                 if(mIsPolygonCircle){
-                    updateMarkerWithCircle(mCurrentPosition);
+                    updateMarkerWithCircle(position);
                 }else{
-                    updateMarkerWithPolygon(mCurrentPosition);
+                    updateMarkerWithPolygon(position);
                 }
             }
 
@@ -288,11 +297,12 @@ public class CreateHaystackMap extends SupportMapFragment
 
         //Add user's marker back
         MarkerOptions markerOptions = new MarkerOptions();
+        LatLng position = (mUseCustomPosition) ? mCustomPosition : mCurrentPosition;
         if(mMarker == null && mCircle == null){
-            markerOptions.position(mCurrentPosition);
-            drawMarkerWithCircle(mCurrentPosition);
+            markerOptions.position(position);
+            drawMarkerWithCircle(position);
         }else{
-            updateMarkerWithCircle(mCurrentPosition);
+            updateMarkerWithCircle(position);
         }
 
         mMarker.setTitle("Your Position");
@@ -320,22 +330,33 @@ public class CreateHaystackMap extends SupportMapFragment
     }
 
     public void moveUserTo(LatLng position){
+        mCustomPosition = position;
+        mUseCustomPosition = true;
         mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(position, 17.0f));
         cameraUpdated = true;
     }
 
     public void moveUserTo(LatLng position, float zoom){
+        mCustomPosition = position;
+        mUseCustomPosition = true;
         mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(position, zoom));
         cameraUpdated = true;
     }
 
+    public void moveUserToCurrentPosition(){
+        mUseCustomPosition = false;
+        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(mCurrentPosition, 17.0f));
+    }
+
     public void focusCamera(float zoom){
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(mCurrentPosition, zoom));
+        LatLng position = (mUseCustomPosition) ? mCustomPosition : mCurrentPosition;
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(position, zoom));
     }
 
     //TODO : make async task ?
     public void focusCamera(){
-        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(mCurrentPosition, 17.0f));
+        LatLng position = (mUseCustomPosition) ? mCustomPosition : mCurrentPosition;
+        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(position, 17.0f));
     }
 
     public void animateMarker(final Marker marker, final LatLng toPosition, final boolean hideMarker) {
@@ -494,21 +515,23 @@ public class CreateHaystackMap extends SupportMapFragment
 
     public void setScaleFactor(Float scaleFactor){
         mScaleFactor = scaleFactor;
+        LatLng position = (mUseCustomPosition) ? mCustomPosition : mCurrentPosition;
 
         if(mIsPolygonCircle){
-            updateMarkerWithCircle(mCurrentPosition);
+            updateMarkerWithCircle(position);
         }else{
-            updateMarkerWithPolygon(mCurrentPosition);
+            updateMarkerWithPolygon(position);
         }
     }
 
     public void setIsPolygonCircle(Boolean value){
         mIsPolygonCircle = value;
+        LatLng position = (mUseCustomPosition) ? mCustomPosition : mCurrentPosition;
 
         if(mIsPolygonCircle){
-            drawMarkerWithCircle(mCurrentPosition);
+            drawMarkerWithCircle(position);
         }else{
-            drawMarkerWithPolygon(mCurrentPosition);
+            drawMarkerWithPolygon(position);
         }
     }
 
@@ -517,6 +540,6 @@ public class CreateHaystackMap extends SupportMapFragment
     }
 
     public LatLng getPosition(){
-        return mCurrentPosition;
+        return (mUseCustomPosition) ? mCustomPosition : mCurrentPosition;
     }
 }

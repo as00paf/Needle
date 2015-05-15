@@ -1,4 +1,4 @@
-package com.nemator.needle.tasks.GetAutoCompleteResultsTask;
+package com.nemator.needle.tasks.getAutoCompleteResultsTask;
 
 import android.os.AsyncTask;
 import android.util.Log;
@@ -111,6 +111,7 @@ public class GetAutoCompleteResultsTask extends AsyncTask<Void, Void, Void> {
             SearchResult searchResult = new SearchResult(searchTerm, mParams.getContext().getResources().getDrawable(R.drawable.ic_action_place));
             if(!mParams.getSearchBox().getSearchables().contains(searchResult)) {
                 mParams.getSearchBox().addSearchable(searchResult);
+
             }
         }
 

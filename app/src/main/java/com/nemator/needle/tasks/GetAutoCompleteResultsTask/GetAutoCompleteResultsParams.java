@@ -1,10 +1,9 @@
-package com.nemator.needle.tasks.GetAutoCompleteResultsTask;
+package com.nemator.needle.tasks.getAutoCompleteResultsTask;
 
 import android.content.Context;
 
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.places.AutocompleteFilter;
-import com.google.android.gms.location.places.PlaceFilter;
 import com.google.android.gms.maps.model.LatLng;
 import com.quinny898.library.persistentsearch.SearchBox;
 

@@ -35,5 +35,6 @@ public class AppConstants {
     //SharedPref keys
     public static final String REQUESTING_LOCATION_UPDATES_KEY = "isRequestingLocationUpdates";
     public static final String LOCATION_KEY = "currentLocation";
+    public static final String CUSTOM_LOCATION_KEY = "customLocation";
     public static final String LAST_UPDATED_TIME_STRING_KEY = "lastUpdatedTime";
 }

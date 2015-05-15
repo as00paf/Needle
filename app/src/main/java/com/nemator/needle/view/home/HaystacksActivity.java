@@ -4,11 +4,13 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.os.Bundle;
+import android.util.Log;
 
 import com.nemator.needle.MainActivity;
 import com.nemator.needle.R;
 import com.nemator.needle.view.authentication.LoginFragment;
 import com.nemator.needle.view.home.createHaystack.CreateHaystackFragment;
+import com.nemator.needle.view.home.createHaystack.CreateHaystackMapFragment;
 import com.nemator.needle.view.home.createHaystack.HomeActivityState;
 import com.nemator.needle.view.home.createHaystack.OnActivityStateChangeListener;
 import com.nemator.needle.view.settings.SettingsFragment;
@@ -19,6 +21,8 @@ import it.neokree.materialnavigationdrawer.elements.MaterialSection;
 import it.neokree.materialnavigationdrawer.elements.listeners.MaterialSectionListener;
 
 public class HaystacksActivity extends MaterialNavigationDrawer implements MaterialSectionListener, OnActivityStateChangeListener {
+    public static String TAG = "HaystacksActivity";
+
     private SharedPreferences mSharedPreferences;
     private int currentState = HomeActivityState.PUBLIC_HAYSTACK_TAB;
 
@@ -95,6 +99,10 @@ public class HaystacksActivity extends MaterialNavigationDrawer implements Mater
             case HomeActivityState.CREATE_HAYSTACK_USERS:
                 //Goto Map
                 ((CreateHaystackFragment) getSupportFragmentManager().getFragments().get(0)).goToPage(1);
+                break;
+            case HomeActivityState.CREATE_HAYSTACK_MAP_SEARCH_OPEN:
+                //Close Search
+                ((CreateHaystackMapFragment) getSupportFragmentManager().getFragments().get(4)).closeSearchResults();
                 break;
             default:
                 super.onBackPressed();

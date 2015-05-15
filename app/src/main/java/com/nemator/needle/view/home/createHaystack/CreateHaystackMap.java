@@ -298,14 +298,16 @@ public class CreateHaystackMap extends SupportMapFragment
         //Add user's marker back
         MarkerOptions markerOptions = new MarkerOptions();
         LatLng position = (mUseCustomPosition) ? mCustomPosition : mCurrentPosition;
-        if(mMarker == null && mCircle == null){
-            markerOptions.position(position);
-            drawMarkerWithCircle(position);
-        }else{
-            updateMarkerWithCircle(position);
-        }
+        if(position != null){
+            if(mMarker == null && mCircle == null){
+                markerOptions.position(position);
+                drawMarkerWithCircle(position);
+            }else{
+                updateMarkerWithCircle(position);
+            }
 
-        mMarker.setTitle("Your Position");
+            mMarker.setTitle("Your Position");
+        }
 
         if(!locationUpdatesStarted)
             startLocationUpdates();
@@ -333,6 +335,7 @@ public class CreateHaystackMap extends SupportMapFragment
         mCustomPosition = position;
         mUseCustomPosition = true;
         mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(position, 17.0f));
+        updateMap();
         cameraUpdated = true;
     }
 

@@ -2,13 +2,16 @@ package com.nemator.needle.view.home;
 
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Parcelable;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.nemator.needle.utils.AppConstants;
 import com.nemator.needle.R;
@@ -16,9 +19,13 @@ import com.nemator.needle.view.haystack.HaystackActivity;
 import com.nemator.needle.tasks.ImageDownloaderTask;
 import com.nemator.needle.models.vo.HaystackVO;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 
 public class HaystackListCardAdapter extends RecyclerView.Adapter<HaystackListCardAdapter.HaystackCardViewHolder> {
+    public static String TAG = "HaystackListCardAdapter";
+
     private static final int TYPE_ITEM = 0;
     private static final int TYPE_EMPTY = 2;
 
@@ -74,8 +81,9 @@ public class HaystackListCardAdapter extends RecyclerView.Adapter<HaystackListCa
                 activeUntil = activeUntil.replace(" 00:00:00", "");
                 holder.active_until.setText(activeUntil);
 
-                if (holder.imageView != null) {
-                    new ImageDownloaderTask(holder.imageView).execute(haystack.getPictureURL());
+                if (holder.imageView != null && haystack.getPictureURL() != null) {
+                    String encodedURL = AppConstants.HAYSTACK_PICTURES_URL + Uri.encode(haystack.getPictureURL());
+                    new ImageDownloaderTask(holder.imageView).execute(encodedURL);
                 }
 
                 holder.setData(haystack);
@@ -119,6 +127,7 @@ public class HaystackListCardAdapter extends RecyclerView.Adapter<HaystackListCa
             userCountView = (TextView)  view.findViewById(R.id.active_users);
             active_until = (TextView)  view.findViewById(R.id.active_until);
             emptyText = (TextView) view.findViewById(R.id.emptyText);
+            imageView = (ImageView) view.findViewById(R.id.thumbImage);
 
             /*if(isNotEmpty){
                 view.setOnClickListener(new View.OnClickListener() {
@@ -141,6 +150,7 @@ public class HaystackListCardAdapter extends RecyclerView.Adapter<HaystackListCa
             userCountView = (TextView)  view.findViewById(R.id.active_users);
             active_until = (TextView)  view.findViewById(R.id.active_until);
             emptyText = (TextView) view.findViewById(R.id.emptyText);
+            imageView = (ImageView) view.findViewById(R.id.thumbImage);
         }
 
         public void setData(HaystackVO haystack){

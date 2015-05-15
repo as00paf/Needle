@@ -106,7 +106,7 @@ public class ImageDownloaderTask extends AsyncTask<String, Void, Bitmap> {
 				// Could provide a more explicit error message for IOException or
 				// IllegalStateException
 				getRequest.abort();
-				Log.w("ImageDownloader", "Error while retrieving bitmap from " + url);
+				Log.e("ImageDownloader", "Error while retrieving bitmap from " + url);
 			} finally {
 				if (client != null) {
 					client.close();

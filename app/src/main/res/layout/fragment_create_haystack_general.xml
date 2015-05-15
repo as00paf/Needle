@@ -52,7 +52,7 @@
                     android:hint="@string/haystack_name_hint"
                     android:imeOptions="actionDone"
                     android:singleLine="true"
-                    android:inputType="textNoSuggestions">
+                    android:inputType="textAutoCorrect">
                 </EditText>
             </com.appcompat.view.floatLabel.FloatLabelLayout>
 

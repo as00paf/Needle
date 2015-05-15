@@ -319,7 +319,9 @@ public class CreateHaystackFragment extends Fragment implements CreateHaystackTa
 
         //Users
         userList.add(user);
-        userList.addAll(mCreateHaystackUsersFragment.getSelectedUsers());
+        if(mCreateHaystackUsersFragment != null){
+            userList.addAll(mCreateHaystackUsersFragment.getSelectedUsers());
+        }
         haystack.setUsers(userList);
 
         //Active users

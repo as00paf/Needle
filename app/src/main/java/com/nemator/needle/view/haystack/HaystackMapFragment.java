@@ -61,7 +61,7 @@ public class HaystackMapFragment extends SupportMapFragment
         implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener,
         LocationListener, RetrieveLocationsTask.RetrieveLocationsResponseHandler, ActivateUserTask.ActivateUserResponseHandler,
         DeactivateUserTask.DeactivateUserResponseHandler, LeaveHaystackTask.LeaveHaystackResponseHandler{
-    public static final String TAG = "CustomSupportMapFragment";
+    public static final String TAG = "HaystackMapFragment";
 
     private ArrayList<HashMap<String, Object>> mLocationList = new ArrayList<HashMap<String, Object>>();
 
@@ -297,11 +297,11 @@ public class HaystackMapFragment extends SupportMapFragment
         Double lng = mCurrentLocation.getLongitude();
         mCurrentPosition = new LatLng(lat, lng);
 
+        updateMap();
+
         if(!cameraUpdated){
             moveCamera();
         }
-
-        updateMap();
 
         postLocation();
         retrieveLocations();

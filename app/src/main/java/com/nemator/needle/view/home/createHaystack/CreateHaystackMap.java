@@ -246,11 +246,11 @@ public class CreateHaystackMap extends SupportMapFragment
         Double lng = mCurrentLocation.getLongitude();
         mCurrentPosition = new LatLng(lat, lng);
 
+        updateMap();
+
         if(!cameraUpdated){
             moveCamera();
         }
-
-        updateMap();
     }
 
     //Map methods
@@ -272,8 +272,6 @@ public class CreateHaystackMap extends SupportMapFragment
         LatLng position = (mUseCustomPosition) ? mCustomPosition : mCurrentPosition;
         if(position != null){
             if(mMarker == null){
-                MarkerOptions markerOptions = new MarkerOptions();
-                markerOptions.position(position);
                 if(mIsPolygonCircle){
                     drawMarkerWithCircle(position);
                 }else{
@@ -297,17 +295,17 @@ public class CreateHaystackMap extends SupportMapFragment
             mMap = getMap();
 
         //Add user's marker back
-        MarkerOptions markerOptions = new MarkerOptions();
         LatLng position = (mUseCustomPosition) ? mCustomPosition : mCurrentPosition;
         if(position != null){
             if(mMarker == null && mCircle == null){
-                markerOptions.position(position);
                 drawMarkerWithCircle(position);
             }else{
                 updateMarkerWithCircle(position);
             }
 
-            mMarker.setTitle("Your Position");
+            String title = (mUseCustomPosition) ? "Hasytack's Position" : "Your Position";
+            mMarker.setTitle(title);
+
             updateMap();
             moveCamera();
         }

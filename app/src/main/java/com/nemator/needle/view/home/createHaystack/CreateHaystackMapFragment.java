@@ -271,7 +271,16 @@ public class CreateHaystackMapFragment extends CreateHaystackBaseFragment{
         if (isAdded() && requestCode == SearchBox.VOICE_RECOGNITION_CODE && resultCode == getActivity().RESULT_OK) {
             ArrayList<String> matches = data
                     .getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
-            searchBox.populateEditText(matches);
+            if(matches.size() > 0){
+                searchBox.setSearchString(matches.get(0));
+
+                searchBox.clearSearchable();
+                for (int i = 0; i < matches.size(); i++) {
+                    searchBox.addSearchable(new SearchResult(matches.get(i), getResources().getDrawable(R.drawable.ic_action_place)));
+                }
+            }
+
+            searchBox.toggleSearch();
         }
         super.onActivityResult(requestCode, resultCode, data);
     }

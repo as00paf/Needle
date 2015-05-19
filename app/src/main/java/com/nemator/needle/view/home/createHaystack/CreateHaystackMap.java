@@ -268,10 +268,10 @@ public class CreateHaystackMap extends SupportMapFragment
     }
 
     public void updateMap() {
-        //Update user's marker
+        //Update user's marker and polygon
         LatLng position = (mUseCustomPosition) ? mCustomPosition : mCurrentPosition;
         if(position != null){
-            if(mMarker == null && mCircle == null){
+            if(mMarker == null){
                 MarkerOptions markerOptions = new MarkerOptions();
                 markerOptions.position(position);
                 if(mIsPolygonCircle){
@@ -287,7 +287,8 @@ public class CreateHaystackMap extends SupportMapFragment
                 }
             }
 
-            mMarker.setTitle("Your Position");
+            String title = (mUseCustomPosition) ? "Hasytack's Position" : "Your Position";
+            mMarker.setTitle(title);
         }
     }
 
@@ -307,13 +308,12 @@ public class CreateHaystackMap extends SupportMapFragment
             }
 
             mMarker.setTitle("Your Position");
+            updateMap();
+            moveCamera();
         }
 
         if(!locationUpdatesStarted)
             startLocationUpdates();
-
-        updateMap();
-        moveCamera();
     }
 
     public void moveCamera(){

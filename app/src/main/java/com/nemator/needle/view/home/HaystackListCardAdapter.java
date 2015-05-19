@@ -77,8 +77,9 @@ public class HaystackListCardAdapter extends RecyclerView.Adapter<HaystackListCa
                 String userCount = count + " " +mContext.getResources().getString(R.string.activeUsers);
                 holder.userCountView.setText(userCount);
 
-                String activeUntil = mContext.getResources().getString(R.string.activeUntil)+ " "+haystack.getTimeLimit();
-                activeUntil = activeUntil.replace(" 00:00:00", "");
+                String activeUntil = haystack.getTimeLimit();
+                activeUntil = activeUntil.replace("00:00:00", "");
+                activeUntil = activeUntil.replace(":00", "");
                 holder.active_until.setText(activeUntil);
 
                 if (holder.imageView != null && haystack.getPictureURL() != null) {

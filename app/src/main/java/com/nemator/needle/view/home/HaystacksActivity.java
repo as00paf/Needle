@@ -11,6 +11,7 @@ import com.nemator.needle.R;
 import com.nemator.needle.view.authentication.LoginFragment;
 import com.nemator.needle.view.home.createHaystack.CreateHaystackFragment;
 import com.nemator.needle.view.home.createHaystack.CreateHaystackMapFragment;
+import com.nemator.needle.view.home.createHaystack.CreateHaystackUsersFragment;
 import com.nemator.needle.view.home.createHaystack.HomeActivityState;
 import com.nemator.needle.view.home.createHaystack.OnActivityStateChangeListener;
 import com.nemator.needle.view.settings.SettingsFragment;
@@ -103,6 +104,10 @@ public class HaystacksActivity extends MaterialNavigationDrawer implements Mater
             case HomeActivityState.CREATE_HAYSTACK_MAP_SEARCH_OPEN:
                 //Close Search
                 ((CreateHaystackMapFragment) getSupportFragmentManager().getFragments().get(4)).closeSearchResults();
+                break;
+            case HomeActivityState.CREATE_HAYSTACK_USERS_SEARCH_OPEN:
+                //Close Search
+                ((CreateHaystackUsersFragment) getSupportFragmentManager().getFragments().get(5)).closeSearchResults();
                 break;
             default:
                 super.onBackPressed();

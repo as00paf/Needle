@@ -7,4 +7,5 @@ public class HomeActivityState {
     public static final int CREATE_HAYSTACK_MAP = 3;
     public static final int CREATE_HAYSTACK_USERS = 4;
     public static final int CREATE_HAYSTACK_MAP_SEARCH_OPEN = 5;
+    public static final int CREATE_HAYSTACK_USERS_SEARCH_OPEN = 6;
 }

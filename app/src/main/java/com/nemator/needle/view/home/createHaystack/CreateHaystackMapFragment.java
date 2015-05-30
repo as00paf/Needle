@@ -230,6 +230,8 @@ public class CreateHaystackMapFragment extends CreateHaystackBaseFragment{
     }
 
     private void addPlaceSuggestion(){
+        connectToApiClient();
+
         PendingResult<PlaceLikelihoodBuffer> result = Places.PlaceDetectionApi
                 .getCurrentPlace(mGoogleApiClient, null);
         result.setResultCallback(new ResultCallback<PlaceLikelihoodBuffer>() {

@@ -44,7 +44,7 @@ public class CreateHaystackUserListCardAdapter extends RecyclerView.Adapter<Crea
         filteredListData = new ArrayList<>();
 
         for (UserVO item: listData) {
-            if (item.getUserName().toLowerCase().contains(queryText))
+            if (item.getUserName().toLowerCase().contains(queryText.toLowerCase()))
                 filteredListData.add(item);
         }
         notifyDataSetChanged();

@@ -14,6 +14,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -63,6 +64,8 @@ public class CreateHaystackMapFragment extends CreateHaystackBaseFragment{
     private AutocompleteFilter mPlaceFilter;
     private GetAutoCompleteResultsTask autoCompleteTask;
     private OnActivityStateChangeListener stateChangeCallback;
+
+    private TextView mRadiusLabel;
 
     public static CreateHaystackMapFragment newInstance() {
         CreateHaystackMapFragment fragment = new CreateHaystackMapFragment();
@@ -193,6 +196,10 @@ public class CreateHaystackMapFragment extends CreateHaystackBaseFragment{
 
         addPlaceSuggestion();
 
+        //Radius Indicator
+        mRadiusLabel = (TextView) rootView.findViewById(R.id.radius_label);
+        mRadiusLabel.setText(String.valueOf(getZoneRadius()) + "m");
+
         //Map Buttons
         ImageButton btn_draw_State = (ImageButton) rootView.findViewById(R.id.btn_draw_State);
         btn_draw_State.setOnClickListener(new View.OnClickListener() {
@@ -301,6 +308,8 @@ public class CreateHaystackMapFragment extends CreateHaystackBaseFragment{
             mScaleFactor = Math.max(0.1f, Math.min(mScaleFactor, 5.0f));
 
             mMapFragment.setScaleFactor(mScaleFactor);
+
+            mRadiusLabel.setText(String.valueOf(getZoneRadius()) + "m");
             return true;
         }
     }

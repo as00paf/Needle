@@ -14,6 +14,7 @@ import com.nemator.needle.view.home.createHaystack.CreateHaystackMapFragment;
 import com.nemator.needle.view.home.createHaystack.CreateHaystackUsersFragment;
 import com.nemator.needle.view.home.createHaystack.HomeActivityState;
 import com.nemator.needle.view.home.createHaystack.OnActivityStateChangeListener;
+import com.nemator.needle.view.locationSharing.LocationSharingFragment;
 import com.nemator.needle.view.settings.SettingsFragment;
 
 import it.neokree.materialnavigationdrawer.MaterialNavigationDrawer;
@@ -41,9 +42,12 @@ public class HaystacksActivity extends MaterialNavigationDrawer implements Mater
 
         //Create Sections
         this.addSection(newSection(getString(R.string.title_haystacks), R.drawable.ic_haystack, new HaystackListFragment()));
+        this.addSection(newSection(getString(R.string.title_location_sharing), R.drawable.ic_action_location_found, new LocationSharingFragment()));
         this.addSection(newSection(getString(R.string.title_settings), R.drawable.ic_action_settings, new SettingsFragment()));
         this.addSection(newSection(getString(R.string.title_helpAndSupport), R.drawable.ic_action_help, new LoginFragment()));
+
         this.addDivisor();
+
         this.addSection(newSection(getString(R.string.title_logOut), R.drawable.ic_action_exit, this));
         this.addDivisor();
 

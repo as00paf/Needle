@@ -24,7 +24,7 @@ import java.util.ArrayList;
 public class HaystackListTabFragment extends Fragment implements FetchHaystacksTask.FetchHaystackResponseHandler, SwipeRefreshLayout.OnRefreshListener{
     private static final String TAG = "HaystackListTabFragment";
 
-    private ProgressBar progressbar = null;
+    private ProgressBar progressbar;
 
     private RecyclerView mRecyclerView;
     private RecyclerView.Adapter mAdapter;

@@ -69,7 +69,7 @@ public class HaystackUserListAdapter extends BaseAdapter {
 
         String url = dItem.getPictureURL();
         if(!TextUtils.isEmpty(url)){
-            new ImageDownloaderTask(userItemHolder.icon).execute(url);
+            new ImageDownloaderTask(userItemHolder.icon, context.getResources().getDrawable(R.drawable.ic_action_person)).execute(url);
         }else{
             userItemHolder.icon.setImageDrawable(context.getResources().getDrawable(R.drawable.ic_action_person));
         }

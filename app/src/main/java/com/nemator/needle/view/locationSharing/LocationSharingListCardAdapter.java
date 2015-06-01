@@ -1,9 +1,7 @@
 package com.nemator.needle.view.locationSharing;
 
 import android.content.Context;
-import android.content.Intent;
 import android.net.Uri;
-import android.os.Parcelable;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,7 +14,6 @@ import com.nemator.needle.models.vo.HaystackVO;
 import com.nemator.needle.models.vo.LocationSharingVO;
 import com.nemator.needle.tasks.ImageDownloaderTask;
 import com.nemator.needle.utils.AppConstants;
-import com.nemator.needle.view.haystack.HaystackActivity;
 
 import java.util.ArrayList;
 
@@ -68,16 +65,16 @@ public class LocationSharingListCardAdapter extends RecyclerView.Adapter<Locatio
         switch (cardType) {
             case TYPE_ITEM:
                 LocationSharingVO locationSharing = (LocationSharingVO) listData.get(position);
-                holder.titleView.setText(locationSharing.senderName);
+                holder.titleView.setText(locationSharing.getSenderName());
 
-                String activeUntil = locationSharing.timeLimit;
+                String activeUntil = locationSharing.getTimeLimit();
                 activeUntil = activeUntil.replace("00:00:00", "");
                 activeUntil = activeUntil.replace(":00", "");
                 holder.active_until.setText(activeUntil);
 
-                if (holder.imageView != null && locationSharing.pictureURL != null) {
-                    String encodedURL = AppConstants.HAYSTACK_PICTURES_URL + Uri.encode(locationSharing.pictureURL);
-                    new ImageDownloaderTask(holder.imageView).execute(encodedURL);
+                if (holder.imageView != null && locationSharing.getPictureURL() != null) {
+                    String encodedURL = AppConstants.HAYSTACK_PICTURES_URL + Uri.encode(locationSharing.getPictureURL());
+                    new ImageDownloaderTask(holder.imageView, mContext.getResources().getDrawable(R.drawable.person_placeholder)).execute(encodedURL);
                 }
 
                 holder.setData(locationSharing);

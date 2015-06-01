@@ -1,4 +1,4 @@
-package com.nemator.needle.view.home.createHaystack;
+package com.nemator.needle.view.haystacks.createHaystack;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -34,6 +34,7 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.places.Places;
 import com.nemator.needle.utils.AppConstants;
+import com.nemator.needle.utils.AppState;
 import com.nemator.needle.view.haystack.HaystackActivity;
 import com.nemator.needle.tasks.createHaystack.CreateHaystackResult;
 import com.nemator.needle.tasks.createHaystack.CreateHaystackTaskParams;
@@ -44,6 +45,7 @@ import com.nemator.needle.models.vo.HaystackVO;
 import com.nemator.needle.models.vo.UserVO;
 import com.nemator.needle.R;
 import com.nemator.needle.tasks.createHaystack.CreateHaystackTask;
+import com.nemator.needle.view.haystacks.OnActivityStateChangeListener;
 import com.shamanland.fab.FloatingActionButton;
 import com.viewpagerindicator.CirclePageIndicator;
 
@@ -156,15 +158,15 @@ public class CreateHaystackFragment extends Fragment implements CreateHaystackTa
                 switch (position){
                     case 0:
                         fab.setImageDrawable(getResources().getDrawable( R.drawable.ic_photo_camera_black_24dp));
-                        stateChangeCallback.onStateChange(HomeActivityState.CREATE_HAYSTACK_GENERAL_INFOS);
+                        stateChangeCallback.onStateChange(AppState.CREATE_HAYSTACK_GENERAL_INFOS);
                         break;
                     case 1:
                         fab.setImageDrawable(getResources().getDrawable( R.drawable.ic_action_location_found));
-                        stateChangeCallback.onStateChange(HomeActivityState.CREATE_HAYSTACK_MAP);
+                        stateChangeCallback.onStateChange(AppState.CREATE_HAYSTACK_MAP);
                         break;
                     case 2:
                         fab.setImageDrawable(getResources().getDrawable( R.drawable.ic_action_add_person));
-                        stateChangeCallback.onStateChange(HomeActivityState.CREATE_HAYSTACK_USERS);
+                        stateChangeCallback.onStateChange(AppState.CREATE_HAYSTACK_USERS);
                         break;
                 }
             }

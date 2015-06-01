@@ -69,8 +69,8 @@ public class RegisterActivity extends Activity implements OnClickListener, Regis
 
     public void onRegistrationComplete(AuthenticationResult result){
         if(result.successCode == 1){
-            Intent intent = new Intent(this, LoginActivity.class);
-            startActivity(intent);
+           /* Intent intent = new Intent(this, LoginActivity.class);
+            startActivity(intent);*/
         }else{
             Toast.makeText(this, "An error occured.", Toast.LENGTH_SHORT).show();
         }

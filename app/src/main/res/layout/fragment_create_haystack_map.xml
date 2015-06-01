@@ -10,7 +10,7 @@
         android:id="@+id/create_haystack_map"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:name="com.nemator.needle.view.home.createHaystack.CreateHaystackMap"
+        android:name="com.nemator.needle.view.haystacks.createHaystack.CreateHaystackMap"
         android:tag="MAP_FRAGMENT"
         android:layout_marginBottom="72dp"/>
 

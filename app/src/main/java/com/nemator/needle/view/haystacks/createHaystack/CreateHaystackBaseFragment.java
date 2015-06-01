@@ -1,4 +1,4 @@
-package com.nemator.needle.view.home.createHaystack;
+package com.nemator.needle.view.haystacks.createHaystack;
 
 import android.support.v4.app.Fragment;
 

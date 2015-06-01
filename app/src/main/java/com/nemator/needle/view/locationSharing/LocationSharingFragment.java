@@ -1,32 +1,30 @@
 package com.nemator.needle.view.locationSharing;
 
 import android.app.Activity;
-import android.content.SharedPreferences;
-import android.net.Uri;
 import android.os.Bundle;
-import android.app.Fragment;
-import android.preference.PreferenceManager;
+import android.support.v4.app.Fragment;
+import android.support.v4.view.ViewPager;
 import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ProgressBar;
 
+import com.appcompat.view.slidingTab.SlidingTabLayout;
+import com.nemator.needle.MainActivity;
 import com.nemator.needle.R;
-import com.nemator.needle.models.vo.HaystackVO;
 import com.nemator.needle.models.vo.LocationSharingVO;
-import com.nemator.needle.tasks.fetchHaystack.FetchHaystacksParams;
-import com.nemator.needle.tasks.fetchHaystack.FetchHaystacksResult;
-import com.nemator.needle.tasks.fetchHaystack.FetchHaystacksTask;
 import com.nemator.needle.tasks.fetchLocationSharing.FetchLocationSharingParams;
 import com.nemator.needle.tasks.fetchLocationSharing.FetchLocationSharingResult;
 import com.nemator.needle.tasks.fetchLocationSharing.FetchLocationSharingTask;
-import com.nemator.needle.view.home.HaystackListCardAdapter;
+import com.nemator.needle.view.haystacks.OnActivityStateChangeListener;
+import com.nemator.needle.utils.AppState;
+import com.nemator.needle.view.locationSharing.createLocationSharing.CreateLocationSharingFragment;
+import com.shamanland.fab.FloatingActionButton;
 
 import java.util.ArrayList;
+
+import it.neokree.materialnavigationdrawer.MaterialNavigationDrawer;
 
 
 public class LocationSharingFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener, FetchLocationSharingTask.FetchLocationSharingResponseHandler {
@@ -34,17 +32,17 @@ public class LocationSharingFragment extends Fragment implements SwipeRefreshLay
 
     //Views
     private View rootView;
-    private ProgressBar progressbar = null;
-    private RecyclerView mRecyclerView;
-    private SwipeRefreshLayout swipeLayout;
+    private ViewPager locationSharingViewPager;
+    private SlidingTabLayout mSlidingTabLayout;
+    private FloatingActionButton fab;
 
     //Objects
-    private RecyclerView.Adapter mAdapter;
-    private RecyclerView.LayoutManager mLayoutManager;
+    private LocationSharingPagerAdapter mLocationSharingPagerAdapter;
 
     //Data
-    private ArrayList<LocationSharingVO> dataList;
-    private int userId = -1;
+    public ArrayList<LocationSharingVO> receivedLocationsList = new ArrayList<>();
+    public ArrayList<LocationSharingVO> sentLocationsList = new ArrayList<>();
+    private OnActivityStateChangeListener stateChangeCallback;
 
     public static LocationSharingFragment newInstance() {
         LocationSharingFragment fragment = new LocationSharingFragment();
@@ -60,30 +58,89 @@ public class LocationSharingFragment extends Fragment implements SwipeRefreshLay
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
+
+        if(savedInstanceState != null){
+            receivedLocationsList = savedInstanceState.getParcelableArrayList("receivedLocationsList");
+            sentLocationsList = savedInstanceState.getParcelableArrayList("sentLocationsList");
+        }
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        outState.putParcelableArrayList("receivedLocationsList", receivedLocationsList);
+        outState.putParcelableArrayList("sentLocationsList", sentLocationsList);
+        super.onSaveInstanceState(outState);
+    }
+
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+
+        try {
+            stateChangeCallback = (OnActivityStateChangeListener) getActivity();
+        } catch (ClassCastException e) {
+            throw new ClassCastException(activity.toString()
+                    + " must implement OnActivityStateChangeListener");
         }
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        rootView = inflater.inflate(R.layout.fragment_location_sharing, container, false);
+        if(rootView == null){
+            rootView = inflater.inflate(R.layout.fragment_location_sharing, container, false);
 
-        //Progress bar
-        progressbar = (ProgressBar) rootView.findViewById(R.id.location_sharing_progress_bar);
+            //FAB
+            fab = (FloatingActionButton) rootView.findViewById(R.id.location_sharing_fab);
+            fab.setColor(getResources().getColor(R.color.primary));
+            fab.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    ((MaterialNavigationDrawer) getActivity()).setFragment(CreateLocationSharingFragment.newInstance(), getString(R.string.create_location_sharing));
+                    //stateChangeCallback.onStateChange(HomeActivityState.CREATE_HAYSTACK_GENERAL_INFOS);
+                }
+            });
+            fab.initBackground();
 
-        //Recycler View
-        mRecyclerView = (RecyclerView) rootView.findViewById(R.id.location_sharing_list);
-        mRecyclerView.setHasFixedSize(true);
+            //View pager
+            mLocationSharingPagerAdapter = new LocationSharingPagerAdapter(getActivity().getSupportFragmentManager(), this);
+            locationSharingViewPager = (ViewPager) rootView.findViewById(R.id.location_sharing_view_pager);
+            locationSharingViewPager.setAdapter(mLocationSharingPagerAdapter);
 
-        mLayoutManager = new LinearLayoutManager(getActivity());
-        mRecyclerView.setLayoutManager(mLayoutManager);
+            //Tabs
+            mSlidingTabLayout = (SlidingTabLayout) rootView.findViewById(R.id.location_sharing_sliding_tabs);
+            mSlidingTabLayout.setDistributeEvenly(true);
+            mSlidingTabLayout.setCustomTabColorizer(new SlidingTabLayout.TabColorizer() {
+                @Override
+                public int getIndicatorColor(int position) {
+                    return getResources().getColor(R.color.tabsScrollColor);
+                }
+            });
 
-        mAdapter = new LocationSharingListCardAdapter(dataList, rootView.getContext());
-        mRecyclerView.setAdapter(mAdapter);
+            mSlidingTabLayout.setViewPager(locationSharingViewPager);
+            mSlidingTabLayout.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+                @Override
+                public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
 
-        //Swipe To Refresh
-        swipeLayout = (SwipeRefreshLayout) rootView.findViewById(R.id.swipe_container);
-        swipeLayout.setOnRefreshListener(this);
+                }
+
+                @Override
+                public void onPageSelected(int position) {
+                    switch (position) {
+                        case 0:
+                            stateChangeCallback.onStateChange(AppState.LOCATION_SHARING_RECEIVED_TAB);
+                            break;
+                        case 1:
+                            stateChangeCallback.onStateChange(AppState.LOCATION_SHARING_SENT_TAB);
+                            break;
+                    }
+                }
+
+                @Override
+                public void onPageScrollStateChanged(int state) {
+
+                }
+            });
+        }
 
         return rootView;
     }
@@ -100,7 +157,11 @@ public class LocationSharingFragment extends Fragment implements SwipeRefreshLay
     }
 
     public void fetchLocationSharing(){
-        FetchLocationSharingParams params = new FetchLocationSharingParams(String.valueOf(getUserId()), rootView.getContext(), progressbar);
+        LocationSharingListTabFragment receivedTab = mLocationSharingPagerAdapter.getReceivedFragment();
+        LocationSharingListTabFragment sentTab = mLocationSharingPagerAdapter.getSentFragment();
+
+        SwipeRefreshLayout refreshLayout = (stateChangeCallback.getCurrentState() == AppState.LOCATION_SHARING_RECEIVED_TAB) ? receivedTab.getRefreshLayout() : sentTab.getRefreshLayout();
+        FetchLocationSharingParams params = new FetchLocationSharingParams(String.valueOf(getUserId()), rootView.getContext(), refreshLayout);
 
         try{
             FetchLocationSharingTask task = new FetchLocationSharingTask(params, this);
@@ -110,37 +171,22 @@ public class LocationSharingFragment extends Fragment implements SwipeRefreshLay
         }
     }
 
-    public void onHaystackFetched(FetchLocationSharingResult result){
-        dataList = result.locationSharingList;
-        updateLocationSharingList();
-    }
-
-    public void updateLocationSharingList() {
-        if(rootView == null){
-            return;
-        }
-
-        mAdapter = new LocationSharingListCardAdapter(dataList, rootView.getContext());
-        mRecyclerView.setAdapter(mAdapter);
-
-        progressbar.setVisibility(View.GONE);
-        mRecyclerView.setVisibility(View.VISIBLE);
-        swipeLayout.setRefreshing(false);
-    }
-
     @Override
     public void onLocationSharingFetched(FetchLocationSharingResult result) {
+        receivedLocationsList = result.receivedLocationSharingList;
+        sentLocationsList = result.sentLocationSharingList;
 
+        ((MainActivity) getActivity()).setLocationSharingCount(receivedLocationsList.size());
+
+        mLocationSharingPagerAdapter.getReceivedFragment().updateLocationSharingList();
+        mLocationSharingPagerAdapter.getSentFragment().updateLocationSharingList();
     }
 
     private int getUserId(){
-        if(userId==-1){
-            SharedPreferences sp = PreferenceManager
-                    .getDefaultSharedPreferences(rootView.getContext());
+        return ((MainActivity) getActivity()).getUserId();
+    }
 
-            userId = sp.getInt("userId", -1);
-        }
-
-        return userId;
+    public void goToPage(int page){
+        locationSharingViewPager.setCurrentItem(page);
     }
 }

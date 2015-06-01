@@ -1,4 +1,4 @@
-package com.nemator.needle.view.home.createHaystack;
+package com.nemator.needle.view.haystacks.createHaystack;
 
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -6,7 +6,7 @@ import android.support.v4.app.FragmentStatePagerAdapter;
 import android.view.View;
 
 import com.nemator.needle.R;
-import com.nemator.needle.view.home.HaystackListTabFragment;
+import com.nemator.needle.view.haystacks.HaystackListTabFragment;
 
 import java.util.ArrayList;
 

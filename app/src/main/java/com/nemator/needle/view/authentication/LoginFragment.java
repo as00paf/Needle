@@ -1,6 +1,5 @@
 package com.nemator.needle.view.authentication;
 
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -22,20 +21,19 @@ import android.widget.Toast;
 import com.nemator.needle.utils.AppConstants;
 import com.nemator.needle.MainActivity;
 import com.nemator.needle.R;
-import com.nemator.needle.tasks.AuthenticationResult;
 import com.nemator.needle.tasks.login.LoginTask;
 import com.nemator.needle.tasks.login.LoginTaskParams;
-import com.nemator.needle.view.home.HaystacksActivity;
 
 import it.neokree.materialnavigationdrawer.MaterialNavigationDrawer;
 
-public class LoginFragment extends Fragment implements View.OnClickListener, LoginTask.LoginResponseHandler{
+public class LoginFragment extends Fragment implements View.OnClickListener{
 
     private FrameLayout layout;
     private SharedPreferences mSharedPreferences;
     private EditText user, pass;
     private Button mSubmit, mRegister;
     private CheckBox rememberMeCheckBox;
+    private MainActivity mActivity;
 
     public static LoginFragment newInstance() {
         LoginFragment fragment = new LoginFragment();
@@ -50,6 +48,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Log
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        mActivity = (MainActivity) getActivity();
         layout = (FrameLayout) inflater.inflate(R.layout.fragment_login, container, false);
 
         mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
@@ -101,7 +100,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Log
     public void onResume(){
         boolean rememberMe = mSharedPreferences.getBoolean("rememberMe", false);
         boolean autoLogin = ((MainActivity) getActivity()).autoLogin;
-        boolean willLogin = rememberMe && autoLogin;
+        boolean willLogin = rememberMe && autoLogin && !((MainActivity) getActivity()).loggedIn;
 
         if(!user.getText().toString().isEmpty() && !pass.getText().toString().isEmpty() && willLogin){
             login();
@@ -120,17 +119,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Log
             Toast.makeText(getActivity(), "You must enter a username and a password", Toast.LENGTH_LONG).show();
         }else{
             LoginTaskParams params = new LoginTaskParams(username, password, getActivity(), rememberMeCheckBox.isChecked(), false);
-            new LoginTask(params, this).execute();
-        }
-    }
-
-    public void onLoginComplete(AuthenticationResult result){
-        if(result.successCode == 1){
-            Intent i = new Intent(getActivity(), HaystacksActivity.class);
-            i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            startActivity(i);
-        }else{
-            Toast.makeText(getActivity(), "An Error Occured\n Please Try Again!", Toast.LENGTH_SHORT).show();
+            new LoginTask(params, mActivity).execute();
         }
     }
 
@@ -141,8 +130,8 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Log
                 login();
                 break;
             case R.id.register:
-                Intent i = new Intent(getActivity(), RegisterActivity.class);
-                startActivity(i);
+                /*Intent i = new Intent(getActivity(), RegisterActivity.class);
+                startActivity(i);*/
                 break;
 
             default:

@@ -1,17 +1,15 @@
-package com.nemator.needle.view.home;
+package com.nemator.needle.view.haystacks;
 
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Parcelable;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.nemator.needle.utils.AppConstants;
 import com.nemator.needle.R;
@@ -19,8 +17,6 @@ import com.nemator.needle.view.haystack.HaystackActivity;
 import com.nemator.needle.tasks.ImageDownloaderTask;
 import com.nemator.needle.models.vo.HaystackVO;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.util.ArrayList;
 
 public class HaystackListCardAdapter extends RecyclerView.Adapter<HaystackListCardAdapter.HaystackCardViewHolder> {
@@ -84,7 +80,7 @@ public class HaystackListCardAdapter extends RecyclerView.Adapter<HaystackListCa
 
                 if (holder.imageView != null && haystack.getPictureURL() != null) {
                     String encodedURL = AppConstants.HAYSTACK_PICTURES_URL + Uri.encode(haystack.getPictureURL());
-                    new ImageDownloaderTask(holder.imageView).execute(encodedURL);
+                    new ImageDownloaderTask(holder.imageView, mContext.getResources().getDrawable(R.drawable.haystack_picture_placeholder)).execute(encodedURL);
                 }
 
                 holder.setData(haystack);

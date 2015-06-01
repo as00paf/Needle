@@ -1,4 +1,4 @@
-package com.nemator.needle.view.home.createHaystack;
+package com.nemator.needle.view.haystacks.createHaystack;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
@@ -74,7 +74,7 @@ public class CreateHaystackUserListCardAdapter extends RecyclerView.Adapter<Crea
 
         //Image
         if(user.getPictureURL() != null){
-            new ImageDownloaderTask(holder.imageView).execute(user.getPictureURL());
+            new ImageDownloaderTask(holder.imageView, mContext.getResources().getDrawable(R.drawable.person_placeholder)).execute(user.getPictureURL());
         }
 
         holder.setData(user);

@@ -2,12 +2,11 @@ package com.nemator.needle.tasks.fetchHaystack;
 
 import android.os.AsyncTask;
 import android.util.Log;
-import android.view.View;
 
 import com.google.android.gms.maps.model.LatLng;
 import com.nemator.needle.models.vo.HaystackVO;
-import com.nemator.needle.utils.AppConstants;
 import com.nemator.needle.models.vo.UserVO;
+import com.nemator.needle.utils.AppConstants;
 import com.nemator.needle.utils.JSONParser;
 
 import org.apache.http.NameValuePair;
@@ -38,8 +37,14 @@ public class FetchHaystacksTask extends AsyncTask<Void, Void, FetchHaystacksResu
     }
 
     @Override
+    protected void onPreExecute() {
+        if(params.refreshLayout != null) params.refreshLayout.setRefreshing(true);
+        super.onPreExecute();
+    }
+
+    @Override
     protected void onPostExecute(FetchHaystacksResult result) {
-        params.progressbar.setVisibility(View.GONE);
+        if(params.refreshLayout != null) params.refreshLayout.setRefreshing(false);
         delegate.onHaystackFetched(result);
     }
 

@@ -3,20 +3,17 @@ package com.nemator.needle.view.haystack;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
-import android.support.v4.app.FragmentManager;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.View;
 import android.widget.ImageView;
 
-import com.nemator.needle.MainActivity;
 import com.nemator.needle.R;
 import com.nemator.needle.view.authentication.LoginFragment;
-import com.nemator.needle.view.home.HaystackListFragment;
+import com.nemator.needle.view.haystacks.HaystackListFragment;
 import com.nemator.needle.models.vo.HaystackVO;
 import com.nemator.needle.models.vo.UserVO;
 import com.nemator.needle.utils.AppConstants;
-import com.nemator.needle.view.home.HaystacksActivity;
 import com.nemator.needle.view.settings.SettingsFragment;
 
 import java.util.ArrayList;
@@ -140,9 +137,9 @@ public class HaystackActivity extends MaterialNavigationDrawer{
             super.onBackPressed();
         }*/
 
-        Intent i = new Intent(this, HaystacksActivity.class);
+        /*Intent i = new Intent(this, HaystacksActivity.class);
         i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        startActivity(i);
+        startActivity(i);*/
     }
 
  /*   public void restoreActionBar() {

@@ -5,11 +5,7 @@ import android.util.Log;
 import android.view.View;
 
 import com.google.android.gms.maps.model.LatLng;
-import com.nemator.needle.models.vo.HaystackVO;
 import com.nemator.needle.models.vo.LocationSharingVO;
-import com.nemator.needle.models.vo.UserVO;
-import com.nemator.needle.tasks.fetchHaystack.FetchHaystacksParams;
-import com.nemator.needle.tasks.fetchHaystack.FetchHaystacksResult;
 import com.nemator.needle.utils.AppConstants;
 import com.nemator.needle.utils.JSONParser;
 
@@ -39,15 +35,24 @@ public class FetchLocationSharingTask extends AsyncTask<Void, Void, FetchLocatio
     }
 
     @Override
+    protected void onPreExecute() {
+        if(params.refreshLayout != null) params.refreshLayout.setRefreshing(true);
+        super.onPreExecute();
+    }
+
+    @Override
     protected void onPostExecute(FetchLocationSharingResult result) {
-        params.progressbar.setVisibility(View.GONE);
+        if(params.refreshLayout != null) params.refreshLayout.setRefreshing(false);
         delegate.onLocationSharingFetched(result);
     }
 
     @Override
     protected FetchLocationSharingResult doInBackground(Void... args) {
         FetchLocationSharingResult result = new FetchLocationSharingResult();
-        int success;
+        int success, receivedSuccess, sentSuccess;
+        String message = "not set";
+        String receivedMessage = "not set";
+        String sentMessage = "not set";
 
         try {
             //Params
@@ -60,32 +65,78 @@ public class FetchLocationSharingTask extends AsyncTask<Void, Void, FetchLocatio
             //Results
             success = json.getInt(AppConstants.TAG_SUCCESS);
             result.successCode = success;
+            message = json.getString(AppConstants.TAG_MESSAGE);
+            result.successMessage = message;
+            receivedSuccess = json.getInt("received_success");
+            result.receivedSuccessCode = receivedSuccess;
+            receivedMessage = json.getString("received_message");
+            result.receivedSuccessMessage = receivedMessage;
+            sentSuccess = json.getInt("sent_success");
+            result.sentSuccessCode = sentSuccess;
+            sentMessage = json.getString("sent_message");
+            result.sentSuccessMessage = sentMessage;
 
             Log.d(TAG, "FetchLocationSharing Successful!\n" + json.toString());
 
-            JSONArray locationSharings = json.getJSONArray("location_sharings");
+            //Sent Locations
+            JSONArray sentLocationSharings = json.getJSONArray("sent");
 
-            if (locationSharings != null) {
+            if (sentLocationSharings != null) {
                 locationSharingList = new ArrayList<LocationSharingVO>();
 
-                int count = locationSharings.length();
+                int count = sentLocationSharings.length();
                 for (int i = 0; i < count; i++) {
-                    JSONObject locationSharingData = locationSharings.getJSONObject(i);
+                    JSONObject locationSharingData = sentLocationSharings.getJSONObject(i);
 
                     LocationSharingVO locationSharingVO = new LocationSharingVO();
-                    locationSharingVO.id = locationSharingData.getInt("id");
-                    locationSharingVO.timeLimit = locationSharingData.getString("timeLimit");
-                    locationSharingVO.senderName = locationSharingData.getString("senderName");
-                    locationSharingVO.senderId = locationSharingData.getInt("senderId");
-                    locationSharingVO.receiverName = locationSharingData.getString("receiverName");
-                    locationSharingVO.receiverId = locationSharingData.getInt("receiverId");
-                    locationSharingVO.location = new LatLng(locationSharingData.getDouble("lat"), locationSharingData.getDouble("lng"));
+                    locationSharingVO.setId(locationSharingData.getInt("id"));
+                    locationSharingVO.setTimeLimit(locationSharingData.getString("timeLimit"));
+                    locationSharingVO.setSenderName(locationSharingData.getString("senderName"));
+                    locationSharingVO.setSenderId(locationSharingData.getInt("senderId"));
+                    locationSharingVO.setReceiverName(locationSharingData.getString("receiverName"));
+                    locationSharingVO.setReceiverId(locationSharingData.getInt("receiverId"));
+                    locationSharingVO.setLocation(new LatLng(locationSharingData.getDouble("lat"), locationSharingData.getDouble("lng")));
+
+                    //Picture
+                    try {
+                        String pictureURL = locationSharingData.getString("pictureURL");
+                        if (pictureURL != null)
+                            locationSharingVO.setPictureURL(pictureURL);
+                    } catch (Exception e) {
+                        Log.e("parseJson", "No pictureURL for #" + i);
+                    }
+
+                    Log.e("parseJson", "Adding Location Sharing # " + i);
+                    locationSharingList.add(locationSharingVO);
+                }
+
+                result.sentLocationSharingList = locationSharingList;
+            }
+
+            //Received Locations
+            JSONArray receivedLocationSharings = json.getJSONArray("received");
+
+            if (receivedLocationSharings != null) {
+                locationSharingList = new ArrayList<LocationSharingVO>();
+
+                int count = receivedLocationSharings.length();
+                for (int i = 0; i < count; i++) {
+                    JSONObject locationSharingData = receivedLocationSharings.getJSONObject(i);
+
+                    LocationSharingVO locationSharingVO = new LocationSharingVO();
+                    locationSharingVO.setId(locationSharingData.getInt("id"));
+                    locationSharingVO.setTimeLimit(locationSharingData.getString("timeLimit"));
+                    locationSharingVO.setSenderName(locationSharingData.getString("senderName"));
+                    locationSharingVO.setSenderId(locationSharingData.getInt("senderId"));
+                    locationSharingVO.setReceiverName(locationSharingData.getString("receiverName"));
+                    locationSharingVO.setReceiverId(locationSharingData.getInt("receiverId"));
+                    locationSharingVO.setLocation(new LatLng(locationSharingData.getDouble("lat"), locationSharingData.getDouble("lng")));
 
                     //Picture
                     try{
                         String pictureURL = locationSharingData.getString("pictureURL");
                         if (pictureURL != null)
-                            locationSharingVO.pictureURL = pictureURL;
+                            locationSharingVO.setPictureURL(pictureURL);
                     }catch(Exception e){
                         Log.e("parseJson", "No pictureURL for #" + i );
                     }
@@ -94,13 +145,12 @@ public class FetchLocationSharingTask extends AsyncTask<Void, Void, FetchLocatio
                     locationSharingList.add(locationSharingVO);
                 }
 
-                result.locationSharingList = locationSharingList;
+                result.sentLocationSharingList = locationSharingList;
 
                 return result;
-            }else{
-                Log.d(TAG, "FetchLocationSharing Failure!" + json.getString(AppConstants.TAG_MESSAGE));
             }
         } catch (Exception e) {
+            Log.d(TAG, "FetchLocationSharing Failure ! message :" + message +"\nreceivedMessage : " + receivedMessage + "\nsentMessage : " + sentMessage);
             e.printStackTrace();
         }
 

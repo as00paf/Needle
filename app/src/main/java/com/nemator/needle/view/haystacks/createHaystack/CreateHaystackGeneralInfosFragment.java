@@ -1,4 +1,4 @@
-package com.nemator.needle.view.home.createHaystack;
+package com.nemator.needle.view.haystacks.createHaystack;
 
 import android.app.Activity;
 import android.app.DatePickerDialog;
@@ -19,7 +19,6 @@ import android.widget.TimePicker;
 
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.nemator.needle.R;
-import com.nemator.needle.view.home.HaystacksActivity;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -163,7 +162,7 @@ public class CreateHaystackGeneralInfosFragment extends CreateHaystackBaseFragme
         super.onAttach(activity);
 
         try {
-            privacySettingsCallback = (OnPrivacySettingsUpdatedListener) ((HaystacksActivity) activity).getSupportFragmentManager().getFragments().get(0);
+            privacySettingsCallback = (CreateHaystackFragment) getParentFragment();
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString()
                     + " must implement OnHeadlineSelectedListener");

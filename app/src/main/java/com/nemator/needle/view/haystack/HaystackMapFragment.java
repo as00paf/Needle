@@ -35,21 +35,20 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.nemator.needle.R;
+import com.nemator.needle.models.vo.HaystackVO;
+import com.nemator.needle.tasks.TaskResult;
+import com.nemator.needle.tasks.activate.ActivateUserParams;
 import com.nemator.needle.tasks.activate.ActivateUserTask;
+import com.nemator.needle.tasks.deactivate.DeactivateUserParams;
+import com.nemator.needle.tasks.deactivate.DeactivateUserTask;
 import com.nemator.needle.tasks.leaveHaystack.LeaveHaystackParams;
 import com.nemator.needle.tasks.leaveHaystack.LeaveHaystackTask;
 import com.nemator.needle.tasks.postLocation.PostLocationParams;
 import com.nemator.needle.tasks.postLocation.PostLocationTask;
-import com.nemator.needle.tasks.retrieveLocations.RetrieveLocationsResult;
-import com.nemator.needle.view.home.HomeActivity;
-import com.nemator.needle.models.vo.HaystackVO;
-import com.nemator.needle.tasks.TaskResult;
-import com.nemator.needle.utils.AppConstants;
-import com.nemator.needle.tasks.activate.ActivateUserParams;
-import com.nemator.needle.tasks.deactivate.DeactivateUserParams;
-import com.nemator.needle.tasks.deactivate.DeactivateUserTask;
 import com.nemator.needle.tasks.retrieveLocations.RetrieveLocationsParams;
+import com.nemator.needle.tasks.retrieveLocations.RetrieveLocationsResult;
 import com.nemator.needle.tasks.retrieveLocations.RetrieveLocationsTask;
+import com.nemator.needle.utils.AppConstants;
 
 import java.text.DateFormat;
 import java.util.ArrayList;
@@ -630,8 +629,8 @@ public class HaystackMapFragment extends SupportMapFragment
         if(result.successCode == 1){
             Toast.makeText(getActivity(), "Haystack Left", Toast.LENGTH_SHORT).show();
 
-            Intent intent = new Intent(getActivity(), HomeActivity.class);
-            startActivity(intent);
+           /* Intent intent = new Intent(getActivity(), HomeActivity.class);
+            startActivity(intent);*/
         }else{
             Toast.makeText(getActivity(), "Error Leaving Haystack", Toast.LENGTH_SHORT).show();
         }

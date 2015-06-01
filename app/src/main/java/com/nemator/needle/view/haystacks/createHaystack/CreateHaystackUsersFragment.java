@@ -1,4 +1,4 @@
-package com.nemator.needle.view.home.createHaystack;
+package com.nemator.needle.view.haystacks.createHaystack;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -19,6 +19,8 @@ import com.nemator.needle.tasks.retrieveUsers.RetrieveUsersParams;
 import com.nemator.needle.tasks.retrieveUsers.RetrieveUsersResult;
 import com.nemator.needle.tasks.retrieveUsers.RetrieveUsersTask;
 import com.nemator.needle.models.vo.UserVO;
+import com.nemator.needle.utils.AppState;
+import com.nemator.needle.view.haystacks.OnActivityStateChangeListener;
 import com.quinny898.library.persistentsearch.SearchBox;
 import com.quinny898.library.persistentsearch.SearchResult;
 
@@ -86,7 +88,7 @@ public class CreateHaystackUsersFragment extends Fragment implements SwipeRefres
             @Override
             public void onSearchOpened() {
                 //Use this to tint the screen
-                stateChangeCallback.onStateChange(HomeActivityState.CREATE_HAYSTACK_USERS_SEARCH_OPEN);
+                stateChangeCallback.onStateChange(AppState.CREATE_HAYSTACK_USERS_SEARCH_OPEN);
 
                 if(searchBox.getSearchables().size() == 0){
                     addFriendsSuggestion();

@@ -2,6 +2,7 @@ package com.nemator.needle.tasks;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.drawable.Drawable;
 import android.net.http.AndroidHttpClient;
 import android.os.AsyncTask;
 import android.util.Log;
@@ -21,21 +22,24 @@ import java.lang.ref.WeakReference;
 public class ImageDownloaderTask extends AsyncTask<String, Void, Bitmap> {
 	private final WeakReference<ImageView> imageViewReference;
 	private double scaleFactor = 1;
+	private Drawable fallBack;
 	
-	public ImageDownloaderTask(ImageView imageView) {
+	/*public ImageDownloaderTask(ImageView imageView) {
 		imageViewReference = new WeakReference<ImageView>(imageView);
-	}
+	}*/
 	
 	public ImageDownloaderTask(ImageView imageView, double factor) {
 		imageViewReference = new WeakReference<ImageView>(imageView);
 		scaleFactor = factor;
 	}
 
+	public ImageDownloaderTask(ImageView imageView, Drawable fallBack){
+		this.imageViewReference = new WeakReference<ImageView>(imageView);
+		this.fallBack = fallBack;
+	}
+
 	@Override
-	// Actual download method, run in the task thread
 	protected Bitmap doInBackground(String... params) {
-		// params comes from the execute() call: params[0] is the url.
-		
 		//Download the image
 		Bitmap result = downloadBitmap(params[0]);
 		
@@ -66,8 +70,8 @@ public class ImageDownloaderTask extends AsyncTask<String, Void, Bitmap> {
 
 				if (bitmap != null) {
 					imageView.setImageBitmap(bitmap);
-				} else {
-					imageView.setImageDrawable(imageView.getContext().getResources().getDrawable(R.drawable.ic_haystack));
+				} else if(fallBack != null) {
+					imageView.setImageDrawable(fallBack);
 				}
 			}
 

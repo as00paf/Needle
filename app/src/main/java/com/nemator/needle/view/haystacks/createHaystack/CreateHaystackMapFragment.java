@@ -1,4 +1,4 @@
-package com.nemator.needle.view.home.createHaystack;
+package com.nemator.needle.view.haystacks.createHaystack;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -31,6 +31,8 @@ import com.google.android.gms.maps.model.LatLngBounds;
 import com.nemator.needle.R;
 import com.nemator.needle.tasks.getAutoCompleteResultsTask.GetAutoCompleteResultsParams;
 import com.nemator.needle.tasks.getAutoCompleteResultsTask.GetAutoCompleteResultsTask;
+import com.nemator.needle.utils.AppState;
+import com.nemator.needle.view.haystacks.OnActivityStateChangeListener;
 import com.quinny898.library.persistentsearch.SearchBox;
 import com.quinny898.library.persistentsearch.SearchResult;
 
@@ -138,7 +140,7 @@ public class CreateHaystackMapFragment extends CreateHaystackBaseFragment{
             @Override
             public void onSearchOpened() {
                 //Use this to tint the screen
-                stateChangeCallback.onStateChange(HomeActivityState.CREATE_HAYSTACK_MAP_SEARCH_OPEN);
+                stateChangeCallback.onStateChange(AppState.CREATE_HAYSTACK_MAP_SEARCH_OPEN);
 
                 if(searchBox.getSearchables().size() == 0){
                     addPlaceSuggestion();
@@ -152,7 +154,7 @@ public class CreateHaystackMapFragment extends CreateHaystackBaseFragment{
                     autoCompleteTask.cancel(true);
                 }
 
-                stateChangeCallback.onStateChange(HomeActivityState.CREATE_HAYSTACK_MAP);
+                stateChangeCallback.onStateChange(AppState.CREATE_HAYSTACK_MAP);
             }
 
             @Override
@@ -173,7 +175,7 @@ public class CreateHaystackMapFragment extends CreateHaystackBaseFragment{
 
             @Override
             public void onSearch(String searchTerm) {
-                stateChangeCallback.onStateChange(HomeActivityState.CREATE_HAYSTACK_MAP);
+                stateChangeCallback.onStateChange(AppState.CREATE_HAYSTACK_MAP);
 
                 Toast.makeText(getActivity(), searchTerm + " Searched", Toast.LENGTH_LONG).show();
                 Geocoder geocoder = new Geocoder(getActivity());

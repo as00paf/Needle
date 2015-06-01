@@ -1,4 +1,4 @@
-package com.nemator.needle.view.home;
+package com.nemator.needle.view.haystacks;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;

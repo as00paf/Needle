@@ -1,13 +1,10 @@
 package com.nemator.needle;
 
-import android.app.ActivityOptions;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.support.v4.widget.SwipeRefreshLayout;
-import android.util.Log;
 import android.widget.Toast;
 
 import com.nemator.needle.tasks.AuthenticationResult;
@@ -16,10 +13,9 @@ import com.nemator.needle.view.authentication.LoginFragment;
 import com.nemator.needle.view.haystacks.HaystackListFragment;
 import com.nemator.needle.view.haystacks.OnActivityStateChangeListener;
 import com.nemator.needle.view.haystacks.createHaystack.CreateHaystackFragment;
-import com.nemator.needle.view.haystacks.createHaystack.CreateHaystackMapFragment;
-import com.nemator.needle.view.haystacks.createHaystack.CreateHaystackUsersFragment;
 import com.nemator.needle.utils.AppState;
 import com.nemator.needle.view.locationSharing.LocationSharingFragment;
+import com.nemator.needle.view.locationSharing.createLocationSharing.CreateLocationSharingFragment;
 import com.nemator.needle.view.settings.SettingsFragment;
 
 import it.neokree.materialnavigationdrawer.MaterialNavigationDrawer;
@@ -28,7 +24,7 @@ import it.neokree.materialnavigationdrawer.elements.MaterialSection;
 import it.neokree.materialnavigationdrawer.elements.listeners.MaterialSectionListener;
 
 public class MainActivity extends MaterialNavigationDrawer implements LoginTask.LoginResponseHandler,
-        OnActivityStateChangeListener, MaterialSectionListener, HaystackListFragment.CreateHaystackFabListener, SwipeRefreshLayout.OnRefreshListener {
+        OnActivityStateChangeListener, MaterialSectionListener, HaystackListFragment.HaystackListFragmentInteractionListener, LocationSharingFragment.LocationSharingFragmentInteractionListener {
     public static String TAG = "MainActivity";
 
     private SharedPreferences mSharedPreferences;
@@ -53,6 +49,7 @@ public class MainActivity extends MaterialNavigationDrawer implements LoginTask.
     private CreateHaystackFragment createHaystackFragment;
 
     private MaterialSection logOutSection;
+    private CreateLocationSharingFragment createLocationSharingFragment;
 
     @Override
     public void init(Bundle savedInstanceState) {
@@ -174,10 +171,14 @@ public class MainActivity extends MaterialNavigationDrawer implements LoginTask.
         super.onClick(section);
     }
 
+    @Override
+    public void onRefreshHaystackList() {
+        haystacksListFragment.fetchHaystacks();
+    }
 
     @Override
-    public void onRefresh() {
-        haystacksListFragment.fetchHaystacks();
+    public void onRefreshLocationSharingList() {
+        locationSharingFragment.fetchLocationSharing();
     }
 
     private void logOut(){
@@ -190,6 +191,7 @@ public class MainActivity extends MaterialNavigationDrawer implements LoginTask.
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         showLoginFragment(true);
+                        removeSection(logOutSection);
                     }
 
                 })
@@ -236,6 +238,11 @@ public class MainActivity extends MaterialNavigationDrawer implements LoginTask.
         showCreateHaystackFragment();
     }
 
+    @Override
+    public void onCreateLocationSharingFabTapped() {
+        showCreateLocationSharingFragment();
+    }
+
     private void showLoginFragment(Boolean updateSections){
         if(updateSections){
             this.removeSection(haystacksSection);
@@ -262,6 +269,12 @@ public class MainActivity extends MaterialNavigationDrawer implements LoginTask.
         createHaystackFragment = new CreateHaystackFragment();
         this.setFragment(createHaystackFragment, getString(R.string.create_haystack));
         onStateChange(AppState.CREATE_HAYSTACK_GENERAL_INFOS);
+    }
+
+    private void showCreateLocationSharingFragment(){
+        createLocationSharingFragment = new CreateLocationSharingFragment();
+        this.setFragment(createLocationSharingFragment, getString(R.string.create_location_sharing));
+        onStateChange(AppState.CREATE_LOCATION_SHARING);
     }
 
     //Getters/Setters

@@ -13,5 +13,5 @@ public class AppState {
     public static final int LOCATION_SHARING_RECEIVED_TAB = 9;
     public static final int LOCATION_SHARING_SENT_TAB = 10;
     public static final int CREATE_LOCATION_SHARING = 11;
-    public static final int HAYSTACK = 11;
+    public static final int HAYSTACK = 12;
 }

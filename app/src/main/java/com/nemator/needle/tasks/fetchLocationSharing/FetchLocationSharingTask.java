@@ -35,14 +35,7 @@ public class FetchLocationSharingTask extends AsyncTask<Void, Void, FetchLocatio
     }
 
     @Override
-    protected void onPreExecute() {
-        if(params.refreshLayout != null) params.refreshLayout.setRefreshing(true);
-        super.onPreExecute();
-    }
-
-    @Override
     protected void onPostExecute(FetchLocationSharingResult result) {
-        if(params.refreshLayout != null) params.refreshLayout.setRefreshing(false);
         delegate.onLocationSharingFetched(result);
     }
 

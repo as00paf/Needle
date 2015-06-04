@@ -26,6 +26,13 @@ public class LocationSharingPagerAdapter extends FragmentStatePagerAdapter {
 
         Bundle args = new Bundle();
         Boolean isReceived = (position == 0);
+
+        if(isReceived){
+            receivedFragment = fragment;
+        }else{
+            sentFragment = fragment;
+        }
+
         args.putBoolean("isReceived", isReceived);
         fragment.setArguments(args);
 
@@ -33,18 +40,10 @@ public class LocationSharingPagerAdapter extends FragmentStatePagerAdapter {
     }
 
     public LocationSharingListTabFragment getReceivedFragment(){
-        if(receivedFragment == null) {
-            receivedFragment = new LocationSharingListTabFragment();
-        }
-
         return receivedFragment;
     }
 
     public LocationSharingListTabFragment getSentFragment(){
-        if(sentFragment == null) {
-            sentFragment = new LocationSharingListTabFragment();
-        }
-
         return sentFragment;
     }
 

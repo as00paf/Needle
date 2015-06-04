@@ -30,6 +30,7 @@ public class HaystackListTabFragment extends Fragment {
     private OnActivityStateChangeListener stateChangeCallback;
     private RecyclerView.Adapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
+    private HaystackListFragment.HaystackListFragmentInteractionListener interactionListener;
 
     //Data
     private ArrayList<HaystackVO> dataList;
@@ -51,6 +52,7 @@ public class HaystackListTabFragment extends Fragment {
 
         try {
             stateChangeCallback = (OnActivityStateChangeListener) getActivity();
+            interactionListener = (HaystackListFragment.HaystackListFragmentInteractionListener) getActivity();
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString()
                     + " must implement OnActivityStateChangeListener");
@@ -70,7 +72,12 @@ public class HaystackListTabFragment extends Fragment {
 
         //Swipe To Refresh
         swipeLayout = (SwipeRefreshLayout) rootView.findViewById(R.id.swipe_container);
-        swipeLayout.setOnRefreshListener((MainActivity) getActivity());
+        swipeLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                interactionListener.onRefreshHaystackList();
+            }
+        });
 
         return rootView;
     }
@@ -87,7 +94,7 @@ public class HaystackListTabFragment extends Fragment {
         this.dataList = data;
 
         if(mAdapter == null){
-            mAdapter = new HaystackListCardAdapter(dataList, getActivity());
+            mAdapter = new HaystackListCardAdapter(this.dataList, getActivity());
         }else{
             mAdapter.notifyDataSetChanged();
         }

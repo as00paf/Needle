@@ -6,12 +6,10 @@ import android.widget.ProgressBar;
 
 public class FetchLocationSharingParams {
     public String userId;
-    public SwipeRefreshLayout refreshLayout;
     public Context context;
 
-    public FetchLocationSharingParams(String userId, Context context, SwipeRefreshLayout refreshLayout){
+    public FetchLocationSharingParams(String userId, Context context){
         this.userId = userId;
-        this.refreshLayout = refreshLayout;
         this.context = context;
     }
 }

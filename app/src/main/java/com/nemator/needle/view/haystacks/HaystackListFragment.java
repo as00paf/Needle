@@ -35,7 +35,7 @@ public class HaystackListFragment extends Fragment implements FetchHaystacksTask
     //Objects
     private HaystackListPagerAdapter mHaystackListPagerAdapter;
     private OnActivityStateChangeListener stateChangeCallback;
-    private CreateHaystackFabListener fabListener;
+    private HaystackListFragmentInteractionListener fabListener;
 
     //Data
     public ArrayList<HaystackVO> publicHaystacks = null;
@@ -92,8 +92,6 @@ public class HaystackListFragment extends Fragment implements FetchHaystacksTask
                 @Override
                 public void onClick(View v) {
                     fabListener.onCreateHaystackFabTapped();
-                    /*((MaterialNavigationDrawer) getActivity()).setFragment(CreateHaystackFragment.newInstance(), getString(R.string.create_haystack));
-                    stateChangeCallback.onStateChange(AppState.CREATE_HAYSTACK_GENERAL_INFOS);*/
                 }
             });
             fab.initBackground();
@@ -193,7 +191,8 @@ public class HaystackListFragment extends Fragment implements FetchHaystacksTask
         haystackListViewPager.setCurrentItem(tab);
     }
 
-    public interface CreateHaystackFabListener{
+    public interface HaystackListFragmentInteractionListener {
         void onCreateHaystackFabTapped();
+        void onRefreshHaystackList();
     }
 }

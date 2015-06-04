@@ -9,14 +9,16 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewParent;
 
+import com.nemator.needle.MainActivity;
 import com.nemator.needle.R;
 import com.nemator.needle.models.vo.HaystackVO;
 import com.nemator.needle.utils.AppState;
 
 import java.util.ArrayList;
 
-public class HaystackListTabFragment extends Fragment{
+public class HaystackListTabFragment extends Fragment {
     private static final String TAG = "HaystackListTabFragment";
 
     //Views
@@ -66,14 +68,9 @@ public class HaystackListTabFragment extends Fragment{
         mLayoutManager = new LinearLayoutManager(getActivity());
         mRecyclerView.setLayoutManager(mLayoutManager);
 
-        HaystackListFragment parentFragment = (HaystackListFragment) getFragmentManager().getFragments().get(0);
-        dataList = isPublic ? parentFragment.publicHaystacks : parentFragment.privateHaystacks;
-        mAdapter = new HaystackListCardAdapter(dataList, rootView.getContext());
-        mRecyclerView.setAdapter(mAdapter);
-
         //Swipe To Refresh
         swipeLayout = (SwipeRefreshLayout) rootView.findViewById(R.id.swipe_container);
-        swipeLayout.setOnRefreshListener((HaystackListFragment) getParentFragment());
+        swipeLayout.setOnRefreshListener((MainActivity) getActivity());
 
         return rootView;
     }
@@ -86,9 +83,17 @@ public class HaystackListTabFragment extends Fragment{
         stateChangeCallback.onStateChange(state);
     }
 
-    public void updateHaystackList(){
-        if(mAdapter != null){
+    public void updateHaystackList(ArrayList<HaystackVO> data){
+        this.dataList = data;
+
+        if(mAdapter == null){
+            mAdapter = new HaystackListCardAdapter(dataList, getActivity());
+        }else{
             mAdapter.notifyDataSetChanged();
+        }
+
+        if(mRecyclerView != null){
+            mRecyclerView.setAdapter(mAdapter);
         }
     }
 
@@ -96,4 +101,6 @@ public class HaystackListTabFragment extends Fragment{
     public SwipeRefreshLayout getRefreshLayout() {
         return swipeLayout;
     }
+
+
 }

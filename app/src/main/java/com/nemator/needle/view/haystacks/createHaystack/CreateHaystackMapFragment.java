@@ -1,6 +1,5 @@
 package com.nemator.needle.view.haystacks.createHaystack;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.location.Address;
 import android.location.Geocoder;
@@ -20,19 +19,14 @@ import android.widget.Toast;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.PendingResult;
 import com.google.android.gms.common.api.ResultCallback;
-import com.google.android.gms.location.places.AutocompleteFilter;
 import com.google.android.gms.location.places.PlaceLikelihood;
 import com.google.android.gms.location.places.PlaceLikelihoodBuffer;
 import com.google.android.gms.location.places.Places;
-import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.Projection;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.LatLngBounds;
 import com.nemator.needle.R;
 import com.nemator.needle.tasks.getAutoCompleteResultsTask.GetAutoCompleteResultsParams;
 import com.nemator.needle.tasks.getAutoCompleteResultsTask.GetAutoCompleteResultsTask;
 import com.nemator.needle.utils.AppState;
-import com.nemator.needle.view.haystacks.OnActivityStateChangeListener;
 import com.quinny898.library.persistentsearch.SearchBox;
 import com.quinny898.library.persistentsearch.SearchResult;
 
@@ -43,31 +37,20 @@ import java.util.List;
 public class CreateHaystackMapFragment extends CreateHaystackBaseFragment{
     public static String TAG = "CreateHaystackMapFragment";
 
-    public View rootView;
-
-    private GoogleMap mMap;
-
-    Boolean mIsMapMoveable = false;
-
-    public static boolean mMapIsTouched = false;
-    Projection projection;
-    public double latitude;
-    public double longitude;
-    ArrayList<LatLng> val = new ArrayList<LatLng>();
-    private float mScaleFactor = 1.f;
-    public CreateHaystackMap mMapFragment;
-    private ScaleGestureDetector mScaleDetector;
-    private Boolean mIsCircle = true;
-    private SearchBox searchBox;
-    private Boolean isPublic = false;
-
-    private GoogleApiClient mGoogleApiClient;
-    private LatLngBounds mBounds;
-    private AutocompleteFilter mPlaceFilter;
-    private GetAutoCompleteResultsTask autoCompleteTask;
-    private OnActivityStateChangeListener stateChangeCallback;
-
+    //Children
     private TextView mRadiusLabel;
+    private SearchBox searchBox;
+    public CreateHaystackMap mMapFragment;
+
+    //Data
+    private Boolean mIsMapMoveable = false;
+    private float mScaleFactor = 1.f;
+    private Boolean mIsCircle = true;
+
+    //Objects
+    private GoogleApiClient mGoogleApiClient;
+    private ScaleGestureDetector mScaleDetector;
+    private GetAutoCompleteResultsTask autoCompleteTask;
 
     public static CreateHaystackMapFragment newInstance() {
         CreateHaystackMapFragment fragment = new CreateHaystackMapFragment();
@@ -80,27 +63,9 @@ public class CreateHaystackMapFragment extends CreateHaystackBaseFragment{
     }
 
     @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-
-        try {
-            stateChangeCallback = (OnActivityStateChangeListener) getActivity();
-        } catch (ClassCastException e) {
-            throw new ClassCastException(activity.toString()
-                    + " must implement OnActivityStateChangeListener");
-        }
-    }
-
-    @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-        }
-
         connectToApiClient();
-
-        setHasOptionsMenu(true);
-        this.setRetainInstance(true);
     }
 
     private void connectToApiClient() {

@@ -14,16 +14,13 @@ import com.appcompat.view.slidingTab.SlidingTabLayout;
 import com.nemator.needle.MainActivity;
 import com.nemator.needle.R;
 import com.nemator.needle.models.vo.HaystackVO;
-import com.nemator.needle.tasks.fetchHaystack.FetchHaystacksParams;
-import com.nemator.needle.tasks.fetchHaystack.FetchHaystacksResult;
-import com.nemator.needle.tasks.fetchHaystack.FetchHaystacksTask;
-import com.nemator.needle.view.haystacks.createHaystack.CreateHaystackFragment;
+import com.nemator.needle.tasks.fetchHaystacks.FetchHaystacksParams;
+import com.nemator.needle.tasks.fetchHaystacks.FetchHaystacksResult;
+import com.nemator.needle.tasks.fetchHaystacks.FetchHaystacksTask;
 import com.nemator.needle.utils.AppState;
 import com.shamanland.fab.FloatingActionButton;
 
 import java.util.ArrayList;
-
-import it.neokree.materialnavigationdrawer.MaterialNavigationDrawer;
 
 public class HaystackListFragment extends Fragment implements FetchHaystacksTask.FetchHaystackResponseHandler, SwipeRefreshLayout.OnRefreshListener{
     private static final String TAG = "HaystackListFragment";
@@ -33,10 +30,12 @@ public class HaystackListFragment extends Fragment implements FetchHaystacksTask
     private FloatingActionButton fab;
     private ViewPager haystackListViewPager;
     private SlidingTabLayout mSlidingTabLayout;
+    private SwipeRefreshLayout refreshLayout;
 
     //Objects
     private HaystackListPagerAdapter mHaystackListPagerAdapter;
     private OnActivityStateChangeListener stateChangeCallback;
+    private CreateHaystackFabListener fabListener;
 
     //Data
     public ArrayList<HaystackVO> publicHaystacks = null;
@@ -86,13 +85,15 @@ public class HaystackListFragment extends Fragment implements FetchHaystacksTask
             rootView = inflater.inflate(R.layout.fragment_haystack_list, container, false);
 
             //FAB
+            fabListener = ((MainActivity) getActivity());
             fab = (FloatingActionButton) rootView.findViewById(R.id.fab);
             fab.setColor(getResources().getColor(R.color.primary));
             fab.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    ((MaterialNavigationDrawer) getActivity()).setFragment(CreateHaystackFragment.newInstance(), getString(R.string.create_haystack));
-                    stateChangeCallback.onStateChange(AppState.CREATE_HAYSTACK_GENERAL_INFOS);
+                    fabListener.onCreateHaystackFabTapped();
+                    /*((MaterialNavigationDrawer) getActivity()).setFragment(CreateHaystackFragment.newInstance(), getString(R.string.create_haystack));
+                    stateChangeCallback.onStateChange(AppState.CREATE_HAYSTACK_GENERAL_INFOS);*/
                 }
             });
             fab.initBackground();
@@ -142,11 +143,7 @@ public class HaystackListFragment extends Fragment implements FetchHaystacksTask
     }
 
     public void fetchHaystacks(){
-        HaystackListTabFragment publicTab = mHaystackListPagerAdapter.getPublicHaystackListFragment();
-        HaystackListTabFragment privateTab = mHaystackListPagerAdapter.getPrivateHaystackListFragment();
-
-        SwipeRefreshLayout refreshLayout = (stateChangeCallback.getCurrentState() == AppState.LOCATION_SHARING_RECEIVED_TAB) ? publicTab.getRefreshLayout() : privateTab.getRefreshLayout();
-        FetchHaystacksParams params = new FetchHaystacksParams(getUserName(), String.valueOf(getUserId()), rootView.getContext(), refreshLayout);
+        FetchHaystacksParams params = new FetchHaystacksParams(getUserName(), String.valueOf(getUserId()), rootView.getContext());
 
         try{
             FetchHaystacksTask task = new FetchHaystacksTask(params, this);
@@ -154,6 +151,12 @@ public class HaystackListFragment extends Fragment implements FetchHaystacksTask
         }catch(Exception e){
             Log.e(TAG, "fetchHaystacks exception : " + e.toString());
         }
+    }
+
+    @Override
+    public void onResume(){
+        super.onResume();
+        fetchHaystacks();
     }
 
     @Override public void onRefresh() {
@@ -164,10 +167,18 @@ public class HaystackListFragment extends Fragment implements FetchHaystacksTask
         publicHaystacks = result.publicHaystackList;
         privateHaystacks = result.privateHaystackList;
 
+        HaystackListTabFragment publicTab = mHaystackListPagerAdapter.getPublicHaystackListFragment();
+        HaystackListTabFragment privateTab = mHaystackListPagerAdapter.getPrivateHaystackListFragment();
+
+        publicTab.getRefreshLayout().setRefreshing(false);
+        privateTab.getRefreshLayout().setRefreshing(false);
+
+        //Show how many haystacks are available in the Nav Drawer
         int count = publicHaystacks.size() + privateHaystacks.size();
         ((MainActivity) getActivity()).setHaystacksCount(count);
 
-        mHaystackListPagerAdapter.getPrivateHaystackListFragment().updateHaystackList();
+        mHaystackListPagerAdapter.getPublicHaystackListFragment().updateHaystackList(publicHaystacks);
+        mHaystackListPagerAdapter.getPrivateHaystackListFragment().updateHaystackList(privateHaystacks);
     }
 
     private int getUserId(){
@@ -180,5 +191,9 @@ public class HaystackListFragment extends Fragment implements FetchHaystacksTask
 
     public void goToTab(int tab){
         haystackListViewPager.setCurrentItem(tab);
+    }
+
+    public interface CreateHaystackFabListener{
+        void onCreateHaystackFabTapped();
     }
 }

@@ -87,9 +87,20 @@ public class LocationSharingListTabFragment extends Fragment{
         stateChangeCallback.onStateChange(state);
     }
 
-    public void updateLocationSharingList(){
+    @Override
+    public void onViewCreated(View view, Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
         if(mAdapter != null){
-            mAdapter.notifyDataSetChanged();
+            mRecyclerView.setAdapter(mAdapter);
+        }
+    }
+
+    public void updateLocationSharingList(ArrayList<LocationSharingVO> data){
+        this.dataList = data;
+        if(mAdapter != null){
+            mAdapter = new LocationSharingListCardAdapter(dataList, getActivity());
+            mRecyclerView.setAdapter(mAdapter);
         }
     }
 

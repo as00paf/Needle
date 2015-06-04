@@ -1,12 +1,10 @@
 package com.nemator.needle.view.haystacks.createHaystack;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.speech.RecognizerIntent;
-import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -15,18 +13,17 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.nemator.needle.R;
+import com.nemator.needle.models.vo.UserVO;
 import com.nemator.needle.tasks.retrieveUsers.RetrieveUsersParams;
 import com.nemator.needle.tasks.retrieveUsers.RetrieveUsersResult;
 import com.nemator.needle.tasks.retrieveUsers.RetrieveUsersTask;
-import com.nemator.needle.models.vo.UserVO;
 import com.nemator.needle.utils.AppState;
-import com.nemator.needle.view.haystacks.OnActivityStateChangeListener;
 import com.quinny898.library.persistentsearch.SearchBox;
 import com.quinny898.library.persistentsearch.SearchResult;
 
 import java.util.ArrayList;
 
-public class CreateHaystackUsersFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener, RetrieveUsersTask.RetrieveUsersResponseHandler{
+public class CreateHaystackUsersFragment extends CreateHaystackBaseFragment implements SwipeRefreshLayout.OnRefreshListener, RetrieveUsersTask.RetrieveUsersResponseHandler{
 
     public static final String TAG = "CreateHaystackUsersFragment";
 
@@ -35,12 +32,10 @@ public class CreateHaystackUsersFragment extends Fragment implements SwipeRefres
     private CreateHaystackUserListCardAdapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
     private SwipeRefreshLayout swipeLayout;
-    private View rootView;
     private SearchBox searchBox;
 
     //Data
     private SearchBox.SearchListener searchListener;
-    private OnActivityStateChangeListener stateChangeCallback;
     private ArrayList<UserVO> usersList;
     private int userId = -1;
 
@@ -52,28 +47,6 @@ public class CreateHaystackUsersFragment extends Fragment implements SwipeRefres
     }
 
     public CreateHaystackUsersFragment() {
-    }
-
-    @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-
-        try {
-            stateChangeCallback = (OnActivityStateChangeListener) getActivity();
-        } catch (ClassCastException e) {
-            throw new ClassCastException(activity.toString()
-                    + " must implement OnActivityStateChangeListener");
-        }
-    }
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setHasOptionsMenu(true);
-        if (getArguments() != null) {
-        }
-
-        this.setRetainInstance(true);
     }
 
     @Override
@@ -136,7 +109,6 @@ public class CreateHaystackUsersFragment extends Fragment implements SwipeRefres
     private void addFriendsSuggestion(){
 
     }
-
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {

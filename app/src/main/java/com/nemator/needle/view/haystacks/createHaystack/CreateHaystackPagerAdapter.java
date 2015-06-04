@@ -10,9 +10,6 @@ import com.nemator.needle.view.haystacks.HaystackListTabFragment;
 
 import java.util.ArrayList;
 
-/**
- * Created by Alex on 12/04/2015.
- */
 public class CreateHaystackPagerAdapter extends FragmentStatePagerAdapter {
     private Fragment fragment;
     private ArrayList<Fragment> fragmentList = new ArrayList<Fragment>();

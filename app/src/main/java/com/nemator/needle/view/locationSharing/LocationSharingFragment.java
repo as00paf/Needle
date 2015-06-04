@@ -176,10 +176,12 @@ public class LocationSharingFragment extends Fragment implements SwipeRefreshLay
         receivedLocationsList = result.receivedLocationSharingList;
         sentLocationsList = result.sentLocationSharingList;
 
-        ((MainActivity) getActivity()).setLocationSharingCount(receivedLocationsList.size());
+        if(receivedLocationsList != null){
+            ((MainActivity) getActivity()).setLocationSharingCount(receivedLocationsList.size());
+        }
 
-        mLocationSharingPagerAdapter.getReceivedFragment().updateLocationSharingList();
-        mLocationSharingPagerAdapter.getSentFragment().updateLocationSharingList();
+        mLocationSharingPagerAdapter.getReceivedFragment().updateLocationSharingList(receivedLocationsList);
+        mLocationSharingPagerAdapter.getSentFragment().updateLocationSharingList(sentLocationsList);
     }
 
     private int getUserId(){

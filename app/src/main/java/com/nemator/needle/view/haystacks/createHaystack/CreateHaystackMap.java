@@ -59,7 +59,6 @@ public class CreateHaystackMap extends SupportMapFragment
 
     private GoogleMap mMap;
     private Marker mMarker;
-    private HashMap<String, Marker> mMarkers;
     private String username = "";
     private int userId = -1;
     private Circle mCircle;

@@ -66,9 +66,10 @@ public class CreateHaystackFragment extends Fragment implements CreateHaystackTa
     private FloatingActionButton fab;
     private CirclePageIndicator viewPagerIndicator;
 
-    private CreateHaystackGeneralInfosFragment mCreateHaystackGenInfosFragment;
-    private CreateHaystackMapFragment mCreateHaystackMapFragment;
-    private CreateHaystackUsersFragment mCreateHaystackUsersFragment;
+    //Fragments
+    public CreateHaystackGeneralInfosFragment mCreateHaystackGenInfosFragment;
+    public CreateHaystackMapFragment mCreateHaystackMapFragment;
+    public CreateHaystackUsersFragment mCreateHaystackUsersFragment;
 
     private CreateHaystackMap mMap;
 

@@ -1,6 +1,7 @@
-package com.nemator.needle.tasks.fetchHaystack;
+package com.nemator.needle.tasks.fetchHaystacks;
 
 import android.os.AsyncTask;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.Log;
 
 import com.google.android.gms.maps.model.LatLng;
@@ -37,14 +38,7 @@ public class FetchHaystacksTask extends AsyncTask<Void, Void, FetchHaystacksResu
     }
 
     @Override
-    protected void onPreExecute() {
-        if(params.refreshLayout != null) params.refreshLayout.setRefreshing(true);
-        super.onPreExecute();
-    }
-
-    @Override
     protected void onPostExecute(FetchHaystacksResult result) {
-        if(params.refreshLayout != null) params.refreshLayout.setRefreshing(false);
         delegate.onHaystackFetched(result);
     }
 

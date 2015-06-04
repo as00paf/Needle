@@ -20,24 +20,15 @@ public class HaystackListPagerAdapter extends FragmentStatePagerAdapter {
 
     @Override
     public Fragment getItem(int position) {
-        HaystackListTabFragment fragment;
-
-            /*switch (position){
-                case 0://Public tab
-                    fragment = getPublicHaystackListFragment();
-                    break;
-                case 1://Private tab
-                    fragment = getPrivateHaystackListFragment();
-                    break;
-                default:
-                    fragment = new HaystackListTabFragment();
-                    break;
-            }*/
-
-        fragment = new HaystackListTabFragment();
+        HaystackListTabFragment fragment  = new HaystackListTabFragment();
 
         Bundle args = new Bundle();
         Boolean isPublic = (position == 0);
+        if(isPublic){
+            publicHaystackListFragment = fragment;
+        }else{
+            privateHaystackListFragment = fragment;
+        }
         args.putBoolean("isPublic", isPublic);
         fragment.setArguments(args);
 
@@ -45,18 +36,10 @@ public class HaystackListPagerAdapter extends FragmentStatePagerAdapter {
     }
 
     public HaystackListTabFragment getPublicHaystackListFragment(){
-        if(publicHaystackListFragment == null) {
-            publicHaystackListFragment = new HaystackListTabFragment();
-        }
-
         return publicHaystackListFragment;
     }
 
     public HaystackListTabFragment getPrivateHaystackListFragment(){
-        if(privateHaystackListFragment == null) {
-            privateHaystackListFragment = new HaystackListTabFragment();
-        }
-
         return privateHaystackListFragment;
     }
 

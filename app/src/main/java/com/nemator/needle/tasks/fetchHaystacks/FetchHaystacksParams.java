@@ -1,19 +1,18 @@
-package com.nemator.needle.tasks.fetchHaystack;
+package com.nemator.needle.tasks.fetchHaystacks;
 
 import android.content.Context;
 import android.support.v4.widget.SwipeRefreshLayout;
-import android.widget.ProgressBar;
+
+import java.lang.ref.WeakReference;
 
 public class FetchHaystacksParams {
     public String userName;
     public String userId;
-    public SwipeRefreshLayout refreshLayout;
     public Context context;
 
-    public FetchHaystacksParams(String userName, String userId, Context context, SwipeRefreshLayout refreshLayout){
+    public FetchHaystacksParams(String userName, String userId, Context context){
         this.userName = userName;
         this.userId = userId;
-        this.refreshLayout = refreshLayout;
         this.context = context;
     }
 }

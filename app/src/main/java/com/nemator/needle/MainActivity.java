@@ -1,10 +1,12 @@
 package com.nemator.needle;
 
+import android.app.ActivityOptions;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -25,7 +27,8 @@ import it.neokree.materialnavigationdrawer.elements.MaterialAccount;
 import it.neokree.materialnavigationdrawer.elements.MaterialSection;
 import it.neokree.materialnavigationdrawer.elements.listeners.MaterialSectionListener;
 
-public class MainActivity extends MaterialNavigationDrawer implements LoginTask.LoginResponseHandler, OnActivityStateChangeListener, MaterialSectionListener {
+public class MainActivity extends MaterialNavigationDrawer implements LoginTask.LoginResponseHandler,
+        OnActivityStateChangeListener, MaterialSectionListener, HaystackListFragment.CreateHaystackFabListener, SwipeRefreshLayout.OnRefreshListener {
     public static String TAG = "MainActivity";
 
     private SharedPreferences mSharedPreferences;
@@ -46,6 +49,8 @@ public class MainActivity extends MaterialNavigationDrawer implements LoginTask.
 
     private MaterialSection locationSharingSection;
     private LocationSharingFragment locationSharingFragment;
+
+    private CreateHaystackFragment createHaystackFragment;
 
     private MaterialSection logOutSection;
 
@@ -118,19 +123,19 @@ public class MainActivity extends MaterialNavigationDrawer implements LoginTask.
                 break;
             case AppState.CREATE_HAYSTACK_MAP:
                 //Goto General Infos
-                ((CreateHaystackFragment) getSupportFragmentManager().getFragments().get(0)).goToPage(0);
+                createHaystackFragment.goToPage(0);
                 break;
             case AppState.CREATE_HAYSTACK_USERS:
                 //Goto Map
-                ((CreateHaystackFragment) getSupportFragmentManager().getFragments().get(0)).goToPage(1);
+                createHaystackFragment.goToPage(1);
                 break;
             case AppState.CREATE_HAYSTACK_MAP_SEARCH_OPEN:
                 //Close Search
-                ((CreateHaystackMapFragment) getSupportFragmentManager().getFragments().get(4)).closeSearchResults();
+                createHaystackFragment.mCreateHaystackMapFragment.closeSearchResults();
                 break;
             case AppState.CREATE_HAYSTACK_USERS_SEARCH_OPEN:
                 //Close Search
-                ((CreateHaystackUsersFragment) getSupportFragmentManager().getFragments().get(5)).closeSearchResults();
+                createHaystackFragment.mCreateHaystackUsersFragment.closeSearchResults();
                 break;
             case AppState.LOCATION_SHARING_RECEIVED_TAB:
                 showHaystacksFragment();
@@ -169,6 +174,12 @@ public class MainActivity extends MaterialNavigationDrawer implements LoginTask.
         super.onClick(section);
     }
 
+
+    @Override
+    public void onRefresh() {
+        haystacksListFragment.fetchHaystacks();
+    }
+
     private void logOut(){
         new AlertDialog.Builder(this)
                 .setIcon(android.R.drawable.ic_dialog_alert)
@@ -188,40 +199,41 @@ public class MainActivity extends MaterialNavigationDrawer implements LoginTask.
 
     //Handlers
     public void onLoginComplete(AuthenticationResult result){
-        if (!loggedIn){
-            if(result.successCode == 1){
-                loggedIn = true;
+        if(result.successCode == 1){
+            loggedIn = true;
 
-                //Add/Remove Sections
-                this.removeSection(loginSection);
+            //Add/Remove Sections
+            this.removeSection(loginSection);
 
-                haystacksSection = newSection(getString(R.string.title_haystacks), R.drawable.ic_haystack, haystacksListFragment);
-                this.addSection(haystacksSection);
+            haystacksSection = newSection(getString(R.string.title_haystacks), R.drawable.ic_haystack, haystacksListFragment);
+            this.addSection(haystacksSection);
 
-                locationSharingFragment = new LocationSharingFragment();
-                locationSharingSection = newSection(getString(R.string.title_location_sharing), R.drawable.ic_action_location_found, locationSharingFragment);
-                this.addSection(locationSharingSection);
-                this.addDivisor();
+            locationSharingFragment = new LocationSharingFragment();
+            locationSharingSection = newSection(getString(R.string.title_location_sharing), R.drawable.ic_action_location_found, locationSharingFragment);
+            this.addSection(locationSharingSection);
+            this.addDivisor();
 
-                logOutSection = newSection(getString(R.string.title_logOut), R.drawable.ic_action_exit, this);
-                this.addSection(logOutSection);
-                this.addDivisor();
+            logOutSection = newSection(getString(R.string.title_logOut), R.drawable.ic_action_exit, this);
+            this.addSection(logOutSection);
+            this.addDivisor();
 
-                //Account
-                String username = mSharedPreferences.getString("username", "");
-                String email = mSharedPreferences.getString("email", "");
+            //Account
+            String username = mSharedPreferences.getString("username", "");
+            String email = mSharedPreferences.getString("email", "");
 
-                MaterialAccount account = new MaterialAccount(getResources(), username, email, R.drawable.me, R.drawable.mat);
-                this.setFirstAccountPhoto(getResources().getDrawable(R.drawable.me));//TODO:Get picture from cache
-                this.addAccount(account);
+            MaterialAccount account = new MaterialAccount(getResources(), username, email, R.drawable.me, R.drawable.mat);
+            this.setFirstAccountPhoto(getResources().getDrawable(R.drawable.me));//TODO:Get picture from cache
+            this.addAccount(account);
 
-                showHaystacksFragment();
-            }else {
-                Toast.makeText(this, "An Error Occured\n Please Try Again!", Toast.LENGTH_SHORT).show();
-            }
-        }else{
-            Log.e(TAG, "onLoginComplete::who called me !?!");
+            showHaystacksFragment();
+        }else {
+            Toast.makeText(this, "An Error Occured\n Please Try Again!", Toast.LENGTH_SHORT).show();
         }
+    }
+
+    @Override
+    public void onCreateHaystackFabTapped() {
+        showCreateHaystackFragment();
     }
 
     private void showLoginFragment(Boolean updateSections){
@@ -244,6 +256,12 @@ public class MainActivity extends MaterialNavigationDrawer implements LoginTask.
     private void showLocationSharingFragment(){
         this.setFragment(locationSharingFragment, getString(R.string.title_location_sharing));
         onStateChange(AppState.LOCATION_SHARING_RECEIVED_TAB);
+    }
+
+    private void showCreateHaystackFragment(){
+        createHaystackFragment = new CreateHaystackFragment();
+        this.setFragment(createHaystackFragment, getString(R.string.create_haystack));
+        onStateChange(AppState.CREATE_HAYSTACK_GENERAL_INFOS);
     }
 
     //Getters/Setters

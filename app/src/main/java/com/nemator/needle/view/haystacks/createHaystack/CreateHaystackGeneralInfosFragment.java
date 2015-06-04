@@ -12,7 +12,6 @@ import android.view.ViewGroup;
 import android.widget.CompoundButton;
 import android.widget.DatePicker;
 import android.widget.EditText;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.TimePicker;
@@ -35,13 +34,10 @@ public class CreateHaystackGeneralInfosFragment extends CreateHaystackBaseFragme
     public static final String SQL_TIME_FORMAT = "HH:mm";
     public static final String TAG = "CreateHaystackGeneralInfosFragment";
 
-    private View rootView;
-
     //Children
     private EditText txtName, dateLimitEditText, timeLimitEditText;
     private SwitchCompat isPublicSwitch;
-    private ImageButton changeTimeLimitButton;
-    private TextView timeLimitText, usersLabel, privacyLabel;
+    private TextView privacyLabel;
     private Calendar calendar;
 
     private String dateLimit;
@@ -66,12 +62,6 @@ public class CreateHaystackGeneralInfosFragment extends CreateHaystackBaseFragme
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-        }
-
-        setHasOptionsMenu(true);
-        this.setRetainInstance(true);
-
         connectToApiClient();
     }
 

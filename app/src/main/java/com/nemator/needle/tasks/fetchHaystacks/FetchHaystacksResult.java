@@ -1,4 +1,4 @@
-package com.nemator.needle.tasks.fetchHaystack;
+package com.nemator.needle.tasks.fetchHaystacks;
 
 import com.nemator.needle.models.vo.HaystackVO;
 

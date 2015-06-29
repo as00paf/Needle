@@ -1,15 +1,16 @@
 package com.nemator.needle.view.haystack;
 
-import android.app.Activity;
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
-import android.content.IntentSender;
-import android.content.SharedPreferences;
+import android.content.IntentFilter;
+import android.content.ServiceConnection;
 import android.graphics.Point;
 import android.location.Location;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.IBinder;
 import android.os.SystemClock;
-import android.preference.PreferenceManager;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.MenuItem;
@@ -19,10 +20,6 @@ import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
-import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.location.LocationListener;
-import com.google.android.gms.location.LocationRequest;
-import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.Projection;
@@ -34,8 +31,10 @@ import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.nemator.broadcastReceiver.LocationServiceBroadcastReceiver;
 import com.nemator.needle.R;
 import com.nemator.needle.models.vo.HaystackVO;
+import com.nemator.needle.service.NeedleLocationService;
 import com.nemator.needle.tasks.TaskResult;
 import com.nemator.needle.tasks.activate.ActivateUserParams;
 import com.nemator.needle.tasks.activate.ActivateUserTask;
@@ -43,12 +42,11 @@ import com.nemator.needle.tasks.deactivate.DeactivateUserParams;
 import com.nemator.needle.tasks.deactivate.DeactivateUserTask;
 import com.nemator.needle.tasks.leaveHaystack.LeaveHaystackParams;
 import com.nemator.needle.tasks.leaveHaystack.LeaveHaystackTask;
-import com.nemator.needle.tasks.postLocation.PostLocationParams;
-import com.nemator.needle.tasks.postLocation.PostLocationTask;
 import com.nemator.needle.tasks.retrieveLocations.RetrieveLocationsParams;
 import com.nemator.needle.tasks.retrieveLocations.RetrieveLocationsResult;
 import com.nemator.needle.tasks.retrieveLocations.RetrieveLocationsTask;
 import com.nemator.needle.utils.AppConstants;
+import com.nemator.needle.utils.AppUtils;
 
 import java.text.DateFormat;
 import java.util.ArrayList;
@@ -57,31 +55,35 @@ import java.util.HashMap;
 import java.util.Iterator;
 
 public class HaystackMapFragment extends SupportMapFragment
-        implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener,
-        LocationListener, RetrieveLocationsTask.RetrieveLocationsResponseHandler, ActivateUserTask.ActivateUserResponseHandler,
-        DeactivateUserTask.DeactivateUserResponseHandler, LeaveHaystackTask.LeaveHaystackResponseHandler{
+        implements RetrieveLocationsTask.RetrieveLocationsResponseHandler, ActivateUserTask.ActivateUserResponseHandler,
+        DeactivateUserTask.DeactivateUserResponseHandler, LeaveHaystackTask.LeaveHaystackResponseHandler, LocationServiceBroadcastReceiver.LocationServiceDelegate {
+
     public static final String TAG = "HaystackMapFragment";
 
+    //Locations
     private ArrayList<HashMap<String, Object>> mLocationList = new ArrayList<HashMap<String, Object>>();
-
-    private GoogleApiClient mGoogleApiClient;
     private Location mCurrentLocation;
     private LatLng mCurrentPosition;
-    private String mLastUpdateTime;
-    private LocationRequest mLocationRequest;
+
     private Boolean mRequestingLocationUpdates = true;
-    private Boolean mPostingLocationUpdates = false;
-    private Boolean isActivated = false;
     private Boolean locationUpdatesStarted = false;
 
+    //Map
     private GoogleMap mMap;
     private Marker mMarker;
-    private HashMap<String, Marker> mMarkers;
-    private String username = "";
-    private int userId = -1;
-    private HaystackVO haystack;
     private Circle mCircle;
+
+    //Map data
+    private HashMap<String, Marker> mMarkers;
+    private HaystackVO haystack;
     private Boolean cameraUpdated = false;
+
+    //Location Service
+    private ServiceConnection mConnection;
+    private NeedleLocationService locationService;
+    private LocationServiceBroadcastReceiver locationServiceBroadcastReceiver;
+    private Boolean mPostingLocationUpdates = false;
+    private Boolean isActivated = false;
 
     //Constructors
     public static HaystackMapFragment newInstance() {
@@ -107,6 +109,24 @@ public class HaystackMapFragment extends SupportMapFragment
             Log.e(TAG, "Google Play Services Unavailable");
         }
 
+        //Location Service
+        mConnection = new ServiceConnection(){
+            public void onServiceConnected(ComponentName className, IBinder service) {
+                locationService = ((NeedleLocationService.LocalBinder)service).getService();
+            }
+
+            public void onServiceDisconnected(ComponentName className) {
+                locationService = null;
+            }
+        };
+
+        getActivity().bindService(new Intent(getActivity(),
+                NeedleLocationService.class), mConnection, Context.BIND_AUTO_CREATE);
+
+        //Broadcast Receiver
+        locationServiceBroadcastReceiver = new LocationServiceBroadcastReceiver(this);
+        getActivity().registerReceiver(locationServiceBroadcastReceiver, new IntentFilter(AppConstants.LOCATION_UPDATED));
+
         //Action Bar
         setHasOptionsMenu(true);
     }
@@ -122,9 +142,6 @@ public class HaystackMapFragment extends SupportMapFragment
                 Double lng = mCurrentLocation.getLongitude();
                 mCurrentPosition = new LatLng(lat, lng);
             }
-            if (savedInstanceState.keySet().contains(AppConstants.LAST_UPDATED_TIME_STRING_KEY)) {
-                mLastUpdateTime = savedInstanceState.getString(AppConstants.LAST_UPDATED_TIME_STRING_KEY);
-            }
         }
 
         haystack = ((HaystackActivity) getActivity()).getHaystack();
@@ -134,7 +151,6 @@ public class HaystackMapFragment extends SupportMapFragment
     public void onSaveInstanceState(Bundle savedInstanceState) {
         savedInstanceState.putBoolean(AppConstants.REQUESTING_LOCATION_UPDATES_KEY, mRequestingLocationUpdates);
         savedInstanceState.putParcelable(AppConstants.LOCATION_KEY, mCurrentLocation);
-        savedInstanceState.putString(AppConstants.LAST_UPDATED_TIME_STRING_KEY, mLastUpdateTime);
     }
 
     @Override
@@ -153,13 +169,13 @@ public class HaystackMapFragment extends SupportMapFragment
     public void onDetach() {
         super.onDetach();
 
-        stopLocationUpdates();
+        //stopLocationUpdates();
     }
 
     @Override
     public void onPause() {
         super.onPause();
-        stopLocationUpdates();
+        //stopLocationUpdates();
 
         if(isActivated) deactivateUser();
     }
@@ -168,20 +184,7 @@ public class HaystackMapFragment extends SupportMapFragment
     @Override
     public void onStop() {
         super.onStop();
-        stopLocationUpdates();
-    }
-
-    //Google Client Methods
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        switch (requestCode) {
-            case AppConstants.CONNECTION_FAILURE_RESOLUTION_REQUEST :
-                switch (resultCode) {
-                    case Activity.RESULT_OK :
-
-                        break;
-                }
-        }
+        //stopLocationUpdates();
     }
 
     @Override
@@ -209,100 +212,15 @@ public class HaystackMapFragment extends SupportMapFragment
         return super.onOptionsItemSelected(item);
     }
 
-    private void connectToApiClient(){
-        if(mGoogleApiClient == null){
-            buildGoogleApiClient();
-            createLocationRequest();
-            mGoogleApiClient.connect();
-        }
-    }
-
-    protected synchronized void buildGoogleApiClient() {
-        mGoogleApiClient = new GoogleApiClient.Builder(getActivity())
-                .addConnectionCallbacks(this)
-                .addOnConnectionFailedListener(this)
-                .addApi(LocationServices.API)
-                .build();
-    }
-
-    protected void createLocationRequest() {
-        mLocationRequest = new LocationRequest();
-        mLocationRequest.setInterval(AppConstants.UPDATE_INTERVAL);
-        mLocationRequest.setFastestInterval(AppConstants.FASTEST_INTERVAL);
-        mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-    }
-
-    protected void startLocationUpdates() {
-        LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
-        locationUpdatesStarted = true;
-    }
-
-    protected void stopLocationUpdates() {
-        if(mGoogleApiClient != null && mGoogleApiClient.isConnected()){
-            LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
-        }
-
-        locationUpdatesStarted = false;
-    }
-
-    @Override
-    public void onConnected(Bundle connectionHint) {
-        if (mRequestingLocationUpdates) {
-            startLocationUpdates();
-        }
-
-        Toast.makeText(getActivity(), "Connected", Toast.LENGTH_SHORT).show();
-
-        mCurrentLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
-        if(mCurrentLocation != null){
-            Double lat = mCurrentLocation.getLatitude();
-            Double lng = mCurrentLocation.getLongitude();
-            mCurrentPosition = new LatLng(lat, lng);
-
-            updateMap();
-            moveCamera();
-        }
-
-        retrieveLocations();
-    }
-
-    @Override
-    public void onConnectionSuspended(int i) {
-
-    }
-
-    @Override
-    public void onConnectionFailed(ConnectionResult connectionResult) {
-        if (connectionResult.hasResolution()) {
-            try {
-                connectionResult.startResolutionForResult(getActivity(), AppConstants.CONNECTION_FAILURE_RESOLUTION_REQUEST);
-            } catch (IntentSender.SendIntentException e) {
-                e.printStackTrace();
-            }
-        } else {
-            showErrorDialog(connectionResult.getErrorCode());
-        }
-    }
-
-    private void showErrorDialog(int errorCode){
-        Toast.makeText(getActivity(), "Error encountered\nError # :"+errorCode, Toast.LENGTH_SHORT).show();
-    }
-
-    @Override
-    public void onLocationChanged(Location location) {
+    public void onLocationUpdated(Location location) {
         mCurrentLocation = location;
-        mLastUpdateTime = DateFormat.getTimeInstance().format(new Date());
-        Double lat = mCurrentLocation.getLatitude();
-        Double lng = mCurrentLocation.getLongitude();
-        mCurrentPosition = new LatLng(lat, lng);
+        mCurrentPosition = new LatLng(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude());
 
         updateMap();
 
-        if(!cameraUpdated){
+        if(!cameraUpdated)
             moveCamera();
-        }
 
-        postLocation();
         retrieveLocations();
     }
 
@@ -310,12 +228,7 @@ public class HaystackMapFragment extends SupportMapFragment
     public void setUpMapIfNeeded() {
         if (mMap == null) {
             mMap = getMap();
-
-            if (mMap != null) {
-                Log.i(TAG, "Map set up");
-                connectToApiClient();
-            }
-        }else if(mGoogleApiClient.isConnected()){
+        }else if(locationService.isConnected()){
             resumeOperations();
         }
     }
@@ -342,7 +255,7 @@ public class HaystackMapFragment extends SupportMapFragment
                 Double lat = (Double) map.get(AppConstants.TAG_LAT);
                 Double lng = (Double) map.get(AppConstants.TAG_LNG);
 
-                if(!TextUtils.isEmpty(id) && !id.equals(getUserName())){
+                if(!TextUtils.isEmpty(id) && !id.equals(AppUtils.getUserName(getActivity()))){
                     Marker marker;
                     LatLng position = new LatLng(lat, lng);
 
@@ -365,7 +278,7 @@ public class HaystackMapFragment extends SupportMapFragment
                         }
 
                         //marker.showInfoWindow();
-                    }else if(!(id.equals(String.valueOf(getUserId())))){
+                    }else if(!(id.equals(String.valueOf(AppUtils.getUserId(getActivity()))))){
                         MarkerOptions markerOptions = new MarkerOptions();
                         markerOptions.position(position);
 
@@ -437,7 +350,7 @@ public class HaystackMapFragment extends SupportMapFragment
                 Double lat = (Double) map.get(AppConstants.TAG_LAT);
                 Double lng = (Double) map.get(AppConstants.TAG_LNG);
 
-                if(!TextUtils.isEmpty(id) && !id.equals(getUserName())){
+                if(!TextUtils.isEmpty(id) && !id.equals(AppUtils.getUserName(getActivity()))){
                     Marker marker;
                     LatLng position = new LatLng(lat, lng);
 
@@ -457,13 +370,9 @@ public class HaystackMapFragment extends SupportMapFragment
             }
         }
 
-        if(!locationUpdatesStarted)
-            startLocationUpdates();
-
         updateMap();
         moveCamera();
 
-        postLocation();
         retrieveLocations();
     }
 
@@ -540,17 +449,8 @@ public class HaystackMapFragment extends SupportMapFragment
     }
 
     //Actions
-    public void postLocation(){
-        if(!mPostingLocationUpdates){
-            return;
-        }
-
-        PostLocationParams params = new PostLocationParams(getActivity(), getUserName(), String.valueOf(getUserId()), mCurrentLocation, mCurrentPosition, false);
-        new PostLocationTask(params).execute();
-    }
-
     public void retrieveLocations(){
-        RetrieveLocationsParams params = new RetrieveLocationsParams(getUserName(), String.valueOf(getUserId()), String.valueOf(haystack.getId()), false);
+        RetrieveLocationsParams params = new RetrieveLocationsParams(AppUtils.getUserName(getActivity()), AppUtils.getUserId(getActivity()), String.valueOf(haystack.getId()), false);
         try{
             RetrieveLocationsTask task = new RetrieveLocationsTask(params, this);
             task.execute();
@@ -567,7 +467,7 @@ public class HaystackMapFragment extends SupportMapFragment
     }
 
     public void activateUser(){
-        ActivateUserParams params = new ActivateUserParams(getActivity(), String.valueOf(getUserId()), String.valueOf(haystack.getId()));
+        ActivateUserParams params = new ActivateUserParams(getActivity(), AppUtils.getUserId(getActivity()), String.valueOf(haystack.getId()));
         isActivated = false;
 
         try{
@@ -592,7 +492,7 @@ public class HaystackMapFragment extends SupportMapFragment
     }
 
     public void deactivateUser(){
-        DeactivateUserParams params = new DeactivateUserParams(getActivity(), String.valueOf(getUserId()), String.valueOf(haystack.getId()));
+        DeactivateUserParams params = new DeactivateUserParams(getActivity(), AppUtils.getUserId(getActivity()), String.valueOf(haystack.getId()));
 
         try{
             DeactivateUserTask task = new DeactivateUserTask(params, this);
@@ -616,7 +516,7 @@ public class HaystackMapFragment extends SupportMapFragment
     }
 
     private void leaveHaystack(){
-        LeaveHaystackParams params = new LeaveHaystackParams(getActivity(), String.valueOf(userId), String.valueOf(haystack.getId()));
+        LeaveHaystackParams params = new LeaveHaystackParams(getActivity(), AppUtils.getUserId(getActivity()), String.valueOf(haystack.getId()));
         try{
             LeaveHaystackTask task = new LeaveHaystackTask(params, this);
             task.execute();
@@ -639,7 +539,8 @@ public class HaystackMapFragment extends SupportMapFragment
     public void shareLocation(){
         mPostingLocationUpdates = true;
         activateUser();
-        postLocation();
+        locationService.isPostingLocationUpdates(true);
+        locationService.postLocation();
     }
 
     public void stopSharingLocation(){
@@ -656,28 +557,7 @@ public class HaystackMapFragment extends SupportMapFragment
     }
 
     //Getters/Setters
-    private String getUserName(){
-        if(username == ""){
-            SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getActivity());
-            username = sp.getString("username", "");
-        }
-
-        return username;
-    }
-
-    public int getUserId(){
-        if(userId==-1){
-            SharedPreferences sp = PreferenceManager
-                    .getDefaultSharedPreferences(getActivity());
-
-            userId = sp.getInt("userId", -1);
-        }
-
-        return userId;
-    }
-
     public Boolean isPostingLocationUpdates() {
         return mPostingLocationUpdates;
     }
-
 }

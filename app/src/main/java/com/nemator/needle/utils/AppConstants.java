@@ -16,6 +16,7 @@ public class AppConstants {
     public static final String TAG_USER_ID = "userId";
     public static final String TAG_ID = "id";
     public static final String TAG_PICTURE_URL = "pictureURL";
+    public static final String TAG_LOCATION = "location";
     public static final String TAG_LOCATIONS = "locations";
     public static final String TAG_LAT = "lat";
     public static final String TAG_LNG = "lng";
@@ -32,6 +33,7 @@ public class AppConstants {
     public final static int CONNECTION_FAILURE_RESOLUTION_REQUEST = 9000;
     public final static String HAYSTACK_DATA_KEY = "data";
     public final static String TAG_IS_OWNER = "isOwner";
+    public final static String LOCATION_UPDATED = "locationUpdated";
 
     //SharedPref keys
     public static final String REQUESTING_LOCATION_UPDATES_KEY = "isRequestingLocationUpdates";

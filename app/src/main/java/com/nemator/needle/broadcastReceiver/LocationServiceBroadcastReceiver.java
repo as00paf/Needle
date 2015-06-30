@@ -1,4 +1,4 @@
-package com.nemator.broadcastReceiver;
+package com.nemator.needle.broadcastReceiver;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;

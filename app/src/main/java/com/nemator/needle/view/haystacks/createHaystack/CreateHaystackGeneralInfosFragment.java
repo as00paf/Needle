@@ -152,7 +152,7 @@ public class CreateHaystackGeneralInfosFragment extends CreateHaystackBaseFragme
         super.onAttach(activity);
 
         try {
-            privacySettingsCallback = (CreateHaystackFragment) getParentFragment();
+            privacySettingsCallback = (CreateHaystackFragment) getFragmentManager().getFragments().get(0);
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString()
                     + " must implement OnHeadlineSelectedListener");
@@ -192,6 +192,6 @@ public class CreateHaystackGeneralInfosFragment extends CreateHaystackBaseFragme
     }
 
     public interface OnPrivacySettingsUpdatedListener{
-        public void onPrivacySettingsChanged(Boolean isPublic);
+        void onPrivacySettingsChanged(Boolean isPublic);
     }
 }

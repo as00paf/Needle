@@ -31,8 +31,9 @@ import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.nemator.broadcastReceiver.LocationServiceBroadcastReceiver;
+import com.nemator.needle.broadcastReceiver.LocationServiceBroadcastReceiver;
 import com.nemator.needle.R;
+import com.nemator.needle.data.LocationServiceDBHelper;
 import com.nemator.needle.models.vo.HaystackVO;
 import com.nemator.needle.service.NeedleLocationService;
 import com.nemator.needle.tasks.TaskResult;
@@ -48,9 +49,7 @@ import com.nemator.needle.tasks.retrieveLocations.RetrieveLocationsTask;
 import com.nemator.needle.utils.AppConstants;
 import com.nemator.needle.utils.AppUtils;
 
-import java.text.DateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 
@@ -66,7 +65,6 @@ public class HaystackMapFragment extends SupportMapFragment
     private LatLng mCurrentPosition;
 
     private Boolean mRequestingLocationUpdates = true;
-    private Boolean locationUpdatesStarted = false;
 
     //Map
     private GoogleMap mMap;
@@ -125,7 +123,6 @@ public class HaystackMapFragment extends SupportMapFragment
 
         //Broadcast Receiver
         locationServiceBroadcastReceiver = new LocationServiceBroadcastReceiver(this);
-        getActivity().registerReceiver(locationServiceBroadcastReceiver, new IntentFilter(AppConstants.LOCATION_UPDATED));
 
         //Action Bar
         setHasOptionsMenu(true);
@@ -162,6 +159,7 @@ public class HaystackMapFragment extends SupportMapFragment
     @Override
     public void onResume() {
         haystack = ((HaystackActivity) getActivity()).getHaystack();
+        getActivity().registerReceiver(locationServiceBroadcastReceiver, new IntentFilter(AppConstants.LOCATION_UPDATED));
         super.onResume();
     }
 
@@ -170,12 +168,14 @@ public class HaystackMapFragment extends SupportMapFragment
         super.onDetach();
 
         //stopLocationUpdates();
+        getActivity().unregisterReceiver(locationServiceBroadcastReceiver);
     }
 
     @Override
     public void onPause() {
         super.onPause();
         //stopLocationUpdates();
+        getActivity().unregisterReceiver(locationServiceBroadcastReceiver);
 
         if(isActivated) deactivateUser();
     }
@@ -539,12 +539,13 @@ public class HaystackMapFragment extends SupportMapFragment
     public void shareLocation(){
         mPostingLocationUpdates = true;
         activateUser();
-        locationService.isPostingLocationUpdates(true);
+        locationService.addPostLocationRequest(LocationServiceDBHelper.PostLocationRequest.POSTER_TYPE_HAYSTACK, haystack.getTimeLimit(), haystack.getId());
         locationService.postLocation();
     }
 
     public void stopSharingLocation(){
         mPostingLocationUpdates = false;
+        locationService.removePostLocationRequest(LocationServiceDBHelper.PostLocationRequest.POSTER_TYPE_HAYSTACK, haystack.getTimeLimit(), haystack.getId());
         deactivateUser();
     }
 

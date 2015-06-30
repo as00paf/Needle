@@ -6,7 +6,6 @@ import android.location.Location;
 import android.os.Binder;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.util.Log;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -16,8 +15,14 @@ import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.model.LatLng;
+import com.nemator.needle.tasks.addPostLocationRequest.AddPostLocationRequestParams;
+import com.nemator.needle.tasks.addPostLocationRequest.AddPostLocationRequestTask;
+import com.nemator.needle.tasks.TaskResult;
+import com.nemator.needle.tasks.isPostLocationRequestDBEmpty.IsPostLocationRequestDBEmptyTask;
+import com.nemator.needle.tasks.isPostLocationRequestDBEmpty.IsPostLocationRequestDBEmptyTask.IsPostLocationRequestDBEmptyResponseHandler;
 import com.nemator.needle.tasks.postLocation.PostLocationParams;
 import com.nemator.needle.tasks.postLocation.PostLocationTask;
+import com.nemator.needle.tasks.removePostLocationRequest.RemovePostLocationRequestTask;
 import com.nemator.needle.utils.AppConstants;
 import com.nemator.needle.utils.AppUtils;
 
@@ -27,7 +32,7 @@ import java.util.Date;
 public class NeedleLocationService extends Service implements
         GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener,
-        LocationListener{
+        LocationListener, AddPostLocationRequestTask.AddPostLocationRequestHandler, IsPostLocationRequestDBEmptyResponseHandler {
 
     private final IBinder mBinder = new LocalBinder();
     private Boolean servicesAvailable = false;
@@ -40,7 +45,6 @@ public class NeedleLocationService extends Service implements
     private Boolean mRequestingLocationUpdates = true;
 
     private Boolean mPostingLocationUpdates = false;
-    private Boolean isActivated = false;
     private Boolean locationUpdatesStarted = false;
 
     // Flag that indicates if a request is underway.
@@ -68,13 +72,7 @@ public class NeedleLocationService extends Service implements
         int resultCode = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this);
 
         // If Google Play services is available
-        if (ConnectionResult.SUCCESS == resultCode) {
-
-            return true;
-        } else {
-
-            return false;
-        }
+        return (ConnectionResult.SUCCESS == resultCode);
     }
 
     @Override
@@ -165,14 +163,27 @@ public class NeedleLocationService extends Service implements
         sendBroadcast(intent);
 
         //Post Location
-        if(mPostingLocationUpdates)
-            postLocation();
+        postOrDie();
+    }
 
+    private void postOrDie(){
+        new IsPostLocationRequestDBEmptyTask(this, this).execute();
+    }
+
+    @Override
+    public void onPostLocationRequestDBIsEmptyResult(Boolean isNotEmpty) {
+        mPostingLocationUpdates = isNotEmpty;
+
+        if(isNotEmpty){
+            postLocation();
+        }else{
+            stopSelf();
+        }
     }
 
     //Actions
     public void postLocation(){
-        if(!mPostingLocationUpdates){
+        if(!mPostingLocationUpdates && mCurrentPosition != null){
             return;
         }
 
@@ -203,12 +214,21 @@ public class NeedleLocationService extends Service implements
         mPostingLocationUpdates = false;
     }
 
-    public void toggleLocationSharing(){
-        if(mPostingLocationUpdates){
-            stopSharingLocation();
-        }else{
-            shareLocation();
-        }
+    public void addPostLocationRequest(int type, String expiration, int posterId){
+        AddPostLocationRequestParams params = new AddPostLocationRequestParams(this, type, expiration, posterId);
+        new AddPostLocationRequestTask(params, this).execute();
+    }
+
+    @Override
+    public void onLocationRequestPosted(TaskResult result) {
+        //FLAGS
+        mPostingLocationUpdates = true;
+        postLocation();
+    }
+
+    public void removePostLocationRequest(int type, String expiration, int posterId){
+        AddPostLocationRequestParams params = new AddPostLocationRequestParams(this, type, expiration, posterId);
+        new RemovePostLocationRequestTask(params).execute();
     }
 
     //Getters/Setters
@@ -219,9 +239,4 @@ public class NeedleLocationService extends Service implements
     public Boolean isPostingLocationUpdates() {
         return mPostingLocationUpdates;
     }
-
-    public void isPostingLocationUpdates(Boolean mPostingLocationUpdates) {
-        this.mPostingLocationUpdates = mPostingLocationUpdates;
-    }
-
 }

@@ -1,4 +1,4 @@
-package com.nemator.needle.tasks.getAutoCompleteResultsTask;
+package com.nemator.needle.tasks.getAutoCompleteResults;
 
 import android.content.Context;
 

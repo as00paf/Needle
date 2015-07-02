@@ -22,13 +22,15 @@ public class LocationSharingListCardAdapter extends RecyclerView.Adapter<Locatio
 
     private static final int TYPE_ITEM = 0;
     private static final int TYPE_EMPTY = 2;
+    private Boolean isSent;
 
     private ArrayList<LocationSharingVO> listData;
     private Context mContext;
 
-    public LocationSharingListCardAdapter(ArrayList<LocationSharingVO> data, Context context) {
+    public LocationSharingListCardAdapter(ArrayList<LocationSharingVO> data, Context context, Boolean isSent) {
         listData = data;
         mContext = context;
+        this.isSent = isSent;
 
         if(listData == null){
             listData = new ArrayList<LocationSharingVO>();
@@ -65,16 +67,16 @@ public class LocationSharingListCardAdapter extends RecyclerView.Adapter<Locatio
         switch (cardType) {
             case TYPE_ITEM:
                 LocationSharingVO locationSharing = (LocationSharingVO) listData.get(position);
-                holder.titleView.setText(locationSharing.getSenderName());
+                holder.titleView.setText(isSent ? locationSharing.getReceiverName() :
+                                                    locationSharing.getSenderName());
 
                 String activeUntil = locationSharing.getTimeLimit();
                 activeUntil = activeUntil.replace("00:00:00", "");
                 activeUntil = activeUntil.replace(":00", "");
                 holder.active_until.setText(activeUntil);
 
-                if (holder.imageView != null && locationSharing.getPictureURL() != null) {
-                    String encodedURL = AppConstants.HAYSTACK_PICTURES_URL + Uri.encode(locationSharing.getPictureURL());
-                    new ImageDownloaderTask(holder.imageView, mContext.getResources().getDrawable(R.drawable.person_placeholder)).execute(encodedURL);
+                if (holder.imageView != null) {
+                    holder.imageView.setImageDrawable(mContext.getResources().getDrawable(R.drawable.person_placeholder));
                 }
 
                 holder.setData(locationSharing);
@@ -95,7 +97,7 @@ public class LocationSharingListCardAdapter extends RecyclerView.Adapter<Locatio
 
     @Override
     public int getItemViewType(int position) {
-        if(getItem(position) instanceof HaystackVO){
+        if(getItem(position) instanceof LocationSharingVO){
             return TYPE_ITEM;
         }else{
             return TYPE_EMPTY;
@@ -114,16 +116,16 @@ public class LocationSharingListCardAdapter extends RecyclerView.Adapter<Locatio
 
         public LocationSharingCardViewHolder(View view, Boolean isNotEmpty) {
             super(view);
-            titleView =  (TextView) view.findViewById(R.id.title);
-            active_until = (TextView)  view.findViewById(R.id.active_until);
+            titleView =  (TextView) view.findViewById(R.id.location_sharing_name_label);
+            active_until = (TextView)  view.findViewById(R.id.location_sharing_time_limit_label);
             emptyText = (TextView) view.findViewById(R.id.emptyText);
             imageView = (ImageView) view.findViewById(R.id.thumbImage);
         }
 
         public LocationSharingCardViewHolder(View view) {
             super(view);
-            titleView =  (TextView) view.findViewById(R.id.title);
-            active_until = (TextView)  view.findViewById(R.id.active_until);
+            titleView =  (TextView) view.findViewById(R.id.location_sharing_name_label);
+            active_until = (TextView)  view.findViewById(R.id.location_sharing_time_limit_label);
             emptyText = (TextView) view.findViewById(R.id.emptyText);
             imageView = (ImageView) view.findViewById(R.id.thumbImage);
         }

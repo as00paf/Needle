@@ -14,11 +14,14 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.appcompat.view.slidingTab.SlidingTabLayout;
+import com.nemator.needle.MainActivity;
 import com.nemator.needle.R;
+import com.nemator.needle.models.vo.HaystackVO;
+import com.nemator.needle.models.vo.UserVO;
 import com.nemator.needle.tasks.retrieveUsers.RetrieveUsersParams;
 import com.nemator.needle.tasks.retrieveUsers.RetrieveUsersResult;
 import com.nemator.needle.tasks.retrieveUsers.RetrieveUsersTask;
-import com.nemator.needle.models.vo.UserVO;
+import com.nemator.needle.utils.AppConstants;
 import com.shamanland.fab.FloatingActionButton;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 
@@ -29,10 +32,12 @@ public class HaystackFragment extends Fragment {
     private static final String TAG = "HaystackFragment";
 
     private SlidingUpPanelLayout mLayout;
-    SlidingPanelPagerAdapter mSlidingPanelPagerAdapter;
-    ViewPager slidingPanelViewPager;
-    SlidingTabLayout mSlidingTabLayout;
-    private HaystackMapFragment mHaystackMapFragment;
+    private SlidingPanelPagerAdapter mSlidingPanelPagerAdapter;
+    private  ViewPager slidingPanelViewPager;
+    private SlidingTabLayout mSlidingTabLayout;
+
+    private HaystackVO haystack;
+    private boolean mIsOwner;
 
     public static HaystackFragment newInstance() {
         HaystackFragment fragment = new HaystackFragment();
@@ -46,6 +51,16 @@ public class HaystackFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        if(savedInstanceState != null){
+            if (savedInstanceState.keySet().contains(AppConstants.HAYSTACK_DATA_KEY)) {
+                haystack = savedInstanceState.getParcelable(AppConstants.HAYSTACK_DATA_KEY);
+            }
+
+            if (savedInstanceState.keySet().contains(AppConstants.TAG_IS_OWNER)) {
+                mIsOwner = savedInstanceState.getBoolean(AppConstants.TAG_IS_OWNER);
+            }
+        }
     }
 
     @Override
@@ -84,7 +99,7 @@ public class HaystackFragment extends Fragment {
         });
 
         //Active Until Label
-        String activeUntil = getResources().getString(R.string.activeUntil)+ " " + ((HaystackActivity) getActivity()).getHaystack().getTimeLimit();
+        String activeUntil = getResources().getString(R.string.activeUntil)+ " " + haystack.getTimeLimit();
         activeUntil = activeUntil.replace(" 00:00:00", "");
         activeUntil = activeUntil.replace(":00", "");
 
@@ -111,7 +126,7 @@ public class HaystackFragment extends Fragment {
 
         //Floating Action Button
         FloatingActionButton fab = (FloatingActionButton) mLayout.findViewById(R.id.fab_add_users);
-        if(((HaystackActivity) getActivity()).isOwner()){
+        if(isOwner()){
             fab.setSize(FloatingActionButton.SIZE_NORMAL);
             fab.setColor(getResources().getColor(R.color.primary));
 
@@ -122,7 +137,7 @@ public class HaystackFragment extends Fragment {
             fab.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    ((HaystackActivity) getActivity()).addUsers();
+
                 }
             });
         }else{
@@ -130,6 +145,23 @@ public class HaystackFragment extends Fragment {
         }
 
         return mLayout;
+    }
+
+    public HaystackVO getHaystack() {
+        return haystack;
+    }
+
+    public void setHaystack(HaystackVO haystack) {
+        this.haystack = haystack;
+    }
+
+    public boolean isOwner(){
+        int userId = ((MainActivity) getActivity()).getUserId();
+        int ownerId = haystack.getOwner();
+
+        mIsOwner = userId == ownerId;
+
+        return mIsOwner;
     }
 
     public class SlidingPanelPagerAdapter extends FragmentStatePagerAdapter {
@@ -254,7 +286,7 @@ public class HaystackFragment extends Fragment {
 
         private void fetchAllUsers(){
             RetrieveUsersParams params = new RetrieveUsersParams();
-            params.userId = String.valueOf(((HaystackActivity) getActivity()).getUserId());
+            params.userId = String.valueOf(((MainActivity) getActivity()).getUserId());
             params.type = RetrieveUsersParams.RetrieveUsersParamsType.TYPE_ALL_USERS;
 
             try{

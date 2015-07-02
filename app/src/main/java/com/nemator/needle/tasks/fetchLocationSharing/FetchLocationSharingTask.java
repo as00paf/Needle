@@ -27,8 +27,6 @@ public class FetchLocationSharingTask extends AsyncTask<Void, Void, FetchLocatio
     private JSONParser jsonParser = new JSONParser();
     private FetchLocationSharingParams params;
 
-    private ArrayList<LocationSharingVO> locationSharingList = null;
-
     public FetchLocationSharingTask(FetchLocationSharingParams params, FetchLocationSharingResponseHandler delegate){
         this.params = params;
         this.delegate = delegate;
@@ -75,7 +73,7 @@ public class FetchLocationSharingTask extends AsyncTask<Void, Void, FetchLocatio
             JSONArray sentLocationSharings = json.getJSONArray("sent");
 
             if (sentLocationSharings != null) {
-                locationSharingList = new ArrayList<LocationSharingVO>();
+                ArrayList<LocationSharingVO> locationSharingList = new ArrayList<LocationSharingVO>();
 
                 int count = sentLocationSharings.length();
                 for (int i = 0; i < count; i++) {
@@ -83,21 +81,11 @@ public class FetchLocationSharingTask extends AsyncTask<Void, Void, FetchLocatio
 
                     LocationSharingVO locationSharingVO = new LocationSharingVO();
                     locationSharingVO.setId(locationSharingData.getInt("id"));
-                    locationSharingVO.setTimeLimit(locationSharingData.getString("timeLimit"));
                     locationSharingVO.setSenderName(locationSharingData.getString("senderName"));
                     locationSharingVO.setSenderId(locationSharingData.getInt("senderId"));
                     locationSharingVO.setReceiverName(locationSharingData.getString("receiverName"));
                     locationSharingVO.setReceiverId(locationSharingData.getInt("receiverId"));
-                    locationSharingVO.setLocation(new LatLng(locationSharingData.getDouble("lat"), locationSharingData.getDouble("lng")));
-
-                    //Picture
-                    try {
-                        String pictureURL = locationSharingData.getString("pictureURL");
-                        if (pictureURL != null)
-                            locationSharingVO.setPictureURL(pictureURL);
-                    } catch (Exception e) {
-                        Log.e("parseJson", "No pictureURL for #" + i);
-                    }
+                    locationSharingVO.setTimeLimit(locationSharingData.getString("timeLimit"));
 
                     Log.e("parseJson", "Adding Location Sharing # " + i);
                     locationSharingList.add(locationSharingVO);
@@ -110,7 +98,7 @@ public class FetchLocationSharingTask extends AsyncTask<Void, Void, FetchLocatio
             JSONArray receivedLocationSharings = json.getJSONArray("received");
 
             if (receivedLocationSharings != null) {
-                locationSharingList = new ArrayList<LocationSharingVO>();
+                ArrayList<LocationSharingVO> locationSharingList = new ArrayList<LocationSharingVO>();
 
                 int count = receivedLocationSharings.length();
                 for (int i = 0; i < count; i++) {
@@ -123,22 +111,12 @@ public class FetchLocationSharingTask extends AsyncTask<Void, Void, FetchLocatio
                     locationSharingVO.setSenderId(locationSharingData.getInt("senderId"));
                     locationSharingVO.setReceiverName(locationSharingData.getString("receiverName"));
                     locationSharingVO.setReceiverId(locationSharingData.getInt("receiverId"));
-                    locationSharingVO.setLocation(new LatLng(locationSharingData.getDouble("lat"), locationSharingData.getDouble("lng")));
-
-                    //Picture
-                    try{
-                        String pictureURL = locationSharingData.getString("pictureURL");
-                        if (pictureURL != null)
-                            locationSharingVO.setPictureURL(pictureURL);
-                    }catch(Exception e){
-                        Log.e("parseJson", "No pictureURL for #" + i );
-                    }
 
                     Log.e("parseJson", "Adding Location Sharing # " + i);
                     locationSharingList.add(locationSharingVO);
                 }
 
-                result.sentLocationSharingList = locationSharingList;
+                result.receivedLocationSharingList = locationSharingList;
 
                 return result;
             }

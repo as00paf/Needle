@@ -12,6 +12,7 @@ public class AppConstants {
     public static final String TAG_SUCCESS = "success";
     public static final String TAG_MESSAGE = "message";
     public static final String TAG_HAYSTACK_ID = "haystackId";
+    public static final String TAG_LOCATION_SHARING_ID = "locationSharingId";
     public static final String TAG_USER_NAME = "userName";
     public static final String TAG_USER_ID = "userId";
     public static final String TAG_ID = "id";
@@ -40,4 +41,5 @@ public class AppConstants {
     public static final String LOCATION_KEY = "currentLocation";
     public static final String CUSTOM_LOCATION_KEY = "customLocation";
     public static final String LAST_UPDATED_TIME_STRING_KEY = "lastUpdatedTime";
+    public static final String APP_STATE = "appState";
 }

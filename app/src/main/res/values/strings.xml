@@ -33,6 +33,7 @@
     <!-- Create Haystack Fragment -->
     <string name="change">Change</string>
     <string name="creatingHaystack">Creating Haystack...</string>
+    <string name="creating_location_sharing">Creating Location Sharing...</string>
 
     <!-- Haystack Map Fragment -->
     <string name="map_view">Map View</string>
@@ -44,6 +45,7 @@
     <string name="timeLimit">Time Limit</string>
     <string name="time">Time</string>
     <string name="date">Date</string>
+    <string name="friend">Friend</string>
     <string name="privateLabel">Private</string>
     <string name="location">Location</string>
     <string name="users">Users</string>
@@ -84,6 +86,7 @@
     <string name="title_users">Users</string>
     <string name="title_pins">Pins</string>
     <string name="haystack_name_hint">Haystack Name</string>
+    <string name="friend_name_hint">Friend\'s Name</string>
     <string name="general_infos">General Infos</string>
     <string name="noLocationSharingAvailable">No Location Sharing Available</string>
     <string name="create_location_sharing">Create Location Sharing</string>

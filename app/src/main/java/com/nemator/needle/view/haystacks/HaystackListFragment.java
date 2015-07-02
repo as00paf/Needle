@@ -35,7 +35,7 @@ public class HaystackListFragment extends Fragment implements FetchHaystacksTask
     //Objects
     private HaystackListPagerAdapter mHaystackListPagerAdapter;
     private OnActivityStateChangeListener stateChangeCallback;
-    private HaystackListFragmentInteractionListener fabListener;
+    private HaystackListFragmentInteractionListener fragmentListener;
 
     //Data
     public ArrayList<HaystackVO> publicHaystacks = null;
@@ -73,6 +73,7 @@ public class HaystackListFragment extends Fragment implements FetchHaystacksTask
 
         try {
             stateChangeCallback = (OnActivityStateChangeListener) getActivity();
+            fragmentListener = ((HaystackListFragmentInteractionListener) getActivity());
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString()
                     + " must implement OnActivityStateChangeListener");
@@ -85,13 +86,12 @@ public class HaystackListFragment extends Fragment implements FetchHaystacksTask
             rootView = inflater.inflate(R.layout.fragment_haystack_list, container, false);
 
             //FAB
-            fabListener = ((MainActivity) getActivity());
             fab = (FloatingActionButton) rootView.findViewById(R.id.fab);
             fab.setColor(getResources().getColor(R.color.primary));
             fab.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    fabListener.onCreateHaystackFabTapped();
+                    fragmentListener.onCreateHaystackFabTapped();
                 }
             });
             fab.initBackground();
@@ -194,5 +194,6 @@ public class HaystackListFragment extends Fragment implements FetchHaystacksTask
     public interface HaystackListFragmentInteractionListener {
         void onCreateHaystackFabTapped();
         void onRefreshHaystackList();
+        void onClickHaystackCard(HaystackVO haystack);
     }
 }

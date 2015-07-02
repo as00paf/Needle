@@ -1,19 +1,37 @@
 package com.nemator.needle;
 
 import android.app.AlertDialog;
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.preference.PreferenceManager;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
+import android.view.Menu;
 import android.widget.Toast;
 
+import com.nemator.needle.data.LocationServiceDBHelper;
+import com.nemator.needle.models.vo.HaystackVO;
+import com.nemator.needle.service.NeedleLocationService;
 import com.nemator.needle.tasks.AuthenticationResult;
+import com.nemator.needle.tasks.createHaystack.CreateHaystackResult;
+import com.nemator.needle.tasks.createHaystack.CreateHaystackTask;
+import com.nemator.needle.tasks.createLocationSharing.CreateLocationSharingResult;
+import com.nemator.needle.tasks.createLocationSharing.CreateLocationSharingTask;
+import com.nemator.needle.tasks.createLocationSharing.CreateLocationSharingTask.CreateLocationSharingResponseHandler;
 import com.nemator.needle.tasks.login.LoginTask;
+import com.nemator.needle.utils.AppConstants;
+import com.nemator.needle.utils.AppState;
 import com.nemator.needle.view.authentication.LoginFragment;
+import com.nemator.needle.view.haystack.HaystackFragment;
 import com.nemator.needle.view.haystacks.HaystackListFragment;
 import com.nemator.needle.view.haystacks.OnActivityStateChangeListener;
 import com.nemator.needle.view.haystacks.createHaystack.CreateHaystackFragment;
-import com.nemator.needle.utils.AppState;
 import com.nemator.needle.view.locationSharing.LocationSharingFragment;
 import com.nemator.needle.view.locationSharing.createLocationSharing.CreateLocationSharingFragment;
 import com.nemator.needle.view.settings.SettingsFragment;
@@ -24,7 +42,8 @@ import it.neokree.materialnavigationdrawer.elements.MaterialSection;
 import it.neokree.materialnavigationdrawer.elements.listeners.MaterialSectionListener;
 
 public class MainActivity extends MaterialNavigationDrawer implements LoginTask.LoginResponseHandler,
-        OnActivityStateChangeListener, MaterialSectionListener, HaystackListFragment.HaystackListFragmentInteractionListener, LocationSharingFragment.LocationSharingFragmentInteractionListener {
+        OnActivityStateChangeListener, MaterialSectionListener, HaystackListFragment.HaystackListFragmentInteractionListener,
+        LocationSharingFragment.LocationSharingFragmentInteractionListener, CreateHaystackTask.CreateHaystackResponseHandler, CreateLocationSharingResponseHandler {
     public static String TAG = "MainActivity";
 
     private SharedPreferences mSharedPreferences;
@@ -48,18 +67,24 @@ public class MainActivity extends MaterialNavigationDrawer implements LoginTask.
 
     private CreateHaystackFragment createHaystackFragment;
 
+    private MaterialSection haystackSection;
+    private HaystackFragment haystackFragment;
+
     private MaterialSection logOutSection;
     private CreateLocationSharingFragment createLocationSharingFragment;
 
+    private Menu menu;
+
+    //Service
+    private ServiceConnection mConnection;
+private NeedleLocationService locationService;
+
     @Override
     public void init(Bundle savedInstanceState) {
-        //Auto-Login
+        //Saved Instance State
         if(savedInstanceState != null){
             autoLogin = savedInstanceState.getBoolean("autoLogin", true);
-        }
-
-        if(getIntent().getExtras() != null){
-            autoLogin = getIntent().getExtras().getBoolean("autoLogin");
+            currentState = savedInstanceState.getInt(AppConstants.APP_STATE, AppState.PUBLIC_HAYSTACK_TAB);
         }
 
         mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
@@ -96,7 +121,51 @@ public class MainActivity extends MaterialNavigationDrawer implements LoginTask.
             edit.putBoolean("firstNavDrawerLearned", true);
             edit.commit();
         }
+
+        //Service
+        mConnection = new ServiceConnection(){
+            public void onServiceConnected(ComponentName className, IBinder service) {
+                locationService = ((NeedleLocationService.LocalBinder)service).getService();
+            }
+
+            public void onServiceDisconnected(ComponentName className) {
+                locationService = null;
+            }
+        };
+
+        bindService(new Intent(this,
+                NeedleLocationService.class), mConnection, Context.BIND_AUTO_CREATE);
     }
+
+    @Override
+    public void onSaveInstanceState(Bundle savedInstanceState) {
+        if(haystackFragment != null){
+            savedInstanceState.putParcelable(AppConstants.HAYSTACK_DATA_KEY, haystackFragment.getHaystack());
+            savedInstanceState.putBoolean(AppConstants.TAG_IS_OWNER, haystackFragment.isOwner());
+        }
+
+        savedInstanceState.putInt(AppConstants.APP_STATE, currentState);
+
+        super.onSaveInstanceState(savedInstanceState);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        this.menu = menu;
+
+        if (!isDrawerOpen()) {
+            if(getCurrentState() == AppState.HAYSTACK){
+                getMenuInflater().inflate(R.menu.haystack, menu);
+            }else{
+                getMenuInflater().inflate(R.menu.menu_haystacks, menu);
+            }
+
+            return true;
+        }
+
+        return super.onCreateOptionsMenu(menu);
+    }
+
 
     @Override
     public void onBackPressed() {
@@ -144,6 +213,10 @@ public class MainActivity extends MaterialNavigationDrawer implements LoginTask.
             case AppState.CREATE_LOCATION_SHARING:
                 showLocationSharingFragment();
                 break;
+            case AppState.HAYSTACK:
+                removeHaystackFragment();
+                showHaystacksFragment();
+                break;
             default:
                 super.onBackPressed();
                 break;
@@ -177,6 +250,36 @@ public class MainActivity extends MaterialNavigationDrawer implements LoginTask.
     }
 
     @Override
+    public void onClickHaystackCard(HaystackVO haystack) {
+        //Add/Remove Sections
+        haystackFragment = new HaystackFragment();
+        haystackFragment.setHaystack(haystack);
+        haystackSection = newSection(haystack.getName(), R.drawable.ic_haystack, haystackFragment);
+        this.addSectionAt(haystackSection, 1);
+
+        showHaystackFragment(haystack.getName());
+    }
+
+    private void removeHaystackFragment(){
+        FragmentManager manager = getSupportFragmentManager();
+        FragmentTransaction trans = manager.beginTransaction();
+        trans.remove(haystackFragment);
+        trans.commit();
+
+        this.removeSection(haystackSection);
+        haystackSection = null;
+        haystackFragment = null;
+    }
+
+    private void removeCreateLocationSharingFragment(){
+        FragmentManager manager = getSupportFragmentManager();
+        FragmentTransaction trans = manager.beginTransaction();
+        trans.remove(createHaystackFragment);
+        trans.commit();
+        createHaystackFragment = null;
+    }
+
+    @Override
     public void onRefreshLocationSharingList() {
         locationSharingFragment.fetchLocationSharing();
     }
@@ -201,35 +304,58 @@ public class MainActivity extends MaterialNavigationDrawer implements LoginTask.
 
     //Handlers
     public void onLoginComplete(AuthenticationResult result){
-        if(result.successCode == 1){
-            loggedIn = true;
+        if(loggedIn == false){
+            if(result.successCode == 1){
+                loggedIn = true;
+
+                //Add/Remove Sections
+                this.removeSection(loginSection);
+
+                haystacksSection = newSection(getString(R.string.title_haystacks), R.drawable.ic_haystack, haystacksListFragment);
+                this.addSection(haystacksSection);
+
+                locationSharingFragment = new LocationSharingFragment();
+                locationSharingSection = newSection(getString(R.string.title_location_sharing), R.drawable.ic_action_location_found, locationSharingFragment);
+                this.addSection(locationSharingSection);
+                this.addDivisor();
+
+                logOutSection = newSection(getString(R.string.title_logOut), R.drawable.ic_action_exit, this);
+                this.addSection(logOutSection);
+                this.addDivisor();
+
+                //Account
+                String username = mSharedPreferences.getString("username", "");
+                String email = mSharedPreferences.getString("email", "");
+
+                MaterialAccount account = new MaterialAccount(getResources(), username, email, R.drawable.me, R.drawable.mat);
+                this.setFirstAccountPhoto(getResources().getDrawable(R.drawable.me));//TODO:Get picture from cache
+                this.addAccount(account);
+
+                showHaystacksFragment();
+            }else {
+                Toast.makeText(this, "An Error Occured\n Please Try Again!", Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
+    public void onHaystackCreated(CreateHaystackResult result){
+        if(result.successCode == 0){
+            Toast.makeText(this, "An error occured while creating Haystack", Toast.LENGTH_SHORT).show();
+        }else{
+            FragmentManager manager = getSupportFragmentManager();
+            FragmentTransaction trans = manager.beginTransaction();
+            trans.remove(createHaystackFragment);
+            trans.commit();
+
+            Toast.makeText(this, getResources().getString(R.string.haystack_created), Toast.LENGTH_SHORT).show();
 
             //Add/Remove Sections
-            this.removeSection(loginSection);
+            haystackFragment = new HaystackFragment();
+            haystackFragment.setHaystack(result.haystack);
+            haystackSection = newSection(result.haystack.getName(), R.drawable.ic_haystack, haystackFragment);
+            this.addSectionAt(haystackSection, 1);
 
-            haystacksSection = newSection(getString(R.string.title_haystacks), R.drawable.ic_haystack, haystacksListFragment);
-            this.addSection(haystacksSection);
-
-            locationSharingFragment = new LocationSharingFragment();
-            locationSharingSection = newSection(getString(R.string.title_location_sharing), R.drawable.ic_action_location_found, locationSharingFragment);
-            this.addSection(locationSharingSection);
-            this.addDivisor();
-
-            logOutSection = newSection(getString(R.string.title_logOut), R.drawable.ic_action_exit, this);
-            this.addSection(logOutSection);
-            this.addDivisor();
-
-            //Account
-            String username = mSharedPreferences.getString("username", "");
-            String email = mSharedPreferences.getString("email", "");
-
-            MaterialAccount account = new MaterialAccount(getResources(), username, email, R.drawable.me, R.drawable.mat);
-            this.setFirstAccountPhoto(getResources().getDrawable(R.drawable.me));//TODO:Get picture from cache
-            this.addAccount(account);
-
-            showHaystacksFragment();
-        }else {
-            Toast.makeText(this, "An Error Occured\n Please Try Again!", Toast.LENGTH_SHORT).show();
+            showHaystackFragment(result.haystack.getName());
         }
     }
 
@@ -277,6 +403,11 @@ public class MainActivity extends MaterialNavigationDrawer implements LoginTask.
         onStateChange(AppState.CREATE_LOCATION_SHARING);
     }
 
+    private void showHaystackFragment(String title){
+        this.setFragment(haystackFragment, title);
+        onStateChange(AppState.HAYSTACK);
+    }
+
     //Getters/Setters
     public int getUserId(){
         if(userId==-1){
@@ -300,5 +431,25 @@ public class MainActivity extends MaterialNavigationDrawer implements LoginTask.
 
     public void setLocationSharingCount(int count){
         locationSharingSection.setNotifications(count);
+    }
+
+    public Menu getMenu(){
+        return menu;
+    }
+
+    public NeedleLocationService getLocationService() {
+        return locationService;
+    }
+
+    @Override
+    public void onLocationSharingCreated(CreateLocationSharingResult result) {
+        if(result.successCode == 1){
+            locationService.addPostLocationRequest(LocationServiceDBHelper.PostLocationRequest.POSTER_TYPE_LOCATION_SHARING, result.locationSharing.getTimeLimit(), result.locationSharing.getId());
+            Toast.makeText(this, "Location shared with " + result.locationSharing.getReceiverName(), Toast.LENGTH_SHORT).show();
+            showLocationSharingFragment();
+            removeCreateLocationSharingFragment();
+        }else{
+            Toast.makeText(this, "Location Sharing not created !", Toast.LENGTH_SHORT).show();
+        }
     }
 }

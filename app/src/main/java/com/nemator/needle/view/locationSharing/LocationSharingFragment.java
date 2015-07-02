@@ -176,6 +176,7 @@ public class LocationSharingFragment extends Fragment implements FetchLocationSh
 
         mLocationSharingPagerAdapter.getReceivedFragment().updateLocationSharingList(receivedLocationsList);
         mLocationSharingPagerAdapter.getSentFragment().updateLocationSharingList(sentLocationsList);
+
     }
 
     private int getUserId(){

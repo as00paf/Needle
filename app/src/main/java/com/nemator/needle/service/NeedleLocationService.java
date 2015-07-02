@@ -34,20 +34,20 @@ public class NeedleLocationService extends Service implements
         GoogleApiClient.OnConnectionFailedListener,
         LocationListener, AddPostLocationRequestTask.AddPostLocationRequestHandler, IsPostLocationRequestDBEmptyResponseHandler {
 
+    //Objects
     private final IBinder mBinder = new LocalBinder();
-    private Boolean servicesAvailable = false;
-
     private GoogleApiClient mGoogleApiClient;
+
+    //Data
     private Location mCurrentLocation;
     private LatLng mCurrentPosition;
     private String mLastUpdateTime;
     private LocationRequest mLocationRequest;
-    private Boolean mRequestingLocationUpdates = true;
 
+    // Flags
     private Boolean mPostingLocationUpdates = false;
-    private Boolean locationUpdatesStarted = false;
-
-    // Flag that indicates if a request is underway.
+    private Boolean mRequestingLocationUpdates = false;
+    private Boolean servicesAvailable = false;
     private boolean mInProgress;
 
     public class LocalBinder extends Binder {
@@ -67,7 +67,6 @@ public class NeedleLocationService extends Service implements
     }
 
     private boolean servicesConnected() {
-
         // Check that Google Play services is available
         int resultCode = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this);
 
@@ -138,8 +137,6 @@ public class NeedleLocationService extends Service implements
             startLocationUpdates();
         }
 
-        Toast.makeText(this, "Connected", Toast.LENGTH_SHORT).show();
-
         mCurrentLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
         if(mCurrentLocation != null) {
             Double lat = mCurrentLocation.getLatitude();
@@ -163,10 +160,10 @@ public class NeedleLocationService extends Service implements
         sendBroadcast(intent);
 
         //Post Location
-        postOrDie();
+        postOrStopPosting();
     }
 
-    private void postOrDie(){
+    private void postOrStopPosting(){
         new IsPostLocationRequestDBEmptyTask(this, this).execute();
     }
 
@@ -176,7 +173,7 @@ public class NeedleLocationService extends Service implements
 
         if(isNotEmpty){
             postLocation();
-        }else{
+        }else if(mRequestingLocationUpdates == false){
             stopSelf();
         }
     }
@@ -193,8 +190,10 @@ public class NeedleLocationService extends Service implements
 
     //Public methods
     public void startLocationUpdates() {
-        LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
-        locationUpdatesStarted = true;
+        if(mGoogleApiClient.isConnected()){
+            LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
+        }
+        mRequestingLocationUpdates = true;
     }
 
     public void stopLocationUpdates() {
@@ -202,7 +201,7 @@ public class NeedleLocationService extends Service implements
             LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
         }
 
-        locationUpdatesStarted = false;
+        mRequestingLocationUpdates = false;
     }
 
     public void shareLocation(){
@@ -238,5 +237,8 @@ public class NeedleLocationService extends Service implements
 
     public Boolean isPostingLocationUpdates() {
         return mPostingLocationUpdates;
+    }
+    public void setRequestingLocationUpdates(Boolean mRequestingLocationUpdates) {
+        this.mRequestingLocationUpdates = mRequestingLocationUpdates;
     }
 }

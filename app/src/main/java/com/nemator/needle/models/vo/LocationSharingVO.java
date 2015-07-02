@@ -15,7 +15,6 @@ public class LocationSharingVO implements Serializable, Parcelable {
     private int senderId;
     private String receiverName;
     private int receiverId;
-    private LatLng location;
     private String timeLimit;
 
     public LocationSharingVO(){
@@ -33,7 +32,6 @@ public class LocationSharingVO implements Serializable, Parcelable {
         this.senderId = in.readInt();
         this.receiverName = in.readString();
         this.receiverId = in.readInt();
-        this.location = new LatLng(in.readDouble(), in.readDouble());
         this.timeLimit = in.readString();
     }
 
@@ -44,8 +42,6 @@ public class LocationSharingVO implements Serializable, Parcelable {
         parcel.writeInt(senderId);
         parcel.writeString(receiverName);
         parcel.writeInt(receiverId);
-        parcel.writeDouble(location.latitude);
-        parcel.writeDouble(location.longitude);
         parcel.writeString(timeLimit);
     }
 
@@ -91,14 +87,6 @@ public class LocationSharingVO implements Serializable, Parcelable {
         this.receiverId = receiverId;
     }
 
-    public LatLng getLocation() {
-        return location;
-    }
-
-    public void setLocation(LatLng location) {
-        this.location = location;
-    }
-
     public String getTimeLimit() {
         return timeLimit;
     }
@@ -106,14 +94,4 @@ public class LocationSharingVO implements Serializable, Parcelable {
     public void setTimeLimit(String timeLimit) {
         this.timeLimit = timeLimit;
     }
-
-    public String getPictureURL() {
-        return pictureURL;
-    }
-
-    public void setPictureURL(String pictureURL) {
-        this.pictureURL = pictureURL;
-    }
-
-    private String pictureURL;
 }

@@ -10,11 +10,9 @@ import android.content.pm.ResolveInfo;
 import android.graphics.Bitmap;
 import android.graphics.Matrix;
 import android.os.Bundle;
-import android.os.Parcelable;
 import android.preference.PreferenceManager;
 import android.provider.MediaStore;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
+import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
@@ -24,7 +22,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.support.v4.app.Fragment;
 import android.widget.Button;
 import android.widget.Toast;
 
@@ -33,18 +30,17 @@ import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.places.Places;
-import com.nemator.needle.utils.AppConstants;
-import com.nemator.needle.utils.AppState;
-import com.nemator.needle.view.haystack.HaystackActivity;
-import com.nemator.needle.tasks.createHaystack.CreateHaystackResult;
+import com.nemator.needle.MainActivity;
+import com.nemator.needle.R;
+import com.nemator.needle.models.vo.HaystackVO;
+import com.nemator.needle.models.vo.UserVO;
+import com.nemator.needle.tasks.createHaystack.CreateHaystackTask;
 import com.nemator.needle.tasks.createHaystack.CreateHaystackTaskParams;
 import com.nemator.needle.tasks.imageUploader.ImageUploadParams;
 import com.nemator.needle.tasks.imageUploader.ImageUploadResult;
 import com.nemator.needle.tasks.imageUploader.ImageUploaderTask;
-import com.nemator.needle.models.vo.HaystackVO;
-import com.nemator.needle.models.vo.UserVO;
-import com.nemator.needle.R;
-import com.nemator.needle.tasks.createHaystack.CreateHaystackTask;
+import com.nemator.needle.utils.AppConstants;
+import com.nemator.needle.utils.AppState;
 import com.nemator.needle.view.haystacks.OnActivityStateChangeListener;
 import com.shamanland.fab.FloatingActionButton;
 import com.viewpagerindicator.CirclePageIndicator;
@@ -52,8 +48,8 @@ import com.viewpagerindicator.CirclePageIndicator;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CreateHaystackFragment extends Fragment implements CreateHaystackTask.CreateHaystackResponseHandler,
-        ImageUploaderTask.ImageUploadResponseHandler, CreateHaystackGeneralInfosFragment.OnPrivacySettingsUpdatedListener,
+public class CreateHaystackFragment extends Fragment implements ImageUploaderTask.ImageUploadResponseHandler,
+        CreateHaystackGeneralInfosFragment.OnPrivacySettingsUpdatedListener,
         GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener{
     public static final String TAG = "CreateHaystackFragment";
 
@@ -354,7 +350,7 @@ public class CreateHaystackFragment extends Fragment implements CreateHaystackTa
             //Create Haystack
             CreateHaystackTaskParams params = new CreateHaystackTaskParams(rootView.getContext(), haystack);
             try{
-                CreateHaystackTask task = new CreateHaystackTask(params, this);
+                CreateHaystackTask task = new CreateHaystackTask(params, ((MainActivity) getActivity()));
                 task.execute();
 
             }catch (Exception e) {
@@ -377,29 +373,12 @@ public class CreateHaystackFragment extends Fragment implements CreateHaystackTa
             //Create Haystack
             CreateHaystackTaskParams params = new CreateHaystackTaskParams(rootView.getContext(), haystack);
             try{
-                CreateHaystackTask task = new CreateHaystackTask(params, this);
+                CreateHaystackTask task = new CreateHaystackTask(params, ((MainActivity) getActivity()));
                 task.execute();
 
             }catch (Exception e) {
                 Toast.makeText(getActivity(), "An error occured while creating Haystack", Toast.LENGTH_SHORT).show();
             }
-        }
-    }
-
-    public void onHaystackCreated(CreateHaystackResult result){
-        if(result.successCode == 0){
-            Toast.makeText(getActivity(), "An error occured while creating Haystack", Toast.LENGTH_SHORT).show();
-        }else{
-            FragmentManager manager = getActivity().getSupportFragmentManager();
-            FragmentTransaction trans = manager.beginTransaction();
-            trans.remove(this);
-            trans.commit();
-
-            Toast.makeText(getActivity(), getResources().getString(R.string.haystack_created), Toast.LENGTH_SHORT).show();
-
-            Intent intent = new Intent(getActivity(), HaystackActivity.class);
-            intent.putExtra(AppConstants.HAYSTACK_DATA_KEY, (Parcelable) haystack);
-            startActivity(intent);
         }
     }
 

@@ -10,12 +10,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.nemator.needle.MainActivity;
 import com.nemator.needle.R;
 import com.nemator.needle.models.vo.LocationSharingVO;
-import com.nemator.needle.view.haystacks.HaystackListFragment;
-import com.nemator.needle.view.haystacks.OnActivityStateChangeListener;
 import com.nemator.needle.utils.AppState;
+import com.nemator.needle.view.haystacks.OnActivityStateChangeListener;
 
 import java.util.ArrayList;
 
@@ -102,7 +100,7 @@ public class LocationSharingListTabFragment extends Fragment{
     public void updateLocationSharingList(ArrayList<LocationSharingVO> data){
         this.dataList = data;
         if(mAdapter == null){
-            mAdapter = new LocationSharingListCardAdapter(dataList, getActivity());
+            mAdapter = new LocationSharingListCardAdapter(dataList, getActivity(), !isReceived);
         }else{
             mAdapter.notifyDataSetChanged();
         }

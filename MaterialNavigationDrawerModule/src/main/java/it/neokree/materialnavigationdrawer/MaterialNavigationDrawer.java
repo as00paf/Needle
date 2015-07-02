@@ -1585,7 +1585,23 @@ public abstract class MaterialNavigationDrawer<Fragment> extends ActionBarActivi
         sections.addView(section.getView(),params);
 
         // add the element to the list
-        elementsList.add(new Element(Element.TYPE_SECTION,section));
+        elementsList.add(new Element(Element.TYPE_SECTION, section));
+    }
+
+    public void addSectionAt(MaterialSection section, int index) {
+//        section.setPosition(sectionList.size());
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,(int)(48 * density));
+        section.setTypeface(fontManager.getRobotoMedium());
+        //sectionList.add(section);
+        sectionList.add(index, section);
+
+        ViewParent parent = section.getView().getParent();
+        //sections.addView(section.getView(), params);
+        sections.addView(section.getView(), index, params);
+
+        // add the element to the list
+        //elementsList.add(new Element(Element.TYPE_SECTION,section));
+        elementsList.add(index, new Element(Element.TYPE_SECTION,section));
     }
 
     public void removeSection(MaterialSection section) {

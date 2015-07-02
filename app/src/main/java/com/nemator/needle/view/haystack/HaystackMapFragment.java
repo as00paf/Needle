@@ -31,8 +31,9 @@ import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.nemator.needle.broadcastReceiver.LocationServiceBroadcastReceiver;
+import com.nemator.needle.MainActivity;
 import com.nemator.needle.R;
+import com.nemator.needle.broadcastReceiver.LocationServiceBroadcastReceiver;
 import com.nemator.needle.data.LocationServiceDBHelper;
 import com.nemator.needle.models.vo.HaystackVO;
 import com.nemator.needle.service.NeedleLocationService;
@@ -64,8 +65,6 @@ public class HaystackMapFragment extends SupportMapFragment
     private Location mCurrentLocation;
     private LatLng mCurrentPosition;
 
-    private Boolean mRequestingLocationUpdates = true;
-
     //Map
     private GoogleMap mMap;
     private Marker mMarker;
@@ -77,10 +76,10 @@ public class HaystackMapFragment extends SupportMapFragment
     private Boolean cameraUpdated = false;
 
     //Location Service
-    private ServiceConnection mConnection;
     private NeedleLocationService locationService;
     private LocationServiceBroadcastReceiver locationServiceBroadcastReceiver;
     private Boolean mPostingLocationUpdates = false;
+    private Boolean mRequestingLocationUpdates = true;
     private Boolean isActivated = false;
 
     //Constructors
@@ -108,18 +107,8 @@ public class HaystackMapFragment extends SupportMapFragment
         }
 
         //Location Service
-        mConnection = new ServiceConnection(){
-            public void onServiceConnected(ComponentName className, IBinder service) {
-                locationService = ((NeedleLocationService.LocalBinder)service).getService();
-            }
-
-            public void onServiceDisconnected(ComponentName className) {
-                locationService = null;
-            }
-        };
-
-        getActivity().bindService(new Intent(getActivity(),
-                NeedleLocationService.class), mConnection, Context.BIND_AUTO_CREATE);
+        locationService = ((MainActivity) getActivity()).getLocationService();
+        locationService.startLocationUpdates();
 
         //Broadcast Receiver
         locationServiceBroadcastReceiver = new LocationServiceBroadcastReceiver(this);
@@ -141,7 +130,7 @@ public class HaystackMapFragment extends SupportMapFragment
             }
         }
 
-        haystack = ((HaystackActivity) getActivity()).getHaystack();
+        haystack = ((HaystackFragment) getParentFragment()).getHaystack();
     }
 
     @Override
@@ -158,8 +147,9 @@ public class HaystackMapFragment extends SupportMapFragment
 
     @Override
     public void onResume() {
-        haystack = ((HaystackActivity) getActivity()).getHaystack();
+        haystack = ((HaystackFragment) getParentFragment()).getHaystack();
         getActivity().registerReceiver(locationServiceBroadcastReceiver, new IntentFilter(AppConstants.LOCATION_UPDATED));
+
         super.onResume();
     }
 
@@ -167,19 +157,16 @@ public class HaystackMapFragment extends SupportMapFragment
     public void onDetach() {
         super.onDetach();
 
-        //stopLocationUpdates();
-        getActivity().unregisterReceiver(locationServiceBroadcastReceiver);
+        if(isActivated == false)
+            locationService.stopLocationUpdates();
     }
 
     @Override
     public void onPause() {
         super.onPause();
-        //stopLocationUpdates();
+
         getActivity().unregisterReceiver(locationServiceBroadcastReceiver);
-
-        if(isActivated) deactivateUser();
     }
-
 
     @Override
     public void onStop() {
@@ -481,7 +468,7 @@ public class HaystackMapFragment extends SupportMapFragment
     public void onUserActivated(TaskResult result){
         isActivated = result.successCode == 1;
 
-        MenuItem item = ((HaystackActivity) getActivity()).getMenu().findItem(R.id.location_sharing);
+        MenuItem item = ((MainActivity) getActivity()).getMenu().findItem(R.id.location_sharing);
         item.setIcon(isActivated ?
                 getResources().getDrawable(R.drawable.ic_action_location_found) :
                 getResources().getDrawable(R.drawable.ic_action_location_off));
@@ -505,7 +492,7 @@ public class HaystackMapFragment extends SupportMapFragment
     public void onUserDeactivated(TaskResult result){
         isActivated = !(result.successCode == 1);
 
-        MenuItem item = ((HaystackActivity) getActivity()).getMenu().findItem(R.id.location_sharing);
+        MenuItem item = ((MainActivity) getActivity()).getMenu().findItem(R.id.location_sharing);
         item.setIcon(isActivated ?
                 getResources().getDrawable(R.drawable.ic_action_location_found) :
                 getResources().getDrawable(R.drawable.ic_action_location_off));

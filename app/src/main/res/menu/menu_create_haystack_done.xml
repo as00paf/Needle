@@ -12,4 +12,7 @@
         android:title="@string/action_settings"
         android:icon="@drawable/ic_action_settings"
         app:showAsAction="never" />
+
+    <item android:id="@+id/menu_option_help" android:title="@string/title_helpAndSupport"
+        app:showAsAction="never" android:icon="@drawable/ic_action_help"/>
 </menu>

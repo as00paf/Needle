@@ -51,10 +51,6 @@
             android:theme="@style/AppTheme2" >
         </activity>
         <activity
-            android:name=".view.haystack.HaystackActivity"
-            android:theme="@style/AppTheme2" >
-        </activity>
-        <activity
             android:name=".view.settings.AppSettingsActivity"
             android:label="@string/title_activity_app_settings"
             android:parentActivityName=".view.home.HomeActivity"

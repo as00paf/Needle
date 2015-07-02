@@ -82,19 +82,11 @@ public class HaystackListTabFragment extends Fragment {
         return rootView;
     }
 
-    @Override
-    public void onResume(){
-        super.onResume();
-
-        int state = isPublic ? AppState.PUBLIC_HAYSTACK_TAB : AppState.PRIVATE_HAYSTACK_TAB;
-        stateChangeCallback.onStateChange(state);
-    }
-
     public void updateHaystackList(ArrayList<HaystackVO> data){
         this.dataList = data;
 
         if(mAdapter == null){
-            mAdapter = new HaystackListCardAdapter(this.dataList, getActivity());
+            mAdapter = new HaystackListCardAdapter(this.dataList, getActivity(), interactionListener);
         }else{
             mAdapter.notifyDataSetChanged();
         }
@@ -108,6 +100,4 @@ public class HaystackListTabFragment extends Fragment {
     public SwipeRefreshLayout getRefreshLayout() {
         return swipeLayout;
     }
-
-
 }

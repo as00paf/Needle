@@ -1,9 +1,7 @@
 package com.nemator.needle.view.haystacks;
 
 import android.content.Context;
-import android.content.Intent;
 import android.net.Uri;
-import android.os.Parcelable;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,11 +9,10 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.nemator.needle.utils.AppConstants;
 import com.nemator.needle.R;
-import com.nemator.needle.view.haystack.HaystackActivity;
-import com.nemator.needle.tasks.ImageDownloaderTask;
 import com.nemator.needle.models.vo.HaystackVO;
+import com.nemator.needle.tasks.ImageDownloaderTask;
+import com.nemator.needle.utils.AppConstants;
 
 import java.util.ArrayList;
 
@@ -27,10 +24,12 @@ public class HaystackListCardAdapter extends RecyclerView.Adapter<HaystackListCa
 
     private ArrayList<HaystackVO> listData;
     private Context mContext;
+    private HaystackListFragment.HaystackListFragmentInteractionListener mListener;
 
-    public HaystackListCardAdapter(ArrayList<HaystackVO> data, Context context) {
+    public HaystackListCardAdapter(ArrayList<HaystackVO> data, Context context, HaystackListFragment.HaystackListFragmentInteractionListener listener) {
         listData = data;
         mContext = context;
+        mListener = listener;
 
         if(listData == null){
             listData = new ArrayList<HaystackVO>();
@@ -51,10 +50,10 @@ public class HaystackListCardAdapter extends RecyclerView.Adapter<HaystackListCa
 
         if(viewType == TYPE_ITEM){
             haystackCard = LayoutInflater.from(parent.getContext()).inflate(R.layout.haystack_card_layout, parent, false);
-            viewHolder = new HaystackCardViewHolder(haystackCard, true);
+            viewHolder = new HaystackCardViewHolder(haystackCard, true, mListener);
         }else{
             haystackCard = LayoutInflater.from(parent.getContext()).inflate(R.layout.haystack_empty_card_layout, parent, false);
-            viewHolder = new HaystackCardViewHolder(haystackCard, false);
+            viewHolder = new HaystackCardViewHolder(haystackCard, false, mListener);
         }
 
         return viewHolder;
@@ -117,9 +116,11 @@ public class HaystackListCardAdapter extends RecyclerView.Adapter<HaystackListCa
         TextView emptyText;
 
         HaystackVO haystackData;
+        private HaystackListFragment.HaystackListFragmentInteractionListener mListener;
 
-        public HaystackCardViewHolder(View view, Boolean isNotEmpty) {
+        public HaystackCardViewHolder(View view, Boolean isNotEmpty, HaystackListFragment.HaystackListFragmentInteractionListener listener) {
             super(view);
+            mListener = listener;
             titleView =  (TextView) view.findViewById(R.id.title);
             userCountView = (TextView)  view.findViewById(R.id.active_users);
             active_until = (TextView)  view.findViewById(R.id.active_until);
@@ -155,9 +156,7 @@ public class HaystackListCardAdapter extends RecyclerView.Adapter<HaystackListCa
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    Intent intent = new Intent(view.getContext(), HaystackActivity.class);
-                    intent.putExtra(AppConstants.HAYSTACK_DATA_KEY, (Parcelable) haystackData);
-                    view.getContext().startActivity(intent);
+                    mListener.onClickHaystackCard(haystackData);
                 }
             });
         }

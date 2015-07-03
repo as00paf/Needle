@@ -13,6 +13,7 @@ import android.preference.PreferenceManager;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.widget.Toast;
 
 import com.nemator.needle.data.LocationServiceDBHelper;
@@ -70,6 +71,9 @@ public class MainActivity extends MaterialNavigationDrawer implements LoginRespo
     private LocationSharingListFragment locationSharingListFragment;
 
     private CreateHaystackFragment createHaystackFragment;
+
+    private MaterialSection settingsSection;
+    private SettingsFragment settingsFragment;
 
     private MaterialSection haystackSection;
     private HaystackFragment haystackFragment;
@@ -148,7 +152,9 @@ public class MainActivity extends MaterialNavigationDrawer implements LoginRespo
         }
 
         // create sections
-        this.addBottomSection(newSection(getString(R.string.title_settings), R.drawable.ic_action_settings, new SettingsFragment()));
+        settingsFragment = new SettingsFragment();
+        settingsSection = newSection(getString(R.string.title_settings), R.drawable.ic_action_settings, settingsFragment);
+        this.addBottomSection(settingsSection);
         this.addBottomSection(newSection(getString(R.string.title_helpAndSupport), R.drawable.ic_action_help, new LoginFragment()));
 
         //Navigation Drawer
@@ -197,8 +203,11 @@ public class MainActivity extends MaterialNavigationDrawer implements LoginRespo
         this.menu = menu;
 
         if (!isDrawerOpen()) {
+            //TODO: use switch statement
             if(getCurrentState() == AppState.HAYSTACK){
                 getMenuInflater().inflate(R.menu.haystack, menu);
+            }else if(getCurrentState() == AppState.SETTINGS){
+                getMenuInflater().inflate(R.menu.menu_settings, menu);
             }else{
                 getMenuInflater().inflate(R.menu.menu_haystacks, menu);
             }
@@ -207,6 +216,22 @@ public class MainActivity extends MaterialNavigationDrawer implements LoginRespo
         }
 
         return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+
+        switch (id) {
+            case R.id.menu_option_settings:
+                showSettingsFragment();
+                return true;
+            case R.id.menu_option_help:
+
+                return true;
+        }
+
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
@@ -263,6 +288,10 @@ public class MainActivity extends MaterialNavigationDrawer implements LoginRespo
                 removeLocationSharingMapFragment();
                 showLocationSharingListFragment();
                 break;
+            case AppState.SETTINGS:
+                removeSettingsFragment();
+                restorePreviousState();
+                break;
             default:
                 super.onBackPressed();
                 break;
@@ -284,6 +313,25 @@ public class MainActivity extends MaterialNavigationDrawer implements LoginRespo
     @Override
     public int getPreviousState() {
         return previousState;
+    }
+
+    private void restorePreviousState(){
+        int state = previousState;
+        onStateChange(previousState);
+
+        switch(state){
+            case AppState.LOGIN:
+                showLoginFragment(true);
+                break;
+            case AppState.PUBLIC_HAYSTACK_TAB :
+            case AppState.PRIVATE_HAYSTACK_TAB :
+                showHaystacksFragment();
+                break;
+            case AppState.LOCATION_SHARING_SENT_TAB :
+            case AppState.LOCATION_SHARING_RECEIVED_TAB :
+                showLocationSharingListFragment();
+                break;
+        }
     }
 
     //Material NavDrawer Listener
@@ -415,6 +463,24 @@ public class MainActivity extends MaterialNavigationDrawer implements LoginRespo
     }
 
     //Fragments Management
+    private void showSettingsFragment(){
+        if(settingsFragment == null) settingsFragment = new SettingsFragment();
+        this.setSection(settingsSection);
+        this.setFragment(settingsFragment, getString(R.string.title_settings));
+        onStateChange(AppState.SETTINGS);
+    }
+
+    private void removeSettingsFragment(){
+        if(settingsFragment != null){
+            FragmentManager manager = getSupportFragmentManager();
+            FragmentTransaction trans = manager.beginTransaction();
+            trans.remove(settingsFragment);
+            trans.commit();
+
+            settingsFragment = null;
+        }
+    }
+
     private void removeHaystackFragment(){
         if(haystackFragment != null){
             FragmentManager manager = getSupportFragmentManager();

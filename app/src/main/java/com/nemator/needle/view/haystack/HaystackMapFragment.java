@@ -183,12 +183,6 @@ public class HaystackMapFragment extends SupportMapFragment
             case R.id.menu_option_leave:
                 leaveHaystack();
                 return true;
-            case R.id.menu_option_settings:
-
-                return true;
-            case R.id.menu_option_help:
-
-                return true;
         }
 
         return super.onOptionsItemSelected(item);

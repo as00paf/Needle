@@ -14,12 +14,14 @@
 
     <!-- App Settings Activity -->
     <string name="rememberMeSummary">Make the Needle remember your credentials</string>
+    <string name="notificationsSummary">Allow Needle to Notify you about events that occur</string>
     <string name="app_settings">App Settings</string>
 
     <!-- Login Activity -->
     <string name="login">Login</string>
     <string name="register">Register</string>
     <string name="rememberMe">Remember Me</string>
+    <string name="notifications">Notifications</string>
     <string name="registerDialog">Creating User...</string>
 
     <!-- Haystack List Fragment -->

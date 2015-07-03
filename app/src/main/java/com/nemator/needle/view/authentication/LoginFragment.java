@@ -110,6 +110,9 @@ public class LoginFragment extends Fragment implements View.OnClickListener{
     }
 
     private void login(){
+        pass.clearFocus();
+        user.clearFocus();
+
         Log.i(AppConstants.TAG_MESSAGE, "Trying to login with credentials : " + user.getText().toString() + ", " + pass.getText().toString());
 
         String username = user.getText().toString();

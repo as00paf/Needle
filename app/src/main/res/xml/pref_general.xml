@@ -7,4 +7,12 @@
         android:summary="@string/rememberMeSummary"
         android:defaultValue="true" />
 
+    <SwitchPreference
+        android:id="@+id/appSettingsNotificationsCheckBox"
+        android:key="notifications"
+        android:title="@string/notifications"
+        android:summary="@string/notificationsSummary"
+        android:defaultValue="true" />
+
+
 </PreferenceScreen>

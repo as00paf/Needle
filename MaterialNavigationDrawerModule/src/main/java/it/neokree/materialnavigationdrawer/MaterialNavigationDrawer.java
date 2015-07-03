@@ -694,7 +694,7 @@ public abstract class MaterialNavigationDrawer<Fragment> extends ActionBarActivi
             ArrayList<Integer> accountNumbers = savedInstanceState.getIntegerArrayList(STATE_ACCOUNT);
 
             // ripristina gli account | restore accounts
-            for(int i = 0; i< accountNumbers.size(); i++) {
+            for(int i = 0; i< accountManager.size(); i++) {
                 MaterialAccount account = accountManager.get(i);
                 account.setAccountNumber(accountNumbers.get(i));
                 if(account.getAccountNumber() == MaterialAccount.FIRST_ACCOUNT) {

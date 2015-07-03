@@ -92,7 +92,7 @@ public class LoginTask extends AsyncTask<Void, Void, AuthenticationResult> {
     }
 
     protected void onPostExecute(AuthenticationResult result) {
-        dialog.dismiss();
+        if(dialog!=null) dialog.dismiss();
         delegate.onLoginComplete(result);
     }
 

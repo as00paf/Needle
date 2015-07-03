@@ -1,15 +1,10 @@
 package com.nemator.needle.view.haystack;
 
-import android.content.ComponentName;
-import android.content.Context;
-import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.ServiceConnection;
 import android.graphics.Point;
 import android.location.Location;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.IBinder;
 import android.os.SystemClock;
 import android.text.TextUtils;
 import android.util.Log;
@@ -226,12 +221,10 @@ public class HaystackMapFragment extends SupportMapFragment
             if(mMarker == null && mCircle == null){
                 MarkerOptions markerOptions = new MarkerOptions();
                 markerOptions.position(mCurrentPosition);
-                drawMarkerWithCircle(mCurrentPosition);
+                drawMarkerWithCircle(mCurrentPosition, "Your Position");
             }else{
                 updateMarkerWithCircle(mCurrentPosition);
             }
-
-            mMarker.setTitle("Your Position");
         }
 
         //Log.i(TAG,"Markers to add : "+mLocationList.size());
@@ -253,7 +246,7 @@ public class HaystackMapFragment extends SupportMapFragment
                     if(mMarkers.containsKey(id)){
                         marker = mMarkers.get(id);
                         if(!marker.getPosition().equals(position)){
-                            animateMarker(marker, position, false);
+                            animateMarker(mMap, marker, position, false);
 
                             Location loc = new Location("");
                             loc.setLatitude(lat);
@@ -321,12 +314,10 @@ public class HaystackMapFragment extends SupportMapFragment
         MarkerOptions markerOptions = new MarkerOptions();
         if(mMarker == null && mCircle == null){
             markerOptions.position(mCurrentPosition);
-            drawMarkerWithCircle(mCurrentPosition);
+            drawMarkerWithCircle(mCurrentPosition, "Your Position");
         }else{
             updateMarkerWithCircle(mCurrentPosition);
         }
-
-        mMarker.setTitle("Your Position");
 
         //Add other user's markers back
         if(mLocationList!=null){
@@ -366,73 +357,6 @@ public class HaystackMapFragment extends SupportMapFragment
     public void moveCamera(){
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(mCurrentPosition, 19.0f));
         cameraUpdated = true;
-    }
-
-    public void animateMarker(final Marker marker, final LatLng toPosition, final boolean hideMarker) {
-        final Handler handler = new Handler();
-        final long start = SystemClock.uptimeMillis();
-        Projection proj = mMap.getProjection();
-        Point startPoint = proj.toScreenLocation(marker.getPosition());
-        final LatLng startLatLng = proj.fromScreenLocation(startPoint);
-        final long duration = 500;
-        final Interpolator interpolator = new LinearInterpolator();
-
-        Location startLocation = new Location("");
-        startLocation.setLatitude(startLatLng.latitude);
-        startLocation.setLongitude(startLatLng.longitude);
-
-        Location endLocation = new Location("");
-        endLocation.setLatitude(toPosition.latitude);
-        endLocation.setLongitude(toPosition.longitude);
-
-        float distance = startLocation.distanceTo(endLocation);
-
-        if(distance > 1){
-            handler.post(new Runnable() {
-                @Override
-                public void run() {
-                    long elapsed = SystemClock.uptimeMillis() - start;
-                    float t = interpolator.getInterpolation((float) elapsed / duration);
-                    double lng = t * toPosition.longitude + (1 - t) * startLatLng.longitude;
-                    double lat = t * toPosition.latitude + (1 - t) * startLatLng.latitude;
-                    marker.setPosition(new LatLng(lat, lng));
-
-                    if (t < 1.0) {
-                        // Post again 16ms later.
-                        handler.postDelayed(this, 16);
-                    } else {
-                        if (hideMarker) {
-                            marker.setVisible(false);
-                        } else {
-                            marker.setVisible(true);
-                        }
-                    }
-
-                }
-            });
-        }
-    }
-
-    private void drawMarkerWithCircle(LatLng position){
-        double radiusInMeters = 10.0;
-        int strokeColor = getResources().getColor(R.color.primary);
-        int shadeColor = getResources().getColor(R.color.circleColor);
-
-        CircleOptions circleOptions = new CircleOptions().center(position).radius(radiusInMeters).fillColor(shadeColor).strokeColor(strokeColor).strokeWidth(8);
-        mCircle = mMap.addCircle(circleOptions);
-
-        MarkerOptions markerOptions = new MarkerOptions().position(position);
-        mMarker = mMap.addMarker(markerOptions);
-    }
-
-    private void updateMarkerWithCircle(LatLng position) {
-        if(!mCircle.getCenter().equals(position)){
-            mCircle.setCenter(position);
-        }
-
-        if(!mMarker.getPosition().equals(position)){
-            animateMarker(mMarker, position, false);
-        }
     }
 
     //Actions
@@ -541,6 +465,76 @@ public class HaystackMapFragment extends SupportMapFragment
             stopSharingLocation();
         }else{
             shareLocation();
+        }
+    }
+
+    //Map Stuff
+    private void drawMarkerWithCircle(LatLng position, String label){
+        double radiusInMeters = 10.0;
+        int strokeColor = getResources().getColor(R.color.primary);
+        int shadeColor = getResources().getColor(R.color.circleColor);
+
+        CircleOptions circleOptions = new CircleOptions().center(position).radius(radiusInMeters).fillColor(shadeColor).strokeColor(strokeColor).strokeWidth(8);
+        mCircle = mMap.addCircle(circleOptions);
+
+        MarkerOptions markerOptions = new MarkerOptions().position(position);
+        mMarker = mMap.addMarker(markerOptions);
+
+        mMarker.setTitle(label);
+    }
+
+    private void updateMarkerWithCircle(LatLng position) {
+        if(!mCircle.getCenter().equals(position)){
+            mCircle.setCenter(position);
+        }
+
+        if(!mMarker.getPosition().equals(position)){
+            animateMarker(mMap, mMarker, position, false);
+        }
+    }
+
+    private void animateMarker(final GoogleMap map, final Marker marker, final LatLng toPosition, final boolean hideMarker) {
+        final Handler handler = new Handler();
+        final long start = SystemClock.uptimeMillis();
+        Projection proj = map.getProjection();
+        Point startPoint = proj.toScreenLocation(marker.getPosition());
+        final LatLng startLatLng = proj.fromScreenLocation(startPoint);
+        final long duration = 500;
+        final Interpolator interpolator = new LinearInterpolator();
+
+        Location startLocation = new Location("");
+        startLocation.setLatitude(startLatLng.latitude);
+        startLocation.setLongitude(startLatLng.longitude);
+
+        Location endLocation = new Location("");
+        endLocation.setLatitude(toPosition.latitude);
+        endLocation.setLongitude(toPosition.longitude);
+
+        float distance = startLocation.distanceTo(endLocation);
+
+        if(distance > 1){
+            handler.post(new Runnable() {
+                @Override
+                public void run() {
+                    long elapsed = SystemClock.uptimeMillis() - start;
+                    float t = interpolator.getInterpolation((float) elapsed / duration);
+                    double lng = t * toPosition.longitude + (1 - t) * startLatLng.longitude;
+                    double lat = t * toPosition.latitude + (1 - t) * startLatLng.latitude;
+                    marker.setPosition(new LatLng(lat, lng));
+
+                    if (t < 1.0) {
+                        // Post again 16ms later.
+                        handler.postDelayed(this, 16);
+                    } else {
+                        if (hideMarker) {
+                            marker.setVisible(false);
+                        } else {
+                            marker.setVisible(true);
+                        }
+                    }
+
+                }
+            });
         }
     }
 

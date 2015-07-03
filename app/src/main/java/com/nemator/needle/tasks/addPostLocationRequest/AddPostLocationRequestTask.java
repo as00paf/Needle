@@ -68,7 +68,7 @@ public class AddPostLocationRequestTask extends AsyncTask<Void, Void, TaskResult
                 values);
 
         //ALARM
-        new PostLocationRequestAlarm().SetAlarm(params.context, newRowId, params.expiration);
+        new PostLocationRequestAlarm().setAlarm(params.context, newRowId, params.expiration, params.posterId);
 
         return result;
     }

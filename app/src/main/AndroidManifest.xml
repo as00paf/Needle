@@ -2,6 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.nemator.needle" >
 
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
@@ -40,38 +41,19 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity
-            android:name=".view.authentication.RegisterActivity"
-            android:label="@string/app_name"
-            android:theme="@style/AppTheme2" >
-        </activity>
-        <activity
-            android:name=".view.home.HomeActivity"
-            android:label="@string/title_activity_haystack"
-            android:theme="@style/AppTheme2" >
-        </activity>
-        <activity
-            android:name=".view.settings.AppSettingsActivity"
-            android:label="@string/title_activity_app_settings"
-            android:parentActivityName=".view.home.HomeActivity"
-            android:theme="@style/AppTheme2" >
-        </activity>
-        <activity
-            android:name=".view.haystack.HaystackUserActivity"
-            android:label="@string/title_activity_haystack_user"
-            android:theme="@style/AppTheme2" >
-        </activity>
-
         <service
             android:name=".service.NeedleLocationService"
             android:enabled="true"
-            android:exported="false" >
+            android:exported="false">
         </service>
 
         <receiver
             android:name=".broadcastReceiver.LocationServiceBroadcastReceiver"
             android:enabled="true"
             android:exported="false" >
+        </receiver>
+
+        <receiver android:name=".broadcastReceiver.PostLocationRequestAlarm">
         </receiver>
     </application>
 

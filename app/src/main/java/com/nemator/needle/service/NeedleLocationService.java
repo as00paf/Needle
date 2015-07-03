@@ -32,7 +32,7 @@ import java.util.Date;
 public class NeedleLocationService extends Service implements
         GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener,
-        LocationListener, AddPostLocationRequestTask.AddPostLocationRequestHandler, IsPostLocationRequestDBEmptyResponseHandler {
+        LocationListener, AddPostLocationRequestTask.AddPostLocationRequestHandler, IsPostLocationRequestDBEmptyResponseHandler{
 
     //Objects
     private final IBinder mBinder = new LocalBinder();
@@ -49,11 +49,13 @@ public class NeedleLocationService extends Service implements
     private Boolean mRequestingLocationUpdates = false;
     private Boolean servicesAvailable = false;
     private boolean mInProgress;
+    private boolean checkForPostRequests;
 
     public class LocalBinder extends Binder {
         public NeedleLocationService getService() {
             return NeedleLocationService.this;
         }
+
     }
 
     public NeedleLocationService() {
@@ -76,16 +78,19 @@ public class NeedleLocationService extends Service implements
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        if(!servicesAvailable || mGoogleApiClient.isConnected() || mInProgress)
+        if(!servicesAvailable || (mGoogleApiClient != null &&mGoogleApiClient.isConnected()) || mInProgress)
             return START_STICKY;
 
         connectToApiClient();
+        checkForPostRequests = true;
         return START_STICKY;
     }
 
     @Override
     public IBinder onBind(Intent intent) {
-        connectToApiClient();
+        if(mGoogleApiClient == null || mGoogleApiClient.isConnected())
+            connectToApiClient();
+
         return mBinder;
     }
 
@@ -144,6 +149,11 @@ public class NeedleLocationService extends Service implements
 
             mCurrentPosition = new LatLng(lat, lng);
         }
+
+        if(checkForPostRequests){
+            checkForPostRequests = false;
+            isPostLocationRequestDBEmpty();
+        }
     }
 
     @Override
@@ -160,10 +170,11 @@ public class NeedleLocationService extends Service implements
         sendBroadcast(intent);
 
         //Post Location
-        postOrStopPosting();
+        isPostLocationRequestDBEmpty();
+        postLocation();
     }
 
-    private void postOrStopPosting(){
+    private void isPostLocationRequestDBEmpty(){
         new IsPostLocationRequestDBEmptyTask(this, this).execute();
     }
 
@@ -172,8 +183,14 @@ public class NeedleLocationService extends Service implements
         mPostingLocationUpdates = isNotEmpty;
 
         if(isNotEmpty){
-            postLocation();
-        }else if(mRequestingLocationUpdates == false){
+            if(!mRequestingLocationUpdates){
+                mRequestingLocationUpdates = true;
+                startLocationUpdates();
+            }
+
+        }else {
+            stopLocationUpdates();
+            mPostingLocationUpdates = false;
             stopSelf();
         }
     }

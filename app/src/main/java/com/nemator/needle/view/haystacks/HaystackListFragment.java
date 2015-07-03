@@ -168,15 +168,17 @@ public class HaystackListFragment extends Fragment implements FetchHaystacksTask
         HaystackListTabFragment publicTab = mHaystackListPagerAdapter.getPublicHaystackListFragment();
         HaystackListTabFragment privateTab = mHaystackListPagerAdapter.getPrivateHaystackListFragment();
 
-        publicTab.getRefreshLayout().setRefreshing(false);
-        privateTab.getRefreshLayout().setRefreshing(false);
-
         //Show how many haystacks are available in the Nav Drawer
         int count = publicHaystacks.size() + privateHaystacks.size();
         ((MainActivity) getActivity()).setHaystacksCount(count);
 
-        mHaystackListPagerAdapter.getPublicHaystackListFragment().updateHaystackList(publicHaystacks);
-        mHaystackListPagerAdapter.getPrivateHaystackListFragment().updateHaystackList(privateHaystacks);
+        if(publicTab == null && privateTab == null) return;
+
+        publicTab.getRefreshLayout().setRefreshing(false);
+        privateTab.getRefreshLayout().setRefreshing(false);
+
+        publicTab.updateHaystackList(publicHaystacks);
+        privateTab.updateHaystackList(privateHaystacks);
     }
 
     private int getUserId(){

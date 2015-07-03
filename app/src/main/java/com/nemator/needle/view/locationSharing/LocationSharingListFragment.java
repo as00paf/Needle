@@ -23,7 +23,7 @@ import com.shamanland.fab.FloatingActionButton;
 import java.util.ArrayList;
 
 
-public class LocationSharingFragment extends Fragment implements FetchLocationSharingTask.FetchLocationSharingResponseHandler {
+public class LocationSharingListFragment extends Fragment implements FetchLocationSharingTask.FetchLocationSharingResponseHandler {
     public static String TAG = "LocationSharingFragment";
 
     //Views
@@ -34,21 +34,21 @@ public class LocationSharingFragment extends Fragment implements FetchLocationSh
 
     //Objects
     private LocationSharingPagerAdapter mLocationSharingPagerAdapter;
-    private LocationSharingFragmentInteractionListener fabListener;
+    private LocationSharingListFragmentInteractionListener fabListener;
 
     //Data
     public ArrayList<LocationSharingVO> receivedLocationsList = new ArrayList<>();
     public ArrayList<LocationSharingVO> sentLocationsList = new ArrayList<>();
     private OnActivityStateChangeListener stateChangeCallback;
 
-    public static LocationSharingFragment newInstance() {
-        LocationSharingFragment fragment = new LocationSharingFragment();
+    public static LocationSharingListFragment newInstance() {
+        LocationSharingListFragment fragment = new LocationSharingListFragment();
         Bundle args = new Bundle();
         fragment.setArguments(args);
         return fragment;
     }
 
-    public LocationSharingFragment() {
+    public LocationSharingListFragment() {
         // Required empty public constructor
     }
 
@@ -174,12 +174,12 @@ public class LocationSharingFragment extends Fragment implements FetchLocationSh
         receivedTab.getRefreshLayout().setRefreshing(false);
         sentTab.getRefreshLayout().setRefreshing(false);
 
-        mLocationSharingPagerAdapter.getReceivedFragment().updateLocationSharingList(receivedLocationsList);
-        mLocationSharingPagerAdapter.getSentFragment().updateLocationSharingList(sentLocationsList);
+        receivedTab.updateLocationSharingList(receivedLocationsList);
+        sentTab.updateLocationSharingList(sentLocationsList);
 
     }
 
-    private int getUserId(){
+    private int getUserId() {
         return ((MainActivity) getActivity()).getUserId();
     }
 
@@ -188,8 +188,9 @@ public class LocationSharingFragment extends Fragment implements FetchLocationSh
     }
 
     //Interface
-    public interface LocationSharingFragmentInteractionListener {
+    public interface LocationSharingListFragmentInteractionListener {
         void onCreateLocationSharingFabTapped();
         void onRefreshLocationSharingList();
+        void onClickLocationSharingCard(LocationSharingVO locationSharing, Boolean isSent);
     }
 }

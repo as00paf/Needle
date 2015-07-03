@@ -10,6 +10,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.nemator.needle.MainActivity;
 import com.nemator.needle.R;
 import com.nemator.needle.models.vo.LocationSharingVO;
 import com.nemator.needle.utils.AppState;
@@ -33,7 +34,7 @@ public class LocationSharingListTabFragment extends Fragment{
     private RecyclerView.Adapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
     private OnActivityStateChangeListener stateChangeCallback;
-    private LocationSharingFragment.LocationSharingFragmentInteractionListener interactionListener;
+    private LocationSharingListFragment.LocationSharingListFragmentInteractionListener interactionListener;
 
     @Override
     public void onCreate(Bundle savedInstanceState){
@@ -51,7 +52,7 @@ public class LocationSharingListTabFragment extends Fragment{
 
         try {
             stateChangeCallback = (OnActivityStateChangeListener) getActivity();
-            interactionListener = (LocationSharingFragment.LocationSharingFragmentInteractionListener) getActivity();
+            interactionListener = (LocationSharingListFragment.LocationSharingListFragmentInteractionListener) getActivity();
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString()
                     + " must implement OnActivityStateChangeListener");
@@ -99,11 +100,7 @@ public class LocationSharingListTabFragment extends Fragment{
 
     public void updateLocationSharingList(ArrayList<LocationSharingVO> data){
         this.dataList = data;
-        if(mAdapter == null){
-            mAdapter = new LocationSharingListCardAdapter(dataList, getActivity(), !isReceived);
-        }else{
-            mAdapter.notifyDataSetChanged();
-        }
+        mAdapter = new LocationSharingListCardAdapter(dataList, getActivity(), !isReceived, ((MainActivity) getActivity()));
 
         if(mRecyclerView != null){
             mRecyclerView.setAdapter(mAdapter);

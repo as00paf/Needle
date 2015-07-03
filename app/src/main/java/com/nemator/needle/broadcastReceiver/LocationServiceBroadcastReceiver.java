@@ -13,6 +13,9 @@ public class LocationServiceBroadcastReceiver extends BroadcastReceiver {
 
     private LocationServiceDelegate mDelegate;
 
+    public LocationServiceBroadcastReceiver(){
+    }
+
     public LocationServiceBroadcastReceiver(LocationServiceDelegate delegate) {
         mDelegate = delegate;
     }

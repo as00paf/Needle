@@ -1,7 +1,6 @@
 package com.nemator.needle.view.locationSharing;
 
 import android.content.Context;
-import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,10 +9,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.nemator.needle.R;
-import com.nemator.needle.models.vo.HaystackVO;
 import com.nemator.needle.models.vo.LocationSharingVO;
-import com.nemator.needle.tasks.ImageDownloaderTask;
-import com.nemator.needle.utils.AppConstants;
+import com.nemator.needle.view.locationSharing.LocationSharingListFragment.LocationSharingListFragmentInteractionListener;
 
 import java.util.ArrayList;
 
@@ -27,7 +24,10 @@ public class LocationSharingListCardAdapter extends RecyclerView.Adapter<Locatio
     private ArrayList<LocationSharingVO> listData;
     private Context mContext;
 
-    public LocationSharingListCardAdapter(ArrayList<LocationSharingVO> data, Context context, Boolean isSent) {
+    private LocationSharingListFragmentInteractionListener mListener;
+
+    public LocationSharingListCardAdapter(ArrayList<LocationSharingVO> data, Context context, Boolean isSent, LocationSharingListFragmentInteractionListener listener) {
+        mListener = listener;
         listData = data;
         mContext = context;
         this.isSent = isSent;
@@ -51,10 +51,10 @@ public class LocationSharingListCardAdapter extends RecyclerView.Adapter<Locatio
 
         if(viewType == TYPE_ITEM){
             locationSharingCard = LayoutInflater.from(parent.getContext()).inflate(R.layout.location_sharing_card_layout, parent, false);
-            viewHolder = new LocationSharingCardViewHolder(locationSharingCard, true);
+            viewHolder = new LocationSharingCardViewHolder(locationSharingCard, true, mListener, isSent);
         }else{
             locationSharingCard = LayoutInflater.from(parent.getContext()).inflate(R.layout.haystack_empty_card_layout, parent, false);
-            viewHolder = new LocationSharingCardViewHolder(locationSharingCard, false);
+            viewHolder = new LocationSharingCardViewHolder(locationSharingCard, false, mListener, isSent);
         }
 
         return viewHolder;
@@ -114,8 +114,13 @@ public class LocationSharingListCardAdapter extends RecyclerView.Adapter<Locatio
 
         LocationSharingVO locationSharingData;
 
-        public LocationSharingCardViewHolder(View view, Boolean isNotEmpty) {
+        private LocationSharingListFragmentInteractionListener mListener;
+        private Boolean isSent;
+
+        public LocationSharingCardViewHolder(View view, Boolean isNotEmpty, LocationSharingListFragmentInteractionListener listener, Boolean isSent) {
             super(view);
+            mListener = listener;
+            this.isSent = isSent;
             titleView =  (TextView) view.findViewById(R.id.location_sharing_name_label);
             active_until = (TextView)  view.findViewById(R.id.location_sharing_time_limit_label);
             emptyText = (TextView) view.findViewById(R.id.emptyText);
@@ -132,13 +137,12 @@ public class LocationSharingListCardAdapter extends RecyclerView.Adapter<Locatio
 
         public void setData(LocationSharingVO locationSharing){
             locationSharingData = locationSharing;
-           /* itemView.setOnClickListener(new View.OnClickListener() {
+            itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    Intent intent = new Intent(view.getContext(), LocationSharing.class);
-                    view.getContext().startActivity(intent);
+                    mListener.onClickLocationSharingCard(locationSharingData, isSent);
                 }
-            });*/
+            });
         }
     }
 }

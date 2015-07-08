@@ -11,6 +11,12 @@
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.GET_ACCOUNTS" />
+    <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
+
+    <permission android:name="com.nemator.needle.gcm.permission.C2D_MESSAGE"
+        android:protectionLevel="signature" />
+    <uses-permission android:name="com.nemator.needle.gcm.permission.C2D_MESSAGE" />
 
     <uses-feature android:name="android.hardware.camera" />
     <uses-feature android:name="android.hardware.camera2" />
@@ -55,6 +61,19 @@
 
         <receiver android:name=".broadcastReceiver.PostLocationRequestAlarm">
         </receiver>
+
+        <!-- For receiving GCM message and registration success -->
+        <receiver
+            android:name=".gcm.GCMBroadcastReceiver"
+            android:permission="com.google.android.c2dm.permission.SEND" >
+            <intent-filter>
+                <action android:name="com.google.android.c2dm.intent.RECEIVE" />
+                <action android:name="com.google.android.c2dm.intent.REGISTRATION" />
+                <category android:name="com.nemator.needle.gcm" />
+            </intent-filter>
+        </receiver>
+
+        <service android:name=".gcm.GCMIntentService" />
     </application>
 
 </manifest>

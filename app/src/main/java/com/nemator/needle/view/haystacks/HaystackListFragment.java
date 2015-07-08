@@ -170,7 +170,8 @@ public class HaystackListFragment extends Fragment implements FetchHaystacksTask
 
         //Show how many haystacks are available in the Nav Drawer
         int count = publicHaystacks.size() + privateHaystacks.size();
-        ((MainActivity) getActivity()).setHaystacksCount(count);
+        if(getActivity() != null)
+            ((MainActivity) getActivity()).setHaystacksCount(count);
 
         if(publicTab == null && privateTab == null) return;
 

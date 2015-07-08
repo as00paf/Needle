@@ -1,4 +1,5 @@
 apply plugin: 'com.android.application'
+apply plugin: 'com.google.gms.google-services'
 repositories {
     mavenCentral()
     maven {
@@ -7,9 +8,12 @@ repositories {
 }
 
 android {
+    signingConfigs {
+        debug {
+        }
+    }
     compileSdkVersion 21
     buildToolsVersion '21.1.2'
-
     defaultConfig {
         applicationId "com.nemator.needle"
         minSdkVersion 15
@@ -22,11 +26,14 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
+        debug {
+            signingConfig signingConfigs.debug
+        }
     }
 }
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
-    compile 'com.google.android.gms:play-services:7.3.0'
+    compile 'com.google.android.gms:play-services:7.5+'
     compile 'com.google.android.gms:play-services-maps:7.3.0'
     compile 'com.android.support:appcompat-v7:21.0.3'
     compile 'com.shamanland:fab:0.0.7'

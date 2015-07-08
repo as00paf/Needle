@@ -8,7 +8,10 @@ import java.io.Serializable;
 public class UserVO implements Serializable, Parcelable{
 
     private int userId;
-    private String userName, pictureURL;
+    private String userName;
+    private String pictureURL;
+
+    private String gcmRegId;
 
     public UserVO(){
 
@@ -18,6 +21,7 @@ public class UserVO implements Serializable, Parcelable{
         userId = in.readInt();
         userName = in.readString();
         pictureURL = in.readString();
+        gcmRegId = in.readString();
     }
 
     public int getUserId() {
@@ -44,6 +48,14 @@ public class UserVO implements Serializable, Parcelable{
         this.pictureURL = pictureURL;
     }
 
+    public String getGcmRegId() {
+        return gcmRegId;
+    }
+
+    public void setGcmRegId(String gcmRegId) {
+        this.gcmRegId = gcmRegId;
+    }
+
     @Override
     public int describeContents() {
         return 0;
@@ -54,6 +66,7 @@ public class UserVO implements Serializable, Parcelable{
         dest.writeInt(userId);
         dest.writeString(userName);
         dest.writeString(pictureURL);
+        dest.writeString(gcmRegId);
     }
 
     public static final Parcelable.Creator<UserVO> CREATOR = new Parcelable.Creator<UserVO>() {

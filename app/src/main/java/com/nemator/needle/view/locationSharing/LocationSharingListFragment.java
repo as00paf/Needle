@@ -164,7 +164,7 @@ public class LocationSharingListFragment extends Fragment implements FetchLocati
         receivedLocationsList = result.receivedLocationSharingList;
         sentLocationsList = result.sentLocationSharingList;
 
-        if(receivedLocationsList != null){
+        if(receivedLocationsList != null && getActivity() != null){
             ((MainActivity) getActivity()).setLocationSharingCount(receivedLocationsList.size());
         }
 
@@ -176,7 +176,6 @@ public class LocationSharingListFragment extends Fragment implements FetchLocati
 
         receivedTab.updateLocationSharingList(receivedLocationsList);
         sentTab.updateLocationSharingList(sentLocationsList);
-
     }
 
     private int getUserId() {

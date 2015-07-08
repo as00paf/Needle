@@ -7,15 +7,22 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.text.TextUtils;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GooglePlayServicesUtil;
+import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.nemator.needle.data.LocationServiceDBHelper;
 import com.nemator.needle.models.vo.HaystackVO;
 import com.nemator.needle.models.vo.LocationSharingVO;
@@ -36,6 +43,17 @@ import com.nemator.needle.view.locationSharing.createLocationSharing.CreateLocat
 import com.nemator.needle.view.locationSharing.locationSharing.LocationSharingMapFragment;
 import com.nemator.needle.view.settings.SettingsFragment;
 
+import java.io.IOException;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.ProtocolException;
+import java.net.URL;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Map.Entry;
+
 import it.neokree.materialnavigationdrawer.MaterialNavigationDrawer;
 import it.neokree.materialnavigationdrawer.elements.MaterialAccount;
 import it.neokree.materialnavigationdrawer.elements.MaterialSection;
@@ -49,7 +67,17 @@ import static com.nemator.needle.view.locationSharing.LocationSharingListFragmen
 public class MainActivity extends MaterialNavigationDrawer implements LoginResponseHandler,
         OnActivityStateChangeListener, MaterialSectionListener, HaystackListFragmentInteractionListener,
         LocationSharingListFragmentInteractionListener, CreateHaystackResponseHandler, CreateLocationSharingResponseHandler {
+
+    private static final int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
     public static String TAG = "MainActivity";
+
+    // Resgistration Id from GCM
+    private static final String PREF_GCM_REG_ID = "PREF_GCM_REG_ID";
+    private static final int ACTION_PLAY_SERVICES_DIALOG = 100;
+    protected static final int MSG_REGISTER_WITH_GCM = 101;
+    protected static final int MSG_REGISTER_WEB_SERVER_SUCCESS = 103;
+    protected static final int MSG_REGISTER_WEB_SERVER_FAILURE = 104;
+    private static final String GCM_SENDER_ID = "648034739265";
 
     private SharedPreferences mSharedPreferences;
     private int currentState = AppState.LOGIN;
@@ -89,6 +117,12 @@ public class MainActivity extends MaterialNavigationDrawer implements LoginRespo
     //Service
     private ServiceConnection mConnection;
     private NeedleLocationService locationService;
+
+    //GCM
+    GoogleCloudMessaging gcm;
+
+
+    private String gcmRegId;
 
     @Override
     public void init(Bundle savedInstanceState) {
@@ -168,7 +202,7 @@ public class MainActivity extends MaterialNavigationDrawer implements LoginRespo
             edit.commit();
         }
 
-        //Service
+        //Needle Location Service
         mConnection = new ServiceConnection(){
             public void onServiceConnected(ComponentName className, IBinder service) {
                 locationService = ((NeedleLocationService.LocalBinder)service).getService();
@@ -182,7 +216,92 @@ public class MainActivity extends MaterialNavigationDrawer implements LoginRespo
         Intent serviceIntent = new Intent(this, NeedleLocationService.class);
         startService(serviceIntent);
         bindService(serviceIntent, mConnection, Context.BIND_AUTO_CREATE);
+
+        //GCM
+        if (checkPlayServices()) {
+            gcm = GoogleCloudMessaging.getInstance(getApplicationContext());
+
+            // Read saved registration id from shared preferences.
+            gcmRegId = mSharedPreferences.getString(PREF_GCM_REG_ID, "");
+
+            if (TextUtils.isEmpty(gcmRegId)) {
+                handler.sendEmptyMessage(MSG_REGISTER_WITH_GCM);
+            }else{
+                new RegisterGCMTask().execute();
+            }
+        }
+
     }
+
+    class RegisterGCMTask extends AsyncTask<Void, Void, Void>{
+
+        @Override
+        protected Void doInBackground(Void... params) {
+            //Already registered with GCM
+            try {
+                gcmRegId = gcm.register(GCM_SENDER_ID);
+            } catch (IOException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+
+            return null;
+        }
+    }
+
+    Handler handler = new Handler() {
+        public void handleMessage(android.os.Message msg) {
+            switch (msg.what) {
+                case MSG_REGISTER_WITH_GCM:
+                    new GCMRegistrationTask().execute();
+                    break;
+                case MSG_REGISTER_WEB_SERVER_SUCCESS:
+                    Toast.makeText(getApplicationContext(),
+                            "registered with web server", Toast.LENGTH_LONG).show();
+                    break;
+                case MSG_REGISTER_WEB_SERVER_FAILURE:
+                    Toast.makeText(getApplicationContext(),
+                            "registration with web server failed",
+                            Toast.LENGTH_LONG).show();
+                    break;
+            }
+        };
+    };
+
+    private class GCMRegistrationTask extends AsyncTask<Void, Void, String> {
+
+        @Override
+        protected String doInBackground(Void... params) {
+            // TODO Auto-generated method stub
+            if (gcm == null && checkPlayServices()) {
+                gcm = GoogleCloudMessaging.getInstance(getApplicationContext());
+            }
+            try {
+                gcmRegId = gcm.register(getResources().getString(R.string.gcm_defaultSenderId));
+            } catch (IOException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+
+            return gcmRegId;
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+            if (result != null) {
+                Toast.makeText(getApplicationContext(), "registered with GCM",
+                        Toast.LENGTH_LONG).show();
+                Log.i(TAG, "registered with GCM " + result);
+
+                SharedPreferences.Editor editor = mSharedPreferences.edit();
+                editor.putString(PREF_GCM_REG_ID, gcmRegId);
+                editor.commit();
+            }
+        }
+
+    }
+
+
 
     @Override
     public void onSaveInstanceState(Bundle savedInstanceState) {
@@ -614,5 +733,24 @@ public class MainActivity extends MaterialNavigationDrawer implements LoginRespo
 
     public NeedleLocationService getLocationService() {
         return locationService;
+    }
+
+    private boolean checkPlayServices() {
+        int resultCode = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this);
+        if (resultCode != ConnectionResult.SUCCESS) {
+            if (GooglePlayServicesUtil.isUserRecoverableError(resultCode)) {
+                GooglePlayServicesUtil.getErrorDialog(resultCode, this,
+                        PLAY_SERVICES_RESOLUTION_REQUEST).show();
+            } else {
+                Log.i(TAG, "This device is not supported.");
+                finish();
+            }
+            return false;
+        }
+        return true;
+    }
+
+    public String getGcmRegId() {
+        return gcmRegId;
     }
 }

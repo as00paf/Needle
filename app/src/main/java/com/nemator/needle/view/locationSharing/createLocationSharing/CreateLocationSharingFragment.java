@@ -217,7 +217,8 @@ public class CreateLocationSharingFragment extends Fragment implements RetrieveU
         //Options
         locationSharingVO.setTimeLimit(dateLimitEditText.getText().toString() + " " + timeLimitEditText.getText().toString());
 
-        CreateLocationSharingTaskParams params = new CreateLocationSharingTaskParams(getActivity(), locationSharingVO);
+        String regId = selectedUser.getGcmRegId();
+        CreateLocationSharingTaskParams params = new CreateLocationSharingTaskParams(getActivity(), locationSharingVO, regId);
         CreateLocationSharingTask task = new CreateLocationSharingTask(params, ((MainActivity) getActivity()));
         task.execute();
     }

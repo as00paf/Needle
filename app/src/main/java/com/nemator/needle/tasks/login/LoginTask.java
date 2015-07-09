@@ -94,9 +94,11 @@ public class LoginTask extends AsyncTask<Void, Void, AuthenticationResult> {
         }
     }
 
+    @Override
     protected void onPostExecute(AuthenticationResult result) {
         if(dialog!=null) dialog.dismiss();
         delegate.onLoginComplete(result);
+        super.onPostExecute(result);
     }
 
     public interface LoginResponseHandler {

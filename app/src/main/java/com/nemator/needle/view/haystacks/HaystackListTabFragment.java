@@ -51,8 +51,8 @@ public class HaystackListTabFragment extends Fragment {
         super.onAttach(activity);
 
         try {
-            stateChangeCallback = (OnActivityStateChangeListener) getActivity();
-            interactionListener = (HaystackListFragment.HaystackListFragmentInteractionListener) getActivity();
+            stateChangeCallback = ((OnActivityStateChangeListener) ((MainActivity) getActivity()).getNavigationController());
+            interactionListener = ((HaystackListFragment.HaystackListFragmentInteractionListener) ((MainActivity) getActivity()).getNavigationController());
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString()
                     + " must implement OnActivityStateChangeListener");

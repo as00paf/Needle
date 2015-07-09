@@ -175,7 +175,7 @@ public class CreateLocationSharingFragment extends Fragment implements RetrieveU
 
     private void fetchAllUsers(){
         RetrieveUsersParams params = new RetrieveUsersParams();
-        params.userId = String.valueOf(((MainActivity) getActivity()).getUserId());
+        params.userId = String.valueOf(((MainActivity) getActivity()).getUserModel().getUserId());
         params.type = RetrieveUsersParams.RetrieveUsersParamsType.TYPE_ALL_USERS;
 
         try{
@@ -207,8 +207,8 @@ public class CreateLocationSharingFragment extends Fragment implements RetrieveU
         locationSharingVO = new LocationSharingVO();
 
         //Sender
-        locationSharingVO.setSenderId(((MainActivity) getActivity()).getUserId());
-        locationSharingVO.setSenderName(((MainActivity) getActivity()).getUserName());
+        locationSharingVO.setSenderId(((MainActivity) getActivity()).getUserModel().getUserId());
+        locationSharingVO.setSenderName(((MainActivity) getActivity()).getUserModel().getUserName());
 
         //Receiver
         locationSharingVO.setReceiverId(selectedUser.getUserId());
@@ -219,7 +219,7 @@ public class CreateLocationSharingFragment extends Fragment implements RetrieveU
 
         String regId = selectedUser.getGcmRegId();
         CreateLocationSharingTaskParams params = new CreateLocationSharingTaskParams(getActivity(), locationSharingVO, regId);
-        CreateLocationSharingTask task = new CreateLocationSharingTask(params, ((MainActivity) getActivity()));
+        CreateLocationSharingTask task = new CreateLocationSharingTask(params, (((MainActivity) getActivity()).getNavigationController()));
         task.execute();
     }
 

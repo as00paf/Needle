@@ -74,7 +74,7 @@ public class LocationSharingListFragment extends Fragment implements FetchLocati
         super.onAttach(activity);
 
         try {
-            stateChangeCallback = (OnActivityStateChangeListener) getActivity();
+            stateChangeCallback = ((OnActivityStateChangeListener) ((MainActivity) getActivity()).getNavigationController());
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString()
                     + " must implement OnActivityStateChangeListener");
@@ -87,7 +87,7 @@ public class LocationSharingListFragment extends Fragment implements FetchLocati
             rootView = inflater.inflate(R.layout.fragment_location_sharing, container, false);
 
             //FAB
-            fabListener = ((MainActivity) getActivity());
+            fabListener = ((MainActivity) getActivity()).getNavigationController();
             fab = (FloatingActionButton) rootView.findViewById(R.id.location_sharing_fab);
             fab.setColor(getResources().getColor(R.color.primary));
             fab.setOnClickListener(new View.OnClickListener() {
@@ -165,7 +165,7 @@ public class LocationSharingListFragment extends Fragment implements FetchLocati
         sentLocationsList = result.sentLocationSharingList;
 
         if(receivedLocationsList != null && getActivity() != null){
-            ((MainActivity) getActivity()).setLocationSharingCount(receivedLocationsList.size());
+            ((MainActivity) getActivity()).getNavigationController().setLocationSharingCount(receivedLocationsList.size());
         }
 
         LocationSharingListTabFragment receivedTab = mLocationSharingPagerAdapter.getReceivedFragment();
@@ -179,7 +179,7 @@ public class LocationSharingListFragment extends Fragment implements FetchLocati
     }
 
     private int getUserId() {
-        return ((MainActivity) getActivity()).getUserId();
+        return ((MainActivity) getActivity()).getUserModel().getUserId();
     }
 
     public void goToPage(int page){

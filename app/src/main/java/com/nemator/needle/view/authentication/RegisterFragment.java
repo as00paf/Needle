@@ -104,8 +104,8 @@ public class RegisterFragment extends Fragment implements View.OnClickListener{
         if(TextUtils.isEmpty(username) || TextUtils.isEmpty(password)){
             Toast.makeText(getActivity(), "You must enter a username and a password", Toast.LENGTH_LONG).show();
         }else{
-            RegisterTaskParams params = new RegisterTaskParams(getActivity(), username, password, ((MainActivity) getActivity()).getGcmRegId());
-            new RegisterTask(params, (MainActivity) getActivity()).execute();
+            RegisterTaskParams params = new RegisterTaskParams(getActivity(), username, password, ((MainActivity) getActivity()).getUserModel().getGcmRegId());
+            new RegisterTask(params, (((MainActivity) getActivity()).getAuthenticationController())).execute();
         }
     }
 

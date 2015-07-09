@@ -48,7 +48,7 @@ import com.viewpagerindicator.CirclePageIndicator;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CreateHaystackFragment extends Fragment implements ImageUploaderTask.ImageUploadResponseHandler,
+public class CreateHaystackFragment extends CreateHaystackBaseFragment implements ImageUploaderTask.ImageUploadResponseHandler,
         CreateHaystackGeneralInfosFragment.OnPrivacySettingsUpdatedListener,
         GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener{
     public static final String TAG = "CreateHaystackFragment";
@@ -90,6 +90,18 @@ public class CreateHaystackFragment extends Fragment implements ImageUploaderTas
     }
 
     public CreateHaystackFragment() {
+    }
+
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+
+        try {
+            stateChangeCallback = ((OnActivityStateChangeListener) ((MainActivity) getActivity()).getNavigationController());
+        } catch (ClassCastException e) {
+            throw new ClassCastException(activity.toString()
+                    + " must implement OnActivityStateChangeListener");
+        }
     }
 
     @Override
@@ -262,18 +274,6 @@ public class CreateHaystackFragment extends Fragment implements ImageUploaderTas
         return super.onOptionsItemSelected(item);
     }
 
-    @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-
-        try {
-            stateChangeCallback = (OnActivityStateChangeListener) getActivity();
-        } catch (ClassCastException e) {
-            throw new ClassCastException(activity.toString()
-                    + " must implement OnActivityStateChangeListener");
-        }
-    }
-
     // method to check if you have a Camera
     private boolean hasCamera(){
         return getActivity().getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA);
@@ -350,7 +350,7 @@ public class CreateHaystackFragment extends Fragment implements ImageUploaderTas
             //Create Haystack
             CreateHaystackTaskParams params = new CreateHaystackTaskParams(rootView.getContext(), haystack);
             try{
-                CreateHaystackTask task = new CreateHaystackTask(params, ((MainActivity) getActivity()));
+                CreateHaystackTask task = new CreateHaystackTask(params, ((MainActivity) getActivity()).getNavigationController());
                 task.execute();
 
             }catch (Exception e) {
@@ -373,7 +373,7 @@ public class CreateHaystackFragment extends Fragment implements ImageUploaderTas
             //Create Haystack
             CreateHaystackTaskParams params = new CreateHaystackTaskParams(rootView.getContext(), haystack);
             try{
-                CreateHaystackTask task = new CreateHaystackTask(params, ((MainActivity) getActivity()));
+                CreateHaystackTask task = new CreateHaystackTask(params, (((MainActivity) getActivity()).getNavigationController()));
                 task.execute();
 
             }catch (Exception e) {

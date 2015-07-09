@@ -156,7 +156,7 @@ public class HaystackFragment extends Fragment {
     }
 
     public boolean isOwner(){
-        int userId = ((MainActivity) getActivity()).getUserId();
+        int userId = ((MainActivity) getActivity()).getUserModel().getUserId();
         int ownerId = haystack.getOwner();
 
         mIsOwner = userId == ownerId;
@@ -286,7 +286,7 @@ public class HaystackFragment extends Fragment {
 
         private void fetchAllUsers(){
             RetrieveUsersParams params = new RetrieveUsersParams();
-            params.userId = String.valueOf(((MainActivity) getActivity()).getUserId());
+            params.userId = String.valueOf(((MainActivity) getActivity()).getUserModel().getUserId());
             params.type = RetrieveUsersParams.RetrieveUsersParamsType.TYPE_ALL_USERS;
 
             try{

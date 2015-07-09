@@ -58,7 +58,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener{
         super.onAttach(activity);
 
         try {
-            fragmentListener = ((LoginFragmentInteractionListener) getActivity());
+            fragmentListener = ((LoginFragmentInteractionListener) ((MainActivity) getActivity()).getNavigationController());
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString()
                     + " must implement OnActivityStateChangeListener");
@@ -117,8 +117,8 @@ public class LoginFragment extends Fragment implements View.OnClickListener{
     @Override
     public void onResume(){
         boolean rememberMe = mSharedPreferences.getBoolean("rememberMe", false);
-        boolean autoLogin = ((MainActivity) getActivity()).autoLogin;
-        boolean willLogin = rememberMe && autoLogin && !((MainActivity) getActivity()).loggedIn;
+        boolean autoLogin = ((MainActivity) getActivity()).getUserModel().isAutoLogin();
+        boolean willLogin = rememberMe && autoLogin && !((MainActivity) getActivity()).getUserModel().isLoggedIn();
 
         if(!user.getText().toString().isEmpty() && !pass.getText().toString().isEmpty() && willLogin){
             login();
@@ -140,7 +140,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener{
             Toast.makeText(getActivity(), "You must enter a username and a password", Toast.LENGTH_LONG).show();
         }else{
             LoginTaskParams params = new LoginTaskParams(username, password, getActivity(), rememberMeCheckBox.isChecked(), false);
-            new LoginTask(params, (MainActivity) getActivity()).execute();
+            new LoginTask(params, ((MainActivity) getActivity()).getAuthenticationController()).execute();
         }
     }
 

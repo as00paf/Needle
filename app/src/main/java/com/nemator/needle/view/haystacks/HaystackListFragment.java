@@ -72,8 +72,8 @@ public class HaystackListFragment extends Fragment implements FetchHaystacksTask
         super.onAttach(activity);
 
         try {
-            stateChangeCallback = (OnActivityStateChangeListener) getActivity();
-            fragmentListener = ((HaystackListFragmentInteractionListener) getActivity());
+            stateChangeCallback = ((OnActivityStateChangeListener) ((MainActivity) getActivity()).getNavigationController());
+            fragmentListener = ((HaystackListFragmentInteractionListener) ((MainActivity) getActivity()).getNavigationController());
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString()
                     + " must implement OnActivityStateChangeListener");
@@ -171,7 +171,7 @@ public class HaystackListFragment extends Fragment implements FetchHaystacksTask
         //Show how many haystacks are available in the Nav Drawer
         int count = publicHaystacks.size() + privateHaystacks.size();
         if(getActivity() != null)
-            ((MainActivity) getActivity()).setHaystacksCount(count);
+            ((MainActivity) getActivity()).getNavigationController().setHaystacksCount(count);
 
         if(publicTab == null && privateTab == null) return;
 
@@ -183,11 +183,11 @@ public class HaystackListFragment extends Fragment implements FetchHaystacksTask
     }
 
     private int getUserId(){
-        return ((MainActivity) getActivity()).getUserId();
+        return ((MainActivity) getActivity()).getUserModel().getUserId();
     }
 
     private String getUserName(){
-        return ((MainActivity) getActivity()).getUserName();
+        return ((MainActivity) getActivity()).getUserModel().getUserName();
     }
 
     public void goToTab(int tab){

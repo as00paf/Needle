@@ -15,6 +15,7 @@ import com.nemator.needle.R;
 import com.nemator.needle.models.vo.LocationSharingVO;
 import com.nemator.needle.utils.AppState;
 import com.nemator.needle.view.haystacks.OnActivityStateChangeListener;
+import com.nemator.needle.view.locationSharing.LocationSharingListFragment.LocationSharingListFragmentInteractionListener;
 
 import java.util.ArrayList;
 
@@ -34,7 +35,7 @@ public class LocationSharingListTabFragment extends Fragment{
     private RecyclerView.Adapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
     private OnActivityStateChangeListener stateChangeCallback;
-    private LocationSharingListFragment.LocationSharingListFragmentInteractionListener interactionListener;
+    private LocationSharingListFragmentInteractionListener interactionListener;
 
     @Override
     public void onCreate(Bundle savedInstanceState){
@@ -51,11 +52,11 @@ public class LocationSharingListTabFragment extends Fragment{
         super.onAttach(activity);
 
         try {
-            stateChangeCallback = (OnActivityStateChangeListener) getActivity();
-            interactionListener = (LocationSharingListFragment.LocationSharingListFragmentInteractionListener) getActivity();
+            stateChangeCallback = ((OnActivityStateChangeListener) ((MainActivity) getActivity()).getNavigationController());
+            interactionListener = ((LocationSharingListFragmentInteractionListener) ((MainActivity) getActivity()).getNavigationController());
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString()
-                    + " must implement OnActivityStateChangeListener");
+                    + " must implement OnActivityStateChangeListener and LocationSharingListFragmentInteractionListener");
         }
     }
 
@@ -100,7 +101,7 @@ public class LocationSharingListTabFragment extends Fragment{
 
     public void updateLocationSharingList(ArrayList<LocationSharingVO> data){
         this.dataList = data;
-        mAdapter = new LocationSharingListCardAdapter(dataList, getActivity(), !isReceived, ((MainActivity) getActivity()));
+        mAdapter = new LocationSharingListCardAdapter(dataList, getActivity(), !isReceived, (((MainActivity) getActivity()).getNavigationController()));
 
         if(mRecyclerView != null){
             mRecyclerView.setAdapter(mAdapter);

@@ -386,7 +386,7 @@ public class HaystackMapFragment extends SupportMapFragment
     public void onUserActivated(TaskResult result){
         isActivated = result.successCode == 1;
 
-        MenuItem item = ((MainActivity) getActivity()).getMenu().findItem(R.id.location_sharing);
+        MenuItem item = ((MainActivity) getActivity()).getNavigationController().getMenu().findItem(R.id.location_sharing);
         item.setIcon(isActivated ?
                 getResources().getDrawable(R.drawable.ic_action_location_found) :
                 getResources().getDrawable(R.drawable.ic_action_location_off));
@@ -410,7 +410,7 @@ public class HaystackMapFragment extends SupportMapFragment
     public void onUserDeactivated(TaskResult result){
         isActivated = !(result.successCode == 1);
 
-        MenuItem item = ((MainActivity) getActivity()).getMenu().findItem(R.id.location_sharing);
+        MenuItem item = ((MainActivity) getActivity()).getNavigationController().getMenu().findItem(R.id.location_sharing);
         item.setIcon(isActivated ?
                 getResources().getDrawable(R.drawable.ic_action_location_found) :
                 getResources().getDrawable(R.drawable.ic_action_location_off));

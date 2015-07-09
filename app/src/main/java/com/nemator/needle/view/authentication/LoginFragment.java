@@ -1,5 +1,6 @@
 package com.nemator.needle.view.authentication;
 
+import android.app.Activity;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -23,17 +24,23 @@ import com.nemator.needle.MainActivity;
 import com.nemator.needle.R;
 import com.nemator.needle.tasks.login.LoginTask;
 import com.nemator.needle.tasks.login.LoginTaskParams;
+import com.nemator.needle.view.haystacks.OnActivityStateChangeListener;
 
 import it.neokree.materialnavigationdrawer.MaterialNavigationDrawer;
 
 public class LoginFragment extends Fragment implements View.OnClickListener{
 
+    private static final String TAG = "LoginFragment";
+
+    //Children
     private FrameLayout layout;
-    private SharedPreferences mSharedPreferences;
     private EditText user, pass;
     private Button mSubmit, mRegister;
     private CheckBox rememberMeCheckBox;
-    private MainActivity mActivity;
+
+    //Objects
+    private SharedPreferences mSharedPreferences;
+    private LoginFragmentInteractionListener fragmentListener;
 
     public static LoginFragment newInstance() {
         LoginFragment fragment = new LoginFragment();
@@ -47,8 +54,19 @@ public class LoginFragment extends Fragment implements View.OnClickListener{
     }
 
     @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+
+        try {
+            fragmentListener = ((LoginFragmentInteractionListener) getActivity());
+        } catch (ClassCastException e) {
+            throw new ClassCastException(activity.toString()
+                    + " must implement OnActivityStateChangeListener");
+        }
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        mActivity = (MainActivity) getActivity();
         layout = (FrameLayout) inflater.inflate(R.layout.fragment_login, container, false);
 
         mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
@@ -113,7 +131,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener{
         pass.clearFocus();
         user.clearFocus();
 
-        Log.i(AppConstants.TAG_MESSAGE, "Trying to login with credentials : " + user.getText().toString() + ", " + pass.getText().toString());
+        Log.i(TAG, "Trying to login with credentials : " + user.getText().toString() + ", " + pass.getText().toString());
 
         String username = user.getText().toString();
         String password = pass.getText().toString();
@@ -122,7 +140,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener{
             Toast.makeText(getActivity(), "You must enter a username and a password", Toast.LENGTH_LONG).show();
         }else{
             LoginTaskParams params = new LoginTaskParams(username, password, getActivity(), rememberMeCheckBox.isChecked(), false);
-            new LoginTask(params, mActivity).execute();
+            new LoginTask(params, (MainActivity) getActivity()).execute();
         }
     }
 
@@ -133,8 +151,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener{
                 login();
                 break;
             case R.id.register:
-                /*Intent i = new Intent(getActivity(), RegisterActivity.class);
-                startActivity(i);*/
+                fragmentListener.onClickRegister();
                 break;
 
             default:
@@ -142,4 +159,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener{
         }
     }
 
+    public interface LoginFragmentInteractionListener{
+        void onClickRegister();
+    }
 }

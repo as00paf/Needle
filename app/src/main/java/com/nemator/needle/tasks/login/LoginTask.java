@@ -6,6 +6,7 @@ import android.os.AsyncTask;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
+import com.nemator.needle.models.vo.UserVO;
 import com.nemator.needle.utils.AppConstants;
 import com.nemator.needle.tasks.AuthenticationResult;
 import com.nemator.needle.utils.JSONParser;
@@ -76,6 +77,8 @@ public class LoginTask extends AsyncTask<Void, Void, AuthenticationResult> {
                 edit.commit();
 
                 result.message = json.getString(AppConstants.TAG_MESSAGE);
+                int userId = json.getInt(AppConstants.TAG_USER_ID);
+                result.user = new UserVO(userId, params.userName, "", params.gcmRegId);
                 return result;
             }else{
                 Log.d("Login Failure!", json.getString(AppConstants.TAG_MESSAGE));

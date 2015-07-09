@@ -1,0 +1,88 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.nemator.needle.view.authentication.RegisterFragment">
+
+    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:focusable="true"
+        android:focusableInTouchMode="true"
+        >
+
+        <ImageView
+            android:id="@+id/register_logo_image_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_alignParentTop="true"
+            android:src="@drawable/pin_small"
+            android:padding="5dp"/>
+
+        <TextView
+            android:id="@+id/register_user_name_label"
+            android:textStyle="bold"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignLeft="@+id/register_user_name_edit_text"
+            android:layout_above="@id/register_user_name_edit_text"
+            android:text="Username"
+            android:textColor="#000000"/>
+
+        <EditText
+            android:id="@+id/register_user_name_edit_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_above="@+id/register_password_label"
+            android:layout_centerHorizontal="true"
+            android:imeOptions="actionNext"
+            android:maxLines="1"
+            android:inputType="text"
+            android:ems="10">
+        </EditText>
+
+        <TextView
+            android:id="@+id/register_password_label"
+            android:textStyle="bold"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_above="@+id/register_password_edit_text"
+            android:layout_alignLeft="@+id/register_password_edit_text"
+            android:text="Password"
+            android:textColor="#000000"/>
+
+        <EditText
+            android:id="@+id/register_password_edit_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_above="@+id/register_remember_me_checkbox"
+            android:layout_centerHorizontal="true"
+            android:ems="10"
+            android:maxLines="1"
+            android:inputType="textPassword"
+            android:imeOptions="actionSend">
+        </EditText>
+
+        <CheckBox
+            android:id="@+id/register_remember_me_checkbox"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:checked="true"
+            android:text="@string/rememberMe"
+            android:layout_above="@+id/register_register_button"
+            android:layout_alignLeft="@+id/register_register_button"/>
+
+        <Button
+            android:id="@+id/register_register_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignLeft="@+id/register_password_edit_text"
+            android:layout_alignRight="@+id/register_password_edit_text"
+            android:layout_alignParentBottom="true"
+            android:layout_marginBottom="25dp"
+            android:text="@string/register" />
+
+    </RelativeLayout>
+
+</FrameLayout>

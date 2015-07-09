@@ -31,9 +31,15 @@ import com.nemator.needle.tasks.AuthenticationResult;
 import com.nemator.needle.tasks.createHaystack.CreateHaystackResult;
 import com.nemator.needle.tasks.createLocationSharing.CreateLocationSharingResult;
 import com.nemator.needle.tasks.createLocationSharing.CreateLocationSharingTask.CreateLocationSharingResponseHandler;
+import com.nemator.needle.tasks.login.LoginTask;
+import com.nemator.needle.tasks.login.LoginTaskParams;
+import com.nemator.needle.tasks.register.RegisterTask;
+import com.nemator.needle.tasks.register.RegisterTask.RegisterResponseHandler;
 import com.nemator.needle.utils.AppConstants;
 import com.nemator.needle.utils.AppState;
 import com.nemator.needle.view.authentication.LoginFragment;
+import com.nemator.needle.view.authentication.LoginFragment.LoginFragmentInteractionListener;
+import com.nemator.needle.view.authentication.RegisterFragment;
 import com.nemator.needle.view.haystack.HaystackFragment;
 import com.nemator.needle.view.haystacks.HaystackListFragment;
 import com.nemator.needle.view.haystacks.OnActivityStateChangeListener;
@@ -44,15 +50,6 @@ import com.nemator.needle.view.locationSharing.locationSharing.LocationSharingMa
 import com.nemator.needle.view.settings.SettingsFragment;
 
 import java.io.IOException;
-import java.io.OutputStream;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.ProtocolException;
-import java.net.URL;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Map.Entry;
 
 import it.neokree.materialnavigationdrawer.MaterialNavigationDrawer;
 import it.neokree.materialnavigationdrawer.elements.MaterialAccount;
@@ -66,14 +63,13 @@ import static com.nemator.needle.view.locationSharing.LocationSharingListFragmen
 
 public class MainActivity extends MaterialNavigationDrawer implements LoginResponseHandler,
         OnActivityStateChangeListener, MaterialSectionListener, HaystackListFragmentInteractionListener,
-        LocationSharingListFragmentInteractionListener, CreateHaystackResponseHandler, CreateLocationSharingResponseHandler {
+        LocationSharingListFragmentInteractionListener, CreateHaystackResponseHandler, CreateLocationSharingResponseHandler,
+        LoginFragmentInteractionListener, RegisterResponseHandler {
 
     private static final int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
     public static String TAG = "MainActivity";
 
     // Resgistration Id from GCM
-    private static final String PREF_GCM_REG_ID = "PREF_GCM_REG_ID";
-    private static final int ACTION_PLAY_SERVICES_DIALOG = 100;
     protected static final int MSG_REGISTER_WITH_GCM = 101;
     protected static final int MSG_REGISTER_WEB_SERVER_SUCCESS = 103;
     protected static final int MSG_REGISTER_WEB_SERVER_FAILURE = 104;
@@ -91,6 +87,9 @@ public class MainActivity extends MaterialNavigationDrawer implements LoginRespo
     //Sections/Fragments
     private MaterialSection loginSection;
     private LoginFragment loginFragment;
+
+    private MaterialSection registerSection;
+    private RegisterFragment registerFragment;
 
     private MaterialSection haystacksSection;
     private HaystackListFragment haystacksListFragment;
@@ -120,8 +119,6 @@ public class MainActivity extends MaterialNavigationDrawer implements LoginRespo
 
     //GCM
     GoogleCloudMessaging gcm;
-
-
     private String gcmRegId;
 
     @Override
@@ -138,28 +135,22 @@ public class MainActivity extends MaterialNavigationDrawer implements LoginRespo
         //Account
         if(!loggedIn){
             String username = mSharedPreferences.getString("username", "");
-            MaterialAccount account;
             if(!username.isEmpty()){
-                String email = mSharedPreferences.getString("email", "");
-                account = new MaterialAccount(getResources(), username, email, R.drawable.me, R.drawable.mat);
-                this.setFirstAccountPhoto(getResources().getDrawable(R.drawable.me));//TODO:Get picture from cache
-            }else{
-                account = new MaterialAccount(getResources(), "Please Log In", "", R.drawable.ic_action_person, R.drawable.mat);
+                setAccount();
             }
-
-            this.addAccount(account);
-
+            //Login Fragment
             loginFragment = new LoginFragment();
             loginSection = newSection(getString(R.string.login), R.drawable.ic_account, loginFragment);
             this.addSection(loginSection);
+
+            //Register Fragment
+            registerFragment = new RegisterFragment();
+            registerSection = newSection(getString(R.string.register), R.drawable.ic_account, registerFragment);
+            this.addSection(registerSection);
         }else{
             //Add/Remove Sections
-            if(loginSection != null){
-                this.removeSection(loginSection);
-                loginSection = null;
-            }
-
-            loginFragment = null;
+            removeLoginFragment();
+            removeRegisterFragment();
 
             haystacksListFragment = new HaystackListFragment();
             haystacksSection = newSection(getString(R.string.title_haystacks), R.drawable.ic_haystack, haystacksListFragment);
@@ -173,14 +164,6 @@ public class MainActivity extends MaterialNavigationDrawer implements LoginRespo
             logOutSection = newSection(getString(R.string.title_logOut), R.drawable.ic_action_exit, this);
             this.addSection(logOutSection);
             this.addDivisor();
-
-            //Account
-            String username = mSharedPreferences.getString("username", "");
-            String email = mSharedPreferences.getString("email", "");
-
-            MaterialAccount account = new MaterialAccount(getResources(), username, email, R.drawable.me, R.drawable.mat);
-            this.setFirstAccountPhoto(getResources().getDrawable(R.drawable.me));//TODO:Get picture from cache
-            this.addAccount(account);
 
             showHaystacksFragment();
         }
@@ -222,7 +205,7 @@ public class MainActivity extends MaterialNavigationDrawer implements LoginRespo
             gcm = GoogleCloudMessaging.getInstance(getApplicationContext());
 
             // Read saved registration id from shared preferences.
-            gcmRegId = mSharedPreferences.getString(PREF_GCM_REG_ID, "");
+            gcmRegId = mSharedPreferences.getString(AppConstants.TAG_GCM_REG_ID, "");
 
             if (TextUtils.isEmpty(gcmRegId)) {
                 handler.sendEmptyMessage(MSG_REGISTER_WITH_GCM);
@@ -230,7 +213,12 @@ public class MainActivity extends MaterialNavigationDrawer implements LoginRespo
                 new RegisterGCMTask().execute();
             }
         }
+    }
 
+    private void setAccount(){
+        String username = mSharedPreferences.getString("username", "");
+        this.addAccount(new MaterialAccount(getResources(), username, "e-mail", R.drawable.me, R.drawable.mat));
+        this.setFirstAccountPhoto(getResources().getDrawable(R.drawable.me));//TODO:Get picture from cache
     }
 
     class RegisterGCMTask extends AsyncTask<Void, Void, Void>{
@@ -256,12 +244,12 @@ public class MainActivity extends MaterialNavigationDrawer implements LoginRespo
                     new GCMRegistrationTask().execute();
                     break;
                 case MSG_REGISTER_WEB_SERVER_SUCCESS:
-                    Toast.makeText(getApplicationContext(),
-                            "registered with web server", Toast.LENGTH_LONG).show();
+                    /*Toast.makeText(getApplicationContext(),
+                            "registered with web server", Toast.LENGTH_LONG).show();*/
                     break;
                 case MSG_REGISTER_WEB_SERVER_FAILURE:
                     Toast.makeText(getApplicationContext(),
-                            "registration with web server failed",
+                            "Registration with web server failed",
                             Toast.LENGTH_LONG).show();
                     break;
             }
@@ -294,14 +282,12 @@ public class MainActivity extends MaterialNavigationDrawer implements LoginRespo
                 Log.i(TAG, "registered with GCM " + result);
 
                 SharedPreferences.Editor editor = mSharedPreferences.edit();
-                editor.putString(PREF_GCM_REG_ID, gcmRegId);
+                editor.putString(AppConstants.TAG_GCM_REG_ID, gcmRegId);
                 editor.commit();
             }
         }
 
     }
-
-
 
     @Override
     public void onSaveInstanceState(Bundle savedInstanceState) {
@@ -465,37 +451,49 @@ public class MainActivity extends MaterialNavigationDrawer implements LoginRespo
             if(result.successCode == 1){
                 loggedIn = true;
 
+                //Save infos
+                mSharedPreferences.edit().putString(AppConstants.TAG_USER_NAME, result.user.getUserName()).
+                        putInt(AppConstants.TAG_USER_ID, result.user.getUserId()).
+                        putString(AppConstants.TAG_GCM_REG_ID, result.user.getGcmRegId()).
+                        commit();
+
                 //Add/Remove Sections
-                this.removeSection(loginSection);
-                loginSection = null;
-                loginFragment = null;
-
-                haystacksListFragment = new HaystackListFragment();
-                haystacksSection = newSection(getString(R.string.title_haystacks), R.drawable.ic_haystack, haystacksListFragment);
-                this.addSection(haystacksSection);
-
-                locationSharingListFragment = new LocationSharingListFragment();
-                locationSharingSection = newSection(getString(R.string.title_location_sharing), R.drawable.ic_action_location_found, locationSharingListFragment);
-                this.addSection(locationSharingSection);
-                this.addDivisor();
-
-                logOutSection = newSection(getString(R.string.title_logOut), R.drawable.ic_action_exit, this);
-                this.addSection(logOutSection);
-                this.addDivisor();
-
-                //Account
-                String username = mSharedPreferences.getString("username", "");
-                String email = mSharedPreferences.getString("email", "");
-
-                MaterialAccount account = new MaterialAccount(getResources(), username, email, R.drawable.me, R.drawable.mat);
-                this.setFirstAccountPhoto(getResources().getDrawable(R.drawable.me));//TODO:Get picture from cache
-                this.addAccount(account);
-
+                removeLoginFragment();
+                removeRegisterFragment();
+                createMainSections();
                 showHaystacksFragment();
             }else {
                 Toast.makeText(this, "An Error Occured\n Please Try Again!", Toast.LENGTH_SHORT).show();
             }
         }
+    }
+
+    private void createMainSections(){
+        haystacksListFragment = new HaystackListFragment();
+        haystacksSection = newSection(getString(R.string.title_haystacks), R.drawable.ic_haystack, haystacksListFragment);
+        this.addSection(haystacksSection);
+
+        locationSharingListFragment = new LocationSharingListFragment();
+        locationSharingSection = newSection(getString(R.string.title_location_sharing), R.drawable.ic_action_location_found, locationSharingListFragment);
+        this.addSection(locationSharingSection);
+        this.addDivisor();
+
+        logOutSection = newSection(getString(R.string.title_logOut), R.drawable.ic_action_exit, this);
+        this.addSection(logOutSection);
+        this.addDivisor();
+    }
+
+    //LoginFragmentInteractionListener
+    @Override
+    public void onClickRegister() {
+        showRegisterFragment();
+    }
+
+    //RegisterResponseHandler
+    @Override
+    public void onRegistrationComplete(AuthenticationResult result, String password, Boolean rememberMe) {
+        LoginTaskParams params = new LoginTaskParams(result.user.getUserName(), password, this, rememberMe, false);
+        new LoginTask(params, this).execute();
     }
 
     //HaystackListFragmentInteractionListener
@@ -649,6 +647,36 @@ public class MainActivity extends MaterialNavigationDrawer implements LoginRespo
         onStateChange(AppState.LOGIN);
     }
 
+    private void removeLoginFragment() {
+        if (loginFragment != null) {
+            this.removeSection(loginSection);
+            loginSection = null;
+            loginFragment = null;
+        }
+    }
+
+    private void showRegisterFragment(){
+        if(registerFragment == null){
+            registerFragment = new RegisterFragment();
+        }
+
+        this.setFragment(registerFragment, getString(R.string.register));
+        onStateChange(AppState.REGISTER);
+    }
+
+    private void removeRegisterFragment(){
+        if(registerFragment != null){
+            FragmentManager manager = getSupportFragmentManager();
+            FragmentTransaction trans = manager.beginTransaction();
+            trans.remove(registerFragment);
+            trans.commit();
+            registerFragment = null;
+
+            this.removeSection(registerSection);
+            registerSection = null;
+        }
+    }
+
     private void showHaystacksFragment(){
         this.setSection(haystacksSection);
         this.setFragment(haystacksListFragment, getString(R.string.title_activity_haystacks));
@@ -719,6 +747,10 @@ public class MainActivity extends MaterialNavigationDrawer implements LoginRespo
         return userName;
     }
 
+    public String getGcmRegId() {
+        return gcmRegId;
+    }
+
     public void setHaystacksCount(int count){
         haystacksSection.setNotifications(count);
     }
@@ -750,7 +782,5 @@ public class MainActivity extends MaterialNavigationDrawer implements LoginRespo
         return true;
     }
 
-    public String getGcmRegId() {
-        return gcmRegId;
-    }
+
 }

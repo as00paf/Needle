@@ -9,16 +9,20 @@ import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Vibrator;
+import android.preference.PreferenceManager;
 import android.support.v4.app.NotificationCompat;
+import android.util.Log;
 
 import com.nemator.needle.MainActivity;
 import com.nemator.needle.R;
+import com.nemator.needle.utils.AppConstants;
 
 public class GCMIntentService extends IntentService {
 
+    public static final String TAG = "GCMIntentService";
     public static final int NOTIFICATION_ID = 1000;
+
     NotificationManager mNotificationManager;
-    NotificationCompat.Builder builder;
 
     public GCMIntentService() {
         super(GCMIntentService.class.getName());
@@ -32,7 +36,23 @@ public class GCMIntentService extends IntentService {
 
             // read extras as sent from server
             String message = extras.getString("message");
-            sendNotification( message);
+            if(message != null && !message.isEmpty()){
+                sendNotification( message);
+            }else{
+                String registrationId = extras.getString("registration_id");
+
+                String regId = PreferenceManager.getDefaultSharedPreferences(this).getString(AppConstants.TAG_GCM_REG_ID, "");
+                if(regId == null || regId.isEmpty()){
+                    PreferenceManager.getDefaultSharedPreferences(this).edit().
+                            putString(AppConstants.TAG_GCM_REG_ID, registrationId).
+                            putBoolean(AppConstants.TAG_GCM_REGISTERD, true).
+                            commit();
+                }else{
+                    PreferenceManager.getDefaultSharedPreferences(this).edit().
+                            putBoolean(AppConstants.TAG_GCM_REGISTERD, true).
+                            commit();
+                }
+            }
         }
         // Release the wake lock provided by the WakefulBroadcastReceiver.
         GCMBroadcastReceiver.completeWakefulIntent(intent);

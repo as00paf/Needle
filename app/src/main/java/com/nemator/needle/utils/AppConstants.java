@@ -15,6 +15,8 @@ public class AppConstants {
     public static final String TAG_LOCATION_SHARING_ID = "locationSharingId";
     public static final String TAG_USER_NAME = "userName";
     public static final String TAG_USER_ID = "userId";
+    public static final String TAG_GCM_REG_ID = "gcmRegId";
+    public static final String TAG_GCM_REGISTERD = "gcmRegistered";
     public static final String TAG_ID = "id";
     public static final String TAG_PICTURE_URL = "pictureURL";
     public static final String TAG_LOCATION = "location";

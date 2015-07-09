@@ -17,6 +17,13 @@ public class UserVO implements Serializable, Parcelable{
 
     }
 
+    public UserVO(int userId, String userName, String pictureURL, String gcmRegId){
+        this.userId = userId;
+        this.userName = userName;
+        this.pictureURL = pictureURL;
+        this.gcmRegId = gcmRegId;
+    }
+
     public UserVO(Parcel in){
         userId = in.readInt();
         userName = in.readString();

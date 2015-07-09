@@ -4,6 +4,7 @@ import android.app.ProgressDialog;
 import android.os.AsyncTask;
 import android.util.Log;
 
+import com.nemator.needle.models.vo.UserVO;
 import com.nemator.needle.utils.AppConstants;
 import com.nemator.needle.R;
 import com.nemator.needle.tasks.AuthenticationResult;
@@ -51,6 +52,7 @@ public class RegisterTask extends AsyncTask<Void, Void, AuthenticationResult> {
             List<NameValuePair> requestParams = new ArrayList<NameValuePair>();
             requestParams.add(new BasicNameValuePair("username", params.userName));
             requestParams.add(new BasicNameValuePair("password", params.password));
+            requestParams.add(new BasicNameValuePair("regId", params.gcmRegId));
 
             Log.d(TAG, "Registering user ...");
             JSONObject json = jsonParser.makeHttpRequest(LOGIN_URL, "POST", requestParams);
@@ -61,6 +63,9 @@ public class RegisterTask extends AsyncTask<Void, Void, AuthenticationResult> {
                 Log.d("User Created!", json.toString());
 
                 result.message = json.getString(AppConstants.TAG_MESSAGE);
+
+                int userId = json.getInt(AppConstants.TAG_USER_ID);
+                result.user = new UserVO(userId, params.userName, "", params.gcmRegId);
                 return result;
             }else{
                 Log.d("Login Failure!", json.getString(AppConstants.TAG_MESSAGE));
@@ -79,10 +84,10 @@ public class RegisterTask extends AsyncTask<Void, Void, AuthenticationResult> {
 
     protected void onPostExecute(AuthenticationResult result) {
         dialog.dismiss();
-        delegate.onRegistrationComplete(result);
+        delegate.onRegistrationComplete(result, params.password, true);
     }
 
     public interface RegisterResponseHandler {
-        void onRegistrationComplete(AuthenticationResult result);
+        void onRegistrationComplete(AuthenticationResult result, String password, Boolean rememberMe);
     }
 }

@@ -59,9 +59,9 @@ public class MainActivity extends MaterialNavigationDrawer implements MaterialSe
 
         //Account
         if(!userModel.isLoggedIn()){
-            if(!userModel.getUserName().isEmpty()){
+            /*if(!userModel.getUserName().isEmpty()){
                 authenticationController.setAccount();
-            }
+            }*/
 
             navigationController.addSection(AppConstants.SECTION_LOGIN);
             navigationController.addSection(AppConstants.SECTION_REGISTER);

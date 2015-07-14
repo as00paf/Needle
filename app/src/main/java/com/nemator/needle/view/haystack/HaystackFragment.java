@@ -311,7 +311,3 @@ public class HaystackFragment extends Fragment {
         }
     }
 }
-
-
-
-

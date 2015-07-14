@@ -30,11 +30,11 @@ import com.nemator.needle.view.haystacks.OnActivityStateChangeListener;
 import com.nemator.needle.view.haystacks.createHaystack.CreateHaystackFragment;
 import com.nemator.needle.view.locationSharing.LocationSharingListFragment;
 import com.nemator.needle.view.locationSharing.createLocationSharing.CreateLocationSharingFragment;
+import com.nemator.needle.view.locationSharing.locationSharing.LocationSharingFragment;
 import com.nemator.needle.view.locationSharing.locationSharing.LocationSharingMapFragment;
 import com.nemator.needle.view.settings.SettingsFragment;
 
 import it.neokree.materialnavigationdrawer.elements.MaterialSection;
-import it.neokree.materialnavigationdrawer.elements.listeners.MaterialSectionListener;
 
 import static com.nemator.needle.tasks.createLocationSharing.CreateLocationSharingTask.CreateLocationSharingResponseHandler;
 import static com.nemator.needle.view.authentication.LoginFragment.LoginFragmentInteractionListener;
@@ -58,7 +58,7 @@ public class NavigationController implements MainActivity.NavigationHandler, OnA
     private MaterialSection haystacksSection;
     private HaystackListFragment haystacksListFragment;
 
-    private MaterialSection locationSharingSection;
+    private MaterialSection locationSharingListSection;
     private LocationSharingListFragment locationSharingListFragment;
 
     private CreateHaystackFragment createHaystackFragment;
@@ -72,8 +72,8 @@ public class NavigationController implements MainActivity.NavigationHandler, OnA
     private MaterialSection logOutSection;
     private CreateLocationSharingFragment createLocationSharingFragment;
 
-    private MaterialSection locationSharingMapSection;
-    private LocationSharingMapFragment locationSharingMapFragment;
+    private MaterialSection locationSharingSection;
+    private LocationSharingFragment locationSharingFragment;
 
     private Menu menu;
 
@@ -104,8 +104,8 @@ public class NavigationController implements MainActivity.NavigationHandler, OnA
                 break;
             case AppConstants.SECTION_LOCATION_SHARING_LIST :
                 locationSharingListFragment = new LocationSharingListFragment();
-                locationSharingSection = activity.newSection(activity.getString(R.string.title_location_sharing), R.drawable.ic_action_location_found, locationSharingListFragment);
-                activity.addSection(locationSharingSection);
+                locationSharingListSection = activity.newSection(activity.getString(R.string.title_location_sharing), R.drawable.ic_action_location_found, locationSharingListFragment);
+                activity.addSection(locationSharingListSection);
                 break;
             case AppConstants.SECTION_LOG_OUT :
                 logOutSection = activity.newSection(activity.getString(R.string.title_logOut), R.drawable.ic_action_exit, this);
@@ -147,7 +147,7 @@ public class NavigationController implements MainActivity.NavigationHandler, OnA
                 onStateChange(AppState.PUBLIC_HAYSTACK_TAB);
                 break;
             case AppConstants.SECTION_LOCATION_SHARING_LIST:
-                activity.setSection(locationSharingSection);
+                activity.setSection(locationSharingListSection);
                 activity.setFragment(locationSharingListFragment, activity.getString(R.string.title_location_sharing));
                 onStateChange(AppState.LOCATION_SHARING_RECEIVED_TAB);
                 break;
@@ -167,8 +167,8 @@ public class NavigationController implements MainActivity.NavigationHandler, OnA
                 onStateChange(AppState.SETTINGS);
                 break;
             case AppConstants.SECTION_LOCATION_SHARING:
-                if(locationSharingMapFragment == null) locationSharingMapFragment = new LocationSharingMapFragment();
-                activity.setFragment(locationSharingMapFragment, activity.getString(R.string.title_location_sharing));
+                if(locationSharingFragment == null) locationSharingFragment = new LocationSharingFragment();
+                activity.setFragment(locationSharingFragment, activity.getString(R.string.title_location_sharing));
                 onStateChange(AppState.LOCATION_SHARING);
                 break;
         }
@@ -197,8 +197,8 @@ public class NavigationController implements MainActivity.NavigationHandler, OnA
             case AppConstants.SECTION_LOCATION_SHARING_LIST:
                 removeFragment(locationSharingListFragment);
                 locationSharingListFragment = null;
-                activity.removeSection(locationSharingSection);
-                locationSharingSection = null;
+                activity.removeSection(locationSharingListSection);
+                locationSharingListSection = null;
                 break;
             case AppConstants.SECTION_SETTINGS:
                 removeFragment(settingsFragment);
@@ -456,14 +456,13 @@ public class NavigationController implements MainActivity.NavigationHandler, OnA
     @Override
     public void onClickLocationSharingCard(LocationSharingVO locationSharing, Boolean isSent) {
         //Add/Remove Sections
-        locationSharingMapFragment = new LocationSharingMapFragment();
-        locationSharingMapFragment.setLocationSharing(locationSharing);
-        locationSharingMapFragment.setIsSent(isSent);
+        locationSharingFragment = new LocationSharingFragment();
+        locationSharingFragment.setLocationSharing(locationSharing);
+        locationSharingFragment.setIsSent(isSent);
         String name = isSent ? locationSharing.getReceiverName() : locationSharing.getSenderName();
-        locationSharingMapSection = activity.newSection(name, R.drawable.ic_action_location_found, locationSharingMapFragment);
-        activity.addSectionAt(locationSharingMapSection, 2);
+        locationSharingSection = activity.newSection(name, R.drawable.ic_action_location_found, locationSharingFragment);
+        activity.addSectionAt(locationSharingSection, 2);
 
-        //showLocationSharingMapFragment(name);
         showSection(AppConstants.SECTION_LOCATION_SHARING);
     }
 
@@ -512,8 +511,8 @@ public class NavigationController implements MainActivity.NavigationHandler, OnA
 
     public void showReceivedLocationSharing(LocationSharingVO vo){
         showSection(AppConstants.SECTION_LOCATION_SHARING);
-        locationSharingMapFragment.setLocationSharing(vo);
-        locationSharingMapFragment.setIsSent(false);
+        locationSharingFragment.setLocationSharing(vo);
+        locationSharingFragment.setIsSent(false);
     }
 
     //Getters/Setters
@@ -526,7 +525,7 @@ public class NavigationController implements MainActivity.NavigationHandler, OnA
     }
 
     public void setLocationSharingCount(int count){
-        locationSharingSection.setNotifications(count);
+        locationSharingListSection.setNotifications(count);
     }
 
     @Override

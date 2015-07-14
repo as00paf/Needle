@@ -102,6 +102,7 @@
     <string name="no">Nah</string>
     <string name="cancel">Cancel</string>
     <string name="ok">Okay</string>
+    <string name="fetch_haystack_error">Could Not Fetch Haystacks</string>
 
     <!-- GCM -->
     <string name="gcm_send_message">Token retrieved and sent to server! You can now use gcmsender to send downstream messages to this app.</string>

@@ -84,7 +84,7 @@ public class LocationSharingListFragment extends Fragment implements FetchLocati
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         if(rootView == null){
-            rootView = inflater.inflate(R.layout.fragment_location_sharing, container, false);
+            rootView = inflater.inflate(R.layout.fragment_location_sharing_list, container, false);
 
             //FAB
             fabListener = ((MainActivity) getActivity()).getNavigationController();

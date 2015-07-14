@@ -41,6 +41,7 @@ public class AppConstants {
     public final static int CONNECTION_FAILURE_RESOLUTION_REQUEST = 9000;
     public final static String HAYSTACK_DATA_KEY = "data";
     public final static String LOCATION_SHARING_DATA_KEY = "data";
+    public final static String IS_SENT_DATA_KEY = "isSent";
     public final static String TAG_IS_OWNER = "isOwner";
     public final static String LOCATION_UPDATED = "locationUpdated";
 

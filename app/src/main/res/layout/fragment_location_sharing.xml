@@ -1,39 +1,25 @@
-<?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <LinearLayout
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical">
+    <!-- Map -->
+    <fragment
+    android:id="@+id/map"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:name="com.nemator.needle.view.locationSharing.locationSharing.LocationSharingMapFragment"
+    android:tag="LOCATION_SHARING_MAP_FRAGMENT"/>
 
-        <com.appcompat.view.slidingTab.SlidingTabLayout
-            android:id="@+id/location_sharing_sliding_tabs"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:elevation="2dp"
-            android:background="@color/primary"/>
-
-        <android.support.v4.view.ViewPager
-            xmlns:android="http://schemas.android.com/apk/res/android"
-            android:id="@+id/location_sharing_view_pager"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@android:color/white"/>
-    </LinearLayout>
-
-    <!-- FAB -->
-    <com.shamanland.fab.FloatingActionButton
-        android:id="@+id/location_sharing_fab"
+    <!-- Distance Indicator -->
+    <TextView
+        android:id="@+id/location_sharing_distance_label"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
+        android:layout_gravity="bottom|right"
+        android:text="Calculating Distance ..."
+        android:layout_marginRight="20dp"
+        android:elevation="4dp"
         android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true"
-        android:layout_marginRight="16dp"
-        android:layout_marginBottom="20dp"
-        android:src="@drawable/ic_action_location_found"/>
+        android:textAppearance="?android:attr/textAppearanceMedium"/>
 
 </RelativeLayout>

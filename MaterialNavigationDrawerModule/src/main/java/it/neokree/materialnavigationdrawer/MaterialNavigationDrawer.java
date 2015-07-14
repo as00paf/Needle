@@ -1701,6 +1701,7 @@ public abstract class MaterialNavigationDrawer<Fragment> extends ActionBarActivi
             case 2:
                 this.setSecondAccountPhoto(findAccountNumber(MaterialAccount.SECOND_ACCOUNT).getCircularPhoto());
             case 1:
+                if(currentAccount == null) currentAccount = getAccountAtCurrentPosition(0);
                 this.setFirstAccountPhoto(currentAccount.getCircularPhoto());
                 this.setDrawerHeaderImage(currentAccount.getBackground());
                 this.setUsername(currentAccount.getTitle());

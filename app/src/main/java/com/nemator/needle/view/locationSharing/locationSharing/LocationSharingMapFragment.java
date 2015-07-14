@@ -38,6 +38,7 @@ import com.nemator.needle.tasks.trackUser.TrackUserResult;
 import com.nemator.needle.tasks.trackUser.TrackUserTask;
 import com.nemator.needle.utils.AppConstants;
 import com.nemator.needle.utils.AppUtils;
+import com.nemator.needle.utils.SphericalUtil;
 
 public class LocationSharingMapFragment extends SupportMapFragment
         implements LocationServiceBroadcastReceiver.LocationServiceDelegate, TrackUserTask.TrackUserResponseHandler {
@@ -60,13 +61,13 @@ public class LocationSharingMapFragment extends SupportMapFragment
 
     //Map data
     private LocationSharingVO locationSharing;
+    private Boolean isSent;
     private Boolean cameraUpdated = false;
 
     //Location Service
     private NeedleLocationService locationService;
     private LocationServiceBroadcastReceiver locationServiceBroadcastReceiver;
     private Boolean mRequestingLocationUpdates = true;
-    private Boolean isSent;
 
     //Constructors
     public static LocationSharingMapFragment newInstance() {
@@ -84,6 +85,9 @@ public class LocationSharingMapFragment extends SupportMapFragment
         super.onCreate(savedInstanceState);
         if(savedInstanceState != null){
             updateValuesFromBundle(savedInstanceState);
+        }else{
+            locationSharing = ((LocationSharingFragment) getParentFragment()).getLocationSharing();
+            isSent = ((LocationSharingFragment) getParentFragment()).getIsSent();
         }
 
         //Map
@@ -107,6 +111,7 @@ public class LocationSharingMapFragment extends SupportMapFragment
             if (savedInstanceState.keySet().contains(AppConstants.REQUESTING_LOCATION_UPDATES_KEY)) {
                 mRequestingLocationUpdates = savedInstanceState.getBoolean(AppConstants.REQUESTING_LOCATION_UPDATES_KEY);
             }
+
             if (savedInstanceState.keySet().contains(AppConstants.LOCATION_KEY)) {
                 mCurrentLocation = savedInstanceState.getParcelable(AppConstants.LOCATION_KEY);
                 Double lat = mCurrentLocation.getLatitude();
@@ -114,9 +119,8 @@ public class LocationSharingMapFragment extends SupportMapFragment
                 mCurrentPosition = new LatLng(lat, lng);
             }
 
-            if (savedInstanceState.keySet().contains(AppConstants.HAYSTACK_DATA_KEY)) {
-                locationSharing = savedInstanceState.getParcelable(AppConstants.LOCATION_SHARING_DATA_KEY);
-            }
+            locationSharing = ((LocationSharingFragment) getParentFragment()).getLocationSharing();
+            isSent = ((LocationSharingFragment) getParentFragment()).getIsSent();
         }
     }
 
@@ -124,7 +128,6 @@ public class LocationSharingMapFragment extends SupportMapFragment
     public void onSaveInstanceState(Bundle savedInstanceState) {
         savedInstanceState.putBoolean(AppConstants.REQUESTING_LOCATION_UPDATES_KEY, mRequestingLocationUpdates);
         savedInstanceState.putParcelable(AppConstants.LOCATION_KEY, mCurrentLocation);
-        savedInstanceState.putParcelable(AppConstants.LOCATION_SHARING_DATA_KEY, locationSharing);
     }
 
     @Override
@@ -136,6 +139,7 @@ public class LocationSharingMapFragment extends SupportMapFragment
     @Override
     public void onResume() {
         //Broadcast Receiver
+        locationSharing = ((LocationSharingFragment) getParentFragment()).getLocationSharing();
         getActivity().registerReceiver(locationServiceBroadcastReceiver, new IntentFilter(AppConstants.LOCATION_UPDATED));
 
         super.onResume();
@@ -184,6 +188,12 @@ public class LocationSharingMapFragment extends SupportMapFragment
 
         if(!isSent && mRequestingLocationUpdates)
             trackUser();
+
+        //Update distance to user
+        if(!isSent && mCurrentPosition != null && mReceivedPosition !=null){
+            double distance = SphericalUtil.computeDistanceBetween(mCurrentPosition, mReceivedPosition);
+            ((LocationSharingFragment) getParentFragment()).updateDistance(String.valueOf(Math.round(distance)) + "m");
+        }
     }
 
     //Map methods
@@ -383,14 +393,5 @@ public class LocationSharingMapFragment extends SupportMapFragment
                 }
             });
         }
-    }
-
-    //Getters/Setters
-    public void setIsSent(Boolean isSent) {
-        this.isSent = isSent;
-    }
-
-    public void setLocationSharing(LocationSharingVO locationSharing) {
-        this.locationSharing = locationSharing;
     }
 }

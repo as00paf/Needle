@@ -9,6 +9,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.appcompat.view.slidingTab.SlidingTabLayout;
 import com.nemator.needle.MainActivity;
@@ -162,24 +163,28 @@ public class HaystackListFragment extends Fragment implements FetchHaystacksTask
     }
 
     public void onHaystackFetched(FetchHaystacksResult result){
-        publicHaystacks = result.publicHaystackList;
-        privateHaystacks = result.privateHaystackList;
+        if(result.successCode == 1){
+            publicHaystacks = result.publicHaystackList;
+            privateHaystacks = result.privateHaystackList;
 
-        HaystackListTabFragment publicTab = mHaystackListPagerAdapter.getPublicHaystackListFragment();
-        HaystackListTabFragment privateTab = mHaystackListPagerAdapter.getPrivateHaystackListFragment();
+            HaystackListTabFragment publicTab = mHaystackListPagerAdapter.getPublicHaystackListFragment();
+            HaystackListTabFragment privateTab = mHaystackListPagerAdapter.getPrivateHaystackListFragment();
 
-        //Show how many haystacks are available in the Nav Drawer
-        int count = publicHaystacks.size() + privateHaystacks.size();
-        if(getActivity() != null)
-            ((MainActivity) getActivity()).getNavigationController().setHaystacksCount(count);
+            //Show how many haystacks are available in the Nav Drawer
+            int count = publicHaystacks.size() + privateHaystacks.size();
+            if(getActivity() != null)
+                ((MainActivity) getActivity()).getNavigationController().setHaystacksCount(count);
 
-        if(publicTab == null && privateTab == null) return;
+            if(publicTab == null && privateTab == null) return;
 
-        publicTab.getRefreshLayout().setRefreshing(false);
-        privateTab.getRefreshLayout().setRefreshing(false);
+            publicTab.getRefreshLayout().setRefreshing(false);
+            privateTab.getRefreshLayout().setRefreshing(false);
 
-        publicTab.updateHaystackList(publicHaystacks);
-        privateTab.updateHaystackList(privateHaystacks);
+            publicTab.updateHaystackList(publicHaystacks);
+            privateTab.updateHaystackList(privateHaystacks);
+        }else{
+            Toast.makeText(getActivity(), R.string.fetch_haystack_error, Toast.LENGTH_SHORT).show();
+        }
     }
 
     private int getUserId(){

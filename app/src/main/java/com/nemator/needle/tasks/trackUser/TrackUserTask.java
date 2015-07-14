@@ -48,7 +48,7 @@ public class TrackUserTask extends AsyncTask<Void, Void, TrackUserResult> {
 
             Log.d(TAG, "Tracking User ...");
 
-            JSONObject json = jParser.makeHttpRequest(TRACK_USER_URL, "POST", requestParams);
+            JSONObject json = jParser.makeHttpRequest(TRACK_USER_URL, "GET", requestParams);
             success = json.getInt(AppConstants.TAG_SUCCESS);
             result.successCode = success;
             if (success == 1) {

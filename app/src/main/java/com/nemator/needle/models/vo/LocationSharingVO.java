@@ -21,6 +21,13 @@ public class LocationSharingVO implements Serializable, Parcelable {
 
     }
 
+    public LocationSharingVO(int id, String senderName, int senderId, String timeLimit){
+        this.id = id;
+        this.senderName = senderName;
+        this.senderId = senderId;
+        this.timeLimit = timeLimit;
+    }
+
     @Override
     public int describeContents() {
         return 0;

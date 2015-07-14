@@ -38,8 +38,9 @@ public class PostLocationRequestAlarm extends BroadcastReceiver {
         int type = intent.getIntExtra(LocationServiceDBHelper.PostLocationRequest.COLUMN_NAME_TYPE, -1);
         String expiration = intent.getStringExtra(LocationServiceDBHelper.PostLocationRequest.COLUMN_NAME_EXPIRATION);
         int posterId = intent.getIntExtra(LocationServiceDBHelper.PostLocationRequest.COLUMN_NAME_POSTER_ID, -1);
+        String itemId = intent.getStringExtra(LocationServiceDBHelper.PostLocationRequest.COLUMN_NAME_ITEM_ID);
 
-        AddPostLocationRequestParams params = new AddPostLocationRequestParams(context, type, expiration, posterId );
+        AddPostLocationRequestParams params = new AddPostLocationRequestParams(context, type, expiration, posterId, itemId );
         params.rowId = intent.getLongExtra(LocationServiceDBHelper.PostLocationRequest._ID, -1);
         params.posterId = posterId;
         params.type = type;
@@ -48,7 +49,7 @@ public class PostLocationRequestAlarm extends BroadcastReceiver {
         new RemovePostLocationRequestTask(params).execute();
     }
 
-    public void setAlarm(Context context, long rowId, String expiration, int posterId)
+    public void setAlarm(Context context, long rowId, String expiration, int posterId, String itemId)
     {
         Log.i(TAG, "Setting Alarm @ " + expiration);
 
@@ -56,6 +57,7 @@ public class PostLocationRequestAlarm extends BroadcastReceiver {
         intent.putExtra(LocationServiceDBHelper.PostLocationRequest._ID, rowId);
         intent.putExtra(LocationServiceDBHelper.PostLocationRequest.COLUMN_NAME_POSTER_ID, posterId);
         intent.putExtra(LocationServiceDBHelper.PostLocationRequest.COLUMN_NAME_EXPIRATION, expiration);
+        intent.putExtra(LocationServiceDBHelper.PostLocationRequest.COLUMN_NAME_ITEM_ID, itemId);
 
         alarmIntent = PendingIntent.getBroadcast(context, 0, intent, 0);
         Date date = new Date();

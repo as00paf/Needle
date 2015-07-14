@@ -96,8 +96,12 @@
     <string name="sentHeader">Sent</string>
     <string name="log_out">Log Out</string>
     <string name="log_out_confirmation_msg">Are you sure you want to log out?</string>
+    <string name="location_sharing_ended">Location Sharing Ended</string>
+    <string name="location_sharing_ended_msg">Location Sharing ended so you should go back or something.</string>
     <string name="yes">Yeah</string>
     <string name="no">Nah</string>
+    <string name="cancel">Cancel</string>
+    <string name="ok">Okay</string>
 
     <!-- GCM -->
     <string name="gcm_send_message">Token retrieved and sent to server! You can now use gcmsender to send downstream messages to this app.</string>

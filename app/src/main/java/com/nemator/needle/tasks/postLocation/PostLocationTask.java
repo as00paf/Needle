@@ -58,7 +58,7 @@ public class PostLocationTask extends AsyncTask<Void, Void, PostLocationResult> 
                 result.message = json.getString(AppConstants.TAG_MESSAGE);
                 return result;
             }
-        } catch (JSONException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
 

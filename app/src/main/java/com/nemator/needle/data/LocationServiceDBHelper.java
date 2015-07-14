@@ -19,7 +19,8 @@ public class LocationServiceDBHelper extends SQLiteOpenHelper {
                     PostLocationRequest.COLUMN_NAME_TYPE + TEXT_TYPE + COMMA_SEP +
                     PostLocationRequest.COLUMN_NAME_DATE + DATE_TYPE + COMMA_SEP +
                     PostLocationRequest.COLUMN_NAME_EXPIRATION + DATE_TYPE + COMMA_SEP +
-                    PostLocationRequest.COLUMN_NAME_POSTER_ID + INT_TYPE +
+                    PostLocationRequest.COLUMN_NAME_POSTER_ID + INT_TYPE + COMMA_SEP +
+                    PostLocationRequest.COLUMN_NAME_ITEM_ID + TEXT_TYPE +
             " )";
 
     private static final String SQL_DELETE_ENTRIES =
@@ -49,6 +50,7 @@ public class LocationServiceDBHelper extends SQLiteOpenHelper {
         public static final String COLUMN_NAME_DATE = "date";
         public static final String COLUMN_NAME_EXPIRATION = "expiration";
         public static final String COLUMN_NAME_POSTER_ID = "posterId";
+        public static final String COLUMN_NAME_ITEM_ID = "itemId";
 
         public static final int POSTER_TYPE_HAYSTACK = 0;
         public static final int POSTER_TYPE_LOCATION_SHARING = 1;

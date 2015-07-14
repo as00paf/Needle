@@ -1,5 +1,7 @@
 package com.nemator.needle.view.locationSharing.locationSharing;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.IntentFilter;
 import android.graphics.Point;
 import android.location.Location;
@@ -30,6 +32,7 @@ import com.nemator.needle.R;
 import com.nemator.needle.broadcastReceiver.LocationServiceBroadcastReceiver;
 import com.nemator.needle.models.vo.LocationSharingVO;
 import com.nemator.needle.service.NeedleLocationService;
+import com.nemator.needle.tasks.logOut.LogOutTask;
 import com.nemator.needle.tasks.trackUser.TrackUserParams;
 import com.nemator.needle.tasks.trackUser.TrackUserResult;
 import com.nemator.needle.tasks.trackUser.TrackUserTask;
@@ -93,7 +96,6 @@ public class LocationSharingMapFragment extends SupportMapFragment
         locationService = ((MainActivity) getActivity()).getLocationService();
         locationService.startLocationUpdates();
 
-        //Broadcast Receiver
         locationServiceBroadcastReceiver = new LocationServiceBroadcastReceiver(this);
 
         //Action Bar
@@ -133,6 +135,7 @@ public class LocationSharingMapFragment extends SupportMapFragment
 
     @Override
     public void onResume() {
+        //Broadcast Receiver
         getActivity().registerReceiver(locationServiceBroadcastReceiver, new IntentFilter(AppConstants.LOCATION_UPDATED));
 
         super.onResume();
@@ -142,7 +145,9 @@ public class LocationSharingMapFragment extends SupportMapFragment
     public void onDetach() {
         super.onDetach();
 
-        locationService.stopLocationUpdates();
+        if(!isSent){
+            locationService.stopLocationUpdates();
+        }
     }
 
     @Override
@@ -177,7 +182,7 @@ public class LocationSharingMapFragment extends SupportMapFragment
         if(!cameraUpdated)
             moveCamera();
 
-        if(!isSent)
+        if(!isSent && mRequestingLocationUpdates)
             trackUser();
     }
 
@@ -243,7 +248,8 @@ public class LocationSharingMapFragment extends SupportMapFragment
         updateMap();
         moveCamera();
 
-        trackUser();
+        if(!isSent && mRequestingLocationUpdates)
+            trackUser();
     }
 
     public void moveCamera(){
@@ -253,7 +259,7 @@ public class LocationSharingMapFragment extends SupportMapFragment
 
     //Actions
     private void trackUser(){
-        TrackUserParams params = new TrackUserParams(String.valueOf(locationSharing.getSenderId()), AppUtils.getUserId(getActivity()));
+        TrackUserParams params = new TrackUserParams(String.valueOf(locationSharing.getId()), String.valueOf(locationSharing.getSenderId()));
         try{
             TrackUserTask task = new TrackUserTask(params, this);
             task.execute();
@@ -267,6 +273,20 @@ public class LocationSharingMapFragment extends SupportMapFragment
         if(result.successCode == 1){
             mReceivedPosition = result.location;
             updateMap();
+        }else if(result.successCode == 201 && mRequestingLocationUpdates){//LocationSharingCancelled or expired
+            mRequestingLocationUpdates = false;
+            new AlertDialog.Builder(getActivity())
+                    .setIcon(android.R.drawable.ic_dialog_alert)
+                    .setTitle(getString(R.string.location_sharing_ended))
+                    .setMessage(getString(R.string.log_out_confirmation_msg))
+                    .setNeutralButton(R.string.ok, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                            ((MainActivity) getActivity()).getNavigationController().onBackPressed();
+                        }
+                    })
+                    .show();
         }
     }
 
@@ -321,8 +341,6 @@ public class LocationSharingMapFragment extends SupportMapFragment
         }
     }
 
-
-
     private void animateMarker(final GoogleMap map, final Marker marker, final LatLng toPosition, final boolean hideMarker) {
         final Handler handler = new Handler();
         final long start = SystemClock.uptimeMillis();
@@ -362,12 +380,10 @@ public class LocationSharingMapFragment extends SupportMapFragment
                             marker.setVisible(true);
                         }
                     }
-
                 }
             });
         }
     }
-
 
     //Getters/Setters
     public void setIsSent(Boolean isSent) {

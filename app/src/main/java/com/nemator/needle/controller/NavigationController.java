@@ -166,6 +166,11 @@ public class NavigationController implements MainActivity.NavigationHandler, OnA
                 activity.setFragment(settingsFragment, activity.getString(R.string.title_settings));
                 onStateChange(AppState.SETTINGS);
                 break;
+            case AppConstants.SECTION_LOCATION_SHARING:
+                if(locationSharingMapFragment == null) locationSharingMapFragment = new LocationSharingMapFragment();
+                activity.setFragment(locationSharingMapFragment, activity.getString(R.string.title_location_sharing));
+                onStateChange(AppState.LOCATION_SHARING);
+                break;
         }
     }
 
@@ -240,7 +245,7 @@ public class NavigationController implements MainActivity.NavigationHandler, OnA
             case AppState.PRIVATE_HAYSTACK_TAB:
                 //Goto Public tab
                 haystacksListFragment.goToTab(0);
-                setCurrentState(AppState.PUBLIC_HAYSTACK_TAB);
+                onStateChange(AppState.PUBLIC_HAYSTACK_TAB);
                 break;
             case AppState.CREATE_HAYSTACK_GENERAL_INFOS:
                 showSection(AppConstants.SECTION_HAYSTACKS);
@@ -249,52 +254,52 @@ public class NavigationController implements MainActivity.NavigationHandler, OnA
             case AppState.CREATE_HAYSTACK_MAP:
                 //Goto General Infos
                 createHaystackFragment.goToPage(0);
-                setCurrentState(AppState.CREATE_HAYSTACK_GENERAL_INFOS);
+                onStateChange(AppState.CREATE_HAYSTACK_GENERAL_INFOS);
                 break;
             case AppState.CREATE_HAYSTACK_USERS:
                 //Goto Map
                 createHaystackFragment.goToPage(1);
-                setCurrentState(AppState.CREATE_HAYSTACK_MAP);
+                onStateChange(AppState.CREATE_HAYSTACK_MAP);
                 break;
             case AppState.CREATE_HAYSTACK_MAP_SEARCH_OPEN:
                 //Close Search
                 createHaystackFragment.mCreateHaystackMapFragment.closeSearchResults();
-                setCurrentState(AppState.CREATE_HAYSTACK_MAP);
+                onStateChange(AppState.CREATE_HAYSTACK_MAP);
                 break;
             case AppState.CREATE_HAYSTACK_USERS_SEARCH_OPEN:
                 //Close Search
                 createHaystackFragment.mCreateHaystackUsersFragment.closeSearchResults();
-                setCurrentState(AppState.CREATE_HAYSTACK_USERS);
+                onStateChange(AppState.CREATE_HAYSTACK_USERS);
                 break;
             case AppState.LOCATION_SHARING_RECEIVED_TAB:
                 showSection(AppConstants.SECTION_HAYSTACKS);
                 haystacksListFragment.goToTab(0);
-                setCurrentState(AppState.PUBLIC_HAYSTACK_TAB);
+                onStateChange(AppState.PUBLIC_HAYSTACK_TAB);
                 break;
             case AppState.LOCATION_SHARING_SENT_TAB:
                 //Goto Received Tab
                 locationSharingListFragment.goToPage(0);
-                setCurrentState(AppState.LOCATION_SHARING_RECEIVED_TAB);
+                onStateChange(AppState.LOCATION_SHARING_RECEIVED_TAB);
                 break;
             case AppState.CREATE_LOCATION_SHARING:
                 showSection(AppConstants.SECTION_LOCATION_SHARING_LIST);
                 locationSharingListFragment.goToPage(0);
-                setCurrentState(AppState.LOCATION_SHARING_RECEIVED_TAB);
+                onStateChange(AppState.LOCATION_SHARING_RECEIVED_TAB);
                 break;
             case AppState.HAYSTACK:
                 removeSection(AppConstants.SECTION_HAYSTACK);
                 showSection(AppConstants.SECTION_HAYSTACKS);
                 haystacksListFragment.goToTab(0);
-                setCurrentState(AppState.PUBLIC_HAYSTACK_TAB);
+                onStateChange(AppState.PUBLIC_HAYSTACK_TAB);
                 break;
             case AppState.LOCATION_SHARING:
-                removeSection(AppConstants.SECTION_LOCATION_SHARING);
                 showSection(AppConstants.SECTION_LOCATION_SHARING_LIST);
-                locationSharingListFragment.goToPage(0);
-                setCurrentState(AppState.LOCATION_SHARING_RECEIVED_TAB);
+                removeSection(AppConstants.SECTION_LOCATION_SHARING);
+                onStateChange(AppState.LOCATION_SHARING_RECEIVED_TAB);
                 break;
             case AppState.SETTINGS:
                 removeFragment(settingsFragment);
+                settingsSection.unSelect();
                 restorePreviousState();
                 break;
             default:
@@ -496,13 +501,19 @@ public class NavigationController implements MainActivity.NavigationHandler, OnA
     public void onLocationSharingCreated(CreateLocationSharingResult result) {
         if(result.successCode == 1){
             activity.getLocationService().startLocationUpdates();
-            activity.getLocationService().addPostLocationRequest(LocationServiceDBHelper.PostLocationRequest.POSTER_TYPE_LOCATION_SHARING, result.locationSharing.getTimeLimit(), result.locationSharing.getId());
+            activity.getLocationService().addPostLocationRequest(LocationServiceDBHelper.PostLocationRequest.POSTER_TYPE_LOCATION_SHARING, result.locationSharing.getTimeLimit(), result.locationSharing.getSenderId(), String.valueOf(result.locationSharing.getId()));
             Toast.makeText(activity, "Location shared with " + result.locationSharing.getReceiverName(), Toast.LENGTH_SHORT).show();
             showSection(AppConstants.SECTION_LOCATION_SHARING_LIST);
             removeSection(AppConstants.SECTION_CREATE_LOCATION_SHARING);
         }else{
             Toast.makeText(activity, "Location Sharing not created !", Toast.LENGTH_SHORT).show();
         }
+    }
+
+    public void showReceivedLocationSharing(LocationSharingVO vo){
+        showSection(AppConstants.SECTION_LOCATION_SHARING);
+        locationSharingMapFragment.setLocationSharing(vo);
+        locationSharingMapFragment.setIsSent(false);
     }
 
     //Getters/Setters

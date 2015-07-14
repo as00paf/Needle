@@ -15,7 +15,12 @@ import android.util.Log;
 
 import com.nemator.needle.MainActivity;
 import com.nemator.needle.R;
+import com.nemator.needle.models.UserModel;
 import com.nemator.needle.utils.AppConstants;
+
+import org.json.JSONObject;
+
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class GCMIntentService extends IntentService {
 
@@ -36,13 +41,15 @@ public class GCMIntentService extends IntentService {
 
             // read extras as sent from server
             String message = extras.getString("message");
+            String type = extras.getString("notificationType");
             if(message != null && !message.isEmpty()){
-                sendNotification( message);
+                sendNotification( message, type, extras);
             }else{
                 String registrationId = extras.getString("registration_id");
 
-                String regId = PreferenceManager.getDefaultSharedPreferences(this).getString(AppConstants.TAG_GCM_REG_ID, "");
-                if(regId == null || regId.isEmpty()){
+                UserModel userModel = new UserModel(this);
+                String regId = userModel.getGcmRegId();
+                if((regId == null || regId.isEmpty()) && !regId.equals(registrationId)){
                     PreferenceManager.getDefaultSharedPreferences(this).edit().
                             putString(AppConstants.TAG_GCM_REG_ID, registrationId).
                             putBoolean(AppConstants.TAG_GCM_REGISTERD, true).
@@ -58,11 +65,11 @@ public class GCMIntentService extends IntentService {
         GCMBroadcastReceiver.completeWakefulIntent(intent);
     }
 
-    private void sendNotification(String msg) {
+    private void sendNotification(String msg, String type, Bundle data) {
         mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
-        PendingIntent contentIntent = PendingIntent.getActivity(this, 0,
-                new Intent(this, MainActivity.class), 0);
+        Intent intent = createIntent(type, data);
+        PendingIntent contentIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
         Uri defaultSoundUri= RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
         NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(
@@ -73,11 +80,31 @@ public class GCMIntentService extends IntentService {
                 .setColor(getResources().getColor(R.color.primary))
                 .setLights(getResources().getColor(R.color.primary), 1500, 2000)
                 .setDefaults(NotificationCompat.DEFAULT_VIBRATE)
-                .setSound(defaultSoundUri);
+                .setSound(defaultSoundUri)
+                .setAutoCancel(true)
+                .setContentIntent(contentIntent);
 
+        int id = new AtomicInteger(NOTIFICATION_ID).incrementAndGet();
+        mNotificationManager.notify(id, mBuilder.build());
+    }
 
-        mBuilder.setContentIntent(contentIntent);
-        mNotificationManager.notify(NOTIFICATION_ID, mBuilder.build());
+    private Intent createIntent(String notificationType, Bundle data){
+        Intent intent = new Intent(this, MainActivity.class);
+        intent.putExtra(AppConstants.TAG_TYPE, notificationType);
+        intent.putExtra(AppConstants.TAG_ACTION, "Notification");
+        intent.putExtra(AppConstants.TAG_ID, data.getString("id"));
+
+        if(notificationType.equals("LocationSharing")){
+            intent.putExtra(AppConstants.TAG_SENDER_NAME, data.getString(AppConstants.TAG_SENDER_NAME));
+            intent.putExtra(AppConstants.TAG_SENDER_ID, data.getString(AppConstants.TAG_SENDER_ID));
+            intent.putExtra(AppConstants.TAG_TIME_LIMIT, data.getString(AppConstants.TAG_TIME_LIMIT));
+        }else{
+
+        }
+
+        intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+
+        return intent;
     }
 
 }

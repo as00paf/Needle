@@ -183,7 +183,9 @@ public class LocationSharingListFragment extends Fragment implements FetchLocati
     }
 
     public void goToPage(int page){
-        locationSharingViewPager.setCurrentItem(page);
+        if(locationSharingViewPager!=null){
+            locationSharingViewPager.setCurrentItem(page);
+        }
     }
 
     //Interface

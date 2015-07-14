@@ -59,6 +59,7 @@ public class AddPostLocationRequestTask extends AsyncTask<Void, Void, TaskResult
         values.put(LocationServiceDBHelper.PostLocationRequest.COLUMN_NAME_DATE, currentDate);
         values.put(LocationServiceDBHelper.PostLocationRequest.COLUMN_NAME_EXPIRATION, params.expiration);
         values.put(LocationServiceDBHelper.PostLocationRequest.COLUMN_NAME_POSTER_ID, params.posterId);
+        values.put(LocationServiceDBHelper.PostLocationRequest.COLUMN_NAME_ITEM_ID, params.itemId);
 
         // Insert the new row, returning the primary key value of the new row
         long newRowId;
@@ -68,7 +69,7 @@ public class AddPostLocationRequestTask extends AsyncTask<Void, Void, TaskResult
                 values);
 
         //ALARM
-        new PostLocationRequestAlarm().setAlarm(params.context, newRowId, params.expiration, params.posterId);
+        new PostLocationRequestAlarm().setAlarm(params.context, newRowId, params.expiration, params.posterId, params.itemId);
 
         return result;
     }

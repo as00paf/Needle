@@ -444,13 +444,13 @@ public class HaystackMapFragment extends SupportMapFragment
     public void shareLocation(){
         mPostingLocationUpdates = true;
         activateUser();
-        locationService.addPostLocationRequest(LocationServiceDBHelper.PostLocationRequest.POSTER_TYPE_HAYSTACK, haystack.getTimeLimit(), haystack.getId());
+        locationService.addPostLocationRequest(LocationServiceDBHelper.PostLocationRequest.POSTER_TYPE_HAYSTACK, haystack.getTimeLimit(), haystack.getOwner(), String.valueOf(haystack.getId()));
         locationService.postLocation();
     }
 
     public void stopSharingLocation(){
         mPostingLocationUpdates = false;
-        locationService.removePostLocationRequest(LocationServiceDBHelper.PostLocationRequest.POSTER_TYPE_HAYSTACK, haystack.getTimeLimit(), haystack.getId());
+        locationService.removePostLocationRequest(LocationServiceDBHelper.PostLocationRequest.POSTER_TYPE_HAYSTACK, haystack.getTimeLimit(), haystack.getOwner(), String.valueOf(haystack.getId()));
         deactivateUser();
     }
 

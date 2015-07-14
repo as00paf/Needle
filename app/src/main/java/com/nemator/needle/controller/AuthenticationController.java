@@ -45,6 +45,8 @@ public class AuthenticationController implements LoginResponseHandler, RegisterR
             if (result.successCode == 1) {
                 userModel.setLoggedIn(true);
 
+                setAccount();
+
                 //Save infos
                 mSharedPreferences.edit().putString(AppConstants.TAG_USER_NAME, result.user.getUserName()).
                         putInt(AppConstants.TAG_USER_ID, result.user.getUserId()).
@@ -64,6 +66,10 @@ public class AuthenticationController implements LoginResponseHandler, RegisterR
 
     //Public Mehtods
     public void setAccount(){
+        if(activity.getAccountList().size() > 0){
+            activity.removeAccount((MaterialAccount) activity.getAccountList().get(0));
+        }
+
         activity.addAccount(new MaterialAccount(activity.getResources(), userModel.getUserName(), "e-mail", R.drawable.me, R.drawable.mat));
         activity.setFirstAccountPhoto(activity.getResources().getDrawable(R.drawable.me));//TODO:Get picture from cache
     }

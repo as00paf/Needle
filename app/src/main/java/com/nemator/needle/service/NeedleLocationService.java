@@ -188,7 +188,7 @@ public class NeedleLocationService extends Service implements
                 startLocationUpdates();
             }
 
-        }else {
+        }else if(!mRequestingLocationUpdates){
             stopLocationUpdates();
             mPostingLocationUpdates = false;
             stopSelf();
@@ -230,8 +230,8 @@ public class NeedleLocationService extends Service implements
         mPostingLocationUpdates = false;
     }
 
-    public void addPostLocationRequest(int type, String expiration, int posterId){
-        AddPostLocationRequestParams params = new AddPostLocationRequestParams(this, type, expiration, posterId);
+    public void addPostLocationRequest(int type, String expiration, int posterId, String itemId){
+        AddPostLocationRequestParams params = new AddPostLocationRequestParams(this, type, expiration, posterId, itemId);
         new AddPostLocationRequestTask(params, this).execute();
     }
 
@@ -242,8 +242,8 @@ public class NeedleLocationService extends Service implements
         postLocation();
     }
 
-    public void removePostLocationRequest(int type, String expiration, int posterId){
-        AddPostLocationRequestParams params = new AddPostLocationRequestParams(this, type, expiration, posterId);
+    public void removePostLocationRequest(int type, String expiration, int posterId, String itemId){
+        AddPostLocationRequestParams params = new AddPostLocationRequestParams(this, type, expiration, posterId, itemId);
         new RemovePostLocationRequestTask(params).execute();
     }
 

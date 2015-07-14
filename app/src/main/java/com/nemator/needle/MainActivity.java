@@ -8,6 +8,7 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -15,6 +16,7 @@ import com.nemator.needle.controller.AuthenticationController;
 import com.nemator.needle.controller.GCMController;
 import com.nemator.needle.controller.NavigationController;
 import com.nemator.needle.models.UserModel;
+import com.nemator.needle.models.vo.LocationSharingVO;
 import com.nemator.needle.service.NeedleLocationService;
 import com.nemator.needle.utils.AppConstants;
 import com.nemator.needle.utils.AppState;
@@ -57,8 +59,7 @@ public class MainActivity extends MaterialNavigationDrawer implements MaterialSe
 
         //Account
         if(!userModel.isLoggedIn()){
-            String username = mSharedPreferences.getString("username", "");
-            if(!username.isEmpty()){
+            if(!userModel.getUserName().isEmpty()){
                 authenticationController.setAccount();
             }
 
@@ -67,12 +68,14 @@ public class MainActivity extends MaterialNavigationDrawer implements MaterialSe
 
             navigationController.showSection(AppConstants.SECTION_LOGIN);
         }else{
+            authenticationController.setAccount();
+
             //Add/Remove Sections
             navigationController.removeSection(AppConstants.SECTION_LOGIN);
             navigationController.removeSection(AppConstants.SECTION_REGISTER);
 
             navigationController.addSection(AppConstants.SECTION_HAYSTACKS);
-            navigationController.addSection(AppConstants.SECTION_LOCATION_SHARING);
+            navigationController.addSection(AppConstants.SECTION_LOCATION_SHARING_LIST);
             navigationController.addSection(AppConstants.SECTION_LOG_OUT);
 
             navigationController.showSection(AppConstants.SECTION_HAYSTACKS);
@@ -107,6 +110,31 @@ public class MainActivity extends MaterialNavigationDrawer implements MaterialSe
         Intent serviceIntent = new Intent(this, NeedleLocationService.class);
         startService(serviceIntent);
         bindService(serviceIntent, mConnection, Context.BIND_AUTO_CREATE);
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        Bundle extras = intent.getExtras();
+        if(extras != null){
+            String action = extras.getString(AppConstants.TAG_ACTION);
+            String type = extras.getString(AppConstants.TAG_TYPE);
+            int id = Integer.parseInt(extras.getString(AppConstants.TAG_ID, "-1"));
+
+            if(action != null && type != null){
+                if(action.equals("Notification") && type.equals("LocationSharing")){
+                    String timeLimit = extras.getString(AppConstants.TAG_TIME_LIMIT);
+                    String senderName = extras.getString(AppConstants.TAG_SENDER_NAME);
+                    int senderId = Integer.parseInt(extras.getString(AppConstants.TAG_SENDER_ID, "-1"));
+
+                    LocationSharingVO vo = new LocationSharingVO(id, senderName, senderId, timeLimit);
+                    navigationController.showReceivedLocationSharing(vo);
+                }
+            }
+
+            Log.i(TAG, "here");
+        }
+
+        super.onNewIntent(intent);
     }
 
     @Override
@@ -145,7 +173,7 @@ public class MainActivity extends MaterialNavigationDrawer implements MaterialSe
             this.closeDrawer();
             navigationController.onClickSection(section);
         } else if(section.getTitle().equals(getString(R.string.title_settings))){
-            navigationController.setCurrentState(AppState.SETTINGS);
+            navigationController.onStateChange(AppState.SETTINGS);
             super.onClick(section);
         }else{
             super.onClick(section);

@@ -68,6 +68,7 @@ public class CreateLocationSharingTask extends AsyncTask<Void, Void, CreateLocat
             String notificationMessage = params.locationSharing.getSenderName() + " shared his location with you !";
             requestParams.add(new BasicNameValuePair("notificationMessage", notificationMessage));
             requestParams.add(new BasicNameValuePair("action", "com.nemator.needle.gcm"));
+            requestParams.add(new BasicNameValuePair("notificationType", "LocationSharing"));
             requestParams.add(new BasicNameValuePair("regId", params.gcmRegId));
 
             Log.d(TAG, "Creating Location Sharing ...");
@@ -81,6 +82,8 @@ public class CreateLocationSharingTask extends AsyncTask<Void, Void, CreateLocat
 
                 result.locationSharing = params.locationSharing;
                 result.message = json.getString(AppConstants.TAG_MESSAGE);
+
+
 
                 Log.d(TAG, "Location Sharing Created Successfuly! " + json.getString(AppConstants.TAG_MESSAGE));
 

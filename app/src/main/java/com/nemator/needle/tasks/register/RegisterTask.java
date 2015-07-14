@@ -56,6 +56,12 @@ public class RegisterTask extends AsyncTask<Void, Void, AuthenticationResult> {
 
             Log.d(TAG, "Registering user ...");
             JSONObject json = jsonParser.makeHttpRequest(LOGIN_URL, "POST", requestParams);
+            if(json == null){
+                Log.d("Login Failure!", "Timeout Error");
+                result.successCode = 0;
+                result.message = "An Error Occured. Please try again";
+                return result;
+            }
 
             success = json.getInt(AppConstants.TAG_SUCCESS);
             result.successCode = success;

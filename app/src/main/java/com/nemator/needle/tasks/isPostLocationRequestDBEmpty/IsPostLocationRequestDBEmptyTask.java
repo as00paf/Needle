@@ -35,6 +35,7 @@ public class IsPostLocationRequestDBEmptyTask extends AsyncTask<Void, Void, Bool
 
         String[] projection = {
                 LocationServiceDBHelper.PostLocationRequest._ID,
+                LocationServiceDBHelper.PostLocationRequest.COLUMN_NAME_ITEM_ID,
                 LocationServiceDBHelper.PostLocationRequest.COLUMN_NAME_TYPE,
                 LocationServiceDBHelper.PostLocationRequest.COLUMN_NAME_DATE,
                 LocationServiceDBHelper.PostLocationRequest.COLUMN_NAME_EXPIRATION,
@@ -52,8 +53,9 @@ public class IsPostLocationRequestDBEmptyTask extends AsyncTask<Void, Void, Bool
         );
 
         cursor.moveToFirst();
+        int count = cursor.getCount();
 
-        return cursor.getCount() > 0;
+        return count > 0;
     }
 
     protected void onPostExecute(Boolean result) {

@@ -12,7 +12,6 @@ import android.graphics.Matrix;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.provider.MediaStore;
-import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
@@ -34,8 +33,8 @@ import com.nemator.needle.MainActivity;
 import com.nemator.needle.R;
 import com.nemator.needle.models.vo.HaystackVO;
 import com.nemator.needle.models.vo.UserVO;
-import com.nemator.needle.tasks.createHaystack.CreateHaystackTask;
-import com.nemator.needle.tasks.createHaystack.CreateHaystackTaskParams;
+import com.nemator.needle.tasks.haystack.HaystackTask;
+import com.nemator.needle.tasks.haystack.HaystackTaskParams;
 import com.nemator.needle.tasks.imageUploader.ImageUploadParams;
 import com.nemator.needle.tasks.imageUploader.ImageUploadResult;
 import com.nemator.needle.tasks.imageUploader.ImageUploaderTask;
@@ -348,9 +347,9 @@ public class CreateHaystackFragment extends CreateHaystackBaseFragment implement
             }
         }else{
             //Create Haystack
-            CreateHaystackTaskParams params = new CreateHaystackTaskParams(rootView.getContext(), haystack);
+            HaystackTaskParams params = new HaystackTaskParams(getActivity(), HaystackTaskParams.TYPE_CREATE, haystack);
             try{
-                CreateHaystackTask task = new CreateHaystackTask(params, ((MainActivity) getActivity()).getNavigationController());
+                HaystackTask task = new HaystackTask(params, ((MainActivity) getActivity()).getNavigationController());
                 task.execute();
 
             }catch (Exception e) {
@@ -371,9 +370,9 @@ public class CreateHaystackFragment extends CreateHaystackBaseFragment implement
         if(result.successCode == 1){
             haystack.setPictureURL(result.imageURL);
             //Create Haystack
-            CreateHaystackTaskParams params = new CreateHaystackTaskParams(rootView.getContext(), haystack);
+            HaystackTaskParams params = new HaystackTaskParams(getActivity(), HaystackTaskParams.TYPE_CREATE, haystack);
             try{
-                CreateHaystackTask task = new CreateHaystackTask(params, (((MainActivity) getActivity()).getNavigationController()));
+                HaystackTask task = new HaystackTask(params, ((MainActivity) getActivity()).getNavigationController());
                 task.execute();
 
             }catch (Exception e) {

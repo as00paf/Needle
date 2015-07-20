@@ -13,9 +13,10 @@ import com.appcompat.view.slidingTab.SlidingTabLayout;
 import com.nemator.needle.MainActivity;
 import com.nemator.needle.R;
 import com.nemator.needle.models.vo.LocationSharingVO;
-import com.nemator.needle.tasks.fetchLocationSharing.FetchLocationSharingParams;
-import com.nemator.needle.tasks.fetchLocationSharing.FetchLocationSharingResult;
-import com.nemator.needle.tasks.fetchLocationSharing.FetchLocationSharingTask;
+import com.nemator.needle.tasks.locationSharing.LocationSharingParams;
+import com.nemator.needle.tasks.locationSharing.LocationSharingResult;
+import com.nemator.needle.tasks.locationSharing.LocationSharingTask;
+import com.nemator.needle.tasks.updateLocationSharing.UpdateLocationSharingResult;
 import com.nemator.needle.utils.AppState;
 import com.nemator.needle.view.haystacks.OnActivityStateChangeListener;
 import com.shamanland.fab.FloatingActionButton;
@@ -23,7 +24,7 @@ import com.shamanland.fab.FloatingActionButton;
 import java.util.ArrayList;
 
 
-public class LocationSharingListFragment extends Fragment implements FetchLocationSharingTask.FetchLocationSharingResponseHandler {
+public class LocationSharingListFragment extends Fragment implements LocationSharingTask.FetchLocationSharingResponseHandler {
     public static String TAG = "LocationSharingFragment";
 
     //Views
@@ -149,10 +150,10 @@ public class LocationSharingListFragment extends Fragment implements FetchLocati
     }
 
     public void fetchLocationSharing(){
-       FetchLocationSharingParams params = new FetchLocationSharingParams(String.valueOf(getUserId()), rootView.getContext());
+       LocationSharingParams params = new LocationSharingParams(rootView.getContext(), LocationSharingParams.TYPE_GET, String.valueOf(getUserId()));
 
         try{
-            FetchLocationSharingTask task = new FetchLocationSharingTask(params, this);
+            LocationSharingTask task = new LocationSharingTask(params, this);
             task.execute();
         }catch(Exception e){
             Log.e(TAG, "fetchLocationSharing exception : " + e.toString());
@@ -160,7 +161,7 @@ public class LocationSharingListFragment extends Fragment implements FetchLocati
     }
 
     @Override
-    public void onLocationSharingFetched(FetchLocationSharingResult result) {
+    public void onLocationSharingFetched(LocationSharingResult result) {
         receivedLocationsList = result.receivedLocationSharingList;
         sentLocationsList = result.sentLocationSharingList;
 
@@ -193,5 +194,6 @@ public class LocationSharingListFragment extends Fragment implements FetchLocati
         void onCreateLocationSharingFabTapped();
         void onRefreshLocationSharingList();
         void onClickLocationSharingCard(LocationSharingVO locationSharing, Boolean isSent);
+        void onLocationSharingUpdated(LocationSharingResult result);
     }
 }

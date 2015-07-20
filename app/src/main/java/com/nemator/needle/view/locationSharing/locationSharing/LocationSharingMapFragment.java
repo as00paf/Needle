@@ -296,6 +296,12 @@ public class LocationSharingMapFragment extends SupportMapFragment
                             ((MainActivity) getActivity()).getNavigationController().onBackPressed();
                         }
                     })
+                    .setOnCancelListener(new DialogInterface.OnCancelListener() {
+                        @Override
+                        public void onCancel(DialogInterface dialog) {
+                            ((MainActivity) getActivity()).getNavigationController().onBackPressed();
+                        }
+                    })
                     .show();
         }
     }

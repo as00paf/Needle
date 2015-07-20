@@ -16,17 +16,17 @@ public class LocationServiceDBHelper extends SQLiteOpenHelper {
     private static final String SQL_CREATE_ENTRIES =
             "CREATE TABLE " + PostLocationRequest.TABLE_NAME + " (" +
                     PostLocationRequest._ID + " INTEGER PRIMARY KEY," +
+                    PostLocationRequest.COLUMN_NAME_ITEM_ID + TEXT_TYPE + COMMA_SEP +
                     PostLocationRequest.COLUMN_NAME_TYPE + TEXT_TYPE + COMMA_SEP +
                     PostLocationRequest.COLUMN_NAME_DATE + DATE_TYPE + COMMA_SEP +
                     PostLocationRequest.COLUMN_NAME_EXPIRATION + DATE_TYPE + COMMA_SEP +
-                    PostLocationRequest.COLUMN_NAME_POSTER_ID + INT_TYPE + COMMA_SEP +
-                    PostLocationRequest.COLUMN_NAME_ITEM_ID + TEXT_TYPE +
+                    PostLocationRequest.COLUMN_NAME_POSTER_ID + INT_TYPE +
             " )";
 
     private static final String SQL_DELETE_ENTRIES =
             "DROP TABLE IF EXISTS " + PostLocationRequest.TABLE_NAME;
 
-    public static final int DATABASE_VERSION = 1;
+    public static final int DATABASE_VERSION = 4;
     public static final String DATABASE_NAME = "PostLocationRequest.db";
 
     public LocationServiceDBHelper(Context context) {
@@ -54,6 +54,7 @@ public class LocationServiceDBHelper extends SQLiteOpenHelper {
 
         public static final int POSTER_TYPE_HAYSTACK = 0;
         public static final int POSTER_TYPE_LOCATION_SHARING = 1;
+        public static final int POSTER_TYPE_LOCATION_SHARING_BACK = 2;
 
     }
 }

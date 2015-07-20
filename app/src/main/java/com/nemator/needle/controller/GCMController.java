@@ -14,11 +14,14 @@ import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.nemator.needle.MainActivity;
 import com.nemator.needle.R;
 import com.nemator.needle.models.UserModel;
+import com.nemator.needle.tasks.TaskResult;
+import com.nemator.needle.tasks.updateGCMRegId.UpdateGCMRegIdTask;
+import com.nemator.needle.tasks.updateGCMRegId.UpdateGCMRegIdTaskParams;
 import com.nemator.needle.utils.AppConstants;
 
 import java.io.IOException;
 
-public class GCMController {
+public class GCMController implements UpdateGCMRegIdTask.UpdateGCMRegIdTaskHandler {
 
     public static String TAG = "GCMController";
 
@@ -33,6 +36,7 @@ public class GCMController {
     private SharedPreferences mSharedPreferences;
 
     GoogleCloudMessaging gcm;
+    int tryCount = 0;
 
     public GCMController(MainActivity activity, UserModel userModel){
         this.activity = activity;
@@ -74,6 +78,19 @@ public class GCMController {
         return true;
     }
 
+    @Override
+    public void onGCMRegIdUpdate(TaskResult result) {
+        if(result.successCode != 1){
+            tryCount++;
+            if(tryCount < 3){
+                UpdateGCMRegIdTaskParams params = new UpdateGCMRegIdTaskParams(activity, String.valueOf(userModel.getUserId()), userModel.getGcmRegId());
+                new UpdateGCMRegIdTask(params, GCMController.this).execute();
+            }else{
+                Toast.makeText(activity, "Error While Updating GCM RegID", Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
     class RegisterGCMTask extends AsyncTask<Void, Void, Void> {
 
         @Override
@@ -90,32 +107,35 @@ public class GCMController {
         }
     }
 
-    private class GCMRegistrationTask extends AsyncTask<Void, Void, String> {
+    private class GCMRegistrationTask extends AsyncTask<Void, Void, Boolean> {
 
         @Override
-        protected String doInBackground(Void... params) {
+        protected Boolean doInBackground(Void... params) {
             // TODO Auto-generated method stub
             if (gcm == null && checkPlayServices()) {
                 gcm = GoogleCloudMessaging.getInstance(activity.getApplicationContext());
             }
             try {
-                userModel.setGcmRegId(gcm.register(activity.getResources().getString(R.string.gcm_defaultSenderId)));
+                return userModel.setGcmRegId(gcm.register(activity.getResources().getString(R.string.gcm_defaultSenderId)));
             } catch (IOException e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
             }
 
-            return userModel.getGcmRegId();
+            return false;
         }
 
         @Override
-        protected void onPostExecute(String result) {
-            if (result != null) {
-                Log.i(TAG, "registered with GCM " + result);
+        protected void onPostExecute(Boolean result) {
+            if(result){
+                Log.i(TAG, "Was already registered with GCM " + userModel.getGcmRegId());
+            }else{
+                Log.i(TAG, "Needs to register with GCM " + userModel.getGcmRegId());
 
-                SharedPreferences.Editor editor = mSharedPreferences.edit();
-                editor.putString(AppConstants.TAG_GCM_REG_ID, userModel.getGcmRegId());
-                editor.commit();
+                if(userModel.getUserId() != -1){
+                    UpdateGCMRegIdTaskParams params = new UpdateGCMRegIdTaskParams(activity, String.valueOf(userModel.getUserId()), userModel.getGcmRegId());
+                    new UpdateGCMRegIdTask(params, GCMController.this).execute();
+                }
             }
         }
     }

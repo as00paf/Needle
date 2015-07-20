@@ -71,6 +71,10 @@ public class LocationSharingListTabFragment extends Fragment{
         mLayoutManager = new LinearLayoutManager(getActivity());
         mRecyclerView.setLayoutManager(mLayoutManager);
 
+        mAdapter = new LocationSharingListCardAdapter(dataList, getActivity(), !isReceived, (((MainActivity) getActivity()).getNavigationController()));
+        mRecyclerView.setAdapter(mAdapter);
+
+
         //Swipe To Refresh
         swipeLayout = (SwipeRefreshLayout) rootView.findViewById(R.id.swipe_container);
         swipeLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
@@ -87,7 +91,7 @@ public class LocationSharingListTabFragment extends Fragment{
         super.onResume();
 
         int state = isReceived ? AppState.LOCATION_SHARING_RECEIVED_TAB : AppState.LOCATION_SHARING_SENT_TAB;
-        stateChangeCallback.onStateChange(state);
+        if(stateChangeCallback!=null) stateChangeCallback.onStateChange(state);
     }
 
     @Override

@@ -29,19 +29,36 @@ public class UserModel {
 
     //Getters/Setters
     public int getUserId(){
+        if(userId == -1)
+            userId = mSharedPreferences.getInt(AppConstants.TAG_USER_ID, -1);
         return userId;
+    }
+
+    public void setUserId(int userId){
+        this.userId = userId;
+        mSharedPreferences.edit().putInt(AppConstants.TAG_USER_ID, userId);
     }
 
     public String getUserName(){
         return userName;
     }
 
+    public void setUserName(String username){
+        this.userName = username;
+
+        mSharedPreferences.edit().putString(AppConstants.TAG_USER_NAME, username);
+    }
+
     public String getGcmRegId() {
         return gcmRegId;
     }
 
-    public void setGcmRegId(String gcmRegId) {
+    public Boolean setGcmRegId(String gcmRegId) {
+        Boolean wereTheSame = this.gcmRegId.equals(gcmRegId);
         this.gcmRegId = gcmRegId;
+        mSharedPreferences.edit().putString(AppConstants.TAG_GCM_REG_ID, gcmRegId);
+
+        return wereTheSame;
     }
 
     public boolean isLoggedIn() {

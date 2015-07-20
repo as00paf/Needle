@@ -85,11 +85,7 @@ public class HaystackListTabFragment extends Fragment {
     public void updateHaystackList(ArrayList<HaystackVO> data){
         this.dataList = data;
 
-        if(mAdapter == null){
-            mAdapter = new HaystackListCardAdapter(this.dataList, getActivity(), interactionListener);
-        }else{
-            mAdapter.notifyDataSetChanged();
-        }
+        mAdapter = new HaystackListCardAdapter(this.dataList, getActivity(), interactionListener);
 
         if(mRecyclerView != null){
             mRecyclerView.setAdapter(mAdapter);

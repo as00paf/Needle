@@ -98,6 +98,7 @@ public class GCMIntentService extends IntentService {
             intent.putExtra(AppConstants.TAG_SENDER_NAME, data.getString(AppConstants.TAG_SENDER_NAME));
             intent.putExtra(AppConstants.TAG_SENDER_ID, data.getString(AppConstants.TAG_SENDER_ID));
             intent.putExtra(AppConstants.TAG_TIME_LIMIT, data.getString(AppConstants.TAG_TIME_LIMIT));
+            intent.putExtra(AppConstants.TAG_SHARE_BACK, data.getString(AppConstants.TAG_SHARE_BACK));
         }else{
 
         }

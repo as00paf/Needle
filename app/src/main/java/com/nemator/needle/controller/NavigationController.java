@@ -11,13 +11,13 @@ import android.widget.Toast;
 
 import com.nemator.needle.MainActivity;
 import com.nemator.needle.R;
-import com.nemator.needle.data.LocationServiceDBHelper;
+import com.nemator.needle.data.LocationServiceDBHelper.PostLocationRequest;
 import com.nemator.needle.models.UserModel;
 import com.nemator.needle.models.vo.HaystackVO;
 import com.nemator.needle.models.vo.LocationSharingVO;
-import com.nemator.needle.tasks.createHaystack.CreateHaystackResult;
-import com.nemator.needle.tasks.createHaystack.CreateHaystackTask.CreateHaystackResponseHandler;
-import com.nemator.needle.tasks.createLocationSharing.CreateLocationSharingResult;
+import com.nemator.needle.tasks.haystack.HaystackTask.CreateHaystackResponseHandler;
+import com.nemator.needle.tasks.haystack.HaystackTaskResult;
+import com.nemator.needle.tasks.locationSharing.LocationSharingResult;
 import com.nemator.needle.tasks.logOut.LogOutTask;
 import com.nemator.needle.tasks.logOut.LogOutTask.LogOutResponseHandler;
 import com.nemator.needle.utils.AppConstants;
@@ -31,19 +31,18 @@ import com.nemator.needle.view.haystacks.createHaystack.CreateHaystackFragment;
 import com.nemator.needle.view.locationSharing.LocationSharingListFragment;
 import com.nemator.needle.view.locationSharing.createLocationSharing.CreateLocationSharingFragment;
 import com.nemator.needle.view.locationSharing.locationSharing.LocationSharingFragment;
-import com.nemator.needle.view.locationSharing.locationSharing.LocationSharingMapFragment;
 import com.nemator.needle.view.settings.SettingsFragment;
 
 import it.neokree.materialnavigationdrawer.elements.MaterialSection;
 
-import static com.nemator.needle.tasks.createLocationSharing.CreateLocationSharingTask.CreateLocationSharingResponseHandler;
+import static com.nemator.needle.tasks.locationSharing.LocationSharingTask.CreateLocationSharingResponseHandler;
 import static com.nemator.needle.view.authentication.LoginFragment.LoginFragmentInteractionListener;
 import static com.nemator.needle.view.haystacks.HaystackListFragment.HaystackListFragmentInteractionListener;
 import static com.nemator.needle.view.locationSharing.LocationSharingListFragment.LocationSharingListFragmentInteractionListener;
 
 public class NavigationController implements MainActivity.NavigationHandler, OnActivityStateChangeListener,
         HaystackListFragmentInteractionListener, LocationSharingListFragmentInteractionListener,
-        CreateHaystackResponseHandler, CreateLocationSharingResponseHandler, LoginFragmentInteractionListener, LogOutResponseHandler {
+        CreateHaystackResponseHandler, LoginFragmentInteractionListener, LogOutResponseHandler, CreateLocationSharingResponseHandler {
 
     private MainActivity activity;
     private UserModel userModel;
@@ -171,6 +170,11 @@ public class NavigationController implements MainActivity.NavigationHandler, OnA
                 activity.setFragment(locationSharingFragment, activity.getString(R.string.title_location_sharing));
                 onStateChange(AppState.LOCATION_SHARING);
                 break;
+            case AppConstants.SECTION_HAYSTACK:
+                if(haystackFragment == null) haystackFragment = new HaystackFragment();
+                activity.setFragment(haystackFragment, activity.getString(R.string.title_activity_haystack));
+                onStateChange(AppState.HAYSTACK);
+                break;
         }
     }
 
@@ -179,26 +183,34 @@ public class NavigationController implements MainActivity.NavigationHandler, OnA
             case AppConstants.SECTION_REGISTER:
                 removeFragment(registerFragment);
                 registerFragment = null;
-                activity.removeSection(registerSection);
-                registerSection = null;
+                if(registerSection!=null){
+                    activity.removeSection(registerSection);
+                    registerSection = null;
+                }
                 break;
             case AppConstants.SECTION_LOGIN:
                 removeFragment(loginFragment);
                 loginFragment = null;
-                activity.removeSection(loginSection);
-                loginSection = null;
+                if(loginSection!=null){
+                    activity.removeSection(loginSection);
+                    loginSection = null;
+                }
                 break;
             case AppConstants.SECTION_HAYSTACKS:
                 removeFragment(haystacksListFragment);
                 haystacksListFragment = null;
-                activity.removeSection(haystacksSection);
-                haystacksSection = null;
+                if(haystacksSection != null){
+                    activity.removeSection(haystacksSection);
+                    haystacksSection = null;
+                }
                 break;
             case AppConstants.SECTION_LOCATION_SHARING_LIST:
                 removeFragment(locationSharingListFragment);
                 locationSharingListFragment = null;
-                activity.removeSection(locationSharingListSection);
-                locationSharingListSection = null;
+                if(locationSharingListSection != null){
+                    activity.removeSection(locationSharingListSection);
+                    locationSharingListSection = null;
+                }
                 break;
             case AppConstants.SECTION_SETTINGS:
                 removeFragment(settingsFragment);
@@ -217,6 +229,12 @@ public class NavigationController implements MainActivity.NavigationHandler, OnA
             case AppConstants.SECTION_CREATE_LOCATION_SHARING:
                 removeFragment(createLocationSharingFragment);
                 createLocationSharingFragment = null;
+                break;
+            case AppConstants.SECTION_LOCATION_SHARING:
+                removeFragment(locationSharingFragment);
+                locationSharingFragment = null;
+                activity.removeSection(locationSharingSection);
+                locationSharingSection = null;
                 break;
         }
     }
@@ -237,7 +255,8 @@ public class NavigationController implements MainActivity.NavigationHandler, OnA
                 activity.onBackPressed();
                 break;
             case AppState.REGISTER:
-                activity.onBackPressed();//TODO : Handle this
+                showSection(AppConstants.SECTION_LOGIN);
+                onStateChange(AppState.LOGIN);
                 break;
             case AppState.PUBLIC_HAYSTACK_TAB:
                 logOut();
@@ -466,6 +485,31 @@ public class NavigationController implements MainActivity.NavigationHandler, OnA
         showSection(AppConstants.SECTION_LOCATION_SHARING);
     }
 
+    //TODO:localize
+    @Override
+    public void onLocationSharingUpdated(LocationSharingResult result) {
+        if(result.successCode == 1){
+            if(result.vo.getShareBack()){
+                activity.getLocationService().startLocationUpdates();
+                activity.getLocationService().addPostLocationRequest(PostLocationRequest.POSTER_TYPE_LOCATION_SHARING_BACK,
+                        result.vo.getTimeLimit(), result.vo.getSenderId(),
+                        String.valueOf(result.vo.getId()));
+
+                Toast.makeText(activity, "Location shared with " + result.vo.getReceiverName(), Toast.LENGTH_SHORT).show();
+            }else{
+                activity.getLocationService().removePostLocationRequest(PostLocationRequest.POSTER_TYPE_LOCATION_SHARING_BACK,
+                                                                        result.vo.getTimeLimit(), result.vo.getSenderId(),
+                                                                        String.valueOf(result.vo.getId()));
+
+                Toast.makeText(activity, "Location shared with " + result.vo.getReceiverName(), Toast.LENGTH_SHORT).show();
+            }
+
+        }else{
+            String msg = result.vo.getShareBack() ? "Location still shared !" : "Could not share location !";
+            Toast.makeText(activity, msg, Toast.LENGTH_SHORT).show();
+        }
+    }
+
     @Override
     public void onRefreshLocationSharingList() {
         locationSharingListFragment.fetchLocationSharing();
@@ -473,7 +517,7 @@ public class NavigationController implements MainActivity.NavigationHandler, OnA
 
     //CreateHaystackResponseHandler
     @Override
-    public void onHaystackCreated(CreateHaystackResult result){
+    public void onHaystackCreated(HaystackTaskResult result){
         if(result.successCode == 0){
             Toast.makeText(activity, "An error occured while creating Haystack", Toast.LENGTH_SHORT).show();
         }else{
@@ -492,16 +536,18 @@ public class NavigationController implements MainActivity.NavigationHandler, OnA
 
             //showHaystackFragment(result.haystack.getName());
             showSection(AppConstants.SECTION_HAYSTACK);
+            onStateChange(AppState.HAYSTACK);
         }
     }
 
     //CreateLocationSharingResponseHandler
     @Override
-    public void onLocationSharingCreated(CreateLocationSharingResult result) {
+    public void onLocationSharingCreated(LocationSharingResult result) {
         if(result.successCode == 1){
             activity.getLocationService().startLocationUpdates();
-            activity.getLocationService().addPostLocationRequest(LocationServiceDBHelper.PostLocationRequest.POSTER_TYPE_LOCATION_SHARING, result.locationSharing.getTimeLimit(), result.locationSharing.getSenderId(), String.valueOf(result.locationSharing.getId()));
-            Toast.makeText(activity, "Location shared with " + result.locationSharing.getReceiverName(), Toast.LENGTH_SHORT).show();
+            activity.getLocationService().addPostLocationRequest(PostLocationRequest.POSTER_TYPE_LOCATION_SHARING,
+                    result.vo.getTimeLimit(), result.vo.getSenderId(), String.valueOf(result.vo.getId()));
+            Toast.makeText(activity, "Location shared with " + result.vo.getReceiverName(), Toast.LENGTH_SHORT).show();
             showSection(AppConstants.SECTION_LOCATION_SHARING_LIST);
             removeSection(AppConstants.SECTION_CREATE_LOCATION_SHARING);
         }else{
@@ -521,11 +567,13 @@ public class NavigationController implements MainActivity.NavigationHandler, OnA
     }
 
     public void setHaystacksCount(int count){
-        haystacksSection.setNotifications(count);
+        if(count>0)
+            haystacksSection.setNotifications(count);
     }
 
     public void setLocationSharingCount(int count){
-        locationSharingListSection.setNotifications(count);
+        if(count>0)
+            locationSharingListSection.setNotifications(count);
     }
 
     @Override

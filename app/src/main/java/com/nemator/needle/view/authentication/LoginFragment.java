@@ -135,11 +135,12 @@ public class LoginFragment extends Fragment implements View.OnClickListener{
 
         String username = user.getText().toString();
         String password = pass.getText().toString();
+        String regId = ((MainActivity) getActivity()).getUserModel().getGcmRegId();
 
         if(TextUtils.isEmpty(username) || TextUtils.isEmpty(password)){
             Toast.makeText(getActivity(), "You must enter a username and a password", Toast.LENGTH_LONG).show();
         }else{
-            LoginTaskParams params = new LoginTaskParams(username, password, getActivity(), rememberMeCheckBox.isChecked(), false);
+            LoginTaskParams params = new LoginTaskParams(username, password, regId, getActivity(), rememberMeCheckBox.isChecked(), false);
             new LoginTask(params, ((MainActivity) getActivity()).getAuthenticationController()).execute();
         }
     }

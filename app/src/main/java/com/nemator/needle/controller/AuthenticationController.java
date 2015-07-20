@@ -12,6 +12,7 @@ import com.nemator.needle.tasks.AuthenticationResult;
 import com.nemator.needle.tasks.login.LoginTask;
 import com.nemator.needle.tasks.login.LoginTask.LoginResponseHandler;
 import com.nemator.needle.tasks.login.LoginTaskParams;
+import com.nemator.needle.tasks.login.LoginTaskResult;
 import com.nemator.needle.tasks.register.RegisterTask.RegisterResponseHandler;
 import com.nemator.needle.utils.AppConstants;
 
@@ -35,12 +36,16 @@ public class AuthenticationController implements LoginResponseHandler, RegisterR
     //Handlers
     @Override
     public void onRegistrationComplete(AuthenticationResult result, String password, Boolean rememberMe) {
-        LoginTaskParams params = new LoginTaskParams(result.user.getUserName(), password, activity, rememberMe, false);
-        new LoginTask(params, this).execute();
+        if(result.successCode==1){
+            LoginTaskParams params = new LoginTaskParams(result.user.getUserName(), password, activity, rememberMe, false);
+            new LoginTask(params, this).execute();
+        }else{
+            Toast.makeText(activity, "Error ! \nPlease Try Again", Toast.LENGTH_SHORT).show();
+        }
     }
 
     @Override
-    public void onLoginComplete(AuthenticationResult result) {
+    public void onLoginComplete(LoginTaskResult result) {
         if(!userModel.isLoggedIn()) {
             if (result.successCode == 1) {
                 userModel.setLoggedIn(true);
@@ -58,6 +63,9 @@ public class AuthenticationController implements LoginResponseHandler, RegisterR
                 navigationController.removeSection(AppConstants.SECTION_REGISTER);
                 navigationController. createMainSections();
                 navigationController.showSection(AppConstants.SECTION_HAYSTACKS);
+
+                navigationController.setHaystacksCount(result.haystackCount);
+                navigationController.setLocationSharingCount(result.locationSharingCount);
             } else {
                 Toast.makeText(activity, "An Error Occured\n Please Try Again!", Toast.LENGTH_SHORT).show();
             }

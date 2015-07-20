@@ -34,8 +34,9 @@
 
     <!-- Create Haystack Fragment -->
     <string name="change">Change</string>
-    <string name="creatingHaystack">Creating Haystack...</string>
+    <string name="creating_haystack">Creating Haystack...</string>
     <string name="creating_location_sharing">Creating Location Sharing...</string>
+    <string name="cancelling_location_sharing">Cancelling Location Sharing...</string>
 
     <!-- Haystack Map Fragment -->
     <string name="map_view">Map View</string>
@@ -77,6 +78,7 @@
     <string name="adding_users">Adding Users...</string>
     <string name="haystack_created">Haystack Created</string>
     <string name="sharing_location_error">Error Sharing Your Location</string>
+    <string name="sharing_location">Sharing Location ...</string>
     <string name="unsharing_location_error">Error Removing Location Sharing</string>
     <string name="quit_confirmation_title">Exit App Confirmation</string>
     <string name="quit_confirmation_msg">Are you sure you want to quit Needle ?</string>
@@ -101,8 +103,12 @@
     <string name="yes">Yeah</string>
     <string name="no">Nah</string>
     <string name="cancel">Cancel</string>
+    <string name="cancel_location_sharing_confirmation">Are you sure you want to cancel this Location Sharing ?</string>
     <string name="ok">Okay</string>
     <string name="fetch_haystack_error">Could Not Fetch Haystacks</string>
+    <string name="share_location_back">Share Location Back</string>
+    <string name="stop_sharing_location">Stop Sharing Location</string>
+    <string name="share_location_back_confirmation">Are you sure you want to share you location back ?</string>
 
     <!-- GCM -->
     <string name="gcm_send_message">Token retrieved and sent to server! You can now use gcmsender to send downstream messages to this app.</string>

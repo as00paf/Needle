@@ -2,12 +2,7 @@ package com.nemator.needle.view.locationSharing.createLocationSharing;
 
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
-import android.content.ComponentName;
-import android.content.Context;
-import android.content.Intent;
-import android.content.ServiceConnection;
 import android.os.Bundle;
-import android.os.IBinder;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -24,14 +19,10 @@ import android.widget.Toast;
 
 import com.nemator.needle.MainActivity;
 import com.nemator.needle.R;
-import com.nemator.needle.data.LocationServiceDBHelper;
 import com.nemator.needle.models.vo.LocationSharingVO;
 import com.nemator.needle.models.vo.UserVO;
-import com.nemator.needle.service.NeedleLocationService;
-import com.nemator.needle.tasks.createLocationSharing.CreateLocationSharingResult;
-import com.nemator.needle.tasks.createLocationSharing.CreateLocationSharingTask;
-import com.nemator.needle.tasks.createLocationSharing.CreateLocationSharingTask.CreateLocationSharingResponseHandler;
-import com.nemator.needle.tasks.createLocationSharing.CreateLocationSharingTaskParams;
+import com.nemator.needle.tasks.locationSharing.LocationSharingParams;
+import com.nemator.needle.tasks.locationSharing.LocationSharingTask;
 import com.nemator.needle.tasks.retrieveUsers.RetrieveUsersParams;
 import com.nemator.needle.tasks.retrieveUsers.RetrieveUsersResult;
 import com.nemator.needle.tasks.retrieveUsers.RetrieveUsersTask;
@@ -218,8 +209,8 @@ public class CreateLocationSharingFragment extends Fragment implements RetrieveU
         locationSharingVO.setTimeLimit(dateLimitEditText.getText().toString() + " " + timeLimitEditText.getText().toString());
 
         String regId = selectedUser.getGcmRegId();
-        CreateLocationSharingTaskParams params = new CreateLocationSharingTaskParams(getActivity(), locationSharingVO, regId);
-        CreateLocationSharingTask task = new CreateLocationSharingTask(params, (((MainActivity) getActivity()).getNavigationController()));
+        LocationSharingParams params = new LocationSharingParams(getActivity(), LocationSharingParams.TYPE_CREATE, locationSharingVO, regId);
+        LocationSharingTask task = new LocationSharingTask(params, (((MainActivity) getActivity()).getNavigationController()));
         task.execute();
     }
 

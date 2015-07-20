@@ -1,8 +1,9 @@
 package com.nemator.needle.view.locationSharing;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.support.v7.widget.PopupMenu;
-import android.support.v7.widget.PopupMenu.OnMenuItemClickListener;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.MenuInflater;
@@ -15,14 +16,16 @@ import android.widget.TextView;
 
 import com.nemator.needle.R;
 import com.nemator.needle.models.vo.LocationSharingVO;
-import com.nemator.needle.tasks.cancelLocationSharing.CancelLocationSharingTask;
-import com.nemator.needle.tasks.cancelLocationSharing.CancelLocationSharingTaskParams;
-import com.nemator.needle.tasks.cancelLocationSharing.CancelLocationSharingTaskResult;
+import com.nemator.needle.tasks.locationSharing.LocationSharingParams;
+import com.nemator.needle.tasks.locationSharing.LocationSharingResult;
+import com.nemator.needle.tasks.locationSharing.LocationSharingTask;
 import com.nemator.needle.view.locationSharing.LocationSharingListFragment.LocationSharingListFragmentInteractionListener;
 
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 
-public class LocationSharingListCardAdapter extends RecyclerView.Adapter<LocationSharingListCardAdapter.LocationSharingCardViewHolder> implements CancelLocationSharingTask.CancelLocationSharingResponseHandler {
+public class LocationSharingListCardAdapter extends RecyclerView.Adapter<LocationSharingListCardAdapter.LocationSharingCardViewHolder> implements
+        LocationSharingTask.CancelLocationSharingResponseHandler, LocationSharingTask.UpdateLocationSharingTaskHandler {
     public static String TAG = "LocationSharingListCardAdapter";
 
     private static final int TYPE_ITEM = 0;
@@ -39,7 +42,6 @@ public class LocationSharingListCardAdapter extends RecyclerView.Adapter<Locatio
         listData = data;
         mContext = context;
         this.isSent = isSent;
-
         if(listData == null){
             listData = new ArrayList<LocationSharingVO>();
         }
@@ -113,9 +115,9 @@ public class LocationSharingListCardAdapter extends RecyclerView.Adapter<Locatio
     }
 
     public void cancel(MenuItem item, LocationSharingCardViewHolder viewHolder){
-        CancelLocationSharingTaskParams params = new CancelLocationSharingTaskParams(mContext, viewHolder.locationSharingData );
+        LocationSharingParams params = new LocationSharingParams(mContext, LocationSharingParams.TYPE_CANCEL, viewHolder.locationSharingData );
         try{
-            CancelLocationSharingTask task = new CancelLocationSharingTask(params, this);
+            LocationSharingTask task = new LocationSharingTask(params, this);
             task.execute();
         }catch (Exception e){
             e.printStackTrace();
@@ -123,18 +125,50 @@ public class LocationSharingListCardAdapter extends RecyclerView.Adapter<Locatio
     }
 
     @Override
-    public void onLocationSharingCancelled(CancelLocationSharingTaskResult result) {
+    public void onLocationSharingCancelled(LocationSharingResult result) {
         //Remove from list
-        int index = listData.indexOf(result.data);
-        listData.remove(index);
-        this.notifyDataSetChanged();
+        int index = -1;
+
+        for (LocationSharingVO vo : listData){
+            if(vo.getId() == result.vo.getId()){
+                index = listData.indexOf(vo);
+            }
+        }
+
+        if(index > -1){
+            listData.remove(index);
+            this.notifyDataSetChanged();
+        }
+    }
+
+    public void shareLocationBack(MenuItem item, LocationSharingCardViewHolder viewHolder){
+        LocationSharingVO vo = ((LocationSharingVO) getItem(viewHolder.getPosition())).clone();
+
+        WeakReference<LocationSharingCardViewHolder> viewHolderRef = new WeakReference<LocationSharingCardViewHolder>(viewHolder);
+
+        LocationSharingParams params = new LocationSharingParams(mContext, LocationSharingParams.TYPE_UPDATE, vo, viewHolderRef);
+
+        try{
+            LocationSharingTask task = new LocationSharingTask(params, this);
+            task.execute();
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void onLocationSharingUpdated(LocationSharingResult result) {
+        LocationSharingCardViewHolder viewHolder = result.viewHolderRef.get();
+        viewHolder.setShareBack(result.vo.getShareBack());
+
+        mListener.onLocationSharingUpdated(result);
     }
 
     public static class LocationSharingCardViewHolder extends RecyclerView.ViewHolder implements PopupMenu.OnMenuItemClickListener, View.OnClickListener
     {
         //Item
         TextView titleView, active_until;
-        ImageView imageView;
+        ImageView imageView, shareBackIndicator;
         ImageButton menuButton;
 
         //Empty
@@ -143,8 +177,11 @@ public class LocationSharingListCardAdapter extends RecyclerView.Adapter<Locatio
         LocationSharingVO locationSharingData;
 
         private LocationSharingListFragmentInteractionListener mListener;
+
         private Boolean isSent;
         private LocationSharingListCardAdapter adapter;
+
+        private Boolean shareBack = false;
 
         public LocationSharingCardViewHolder(LocationSharingListCardAdapter adapter, View view, Boolean isNotEmpty, LocationSharingListFragmentInteractionListener listener, Boolean isSent) {
             super(view);
@@ -155,6 +192,7 @@ public class LocationSharingListCardAdapter extends RecyclerView.Adapter<Locatio
             emptyText = (TextView) view.findViewById(R.id.emptyText);
             imageView = (ImageView) view.findViewById(R.id.thumbImage);
             menuButton = (ImageButton) view.findViewById(R.id.location_sharing_card_menu_button);
+            shareBackIndicator = (ImageView) view.findViewById(R.id.location_sharing_share_back_indicator);
             this.adapter = adapter;
         }
 
@@ -175,31 +213,76 @@ public class LocationSharingListCardAdapter extends RecyclerView.Adapter<Locatio
                 }
             });
 
-            if(!isSent){
-                menuButton.setVisibility(View.GONE);
-            }else{
-                menuButton.setOnClickListener(this);
-            }
+            menuButton.setOnClickListener(this);
+            setShareBack(locationSharing.getShareBack());
         }
 
         @Override
-        public boolean onMenuItemClick(MenuItem item) {
+        public boolean onMenuItemClick(final MenuItem item) {
+            final LocationSharingCardViewHolder me = this;
             switch (item.getItemId()) {
+                 case R.id.menu_option_share_back:
+                     adapter.shareLocationBack(item, me);
+                     break;
                 case R.id.menu_option_cancel:
-                    adapter.cancel(item, this);
-                    return true;
+                    new AlertDialog.Builder(mContext)
+                            .setIcon(android.R.drawable.ic_dialog_alert)
+                            .setTitle(mContext.getString(R.string.cancel))
+                            .setMessage(mContext.getString(R.string.cancel_location_sharing_confirmation))
+                            .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    adapter.cancel(item, me);
+                                }
+                            })
+                            .setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+
+                                }
+                            })
+                            .show();
+
+                    break;
                 default:
                     return false;
             }
+
+            return true;
         }
 
         @Override
         public void onClick(View v) {
             PopupMenu popup = new PopupMenu(v.getContext(), menuButton);
             MenuInflater inflater = popup.getMenuInflater();
-            inflater.inflate(R.menu.menu_location_sharing_card, popup.getMenu());
+
+            int resourceId = isSent ? R.menu.menu_location_sharing_sent_card : R.menu.menu_location_sharing_received_card;
+            inflater.inflate(resourceId, popup.getMenu());
             popup.setOnMenuItemClickListener(this);
+            if(!isSent){
+                popup.getMenu().getItem(0).setTitle(shareBack ? mContext.getString(R.string.stop_sharing_location) :
+                                                                mContext.getString(R.string.share_location_back));
+            }
+
             popup.show();
+        }
+
+        public Boolean getIsSent() {
+            return isSent;
+        }
+
+        public void setShareBack(Boolean value) {
+            shareBack = value;
+            shareBackIndicator.setVisibility(shareBack ? View.VISIBLE : View.INVISIBLE);
+        }
+
+        public Boolean getShareBack() {
+            return shareBack;
+        }
+
+        public Boolean toggleShareBack(){
+            setShareBack(!shareBack);
+            return shareBack;
         }
     }
 }

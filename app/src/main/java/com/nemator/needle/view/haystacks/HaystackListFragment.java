@@ -15,15 +15,15 @@ import com.appcompat.view.slidingTab.SlidingTabLayout;
 import com.nemator.needle.MainActivity;
 import com.nemator.needle.R;
 import com.nemator.needle.models.vo.HaystackVO;
-import com.nemator.needle.tasks.fetchHaystacks.FetchHaystacksParams;
-import com.nemator.needle.tasks.fetchHaystacks.FetchHaystacksResult;
-import com.nemator.needle.tasks.fetchHaystacks.FetchHaystacksTask;
+import com.nemator.needle.tasks.haystack.HaystackTask;
+import com.nemator.needle.tasks.haystack.HaystackTaskParams;
+import com.nemator.needle.tasks.haystack.HaystackTaskResult;
 import com.nemator.needle.utils.AppState;
 import com.shamanland.fab.FloatingActionButton;
 
 import java.util.ArrayList;
 
-public class HaystackListFragment extends Fragment implements FetchHaystacksTask.FetchHaystackResponseHandler, SwipeRefreshLayout.OnRefreshListener{
+public class HaystackListFragment extends Fragment implements HaystackTask.FetchHaystackResponseHandler, SwipeRefreshLayout.OnRefreshListener{
     private static final String TAG = "HaystackListFragment";
 
     //Views
@@ -142,10 +142,10 @@ public class HaystackListFragment extends Fragment implements FetchHaystacksTask
     }
 
     public void fetchHaystacks(){
-        FetchHaystacksParams params = new FetchHaystacksParams(getUserName(), String.valueOf(getUserId()), rootView.getContext());
+        HaystackTaskParams params = new HaystackTaskParams(rootView.getContext(), HaystackTaskParams.TYPE_GET, getUserId());
 
         try{
-            FetchHaystacksTask task = new FetchHaystacksTask(params, this);
+            HaystackTask task = new HaystackTask(params, this);
             task.execute();
         }catch(Exception e){
             Log.e(TAG, "fetchHaystacks exception : " + e.toString());
@@ -162,19 +162,19 @@ public class HaystackListFragment extends Fragment implements FetchHaystacksTask
         fetchHaystacks();
     }
 
-    public void onHaystackFetched(FetchHaystacksResult result){
+    public void onHaystackFetched(HaystackTaskResult result){
         if(result.successCode == 1){
             publicHaystacks = result.publicHaystackList;
             privateHaystacks = result.privateHaystackList;
 
             HaystackListTabFragment publicTab = mHaystackListPagerAdapter.getPublicHaystackListFragment();
             HaystackListTabFragment privateTab = mHaystackListPagerAdapter.getPrivateHaystackListFragment();
-
+/*
             //Show how many haystacks are available in the Nav Drawer
             int count = publicHaystacks.size() + privateHaystacks.size();
             if(getActivity() != null)
                 ((MainActivity) getActivity()).getNavigationController().setHaystacksCount(count);
-
+*/
             if(publicTab == null && privateTab == null) return;
 
             publicTab.getRefreshLayout().setRefreshing(false);

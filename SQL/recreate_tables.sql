@@ -70,5 +70,6 @@ senderId INT,
 senderName TEXT,
 receiverId INT,
 receiverName TEXT,
-timeLimit datetime
+timeLimit datetime,
+shareBack BOOLEAN
 );

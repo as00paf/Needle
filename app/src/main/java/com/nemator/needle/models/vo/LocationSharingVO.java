@@ -16,16 +16,18 @@ public class LocationSharingVO implements Serializable, Parcelable {
     private String receiverName;
     private int receiverId;
     private String timeLimit;
+    private Boolean shareBack;
 
     public LocationSharingVO(){
 
     }
 
-    public LocationSharingVO(int id, String senderName, int senderId, String timeLimit){
+    public LocationSharingVO(int id, String senderName, int senderId, String timeLimit, Boolean shareBack){
         this.id = id;
         this.senderName = senderName;
         this.senderId = senderId;
         this.timeLimit = timeLimit;
+        this.shareBack = shareBack;
     }
 
     @Override
@@ -40,6 +42,7 @@ public class LocationSharingVO implements Serializable, Parcelable {
         this.receiverName = in.readString();
         this.receiverId = in.readInt();
         this.timeLimit = in.readString();
+        this.shareBack = in.readByte() != 0;
     }
 
     @Override
@@ -50,8 +53,20 @@ public class LocationSharingVO implements Serializable, Parcelable {
         parcel.writeString(receiverName);
         parcel.writeInt(receiverId);
         parcel.writeString(timeLimit);
+        parcel.writeByte((byte) (shareBack ? 1 : 0));
     }
 
+    public LocationSharingVO clone(){
+        LocationSharingVO vo = new LocationSharingVO();
+        vo.id = this.id;
+        vo.senderId = this.senderId;
+        vo.senderName = this.senderName;
+        vo.receiverId = this.receiverId;
+        vo.receiverName = this.receiverName;
+        vo.timeLimit = this.timeLimit;
+        vo.shareBack = this.shareBack;
+        return vo;
+    }
 
     //Getters/Setters
     public int getId() {
@@ -100,5 +115,13 @@ public class LocationSharingVO implements Serializable, Parcelable {
 
     public void setTimeLimit(String timeLimit) {
         this.timeLimit = timeLimit;
+    }
+
+    public Boolean getShareBack() {
+        return shareBack;
+    }
+
+    public void setShareBack(Boolean shareBack) {
+        this.shareBack = shareBack;
     }
 }

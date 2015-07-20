@@ -14,23 +14,32 @@ public class AppConstants {
     public static final String TAG_TYPE = "type";
     public static final String TAG_TIME_LIMIT = "timeLimit";
     public static final String TAG_SENDER_NAME = "senderName";
+    public static final String TAG_RECEIVER_NAME = "receiverName";
     public static final String TAG_SENDER_ID = "senderId";
+    public static final String TAG_RECEIVER_ID = "receiverId";
     public static final String TAG_ACTION = "action";
+    public static final String TAG_HAYSTACK = "haystack";
     public static final String TAG_HAYSTACK_ID = "haystackId";
     public static final String TAG_LOCATION_SHARING_ID = "locationSharingId";
     public static final String TAG_USER_NAME = "userName";
     public static final String TAG_USER_ID = "userId";
     public static final String TAG_GCM_REG_ID = "gcmRegId";
+    public static final String TAG_NOTIFICATION_MESSAGE = "notificationMessage";
     public static final String TAG_GCM_REGISTERD = "gcmRegistered";
     public static final String TAG_ID = "id";
     public static final String TAG_PICTURE_URL = "pictureURL";
     public static final String TAG_LOCATION = "location";
     public static final String TAG_LOCATIONS = "locations";
     public static final String TAG_LAT = "lat";
+    public static final String TAG_LATITUDE = "latitude";
     public static final String TAG_LNG = "lng";
+    public static final String TAG_LONGITUDE = "longitude";
     public static final String TAG_USERS = "users";
     public static final String TAG_ADDED_USERS = "addedUserList";
     public static final String TAG_REQUEST_CODE = "requestCode";
+    public static final String TAG_HAYSTACK_COUNT = "haystackCount";
+    public static final String TAG_LOCATION_SHARING_COUNT = "locationSharingCount";
+    public static final String TAG_SHARE_BACK = "shareBack";
 
     //Location updates
     public static final int MILLISECONDS_PER_SECOND = 1000;

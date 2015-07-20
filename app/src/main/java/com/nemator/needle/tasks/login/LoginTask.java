@@ -18,7 +18,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
-public class LoginTask extends AsyncTask<Void, Void, AuthenticationResult> {
+public class LoginTask extends AsyncTask<Void, Void, LoginTaskResult> {
     private static final String LOGIN_URL = AppConstants.PROJECT_URL +"login.php";
     private static final String TAG = "LoginTask";
 
@@ -44,14 +44,15 @@ public class LoginTask extends AsyncTask<Void, Void, AuthenticationResult> {
     }
 
     @Override
-    protected AuthenticationResult doInBackground(Void... args) {
-        AuthenticationResult result = new AuthenticationResult();
+    protected LoginTaskResult doInBackground(Void... args) {
+        LoginTaskResult result = new LoginTaskResult();
 
         int success;
         try {
             List<NameValuePair> requestParams = new ArrayList<NameValuePair>();
             requestParams.add(new BasicNameValuePair("username", params.userName));
             requestParams.add(new BasicNameValuePair("password", params.password));
+            requestParams.add(new BasicNameValuePair("regId", params.gcmRegId));
 
             if(params.verbose) Log.d(TAG, "Attempting Login");
             JSONObject json = jsonParser.makeHttpRequest(LOGIN_URL, "POST", requestParams);
@@ -66,8 +67,8 @@ public class LoginTask extends AsyncTask<Void, Void, AuthenticationResult> {
                 SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(params.context);
                 SharedPreferences.Editor edit = sp.edit();
 
-                edit.putString("username", params.userName);
-                edit.putInt("userId", json.getInt(AppConstants.TAG_USER_ID));
+                edit.putString(AppConstants.TAG_USER_NAME, params.userName);
+                edit.putInt(AppConstants.TAG_USER_ID, json.getInt(AppConstants.TAG_USER_ID));
                 edit.putBoolean("rememberMe", params.rememberMe);
 
                 if(params.rememberMe){
@@ -79,6 +80,9 @@ public class LoginTask extends AsyncTask<Void, Void, AuthenticationResult> {
                 result.message = json.getString(AppConstants.TAG_MESSAGE);
                 int userId = json.getInt(AppConstants.TAG_USER_ID);
                 result.user = new UserVO(userId, params.userName, "", params.gcmRegId);
+                result.locationSharingCount = json.getInt(AppConstants.TAG_LOCATION_SHARING_COUNT);
+                result.haystackCount = json.getInt(AppConstants.TAG_HAYSTACK_COUNT);
+
                 return result;
             }else{
                 Log.d("Login Failure!", json.getString(AppConstants.TAG_MESSAGE));
@@ -95,14 +99,14 @@ public class LoginTask extends AsyncTask<Void, Void, AuthenticationResult> {
     }
 
     @Override
-    protected void onPostExecute(AuthenticationResult result) {
+    protected void onPostExecute(LoginTaskResult result) {
         if(dialog!=null) dialog.dismiss();
         delegate.onLoginComplete(result);
         super.onPostExecute(result);
     }
 
     public interface LoginResponseHandler {
-        void onLoginComplete(AuthenticationResult result);
+        void onLoginComplete(LoginTaskResult result);
     }
 
 }

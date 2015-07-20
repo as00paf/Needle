@@ -125,8 +125,9 @@ public class MainActivity extends MaterialNavigationDrawer implements MaterialSe
                     String timeLimit = extras.getString(AppConstants.TAG_TIME_LIMIT);
                     String senderName = extras.getString(AppConstants.TAG_SENDER_NAME);
                     int senderId = Integer.parseInt(extras.getString(AppConstants.TAG_SENDER_ID, "-1"));
+                    Boolean shareBack = extras.getBoolean(AppConstants.TAG_SHARE_BACK);
 
-                    LocationSharingVO vo = new LocationSharingVO(id, senderName, senderId, timeLimit);
+                    LocationSharingVO vo = new LocationSharingVO(id, senderName, senderId, timeLimit, shareBack);
                     navigationController.showReceivedLocationSharing(vo);
                 }
             }

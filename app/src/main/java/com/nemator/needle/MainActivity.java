@@ -100,6 +100,7 @@ public class MainActivity extends MaterialNavigationDrawer implements MaterialSe
         mConnection = new ServiceConnection(){
             public void onServiceConnected(ComponentName className, IBinder service) {
                 locationService = ((NeedleLocationService.LocalBinder)service).getService();
+                locationService.userModel = userModel;
             }
 
             public void onServiceDisconnected(ComponentName className) {
@@ -142,7 +143,7 @@ public class MainActivity extends MaterialNavigationDrawer implements MaterialSe
     public void onSaveInstanceState(Bundle savedInstanceState) {
         if(navigationController.getHaystackFragment() != null){
             savedInstanceState.putParcelable(AppConstants.HAYSTACK_DATA_KEY, navigationController.getHaystackFragment().getHaystack());
-            savedInstanceState.putBoolean(AppConstants.TAG_IS_OWNER, navigationController.getHaystackFragment().isOwner());
+            savedInstanceState.putBoolean(AppConstants.TAG_IS_OWNER, navigationController.getHaystackFragment().isOwner(userModel.getUserId()));
         }
 
         savedInstanceState.putInt(AppConstants.APP_STATE, navigationController.getCurrentState());

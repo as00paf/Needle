@@ -25,7 +25,7 @@ public class IsPostLocationRequestDBEmptyTask extends AsyncTask<Void, Void, Bool
     protected void onPreExecute() {
         super.onPreExecute();
 
-        dbHelper = new LocationServiceDBHelper(context);
+        dbHelper = LocationServiceDBHelper.getInstance(context);
     }
 
     @Override

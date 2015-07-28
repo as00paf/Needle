@@ -445,7 +445,7 @@ public class NavigationController implements MainActivity.NavigationHandler, OnA
     //HaystackListFragmentInteractionListener
     @Override
     public void onRefreshHaystackList() {
-        haystacksListFragment.fetchHaystacks();
+        haystacksListFragment.fetchHaystacks(true);
     }
 
     @Override

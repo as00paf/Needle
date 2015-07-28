@@ -2,29 +2,16 @@ package com.nemator.needle.tasks.removePostLocationRequest;
 
 import android.app.AlarmManager;
 import android.app.PendingIntent;
-import android.content.ComponentName;
-import android.content.ContentValues;
-import android.content.Context;
 import android.content.Intent;
-import android.content.ServiceConnection;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
-import android.os.IBinder;
 import android.util.Log;
 
 import com.nemator.needle.broadcastReceiver.PostLocationRequestAlarm;
 import com.nemator.needle.data.LocationServiceDBHelper;
-import com.nemator.needle.service.NeedleLocationService;
 import com.nemator.needle.tasks.TaskResult;
 import com.nemator.needle.tasks.addPostLocationRequest.AddPostLocationRequestParams;
-import com.nemator.needle.tasks.retrieveLocations.RetrieveLocationsResult;
-
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.Locale;
 
 public class RemovePostLocationRequestTask extends AsyncTask<Void, Void, TaskResult> {
     private static final String TAG = "RemovePostLocationTask";
@@ -43,7 +30,7 @@ public class RemovePostLocationRequestTask extends AsyncTask<Void, Void, TaskRes
     protected void onPreExecute() {
         super.onPreExecute();
 
-        dbHelper = new LocationServiceDBHelper(params.context);
+        dbHelper = LocationServiceDBHelper.getInstance(params.context);
     }
 
     @Override

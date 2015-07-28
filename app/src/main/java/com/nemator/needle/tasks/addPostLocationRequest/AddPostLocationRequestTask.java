@@ -31,7 +31,7 @@ public class AddPostLocationRequestTask extends AsyncTask<Void, Void, TaskResult
     protected void onPreExecute() {
         super.onPreExecute();
 
-        dbHelper = new LocationServiceDBHelper(params.context);
+        dbHelper = LocationServiceDBHelper.getInstance(params.context);
     }
 
     @Override

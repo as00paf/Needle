@@ -61,7 +61,7 @@ public class AuthenticationController implements LoginResponseHandler, RegisterR
                 //Add/Remove Sections
                 navigationController.removeSection(AppConstants.SECTION_LOGIN);
                 navigationController.removeSection(AppConstants.SECTION_REGISTER);
-                navigationController. createMainSections();
+                navigationController.createMainSections();
                 navigationController.showSection(AppConstants.SECTION_HAYSTACKS);
 
                 navigationController.setHaystacksCount(result.haystackCount);

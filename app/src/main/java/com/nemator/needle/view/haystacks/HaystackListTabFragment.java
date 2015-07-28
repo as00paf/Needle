@@ -70,6 +70,9 @@ public class HaystackListTabFragment extends Fragment {
         mLayoutManager = new LinearLayoutManager(getActivity());
         mRecyclerView.setLayoutManager(mLayoutManager);
 
+        mAdapter = new HaystackListCardAdapter(this.dataList, getActivity(), interactionListener);
+        mRecyclerView.setAdapter(mAdapter);
+
         //Swipe To Refresh
         swipeLayout = (SwipeRefreshLayout) rootView.findViewById(R.id.swipe_container);
         swipeLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
@@ -89,6 +92,7 @@ public class HaystackListTabFragment extends Fragment {
 
         if(mRecyclerView != null){
             mRecyclerView.setAdapter(mAdapter);
+            mAdapter.notifyDataSetChanged();
         }
     }
 

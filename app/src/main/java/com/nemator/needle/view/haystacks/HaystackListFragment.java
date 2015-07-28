@@ -22,6 +22,7 @@ import com.nemator.needle.utils.AppState;
 import com.shamanland.fab.FloatingActionButton;
 
 import java.util.ArrayList;
+import java.util.Date;
 
 public class HaystackListFragment extends Fragment implements HaystackTask.FetchHaystackResponseHandler, SwipeRefreshLayout.OnRefreshListener{
     private static final String TAG = "HaystackListFragment";
@@ -41,6 +42,7 @@ public class HaystackListFragment extends Fragment implements HaystackTask.Fetch
     //Data
     public ArrayList<HaystackVO> publicHaystacks = null;
     public ArrayList<HaystackVO> privateHaystacks = null;
+    private long lastUpdate;
 
     public static HaystackListFragment newInstance() {
         HaystackListFragment fragment = new HaystackListFragment();
@@ -141,7 +143,17 @@ public class HaystackListFragment extends Fragment implements HaystackTask.Fetch
         return rootView;
     }
 
-    public void fetchHaystacks(){
+    public void fetchHaystacks(Boolean force){
+        long now = new Date().getTime();
+
+        if(!force){
+            if(now < lastUpdate + 5000){
+                return;
+            }
+        }
+
+        lastUpdate = now;
+
         HaystackTaskParams params = new HaystackTaskParams(rootView.getContext(), HaystackTaskParams.TYPE_GET, getUserId());
 
         try{
@@ -155,11 +167,11 @@ public class HaystackListFragment extends Fragment implements HaystackTask.Fetch
     @Override
     public void onResume(){
         super.onResume();
-        fetchHaystacks();
+        fetchHaystacks(false);
     }
 
     @Override public void onRefresh() {
-        fetchHaystacks();
+        fetchHaystacks(true);
     }
 
     public void onHaystackFetched(HaystackTaskResult result){

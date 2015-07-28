@@ -48,6 +48,7 @@ public class HaystackTask extends AsyncTask<Void, Void, HaystackTaskResult> {
             case HaystackTaskParams.TYPE_CREATE :
                 message = params.context.getResources().getString(R.string.creating_haystack);
                 isCancellable = false;
+                showDialog = true;
                 break;
             case HaystackTaskParams.TYPE_UPDATE :
                 //message = params.context.getResources().getString(R.string.sharing_location);
@@ -80,7 +81,7 @@ public class HaystackTask extends AsyncTask<Void, Void, HaystackTaskResult> {
             case HaystackTaskParams.TYPE_CREATE :
                 ((CreateHaystackResponseHandler) delegate).onHaystackCreated(result);
                 break;
-            /*case HaystackTaskParams.TYPE_UPDATE :
+            /*case HaystackTaskParams.TYPE_ACTIVATION :
                 ((UpdateLocationSharingTaskHandler) delegate).onLocationSharingUpdated(result);
                 break;
             case HaystackTaskParams.TYPE_DELETE :
@@ -120,6 +121,7 @@ public class HaystackTask extends AsyncTask<Void, Void, HaystackTaskResult> {
             result.message = message;
 
             if(result.successCode == 1){
+                Log.i(TAG, "Request of type " + params.type + " succeeded with result : " + json.toString());
                 switch(params.type){
                     case LocationSharingParams.TYPE_GET:
                         return getHaystackList(json, result);

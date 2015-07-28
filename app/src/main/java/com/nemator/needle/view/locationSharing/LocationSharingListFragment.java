@@ -16,7 +16,6 @@ import com.nemator.needle.models.vo.LocationSharingVO;
 import com.nemator.needle.tasks.locationSharing.LocationSharingParams;
 import com.nemator.needle.tasks.locationSharing.LocationSharingResult;
 import com.nemator.needle.tasks.locationSharing.LocationSharingTask;
-import com.nemator.needle.tasks.updateLocationSharing.UpdateLocationSharingResult;
 import com.nemator.needle.utils.AppState;
 import com.nemator.needle.view.haystacks.OnActivityStateChangeListener;
 import com.shamanland.fab.FloatingActionButton;

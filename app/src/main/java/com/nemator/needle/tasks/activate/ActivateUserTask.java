@@ -20,7 +20,7 @@ public class ActivateUserTask extends AsyncTask<Void, Void, TaskResult> {
     private static final String TAG = "ActivateUserTask";
 
     private ActivateUserResponseHandler delegate;
-    private JSONParser jsonParser = new JSONParser();
+    private JSONParser jsonParser = new JSONParser(5000, 10000);
     private ActivateUserParams params;
 
     public ActivateUserTask(ActivateUserParams params, ActivateUserResponseHandler delegate){

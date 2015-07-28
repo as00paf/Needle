@@ -25,7 +25,7 @@ public class LoginTask extends AsyncTask<Void, Void, LoginTaskResult> {
     private LoginResponseHandler delegate;
 
     private LoginTaskParams params;
-    private JSONParser jsonParser = new JSONParser();
+    private JSONParser jsonParser = new JSONParser(7000, 10000);
     private ProgressDialog dialog;
 
     public LoginTask(LoginTaskParams params, LoginResponseHandler delegate){

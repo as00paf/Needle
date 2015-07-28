@@ -20,7 +20,7 @@ public class DeactivateUserTask extends AsyncTask<Void, Void, TaskResult> {
     private static final String TAG = "DeactivateUserTask";
 
     private DeactivateUserResponseHandler delegate;
-    private JSONParser jsonParser = new JSONParser();
+    private JSONParser jsonParser = new JSONParser(5000, 10000);
     private DeactivateUserParams params;
 
     public DeactivateUserTask(DeactivateUserParams params, DeactivateUserResponseHandler delegate){

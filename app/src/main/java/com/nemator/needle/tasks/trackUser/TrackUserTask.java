@@ -4,8 +4,6 @@ import android.os.AsyncTask;
 import android.util.Log;
 
 import com.google.android.gms.maps.model.LatLng;
-import com.nemator.needle.tasks.retrieveLocations.RetrieveLocationsParams;
-import com.nemator.needle.tasks.retrieveLocations.RetrieveLocationsResult;
 import com.nemator.needle.utils.AppConstants;
 import com.nemator.needle.utils.JSONParser;
 
@@ -15,7 +13,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 public class TrackUserTask extends AsyncTask<Void, Void, TrackUserResult> {

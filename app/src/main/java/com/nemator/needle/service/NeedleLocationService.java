@@ -15,16 +15,16 @@ import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.model.LatLng;
+import com.nemator.needle.models.UserModel;
+import com.nemator.needle.tasks.TaskResult;
 import com.nemator.needle.tasks.addPostLocationRequest.AddPostLocationRequestParams;
 import com.nemator.needle.tasks.addPostLocationRequest.AddPostLocationRequestTask;
-import com.nemator.needle.tasks.TaskResult;
 import com.nemator.needle.tasks.isPostLocationRequestDBEmpty.IsPostLocationRequestDBEmptyTask;
 import com.nemator.needle.tasks.isPostLocationRequestDBEmpty.IsPostLocationRequestDBEmptyTask.IsPostLocationRequestDBEmptyResponseHandler;
-import com.nemator.needle.tasks.postLocation.PostLocationParams;
-import com.nemator.needle.tasks.postLocation.PostLocationTask;
+import com.nemator.needle.tasks.location.LocationTask;
+import com.nemator.needle.tasks.location.LocationTaskParams;
 import com.nemator.needle.tasks.removePostLocationRequest.RemovePostLocationRequestTask;
 import com.nemator.needle.utils.AppConstants;
-import com.nemator.needle.utils.AppUtils;
 
 import java.text.DateFormat;
 import java.util.Date;
@@ -37,11 +37,12 @@ public class NeedleLocationService extends Service implements
     //Objects
     private final IBinder mBinder = new LocalBinder();
     private GoogleApiClient mGoogleApiClient;
+    public UserModel userModel;
 
     //Data
     private Location mCurrentLocation;
     private LatLng mCurrentPosition;
-    private String mLastUpdateTime;
+    private LatLng mLastUpdatedPosition;
     private LocationRequest mLocationRequest;
 
     // Flags
@@ -160,7 +161,6 @@ public class NeedleLocationService extends Service implements
     public void onLocationChanged(Location location) {
         //Get current Location
         mCurrentLocation = location;
-        mLastUpdateTime = DateFormat.getTimeInstance().format(new Date());
         mCurrentPosition = new LatLng(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude());
 
         //Broadcast Intent
@@ -197,12 +197,14 @@ public class NeedleLocationService extends Service implements
 
     //Actions
     public void postLocation(){
-        if(!mPostingLocationUpdates && mCurrentPosition != null){
+        if(!mPostingLocationUpdates || mCurrentPosition == null || mCurrentPosition == mLastUpdatedPosition ){
             return;
         }
 
-        PostLocationParams params = new PostLocationParams(this, AppUtils.getUserName(this), AppUtils.getUserId(this), mCurrentLocation, mCurrentPosition, false);
-        new PostLocationTask(params).execute();
+        mLastUpdatedPosition = mCurrentPosition;
+
+        LocationTaskParams params = new LocationTaskParams(this, LocationTaskParams.TYPE_UPDATE, String.valueOf(userModel.getUserId()), mCurrentPosition);
+        new LocationTask(params).execute();
     }
 
     //Public methods

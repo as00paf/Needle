@@ -29,7 +29,16 @@ public class LocationServiceDBHelper extends SQLiteOpenHelper {
     public static final int DATABASE_VERSION = 4;
     public static final String DATABASE_NAME = "PostLocationRequest.db";
 
-    public LocationServiceDBHelper(Context context) {
+    private static LocationServiceDBHelper mInstance = null;
+
+    public static LocationServiceDBHelper getInstance(Context ctx) {
+        if (mInstance == null) {
+            mInstance = new LocationServiceDBHelper(ctx.getApplicationContext());
+        }
+        return mInstance;
+    }
+
+    private LocationServiceDBHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
 

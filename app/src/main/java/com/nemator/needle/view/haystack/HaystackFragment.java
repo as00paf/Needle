@@ -164,6 +164,14 @@ public class HaystackFragment extends Fragment {
         return mIsOwner;
     }
 
+    public boolean isOwner(int userId){
+        int ownerId = haystack.getOwner();
+
+        mIsOwner = userId == ownerId;
+
+        return mIsOwner;
+    }
+
     public class SlidingPanelPagerAdapter extends FragmentStatePagerAdapter {
         public SlidingPanelPagerAdapter(FragmentManager fm) {
             super(fm);

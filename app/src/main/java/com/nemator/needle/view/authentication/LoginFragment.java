@@ -73,10 +73,10 @@ public class LoginFragment extends Fragment implements View.OnClickListener{
 
         //Username & Password
         user = (EditText) layout.findViewById(R.id.usernameEditText);
-        user.setText(mSharedPreferences.getString("username", ""));
+        user.setText(mSharedPreferences.getString(AppConstants.TAG_USER_NAME, ""));
 
         pass = (EditText) layout.findViewById(R.id.password);
-        pass.setText(mSharedPreferences.getString("password", ""));
+        pass.setText(mSharedPreferences.getString(AppConstants.TAG_PASSWORD, ""));
 
         if(!((MaterialNavigationDrawer) getActivity()).isDrawerOpen()){
             if(TextUtils.isEmpty(user.getText())){

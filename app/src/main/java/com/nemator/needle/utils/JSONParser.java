@@ -32,30 +32,36 @@ import java.util.List;
 
 public class JSONParser {
 
-    static InputStream is = null;
-    static JSONObject jObj = null;
-    static String json = "";
-    int retryCount = 0;
+    public static final int CONNECTION_TIMEOUT = 5000;
+    public static final int SOCKET_TIMEOUT = 7000;
+
+    private InputStream is = null;
+    private JSONObject jObj = null;
+    private String json = "";
+
+    private int connectionTimeout = CONNECTION_TIMEOUT;
+    private int socketTimeout = SOCKET_TIMEOUT;
+
 
     public JSONParser() {
 
     }
 
-    public JSONParser(int retryCount) {
-        this.retryCount = retryCount;
+    public JSONParser(int connectionTimeout, int socketTimeout) {
+        this.connectionTimeout = connectionTimeout;
+        this.socketTimeout = socketTimeout;
     }
 
     //GET and POST requests
     public JSONObject makeHttpRequest(String url, String method, List<NameValuePair> params) {
+        HttpParams httpParams = new BasicHttpParams();
+        HttpConnectionParams.setConnectionTimeout(httpParams, connectionTimeout);
+        HttpConnectionParams.setSoTimeout(httpParams, socketTimeout);
+
+        DefaultHttpClient httpClient = new DefaultHttpClient(httpParams);
+
         try {
             if(method == "POST"){
-                HttpParams httpParams = new BasicHttpParams();
-                int timeoutConnection = 3000;
-                HttpConnectionParams.setConnectionTimeout(httpParams, timeoutConnection);
-                int timeoutSocket = 5000;
-                HttpConnectionParams.setSoTimeout(httpParams, timeoutSocket);
-
-                DefaultHttpClient httpClient = new DefaultHttpClient(httpParams);
                 HttpPost httpPost = new HttpPost(url);
                 httpPost.setEntity(new UrlEncodedFormEntity(params));
 
@@ -65,7 +71,6 @@ public class JSONParser {
 
             }else if(method == "GET"){
                 // request method is GET
-                DefaultHttpClient httpClient = new DefaultHttpClient();
                 String paramString = URLEncodedUtils.format(params, "utf-8");
                 url += "?" + paramString;
                 HttpGet httpGet = new HttpGet(url);
@@ -75,13 +80,6 @@ public class JSONParser {
                 is = httpEntity.getContent();
             }else if(method == "DELETE"){
                 try{
-                    HttpParams httpParams = new BasicHttpParams();
-                    int timeoutConnection = 5000;
-                    HttpConnectionParams.setConnectionTimeout(httpParams, timeoutConnection);
-                    int timeoutSocket = 7000;
-                    HttpConnectionParams.setSoTimeout(httpParams, timeoutSocket);
-                    DefaultHttpClient httpClient = new DefaultHttpClient(httpParams);
-
                     String paramString = URLEncodedUtils.format(params, "utf-8");
                     url += "?" + paramString;
                     HttpDelete deleteConnection = new HttpDelete(url);
@@ -131,42 +129,50 @@ public class JSONParser {
             Log.e("JSON Parser", "Error parsing data " + e.toString() + " json : "+json);
         }
 
+        if(is != null){
+            try {
+                is.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+                Log.e("JSON Parser", "Error closing input stream " + e.toString() + " json : " + json);
+            }
+        }
+
+
         // return JSON String
         return jObj;
 
     }
 
-    public JSONObject makeHttpRequest(String url, String method, List<NameValuePair> params, JSONObject jsonObject){
-        if(method == "PUT"){
-            try{
+    public JSONObject makeHttpRequest(String url, String method, List<NameValuePair> params, JSONObject jsonObject) {
+        if (method == "PUT") {
+            try {
                 HttpParams httpParams = new BasicHttpParams();
-                int timeoutConnection = 5000;
-                HttpConnectionParams.setConnectionTimeout(httpParams, timeoutConnection);
-                int timeoutSocket = 7000;
-                HttpConnectionParams.setSoTimeout(httpParams, timeoutSocket);
+                HttpConnectionParams.setConnectionTimeout(httpParams, connectionTimeout);
+                HttpConnectionParams.setSoTimeout(httpParams, socketTimeout);
                 DefaultHttpClient httpClient = new DefaultHttpClient(httpParams);
 
                 HttpPut putConnection = new HttpPut(url);
                 putConnection.setHeader("json", jsonObject.toString());
                 StringEntity se = new StringEntity(jsonObject.toString(), "UTF-8");
-                se.setContentEncoding(new BasicHeader(HTTP.CONTENT_TYPE,
-                        "application/json"));
+                se.setContentEncoding(new BasicHeader(HTTP.CONTENT_TYPE, "application/json"));
                 putConnection.setEntity(se);
                 try {
                     HttpResponse httpResponse = httpClient.execute(putConnection);
                     String JSONString = EntityUtils.toString(httpResponse.getEntity(),
                             "UTF-8");
+                    Log.i("JSON Parser", "Put request response: " + httpResponse.getStatusLine());
                 } catch (ClientProtocolException e) {
                     e.printStackTrace();
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-            }catch (Exception e){
+            } catch (Exception e) {
                 Log.e("JSON Parser", "Error with request : " + e.getMessage());
                 e.printStackTrace();
             }
         }
-
+        /*
         try {
             BufferedReader reader = new BufferedReader(new InputStreamReader(
                     is, "iso-8859-1"), 8);
@@ -178,16 +184,25 @@ public class JSONParser {
             is.close();
             json = sb.toString();
         } catch (Exception e) {
-            Log.e("Buffer Error", "Error converting result " + e.toString());
+            Log.e("JSON Parser", "Buffer Error converting result " + e.toString());
         }
 
         // try parse the string to a JSON object
         try {
             jObj = new JSONObject(json);
         } catch (JSONException e) {
-            Log.e("JSON Parser", "Error parsing data " + e.toString() + " json : "+json);
+            Log.e("JSON Parser", "Error parsing data " + e.toString() + " json : " + json);
         }
 
+        if (is != null) {
+            try {
+                is.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+                Log.e("JSON Parser", "Error closing input stream " + e.toString() + " json : " + json);
+            }
+        }
+*/
         // return JSON String
         return jObj;
     }

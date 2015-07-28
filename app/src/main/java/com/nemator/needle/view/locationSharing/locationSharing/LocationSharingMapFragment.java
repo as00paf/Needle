@@ -32,12 +32,10 @@ import com.nemator.needle.R;
 import com.nemator.needle.broadcastReceiver.LocationServiceBroadcastReceiver;
 import com.nemator.needle.models.vo.LocationSharingVO;
 import com.nemator.needle.service.NeedleLocationService;
-import com.nemator.needle.tasks.logOut.LogOutTask;
 import com.nemator.needle.tasks.trackUser.TrackUserParams;
 import com.nemator.needle.tasks.trackUser.TrackUserResult;
 import com.nemator.needle.tasks.trackUser.TrackUserTask;
 import com.nemator.needle.utils.AppConstants;
-import com.nemator.needle.utils.AppUtils;
 import com.nemator.needle.utils.SphericalUtil;
 
 public class LocationSharingMapFragment extends SupportMapFragment

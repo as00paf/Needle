@@ -8,12 +8,12 @@ import android.widget.Toast;
 import com.nemator.needle.MainActivity;
 import com.nemator.needle.R;
 import com.nemator.needle.models.UserModel;
-import com.nemator.needle.tasks.AuthenticationResult;
 import com.nemator.needle.tasks.login.LoginTask;
 import com.nemator.needle.tasks.login.LoginTask.LoginResponseHandler;
 import com.nemator.needle.tasks.login.LoginTaskParams;
 import com.nemator.needle.tasks.login.LoginTaskResult;
-import com.nemator.needle.tasks.register.RegisterTask.RegisterResponseHandler;
+import com.nemator.needle.tasks.user.UserTask.RegisterResponseHandler;
+import com.nemator.needle.tasks.user.UserTaskResult;
 import com.nemator.needle.utils.AppConstants;
 
 import it.neokree.materialnavigationdrawer.elements.MaterialAccount;
@@ -35,9 +35,9 @@ public class AuthenticationController implements LoginResponseHandler, RegisterR
 
     //Handlers
     @Override
-    public void onRegistrationComplete(AuthenticationResult result, String password, Boolean rememberMe) {
+    public void onUserRegistered(UserTaskResult result) {
         if(result.successCode==1){
-            LoginTaskParams params = new LoginTaskParams(result.user.getUserName(), password, activity, rememberMe, false);
+            LoginTaskParams params = new LoginTaskParams(result.user.getUserName(), result.user.getPassword(), activity, true, false);
             new LoginTask(params, this).execute();
         }else{
             Toast.makeText(activity, "Error ! \nPlease Try Again", Toast.LENGTH_SHORT).show();

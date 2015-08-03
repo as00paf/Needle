@@ -354,7 +354,7 @@ public class HaystackMapFragment extends SupportMapFragment
 
     //Actions
     public void retrieveLocations(){
-        LocationTaskParams params = new LocationTaskParams(getActivity(), LocationTaskParams.TYPE_GET, String.valueOf(haystack.getId()));
+        LocationTaskParams params = LocationTaskParams.newLocationHaystackTaskParams(getActivity(), LocationTaskParams.TYPE_GET, String.valueOf(haystack.getId()));
         try{
             new LocationTask(params, this).execute();
         }catch (Exception e){

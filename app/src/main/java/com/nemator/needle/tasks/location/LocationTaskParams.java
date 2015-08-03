@@ -13,17 +13,33 @@ public class LocationTaskParams {
     public static final String TYPE_UPDATE = "PUT";
     public static final String TYPE_CANCEL = "DELETE";
 
-    public String userId, haystackId;
+    public String userId, haystackId, locationSharingId;
     public String type;
     public Context context;
     public LatLng location;
 
-    //Constructor for GET
-    public LocationTaskParams(Context context, String type, String haystackId){
-        this.context = context;
-        this.type = type;
+    public LocationTaskParams(){
 
-        this.haystackId = haystackId;
+    }
+
+    //Constructor for GET haystacks
+    public static LocationTaskParams newLocationHaystackTaskParams(Context context, String type, String haystackId){
+        LocationTaskParams params = new LocationTaskParams();
+        params.context = context;
+        params.type = type;
+
+        params.haystackId = haystackId;
+        return params;
+    }
+
+    //Constructor for GET location sharing
+    public static LocationTaskParams newLocationSharingLocationTaskParams(Context context, String type, String locationSharingId){
+        LocationTaskParams params = new LocationTaskParams();
+        params.context = context;
+        params.type = type;
+
+        params.locationSharingId = locationSharingId;
+        return params;
     }
 
     //Constructor for Update

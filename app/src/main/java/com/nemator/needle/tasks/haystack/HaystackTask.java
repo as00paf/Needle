@@ -105,7 +105,7 @@ public class HaystackTask extends AsyncTask<Void, Void, HaystackTaskResult> {
         try {
             //Request
             JSONObject json;
-            if(params.type == LocationSharingParams.TYPE_GET || params.type == LocationSharingParams.TYPE_CREATE || params.type == LocationSharingParams.TYPE_CANCEL){
+            if(params.type == HaystackTaskParams.TYPE_GET || params.type == HaystackTaskParams.TYPE_CREATE || params.type == HaystackTaskParams.TYPE_DELETE){
                  //Params
                  List<NameValuePair> requestParams = (List<NameValuePair>) getRequestParams();
                  json = jsonParser.makeHttpRequest(LOCATION_SHARING_URL, params.type, requestParams);
@@ -123,14 +123,14 @@ public class HaystackTask extends AsyncTask<Void, Void, HaystackTaskResult> {
             if(result.successCode == 1){
                 Log.i(TAG, "Request of type " + params.type + " succeeded with result : " + json.toString());
                 switch(params.type){
-                    case LocationSharingParams.TYPE_GET:
+                    case HaystackTaskParams.TYPE_GET:
                         return getHaystackList(json, result);
-                    case LocationSharingParams.TYPE_CREATE:
+                    case HaystackTaskParams.TYPE_CREATE:
                         return getCreatedHaystack(json, result);
-                    case LocationSharingParams.TYPE_UPDATE:
+                    case HaystackTaskParams.TYPE_UPDATE:
                         //return getUpdatedLocationSharing(json, result);
                         return null;
-                    case LocationSharingParams.TYPE_CANCEL:
+                    case HaystackTaskParams.TYPE_DELETE:
                         // return getCancelledLocationSharing(json, result);
                         return null;
 
@@ -160,7 +160,7 @@ public class HaystackTask extends AsyncTask<Void, Void, HaystackTaskResult> {
             case HaystackTaskParams.TYPE_GET :
                 requestParams.add(new BasicNameValuePair(AppConstants.TAG_USER_ID, String.valueOf(params.userId)));
                 return requestParams;
-            case LocationSharingParams.TYPE_CREATE :
+            case HaystackTaskParams.TYPE_CREATE :
                 requestParams.add(new BasicNameValuePair("name", params.vo.getName()));
                 requestParams.add(new BasicNameValuePair("owner", String.valueOf(params.vo.getOwner())));
                 requestParams.add(new BasicNameValuePair("isPublic", (params.vo.getIsPublic()) ? "1" : "0"));
@@ -191,7 +191,7 @@ public class HaystackTask extends AsyncTask<Void, Void, HaystackTaskResult> {
                 }
 
                 return requestParams;
-            case LocationSharingParams.TYPE_UPDATE :
+            case HaystackTaskParams.TYPE_UPDATE :
                 /*try{
                     jsonObject.put(AppConstants.TAG_RECEIVER_ID, String.valueOf(params.vo.getReceiverId()));
                     jsonObject.put(AppConstants.TAG_LOCATION_SHARING_ID, String.valueOf(params.vo.getId()));
@@ -201,7 +201,7 @@ public class HaystackTask extends AsyncTask<Void, Void, HaystackTaskResult> {
                 }
 
                 return jsonObject;*/
-            case LocationSharingParams.TYPE_CANCEL :
+            case HaystackTaskParams.TYPE_DELETE :
                /* requestParams.add(new BasicNameValuePair(AppConstants.TAG_SENDER_ID, String.valueOf(params.vo.getSenderId())));
                 requestParams.add(new BasicNameValuePair(AppConstants.TAG_LOCATION_SHARING_ID, String.valueOf(params.vo.getId())));
 
@@ -389,8 +389,6 @@ public class HaystackTask extends AsyncTask<Void, Void, HaystackTaskResult> {
             result.message = "Location Sharing could not be created. Exception : " + e.getMessage();
             result.successCode = 0;
         }
-
-        Log.d(TAG, "Location Sharing Created Successfuly! " + result.message);
 
         return result;
     }

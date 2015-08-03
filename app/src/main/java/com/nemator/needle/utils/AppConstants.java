@@ -12,6 +12,7 @@ public class AppConstants {
     public static final String TAG_SUCCESS = "success";
     public static final String TAG_MESSAGE = "message";
     public static final String TAG_TYPE = "type";
+    public static final String TAG_USER = "user";
     public static final String TAG_TIME_LIMIT = "timeLimit";
     public static final String TAG_SENDER_NAME = "senderName";
     public static final String TAG_RECEIVER_NAME = "receiverName";

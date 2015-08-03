@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 
+import com.nemator.needle.models.vo.UserVO;
 import com.nemator.needle.utils.AppConstants;
 
 public class UserModel {
@@ -28,6 +29,11 @@ public class UserModel {
     }
 
     //Getters/Setters
+    public UserVO getUser(){
+        UserVO user = new UserVO(userId, userName, null, null, gcmRegId);
+        return user;
+    }
+
     public int getUserId(){
         if(userId == -1)
             userId = mSharedPreferences.getInt(AppConstants.TAG_USER_ID, -1);

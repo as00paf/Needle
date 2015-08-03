@@ -14,14 +14,14 @@ import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.nemator.needle.MainActivity;
 import com.nemator.needle.R;
 import com.nemator.needle.models.UserModel;
-import com.nemator.needle.tasks.TaskResult;
-import com.nemator.needle.tasks.updateGCMRegId.UpdateGCMRegIdTask;
-import com.nemator.needle.tasks.updateGCMRegId.UpdateGCMRegIdTaskParams;
+import com.nemator.needle.tasks.user.UserTask;
+import com.nemator.needle.tasks.user.UserTaskParams;
+import com.nemator.needle.tasks.user.UserTaskResult;
 import com.nemator.needle.utils.AppConstants;
 
 import java.io.IOException;
 
-public class GCMController implements UpdateGCMRegIdTask.UpdateGCMRegIdTaskHandler {
+public class GCMController implements UserTask.UpdateGCMIDResponseHandler {
 
     public static String TAG = "GCMController";
 
@@ -79,12 +79,12 @@ public class GCMController implements UpdateGCMRegIdTask.UpdateGCMRegIdTaskHandl
     }
 
     @Override
-    public void onGCMRegIdUpdate(TaskResult result) {
-        if(result.successCode != 1){
+    public void onGCMIDUpdated(UserTaskResult result) {
+        if(result.successCode != 1){//Retry
             tryCount++;
             if(tryCount < 3){
-                UpdateGCMRegIdTaskParams params = new UpdateGCMRegIdTaskParams(activity, String.valueOf(userModel.getUserId()), userModel.getGcmRegId());
-                new UpdateGCMRegIdTask(params, GCMController.this).execute();
+                UserTaskParams params = new UserTaskParams(activity, UserTaskParams.TYPE_UPDATE_GCM_ID, userModel.getUser());
+                new UserTask(params, GCMController.this).execute();
             }else{
                 Toast.makeText(activity, "Error While Updating GCM RegID", Toast.LENGTH_SHORT).show();
             }
@@ -133,8 +133,8 @@ public class GCMController implements UpdateGCMRegIdTask.UpdateGCMRegIdTaskHandl
                 Log.i(TAG, "Needs to register with GCM " + userModel.getGcmRegId());
 
                 if(userModel.getUserId() != -1){
-                    UpdateGCMRegIdTaskParams params = new UpdateGCMRegIdTaskParams(activity, String.valueOf(userModel.getUserId()), userModel.getGcmRegId());
-                    new UpdateGCMRegIdTask(params, GCMController.this).execute();
+                    UserTaskParams params = new UserTaskParams(activity, UserTaskParams.TYPE_UPDATE_GCM_ID, userModel.getUser());
+                    new UserTask(params, GCMController.this).execute();
                 }
             }
         }

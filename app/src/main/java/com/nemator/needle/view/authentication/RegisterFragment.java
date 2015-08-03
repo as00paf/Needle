@@ -1,9 +1,6 @@
 package com.nemator.needle.view.authentication;
 
-import android.app.Activity;
-import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.text.TextUtils;
 import android.util.Log;
@@ -21,12 +18,9 @@ import android.widget.Toast;
 
 import com.nemator.needle.MainActivity;
 import com.nemator.needle.R;
-import com.nemator.needle.tasks.login.LoginTask;
-import com.nemator.needle.tasks.login.LoginTaskParams;
-import com.nemator.needle.tasks.register.RegisterTask;
-import com.nemator.needle.tasks.register.RegisterTaskParams;
-import com.nemator.needle.utils.AppConstants;
-import com.nemator.needle.view.haystacks.OnActivityStateChangeListener;
+import com.nemator.needle.models.vo.UserVO;
+import com.nemator.needle.tasks.user.UserTask;
+import com.nemator.needle.tasks.user.UserTaskParams;
 
 import it.neokree.materialnavigationdrawer.MaterialNavigationDrawer;
 
@@ -104,8 +98,9 @@ public class RegisterFragment extends Fragment implements View.OnClickListener{
         if(TextUtils.isEmpty(username) || TextUtils.isEmpty(password)){
             Toast.makeText(getActivity(), "You must enter a username and a password", Toast.LENGTH_LONG).show();
         }else{
-            RegisterTaskParams params = new RegisterTaskParams(getActivity(), username, password, ((MainActivity) getActivity()).getUserModel().getGcmRegId());
-            new RegisterTask(params, (((MainActivity) getActivity()).getAuthenticationController())).execute();
+            UserVO userVO = new UserVO(-1, username, password, null, ((MainActivity) getActivity()).getUserModel().getGcmRegId());
+            UserTaskParams params = new UserTaskParams(getActivity(), UserTaskParams.TYPE_REGISTER, userVO);
+            new UserTask(params, (((MainActivity) getActivity()).getAuthenticationController())).execute();
         }
     }
 

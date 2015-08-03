@@ -9,6 +9,7 @@ public class UserVO implements Serializable, Parcelable{
 
     private int userId;
     private String userName;
+    private String password;
     private String pictureURL;
 
     private String gcmRegId;
@@ -24,9 +25,18 @@ public class UserVO implements Serializable, Parcelable{
         this.gcmRegId = gcmRegId;
     }
 
+    public UserVO(int userId, String userName, String password, String pictureURL, String gcmRegId){
+        this.userId = userId;
+        this.userName = userName;
+        this.password = password;
+        this.pictureURL = pictureURL;
+        this.gcmRegId = gcmRegId;
+    }
+
     public UserVO(Parcel in){
         userId = in.readInt();
         userName = in.readString();
+        password = in.readString();
         pictureURL = in.readString();
         gcmRegId = in.readString();
     }
@@ -63,6 +73,14 @@ public class UserVO implements Serializable, Parcelable{
         this.gcmRegId = gcmRegId;
     }
 
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
     @Override
     public int describeContents() {
         return 0;
@@ -72,6 +90,7 @@ public class UserVO implements Serializable, Parcelable{
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeInt(userId);
         dest.writeString(userName);
+        dest.writeString(password);
         dest.writeString(pictureURL);
         dest.writeString(gcmRegId);
     }

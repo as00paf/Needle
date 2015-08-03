@@ -2,19 +2,24 @@ package com.nemator.needle.tasks.login;
 
 import android.content.Context;
 
-import com.nemator.needle.tasks.register.RegisterTaskParams;
-
-public class LoginTaskParams extends RegisterTaskParams {
+public class LoginTaskParams {
     Boolean rememberMe, verbose;
+    public String userName, password, gcmRegId;
+    public Context context;
 
     public LoginTaskParams(String userName, String password, String regId, Context context, Boolean rememberMe, Boolean verbose){
-        super(context, userName, password, regId);
+        this.context = context;
+        this.userName = userName;
+        this.password = password;
+        this.gcmRegId = regId;
         this.rememberMe = rememberMe;
         this.verbose = verbose;
     }
 
     public LoginTaskParams(String userName, String password, Context context, Boolean rememberMe, Boolean verbose){
-        super(context, userName, password);
+        this.userName = userName;
+        this.password = password;
+        this.context = context;
         this.rememberMe = rememberMe;
         this.verbose = verbose;
     }

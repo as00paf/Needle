@@ -3,17 +3,13 @@ package com.nemator.needle.broadcastReceiver;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.content.ServiceConnection;
-import android.os.IBinder;
 import android.util.Log;
 
 import com.nemator.needle.data.LocationServiceDBHelper;
-import com.nemator.needle.service.NeedleLocationService;
-import com.nemator.needle.tasks.addPostLocationRequest.AddPostLocationRequestParams;
-import com.nemator.needle.tasks.removePostLocationRequest.RemovePostLocationRequestTask;
+import com.nemator.needle.tasks.db.addPostLocationRequest.AddPostLocationRequestParams;
+import com.nemator.needle.tasks.db.removePostLocationRequest.RemovePostLocationRequestTask;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;

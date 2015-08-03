@@ -4,13 +4,7 @@ import android.app.ProgressDialog;
 import android.os.AsyncTask;
 import android.util.Log;
 
-import com.nemator.needle.R;
-import com.nemator.needle.data.LocationServiceDBHelper.PostLocationRequest;
-import com.nemator.needle.models.vo.LocationSharingVO;
-import com.nemator.needle.tasks.addPostLocationRequest.AddPostLocationRequestParams;
 import com.nemator.needle.tasks.locationSharing.LocationSharingParams;
-import com.nemator.needle.tasks.locationSharing.LocationSharingResult;
-import com.nemator.needle.tasks.removePostLocationRequest.RemovePostLocationRequestTask;
 import com.nemator.needle.utils.AppConstants;
 import com.nemator.needle.utils.JSONParser;
 

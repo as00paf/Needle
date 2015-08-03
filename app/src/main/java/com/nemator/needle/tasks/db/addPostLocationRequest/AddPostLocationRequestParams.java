@@ -1,4 +1,4 @@
-package com.nemator.needle.tasks.addPostLocationRequest;
+package com.nemator.needle.tasks.db.addPostLocationRequest;
 
 import android.content.Context;
 

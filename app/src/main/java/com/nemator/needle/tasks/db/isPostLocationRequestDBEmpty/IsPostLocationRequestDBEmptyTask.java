@@ -1,4 +1,4 @@
-package com.nemator.needle.tasks.isPostLocationRequestDBEmpty;
+package com.nemator.needle.tasks.db.isPostLocationRequestDBEmpty;
 
 import android.content.Context;
 import android.database.Cursor;

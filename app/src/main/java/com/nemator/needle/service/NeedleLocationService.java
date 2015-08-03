@@ -17,17 +17,14 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.model.LatLng;
 import com.nemator.needle.models.UserModel;
 import com.nemator.needle.tasks.TaskResult;
-import com.nemator.needle.tasks.addPostLocationRequest.AddPostLocationRequestParams;
-import com.nemator.needle.tasks.addPostLocationRequest.AddPostLocationRequestTask;
-import com.nemator.needle.tasks.isPostLocationRequestDBEmpty.IsPostLocationRequestDBEmptyTask;
-import com.nemator.needle.tasks.isPostLocationRequestDBEmpty.IsPostLocationRequestDBEmptyTask.IsPostLocationRequestDBEmptyResponseHandler;
+import com.nemator.needle.tasks.db.addPostLocationRequest.AddPostLocationRequestParams;
+import com.nemator.needle.tasks.db.addPostLocationRequest.AddPostLocationRequestTask;
+import com.nemator.needle.tasks.db.isPostLocationRequestDBEmpty.IsPostLocationRequestDBEmptyTask;
+import com.nemator.needle.tasks.db.isPostLocationRequestDBEmpty.IsPostLocationRequestDBEmptyTask.IsPostLocationRequestDBEmptyResponseHandler;
 import com.nemator.needle.tasks.location.LocationTask;
 import com.nemator.needle.tasks.location.LocationTaskParams;
-import com.nemator.needle.tasks.removePostLocationRequest.RemovePostLocationRequestTask;
+import com.nemator.needle.tasks.db.removePostLocationRequest.RemovePostLocationRequestTask;
 import com.nemator.needle.utils.AppConstants;
-
-import java.text.DateFormat;
-import java.util.Date;
 
 public class NeedleLocationService extends Service implements
         GoogleApiClient.ConnectionCallbacks,

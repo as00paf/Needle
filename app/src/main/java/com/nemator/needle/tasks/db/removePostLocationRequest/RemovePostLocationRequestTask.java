@@ -1,4 +1,4 @@
-package com.nemator.needle.tasks.removePostLocationRequest;
+package com.nemator.needle.tasks.db.removePostLocationRequest;
 
 import android.app.AlarmManager;
 import android.app.PendingIntent;
@@ -11,7 +11,7 @@ import android.util.Log;
 import com.nemator.needle.broadcastReceiver.PostLocationRequestAlarm;
 import com.nemator.needle.data.LocationServiceDBHelper;
 import com.nemator.needle.tasks.TaskResult;
-import com.nemator.needle.tasks.addPostLocationRequest.AddPostLocationRequestParams;
+import com.nemator.needle.tasks.db.addPostLocationRequest.AddPostLocationRequestParams;
 
 public class RemovePostLocationRequestTask extends AsyncTask<Void, Void, TaskResult> {
     private static final String TAG = "RemovePostLocationTask";

@@ -5,21 +5,30 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
+import android.util.Base64;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.google.android.gms.maps.model.LatLng;
 import com.nemator.needle.controller.AuthenticationController;
 import com.nemator.needle.controller.GCMController;
+import com.nemator.needle.controller.GoogleAPIController;
 import com.nemator.needle.controller.NavigationController;
 import com.nemator.needle.models.UserModel;
+import com.nemator.needle.models.vo.HaystackVO;
 import com.nemator.needle.models.vo.LocationSharingVO;
 import com.nemator.needle.service.NeedleLocationService;
 import com.nemator.needle.utils.AppConstants;
 import com.nemator.needle.utils.AppState;
+
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 
 import it.neokree.materialnavigationdrawer.MaterialNavigationDrawer;
 import it.neokree.materialnavigationdrawer.elements.MaterialSection;
@@ -40,6 +49,7 @@ public class MainActivity extends MaterialNavigationDrawer implements MaterialSe
     private AuthenticationController authenticationController;
     private NavigationController navigationController;
     private GCMController gcmController;
+    private GoogleAPIController googleApiController;
 
     @Override
     public void init(Bundle savedInstanceState) {
@@ -47,6 +57,7 @@ public class MainActivity extends MaterialNavigationDrawer implements MaterialSe
         navigationController = new NavigationController(this, userModel);
         authenticationController = new AuthenticationController(this, userModel, navigationController);
         gcmController = new GCMController(this, userModel);
+        googleApiController = new GoogleAPIController(this);
 
         //Saved Instance State
         if(savedInstanceState != null){
@@ -59,10 +70,6 @@ public class MainActivity extends MaterialNavigationDrawer implements MaterialSe
 
         //Account
         if(!userModel.isLoggedIn()){
-            /*if(!userModel.getUserName().isEmpty()){
-                authenticationController.setAccount();
-            }*/
-
             navigationController.addSection(AppConstants.SECTION_LOGIN);
             navigationController.addSection(AppConstants.SECTION_REGISTER);
 
@@ -122,14 +129,31 @@ public class MainActivity extends MaterialNavigationDrawer implements MaterialSe
             int id = Integer.parseInt(extras.getString(AppConstants.TAG_ID, "-1"));
 
             if(action != null && type != null){
-                if(action.equals("Notification") && type.equals("LocationSharing")){
-                    String timeLimit = extras.getString(AppConstants.TAG_TIME_LIMIT);
-                    String senderName = extras.getString(AppConstants.TAG_SENDER_NAME);
-                    int senderId = Integer.parseInt(extras.getString(AppConstants.TAG_SENDER_ID, "-1"));
-                    Boolean shareBack = extras.getBoolean(AppConstants.TAG_SHARE_BACK);
+                if(action.equals("Notification")){
+                    if(type.equals("LocationSharing")){
+                        String timeLimit = extras.getString(AppConstants.TAG_TIME_LIMIT);
+                        String senderName = extras.getString(AppConstants.TAG_SENDER_NAME);
+                        int senderId = Integer.parseInt(extras.getString(AppConstants.TAG_SENDER_ID, "-1"));
+                        Boolean shareBack = extras.getBoolean(AppConstants.TAG_SHARE_BACK);
 
-                    LocationSharingVO vo = new LocationSharingVO(id, senderName, senderId, timeLimit, shareBack);
-                    navigationController.showReceivedLocationSharing(vo);
+                        LocationSharingVO vo = new LocationSharingVO(id, senderName, senderId, timeLimit, shareBack);
+                        navigationController.showReceivedLocationSharing(vo);
+                    }else if(type.equals("Haystack")){
+                        int owner = Integer.parseInt(extras.getString(AppConstants.TAG_IS_OWNER, "-1"));
+                        String name = extras.getString(AppConstants.TAG_HAYSTACK_NAME);
+                        String timeLimit = extras.getString(AppConstants.TAG_TIME_LIMIT);
+                        int zoneRadius = Integer.parseInt(extras.getString(AppConstants.TAG_ZONE_RADIUS, "-1"));
+                        Boolean isCircle = extras.getBoolean(AppConstants.TAG_IS_CIRCLE);
+                        Boolean isPublic = extras.getBoolean(AppConstants.TAG_IS_PUBLIC);
+                        double latitude = extras.getDouble(AppConstants.TAG_LATITUDE);
+                        double longitude = extras.getDouble(AppConstants.TAG_LONGITUDE);
+                        LatLng position = new LatLng(latitude, longitude);
+                        String pictureURL = extras.getString(AppConstants.TAG_PICTURE_URL);
+
+
+                        HaystackVO vo = new HaystackVO(id, owner, name, isPublic, timeLimit, zoneRadius, isCircle, position, pictureURL, null, null);
+                        navigationController.showReceivedHaystack(vo);
+                    }
                 }
             }
 
@@ -165,7 +189,17 @@ public class MainActivity extends MaterialNavigationDrawer implements MaterialSe
 
     @Override
     public void onBackPressed() {
-        navigationController.onBackPressed();
+        if(navigationController.getCurrentState() != AppState.LOGIN){
+            navigationController.onBackPressed();
+        }else{
+            super.onBackPressed();
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        authenticationController.onActivityResult(requestCode, resultCode, data);
     }
 
     //Material NavDrawer Listener

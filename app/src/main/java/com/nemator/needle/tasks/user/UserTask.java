@@ -6,6 +6,7 @@ import android.util.Log;
 
 import com.google.android.gms.maps.model.LatLng;
 import com.nemator.needle.R;
+import com.nemator.needle.controller.AuthenticationController;
 import com.nemator.needle.models.vo.HaystackVO;
 import com.nemator.needle.models.vo.UserVO;
 import com.nemator.needle.tasks.haystack.HaystackTaskParams;
@@ -164,8 +165,25 @@ public class UserTask extends AsyncTask<Void, Void, UserTaskResult> {
                 return null;
             case UserTaskParams.TYPE_REGISTER :
                 requestParams.add(new BasicNameValuePair(AppConstants.TAG_USER_NAME, params.vo.getUserName()));
-                requestParams.add(new BasicNameValuePair(AppConstants.TAG_PASSWORD, params.vo.getPassword()));
                 requestParams.add(new BasicNameValuePair(AppConstants.TAG_GCM_REG_ID, params.vo.getGcmRegId()));
+                requestParams.add(new BasicNameValuePair(AppConstants.TAG_LOGIN_TYPE, String.valueOf(params.vo.getLoginType())));
+                requestParams.add(new BasicNameValuePair(AppConstants.TAG_PICTURE_URL, params.vo.getPictureURL()));
+                requestParams.add(new BasicNameValuePair(AppConstants.TAG_COVER_PICTURE_URL, params.vo.getCoverPictureURL()));
+
+                switch (params.vo.getLoginType()){
+                    case AuthenticationController.LOGIN_TYPE_DEFAULT:
+                        requestParams.add(new BasicNameValuePair(AppConstants.TAG_PASSWORD, params.vo.getPassword()));
+                        break;
+                    case AuthenticationController.LOGIN_TYPE_FACEBOOK:
+                        requestParams.add(new BasicNameValuePair(AppConstants.TAG_FB_ID, params.vo.getFbId()));
+                        break;
+                    case AuthenticationController.LOGIN_TYPE_TWITTER:
+                        requestParams.add(new BasicNameValuePair(AppConstants.TAG_TWITTER_ID, params.vo.getTwitterId()));
+                        break;
+                    case AuthenticationController.LOGIN_TYPE_GOOGLE:
+                        requestParams.add(new BasicNameValuePair(AppConstants.TAG_GOOGLE_ID, params.vo.getGoogleId()));
+                        break;
+                }
 
                 return requestParams;
             case UserTaskParams.TYPE_UPDATE_GCM_ID :
@@ -188,7 +206,23 @@ public class UserTask extends AsyncTask<Void, Void, UserTaskResult> {
         try{
             result.user = params.vo;
             int userId = json.getInt(AppConstants.TAG_USER_ID);
+            int loginType = json.getInt(AppConstants.TAG_LOGIN_TYPE);
             result.user.setUserId(userId);
+            result.user.setLoginType(loginType);
+            result.user.setPictureURL(params.vo.getPictureURL());
+            result.user.setCoverPictureURL(params.vo.getCoverPictureURL());
+
+            switch (loginType){
+                case AuthenticationController.LOGIN_TYPE_FACEBOOK:
+                    result.user.setFbId(params.vo.getFbId());
+                    break;
+                case AuthenticationController.LOGIN_TYPE_TWITTER:
+                    result.user.setFbId(params.vo.getTwitterId());
+                    break;
+                case AuthenticationController.LOGIN_TYPE_GOOGLE:
+                    result.user.setFbId(params.vo.getGoogleId());
+                    break;
+            }
 
             Log.d(TAG, "User Registered Successfuly! " + json.getString(AppConstants.TAG_MESSAGE));
         }catch (JSONException e) {

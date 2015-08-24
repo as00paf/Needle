@@ -66,6 +66,14 @@ public class RetrieveUsersTask extends AsyncTask<Void, Void, RetrieveUsersResult
             }
 
             JSONObject json = jParser.makeHttpRequest(url, "POST", requestParams);
+
+            if(json == null){
+                Log.d(TAG, "RetrieveUsersTask failed");
+                result.successCode = 0;
+                result.message = "Error with request to retrieve users";
+                return result;
+            }
+
             success = json.getInt(AppConstants.TAG_SUCCESS);
             result.successCode = success;
             result.userList = new ArrayList<UserVO>();

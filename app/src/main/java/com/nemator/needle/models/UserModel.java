@@ -12,56 +12,60 @@ public class UserModel {
     private final Context context;
     private SharedPreferences mSharedPreferences;
 
-    private int userId = -1;
-    private String userName;
-    private String gcmRegId;
     private boolean loggedIn = false;
     private boolean autoLogin = true;
+
+    private UserVO user;
 
 
     public UserModel(Context context){
         this.context = context;
 
         mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
-        userName = mSharedPreferences.getString(AppConstants.TAG_USER_NAME, "");
-        gcmRegId = mSharedPreferences.getString(AppConstants.TAG_GCM_REG_ID, "");
-        userId = mSharedPreferences.getInt(AppConstants.TAG_USER_ID, -1);
+        String userName = mSharedPreferences.getString(AppConstants.TAG_USER_NAME, "");
+        String gcmRegId = mSharedPreferences.getString(AppConstants.TAG_GCM_REG_ID, "");
+        int userId = mSharedPreferences.getInt(AppConstants.TAG_USER_ID, -1);
+
+        user = new UserVO(userId, userName, null, gcmRegId);
     }
 
     //Getters/Setters
     public UserVO getUser(){
-        UserVO user = new UserVO(userId, userName, null, null, gcmRegId);
         return user;
     }
 
+    public void setUser(UserVO user) {
+        this.user = user;
+    }
+
     public int getUserId(){
-        if(userId == -1)
-            userId = mSharedPreferences.getInt(AppConstants.TAG_USER_ID, -1);
-        return userId;
+        if(user.getUserId() == -1)
+            user.setUserId(mSharedPreferences.getInt(AppConstants.TAG_USER_ID, -1));
+        return user.getUserId();
     }
 
     public void setUserId(int userId){
-        this.userId = userId;
+        user.setUserId(userId);
         mSharedPreferences.edit().putInt(AppConstants.TAG_USER_ID, userId);
     }
 
     public String getUserName(){
-        return userName;
+        return user.getUserName();
     }
 
     public void setUserName(String username){
-        this.userName = username;
+        user.setUserName(username);
 
         mSharedPreferences.edit().putString(AppConstants.TAG_USER_NAME, username);
     }
 
     public String getGcmRegId() {
-        return gcmRegId;
+        return user.getGcmRegId();
     }
 
     public Boolean setGcmRegId(String gcmRegId) {
-        Boolean wereTheSame = this.gcmRegId.equals(gcmRegId);
-        this.gcmRegId = gcmRegId;
+        Boolean wereTheSame = user.getGcmRegId().equals(gcmRegId);
+        user.setGcmRegId(gcmRegId);
         mSharedPreferences.edit().putString(AppConstants.TAG_GCM_REG_ID, gcmRegId);
 
         return wereTheSame;

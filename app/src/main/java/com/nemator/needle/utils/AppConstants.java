@@ -8,12 +8,16 @@ public class AppConstants {
     public static final String PROJECT_URL = "http://173.176.76.40:2772/Needle/";
     public static final String HAYSTACK_PICTURES_URL = PROJECT_URL + "pictures/";
 
+    public static final String TWITTER_API_KEY = "wWswYiVtl4FaykxAS4a6ikriG";
+    public static final String TWITTER_API_SECRET = "stpTOh5IAKuX1NRdmOhybIETxUQ3Eftn3byNUsX4ZOjr9aUdmF";
+
     //Json tags
     public static final String TAG_SUCCESS = "success";
     public static final String TAG_MESSAGE = "message";
     public static final String TAG_TYPE = "type";
     public static final String TAG_USER = "user";
     public static final String TAG_TIME_LIMIT = "timeLimit";
+    public static final String TAG_ZONE_RADIUS = "zoneRadius";
     public static final String TAG_SENDER_NAME = "senderName";
     public static final String TAG_RECEIVER_NAME = "receiverName";
     public static final String TAG_SENDER_ID = "senderId";
@@ -26,11 +30,16 @@ public class AppConstants {
     public static final String TAG_USER_NAME = "userName";
     public static final String TAG_PASSWORD = "password";
     public static final String TAG_USER_ID = "userId";
+    public static final String TAG_FB_ID = "fbId";
+    public static final String TAG_TWITTER_ID = "twitterId";
+    public static final String TAG_GOOGLE_ID = "googleId";
+    public static final String TAG_LOGIN_TYPE = "loginType";
     public static final String TAG_GCM_REG_ID = "gcmRegId";
     public static final String TAG_NOTIFICATION_MESSAGE = "notificationMessage";
     public static final String TAG_GCM_REGISTERD = "gcmRegistered";
     public static final String TAG_ID = "id";
     public static final String TAG_PICTURE_URL = "pictureURL";
+    public static final String TAG_COVER_PICTURE_URL = "coverPictureURL";
     public static final String TAG_LOCATION = "location";
     public static final String TAG_LOCATIONS = "locations";
     public static final String TAG_LAT = "lat";
@@ -43,6 +52,8 @@ public class AppConstants {
     public static final String TAG_HAYSTACK_COUNT = "haystackCount";
     public static final String TAG_LOCATION_SHARING_COUNT = "locationSharingCount";
     public static final String TAG_SHARE_BACK = "shareBack";
+    public static final String TAG_IS_CIRCLE = "isCircle";
+    public static final String TAG_IS_PUBLIC = "isPublic";
 
     //Location updates
     public static final int MILLISECONDS_PER_SECOND = 1000;
@@ -55,6 +66,7 @@ public class AppConstants {
     public final static String LOCATION_SHARING_DATA_KEY = "data";
     public final static String IS_SENT_DATA_KEY = "isSent";
     public final static String TAG_IS_OWNER = "isOwner";
+    public final static String TAG_HAYSTACK_NAME = "name";
     public final static String LOCATION_UPDATED = "locationUpdated";
 
     //SharedPref keys

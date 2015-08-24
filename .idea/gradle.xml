@@ -10,12 +10,15 @@
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$" />
+            <option value="$PROJECT_DIR$/ASNECore" />
             <option value="$PROJECT_DIR$/MaterialNavigationDrawerModule" />
             <option value="$PROJECT_DIR$/PersistentSearch" />
             <option value="$PROJECT_DIR$/ViewPagerIndicator" />
             <option value="$PROJECT_DIR$/android-maps-utils" />
             <option value="$PROJECT_DIR$/android-support-v4-preferencefragment-master" />
             <option value="$PROJECT_DIR$/app" />
+            <option value="$PROJECT_DIR$/facebook" />
+            <option value="$PROJECT_DIR$/picasso-2.5.2" />
           </set>
         </option>
       </GradleProjectSettings>

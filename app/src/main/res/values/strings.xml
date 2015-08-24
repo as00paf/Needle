@@ -4,6 +4,7 @@
     <!-- App -->
 
     <string name="app_name">Needle</string>
+    <string name="facebook_app_id">1384996395135194</string>
     <string name="title_activity_maps">Needle</string>
     <string name="title_haystacks">Haystacks</string>
     <string name="title_location_sharing">Location Sharing</string>
@@ -17,12 +18,21 @@
     <string name="notificationsSummary">Allow Needle to Notify you about events that occur</string>
     <string name="app_settings">App Settings</string>
 
-    <!-- Login Activity -->
+    <!-- Login -->
     <string name="login">Login</string>
+    <string name="login_message">Logging in ...</string>
+    <string name="login_via_fb">Login via Facebook</string>
+    <string name="login_via_twitter">Login via Twitter</string>
+    <string name="use_fb_account">Use Facebook Account</string>
+    <string name="use_twitter_account">Use Twitter Account</string>
     <string name="register">Register</string>
     <string name="rememberMe">Remember Me</string>
     <string name="notifications">Notifications</string>
     <string name="registerDialog">Creating User...</string>
+    <string name="username">Username</string>
+    <string name="password">Password</string>
+    <string name="accout_cta">No account yet? Create one</string>
+    <string name="or">OR</string>
 
     <!-- Haystack List Fragment -->
     <string name="publicHeader">Public Haystacks</string>
@@ -105,6 +115,7 @@
     <string name="cancel">Cancel</string>
     <string name="cancel_location_sharing_confirmation">Are you sure you want to cancel this Location Sharing ?</string>
     <string name="ok">Okay</string>
+
     <string name="fetch_haystack_error">Could Not Fetch Haystacks</string>
     <string name="share_location_back">Share Location Back</string>
     <string name="stop_sharing_location">Stop Sharing Location</string>
@@ -115,5 +126,7 @@
     <string name="registering_message">Generating InstanceID token...</string>
     <string name="unregistering_message">Unregistering user</string>
     <string name="token_error_message">An error occurred while either fetching the InstanceID token, sending the fetched token to the server or subscribing to the PubSub topic. Please try running the sample again.</string>
+    <string name="title_activity_facebook">FacebookActivity</string>
+    <string name="user_not_found_message">User not foud. Please Register first</string>
 
 </resources>

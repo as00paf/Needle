@@ -30,6 +30,20 @@ public class HaystackVO implements Serializable, Parcelable {
 
     }
 
+    public HaystackVO(int id, int owner, String name, Boolean isPublic, String timeLimit, int zoneRadius, Boolean isCircle, LatLng position, String pictureURL, ArrayList<UserVO> users, ArrayList<UserVO> activeUsers){
+        this.id = id;
+        this.owner = owner;
+        this.name = name;
+        this.timeLimit = timeLimit;
+        this.zoneRadius = zoneRadius;
+        this.isCircle = isCircle;
+        this.isPublic = isPublic;
+        this.position = position;
+        this.pictureURL = pictureURL;
+        this.users = users;
+        this.activeUsers = activeUsers;
+    }
+
     @Override
     public int describeContents() {
         return 0;

@@ -1,6 +1,8 @@
 package com.nemator.needle.controller;
 
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -9,6 +11,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+import com.github.gorbin.asne.core.SocialNetworkManager;
 import com.nemator.needle.MainActivity;
 import com.nemator.needle.R;
 import com.nemator.needle.data.LocationServiceDBHelper.PostLocationRequest;
@@ -43,6 +46,10 @@ import static com.nemator.needle.view.locationSharing.LocationSharingListFragmen
 public class NavigationController implements MainActivity.NavigationHandler, OnActivityStateChangeListener,
         HaystackListFragmentInteractionListener, LocationSharingListFragmentInteractionListener,
         CreateHaystackResponseHandler, LoginFragmentInteractionListener, LogOutResponseHandler, CreateLocationSharingResponseHandler {
+
+    private static final String TAG = "NavigationController";
+
+    public static final String SOCIAL_NETWORK_TAG = "SocialIntegrationMain.SOCIAL_NETWORK_TAG";
 
     private MainActivity activity;
     private UserModel userModel;
@@ -79,8 +86,12 @@ public class NavigationController implements MainActivity.NavigationHandler, OnA
     private int currentState = AppState.LOGIN;
     private int previousState;
 
+    private static ProgressDialog pd;
+    static Context context;
+
     public NavigationController(MainActivity activity, UserModel userModel){
         this.activity = activity;
+        this.context = activity;
         this.userModel = userModel;
     }
 
@@ -384,6 +395,7 @@ public class NavigationController implements MainActivity.NavigationHandler, OnA
                 {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
+                        ((MainActivity) activity).getAuthenticationController().logOut();
                         new LogOutTask(activity, NavigationController.this).execute();
                     }
                 })
@@ -439,6 +451,7 @@ public class NavigationController implements MainActivity.NavigationHandler, OnA
 
     @Override
     public void onClickRegister() {
+        removeFragment(loginFragment);
         showSection(AppConstants.SECTION_REGISTER);
     }
 
@@ -561,6 +574,15 @@ public class NavigationController implements MainActivity.NavigationHandler, OnA
         locationSharingFragment.setIsSent(false);
     }
 
+    public void showReceivedHaystack(HaystackVO vo){
+        showSection(AppConstants.SECTION_HAYSTACK);
+        haystackFragment.setHaystack(vo);
+    }
+
+    public void showFacebookFragment(SocialNetworkManager networkManager){
+        activity.setFragment(networkManager, SOCIAL_NETWORK_TAG);
+    }
+
     //Getters/Setters
     public HaystackFragment getHaystackFragment() {
         return haystackFragment;
@@ -589,5 +611,22 @@ public class NavigationController implements MainActivity.NavigationHandler, OnA
 
         showSection(AppConstants.SECTION_LOGIN);
         removeSection(AppConstants.SECTION_LOG_OUT);
+    }
+
+    public LoginFragment getLoginFragment() {
+        return loginFragment;
+    }
+
+    public static void showProgress(String message) {
+        pd = new ProgressDialog(context);
+        pd.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+        pd.setMessage(message);
+        //pd.setCancelable(false);
+        pd.setCanceledOnTouchOutside(false);
+        pd.show();
+    }
+
+    public static void hideProgress() {
+        pd.dismiss();
     }
 }

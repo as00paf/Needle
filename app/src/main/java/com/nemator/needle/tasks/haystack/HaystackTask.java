@@ -117,11 +117,12 @@ public class HaystackTask extends AsyncTask<Void, Void, HaystackTaskResult> {
             //Results
             success = json.getInt(AppConstants.TAG_SUCCESS);
             result.successCode = success;
-            message = json.getString(AppConstants.TAG_MESSAGE);
-            result.message = message;
 
             if(result.successCode == 1){
                 Log.i(TAG, "Request of type " + params.type + " succeeded with result : " + json.toString());
+                message = json.getString(AppConstants.TAG_MESSAGE);
+                result.message = message;
+
                 switch(params.type){
                     case HaystackTaskParams.TYPE_GET:
                         return getHaystackList(json, result);
@@ -144,7 +145,7 @@ public class HaystackTask extends AsyncTask<Void, Void, HaystackTaskResult> {
 
             return result;
         } catch (Exception e) {
-            result.message = "CreateHaystack Failure! " + e.getMessage();
+            result.message = "HaystackTask Failure! " + e.getMessage();
             Log.d(TAG, result.message);
 
             e.printStackTrace();
@@ -299,6 +300,7 @@ public class HaystackTask extends AsyncTask<Void, Void, HaystackTaskResult> {
                     JSONObject haystackData = privateHaystacks.getJSONObject(i);
                     HaystackVO haystack = new HaystackVO();
 
+                    //TODO:use app constants
                     haystack.setId(haystackData.getInt("id"));
                     haystack.setName(haystackData.getString("name"));
                     haystack.setOwner(haystackData.getInt("owner"));

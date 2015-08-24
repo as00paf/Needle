@@ -3,95 +3,119 @@
     android:layout_height="match_parent"
     tools:context="com.nemator.needle.view.authentication.LoginFragment">
 
-    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:focusable="true"
-        android:focusableInTouchMode="true"
-        >
+    <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:fitsSystemWindows="true">
 
-        <ImageView
-            android:id="@+id/imageView1"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_centerHorizontal="true"
-            android:layout_alignParentTop="true"
-            android:src="@drawable/pin_small"
-            android:padding="5dp"/>
+            android:paddingTop="24dp"
+            android:paddingLeft="24dp"
+            android:paddingRight="24dp"
+            android:focusable="true"
+            android:focusableInTouchMode="true">
 
-        <TextView
-            android:id="@+id/usernameLabel"
-            android:textStyle="bold"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignLeft="@+id/usernameEditText"
-            android:layout_above="@id/usernameEditText"
-            android:text="Username"
-            android:textColor="#000000"/>
+            <!-- Logo -->
+            <ImageView android:src="@drawable/pin"
+                android:layout_width="wrap_content"
+                android:layout_height="84dp"
+                android:layout_marginBottom="24dp"
+                android:layout_gravity="center_horizontal" />
+    
+            <!-- Username Label -->
+            <android.support.design.widget.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="8dp">
+                <EditText android:id="@+id/usernameEditText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="text"
+                    android:hint="@string/username" />
+            </android.support.design.widget.TextInputLayout>
 
-        <EditText
-            android:id="@+id/usernameEditText"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_above="@+id/passwordLabel"
-            android:layout_centerHorizontal="true"
-            android:imeOptions="actionNext"
-            android:maxLines="1"
-            android:inputType="text"
-            android:ems="10">
-        </EditText>
+            <!-- Password Label -->
+            <android.support.design.widget.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="8dp">
+                <EditText android:id="@+id/input_password"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="textPassword"
+                    android:hint="@string/password"/>
+            </android.support.design.widget.TextInputLayout>
 
-        <TextView
-            android:id="@+id/passwordLabel"
-            android:textStyle="bold"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_above="@+id/password"
-            android:layout_alignLeft="@+id/password"
-            android:text="Password"
-            android:textColor="#000000"/>
+            <!-- Login Button -->
+            <android.support.v7.widget.AppCompatButton
+                android:id="@+id/btn_login"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:layout_marginBottom="24dp"
+                android:padding="12dp"
+                android:text="@string/login"/>
 
-        <EditText
-            android:id="@+id/password"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_above="@+id/rememberMeCheckBox"
-            android:layout_centerHorizontal="true"
-            android:ems="10"
-            android:maxLines="1"
-            android:inputType="textPassword"
-            android:imeOptions="actionSend">
-        </EditText>
+            <!-- Register Link -->
+            <TextView android:id="@+id/link_signup"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="24dp"
+                android:text="@string/accout_cta"
+                android:gravity="center"
+                android:textSize="16dip"/>
 
-        <CheckBox
-            android:id="@+id/rememberMeCheckBox"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerHorizontal="true"
-            android:checked="true"
-            android:text="@string/rememberMe"
-            android:layout_above="@+id/login"
-            android:layout_alignLeft="@+id/login"/>
+            <!-- OR Label -->
+            <TextView
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="24dp"
+                android:text="@string/or"
+                android:gravity="center"
+                android:textSize="32dip"/>
 
-        <Button
-            android:id="@+id/login"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_above="@+id/register"
-            android:layout_alignLeft="@+id/password"
-            android:layout_alignRight="@+id/password"
-            android:text="@string/login" />
+            <!-- Facebook Button -->
+            <android.support.v7.widget.AppCompatButton
+                android:layout_width="fill_parent"
+                android:layout_height="64dp"
+                android:text="@string/login_via_fb"
+                android:drawableStart="@drawable/facebook_logo"
+                android:drawablePadding="8dp"
+                android:id="@+id/btn_facebook"
+                android:layout_gravity="center_horizontal"
+                android:background="#3b5998"
+                android:layout_margin="8dp"
+                android:textColor="#ffffffff" />
 
-        <Button
-            android:id="@+id/register"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignLeft="@+id/login"
-            android:layout_alignParentBottom="true"
-            android:layout_alignRight="@+id/login"
-            android:layout_marginBottom="25dp"
-            android:text="@string/register" />
+            <!-- Twitter Button -->
+            <android.support.v7.widget.AppCompatButton
+                android:layout_width="fill_parent"
+                android:layout_height="64dp"
+                android:text="@string/login_via_twitter"
+                android:drawableStart="@drawable/twitter_logo_white"
+                android:id="@+id/btn_twitter"
+                android:layout_gravity="center_horizontal"
+                android:background="#55ACEE"
+                android:layout_margin="8dp"
+                android:textColor="#ffffffff"/>
 
-    </RelativeLayout>
+            <!-- G+ Button -->
+            <com.google.android.gms.common.SignInButton
+                android:id="@+id/btn_google"
+                android:layout_width="fill_parent"
+                android:layout_height="64dp"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginBottom="30dip"
+                android:layout_margin="4dp"
+                android:text="Login via Google+"
+                android:enabled="true" />
+
+        </LinearLayout>
+    </ScrollView>
 
 </FrameLayout>

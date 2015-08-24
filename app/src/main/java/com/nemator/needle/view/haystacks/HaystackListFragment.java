@@ -175,26 +175,26 @@ public class HaystackListFragment extends Fragment implements HaystackTask.Fetch
     }
 
     public void onHaystackFetched(HaystackTaskResult result){
-        if(result.successCode == 1){
-            publicHaystacks = result.publicHaystackList;
-            privateHaystacks = result.privateHaystackList;
-
-            HaystackListTabFragment publicTab = mHaystackListPagerAdapter.getPublicHaystackListFragment();
-            HaystackListTabFragment privateTab = mHaystackListPagerAdapter.getPrivateHaystackListFragment();
+        HaystackListTabFragment publicTab = mHaystackListPagerAdapter.getPublicHaystackListFragment();
+        HaystackListTabFragment privateTab = mHaystackListPagerAdapter.getPrivateHaystackListFragment();
 /*
             //Show how many haystacks are available in the Nav Drawer
             int count = publicHaystacks.size() + privateHaystacks.size();
             if(getActivity() != null)
                 ((MainActivity) getActivity()).getNavigationController().setHaystacksCount(count);
 */
-            if(publicTab == null && privateTab == null) return;
+        if(publicTab == null && privateTab == null) return;
 
-            publicTab.getRefreshLayout().setRefreshing(false);
-            privateTab.getRefreshLayout().setRefreshing(false);
+        publicTab.getRefreshLayout().setRefreshing(false);
+        privateTab.getRefreshLayout().setRefreshing(false);
+
+        if(result.successCode == 1){
+            publicHaystacks = result.publicHaystackList;
+            privateHaystacks = result.privateHaystackList;
 
             publicTab.updateHaystackList(publicHaystacks);
             privateTab.updateHaystackList(privateHaystacks);
-        }else{
+        }else if(getActivity() != null){
             Toast.makeText(getActivity(), R.string.fetch_haystack_error, Toast.LENGTH_SHORT).show();
         }
     }

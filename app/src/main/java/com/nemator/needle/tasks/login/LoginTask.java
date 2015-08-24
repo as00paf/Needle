@@ -6,6 +6,7 @@ import android.os.AsyncTask;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
+import com.nemator.needle.controller.AuthenticationController;
 import com.nemator.needle.models.vo.UserVO;
 import com.nemator.needle.utils.AppConstants;
 import com.nemator.needle.tasks.AuthenticationResult;
@@ -46,13 +47,20 @@ public class LoginTask extends AsyncTask<Void, Void, LoginTaskResult> {
     @Override
     protected LoginTaskResult doInBackground(Void... args) {
         LoginTaskResult result = new LoginTaskResult();
+        result.type = params.socialNetworkId;
 
         int success;
         try {
             List<NameValuePair> requestParams = new ArrayList<NameValuePair>();
             requestParams.add(new BasicNameValuePair("username", params.userName));
-            requestParams.add(new BasicNameValuePair("password", params.password));
             requestParams.add(new BasicNameValuePair("regId", params.gcmRegId));
+            requestParams.add(new BasicNameValuePair("type", String.valueOf(params.socialNetworkId)));
+
+            if(params.socialNetworkId == AuthenticationController.LOGIN_TYPE_DEFAULT){
+                requestParams.add(new BasicNameValuePair("password", params.password));
+            }else if(params.socialNetworkId == AuthenticationController.LOGIN_TYPE_FACEBOOK){
+                requestParams.add(new BasicNameValuePair("fbId", params.fbId));
+            }
 
             if(params.verbose) Log.d(TAG, "Attempting Login");
             JSONObject json = jsonParser.makeHttpRequest(LOGIN_URL, "POST", requestParams);
@@ -80,18 +88,22 @@ public class LoginTask extends AsyncTask<Void, Void, LoginTaskResult> {
                 result.message = json.getString(AppConstants.TAG_MESSAGE);
                 int userId = json.getInt(AppConstants.TAG_USER_ID);
                 result.user = new UserVO(userId, params.userName, "", params.gcmRegId);
+                result.user.setFbId(params.fbId);
+                result.user.setLoginType(params.socialNetworkId);
+                result.user.setPictureURL(json.getString(AppConstants.TAG_PICTURE_URL));
+                result.user.setPictureURL(json.getString(AppConstants.TAG_PICTURE_URL));
                 result.locationSharingCount = json.getInt(AppConstants.TAG_LOCATION_SHARING_COUNT);
                 result.haystackCount = json.getInt(AppConstants.TAG_HAYSTACK_COUNT);
 
                 return result;
             }else{
-                Log.d("Login Failure!", json.getString(AppConstants.TAG_MESSAGE));
+                Log.d(TAG, json.getString(AppConstants.TAG_MESSAGE));
                 result.message = json.getString(AppConstants.TAG_MESSAGE);
                 return result;
 
             }
         } catch (Exception e) {
-            Log.d("Login Failure!", "Error : " + e.getMessage());
+            Log.d(TAG, "Error : " + e.getMessage());
             result.successCode = 0;
             result.message = "Login Failure! Error : " + e.getMessage();
             return result;

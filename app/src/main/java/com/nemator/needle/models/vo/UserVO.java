@@ -7,12 +7,17 @@ import java.io.Serializable;
 
 public class UserVO implements Serializable, Parcelable{
 
-    private int userId;
+    private int userId = -1;
     private String userName;
     private String password;
     private String pictureURL;
+    private String coverPictureURL;
 
     private String gcmRegId;
+    private String fbId;
+    private String twitterId;
+    private String googleId;
+    private int loginType = 0;
 
     public UserVO(){
 
@@ -25,12 +30,13 @@ public class UserVO implements Serializable, Parcelable{
         this.gcmRegId = gcmRegId;
     }
 
-    public UserVO(int userId, String userName, String password, String pictureURL, String gcmRegId){
+    public UserVO(int userId, String userName, String password, String pictureURL, String gcmRegId, int loginType){
         this.userId = userId;
         this.userName = userName;
         this.password = password;
         this.pictureURL = pictureURL;
         this.gcmRegId = gcmRegId;
+        this.loginType = loginType;
     }
 
     public UserVO(Parcel in){
@@ -39,6 +45,11 @@ public class UserVO implements Serializable, Parcelable{
         password = in.readString();
         pictureURL = in.readString();
         gcmRegId = in.readString();
+        loginType = in.readInt();
+        fbId = in.readString();
+        twitterId = in.readString();
+        googleId = in.readString();
+        coverPictureURL = in.readString();
     }
 
     public int getUserId() {
@@ -81,6 +92,46 @@ public class UserVO implements Serializable, Parcelable{
         this.password = password;
     }
 
+    public String getFbId() {
+        return fbId;
+    }
+
+    public void setFbId(String fbId) {
+        this.fbId = fbId;
+    }
+
+    public String getTwitterId() {
+        return twitterId;
+    }
+
+    public void setTwitterId(String twitterId) {
+        this.twitterId = twitterId;
+    }
+
+    public String getGoogleId() {
+        return googleId;
+    }
+
+    public void setGoogleId(String googleId) {
+        this.googleId = googleId;
+    }
+
+    public int getLoginType() {
+        return loginType;
+    }
+
+    public void setLoginType(int loginType) {
+        this.loginType = loginType;
+    }
+
+    public String getCoverPictureURL() {
+        return coverPictureURL;
+    }
+
+    public void setCoverPictureURL(String coverPictureURL) {
+        this.coverPictureURL = coverPictureURL;
+    }
+
     @Override
     public int describeContents() {
         return 0;
@@ -93,6 +144,11 @@ public class UserVO implements Serializable, Parcelable{
         dest.writeString(password);
         dest.writeString(pictureURL);
         dest.writeString(gcmRegId);
+        dest.writeInt(loginType);
+        dest.writeString(fbId);
+        dest.writeString(twitterId);
+        dest.writeString(googleId);
+        dest.writeString(coverPictureURL);
     }
 
     public static final Parcelable.Creator<UserVO> CREATOR = new Parcelable.Creator<UserVO>() {

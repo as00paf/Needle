@@ -10,14 +10,15 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
-import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.common.SignInButton;
 import com.nemator.needle.MainActivity;
 import com.nemator.needle.R;
+import com.nemator.needle.controller.AuthenticationController;
 import com.nemator.needle.models.vo.UserVO;
 import com.nemator.needle.tasks.user.UserTask;
 import com.nemator.needle.tasks.user.UserTaskParams;
@@ -31,8 +32,10 @@ public class RegisterFragment extends Fragment implements View.OnClickListener{
     //Children
     private FrameLayout layout;
     private EditText user, pass;
-    private Button mRegister;
-    private CheckBox rememberMeCheckBox;
+    private Button registerButton, facebookButton, twitterButton;
+    private SignInButton googleButton;
+
+    private AuthenticationController authenticationController;
 
     public static RegisterFragment newInstance() {
         RegisterFragment fragment = new RegisterFragment();
@@ -50,8 +53,8 @@ public class RegisterFragment extends Fragment implements View.OnClickListener{
         layout = (FrameLayout) inflater.inflate(R.layout.fragment_register, container, false);
 
         //Username & Password
-        user = (EditText) layout.findViewById(R.id.register_user_name_edit_text);
-        pass = (EditText) layout.findViewById(R.id.register_password_edit_text);
+        user = (EditText) layout.findViewById(R.id.register_input_username);
+        pass = (EditText) layout.findViewById(R.id.register_input_password);
 
         if(!((MaterialNavigationDrawer) getActivity()).isDrawerOpen()){
             if(TextUtils.isEmpty(user.getText())){
@@ -73,23 +76,25 @@ public class RegisterFragment extends Fragment implements View.OnClickListener{
             }
         });
 
-        //Remember me CheckBox
-        rememberMeCheckBox = (CheckBox) layout.findViewById(R.id.register_remember_me_checkbox);
-        rememberMeCheckBox.setChecked(true);
-
         //setup buttons
-        mRegister = (Button) layout.findViewById(R.id.register_register_button);
+        registerButton = (Button) layout.findViewById(R.id.btn_register);
+        facebookButton = (Button) layout.findViewById(R.id.register_btn_facebook);
+        twitterButton = (Button) layout.findViewById(R.id.register_btn_twitter);
+        googleButton = (SignInButton) layout.findViewById(R.id.register_btn_google);
 
         //register listeners
-        mRegister.setOnClickListener(this);
+        registerButton.setOnClickListener(this);
+        facebookButton.setOnClickListener(this);
+        twitterButton.setOnClickListener(this);
+        googleButton.setOnClickListener(this);
+
+        authenticationController = ((MainActivity) getActivity()).getAuthenticationController();
+        authenticationController.initSocialNetworkManager(this);
 
         return layout;
     }
 
     private void register(){
-        pass.clearFocus();
-        user.clearFocus();
-
         Log.i(TAG, "Trying to register with credentials : " + user.getText().toString() + ", " + pass.getText().toString());
 
         String username = user.getText().toString();
@@ -98,7 +103,7 @@ public class RegisterFragment extends Fragment implements View.OnClickListener{
         if(TextUtils.isEmpty(username) || TextUtils.isEmpty(password)){
             Toast.makeText(getActivity(), "You must enter a username and a password", Toast.LENGTH_LONG).show();
         }else{
-            UserVO userVO = new UserVO(-1, username, password, null, ((MainActivity) getActivity()).getUserModel().getGcmRegId());
+            UserVO userVO = new UserVO(-1, username, password, null, ((MainActivity) getActivity()).getUserModel().getGcmRegId(), AuthenticationController.LOGIN_TYPE_DEFAULT);
             UserTaskParams params = new UserTaskParams(getActivity(), UserTaskParams.TYPE_REGISTER, userVO);
             new UserTask(params, (((MainActivity) getActivity()).getAuthenticationController())).execute();
         }
@@ -106,6 +111,19 @@ public class RegisterFragment extends Fragment implements View.OnClickListener{
 
     @Override
     public void onClick(View v) {
-        register();
+        switch (v.getId()) {
+            case R.id.btn_register:
+                register();
+                break;
+            case R.id.register_btn_facebook:
+                authenticationController.registerWithNetwork(AuthenticationController.LOGIN_TYPE_FACEBOOK);
+                break;
+            case R.id.register_btn_twitter:
+                authenticationController.registerWithNetwork(AuthenticationController.LOGIN_TYPE_TWITTER);
+                break;
+            case R.id.register_btn_google:
+                authenticationController.registerWithNetwork(AuthenticationController.LOGIN_TYPE_GOOGLE);
+                break;
+        }
     }
 }

@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
-import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -18,6 +17,8 @@ import com.github.gorbin.asne.core.listener.OnLoginCompleteListener;
 import com.github.gorbin.asne.core.listener.OnRequestSocialPersonCompleteListener;
 import com.github.gorbin.asne.core.persons.SocialPerson;
 import com.github.gorbin.asne.facebook.FacebookSocialNetwork;
+import com.github.gorbin.asne.googleplus.GooglePlusSocialNetwork;
+import com.github.gorbin.asne.twitter.TwitterSocialNetwork;
 import com.nemator.needle.MainActivity;
 import com.nemator.needle.R;
 import com.nemator.needle.models.UserModel;
@@ -63,6 +64,7 @@ public class AuthenticationController implements LoginResponseHandler, RegisterR
     private Fragment socialNetworkManagerFragment;
     private int loginRequestType;
     public Bitmap pictureBitmap;
+    public Bitmap coverPictureBitmap;
 
     public AuthenticationController(MainActivity activity, UserModel userModel, NavigationController navigationController){
         this.activity = activity;
@@ -80,8 +82,21 @@ public class AuthenticationController implements LoginResponseHandler, RegisterR
         if (mSocialNetworkManager == null || socialNetworkManagerFragment != fragment) {
             socialNetworkManagerFragment = fragment;
             mSocialNetworkManager = new SocialNetworkManager();
+
+            //Facebook
             FacebookSocialNetwork fbNetwork = new FacebookSocialNetwork(fragment, fbScope);
             mSocialNetworkManager.addSocialNetwork(fbNetwork);
+
+            //Twitter
+            String key = AppConstants.TWITTER_API_KEY;
+            String secret = AppConstants.TWITTER_API_SECRET;
+
+            TwitterSocialNetwork twitterNetwork = new TwitterSocialNetwork(fragment, key, secret, "x-oauthflow-twitter://callback");
+            mSocialNetworkManager.addSocialNetwork(twitterNetwork);
+
+            //Google
+            GooglePlusSocialNetwork googleNetwork = new GooglePlusSocialNetwork(fragment);
+            mSocialNetworkManager.addSocialNetwork(googleNetwork);
 
             activity.getSupportFragmentManager().beginTransaction().add(mSocialNetworkManager, NavigationController.SOCIAL_NETWORK_TAG).commit();
 
@@ -114,17 +129,8 @@ public class AuthenticationController implements LoginResponseHandler, RegisterR
         navigationController.hideProgress();
 
         if(result.successCode==1){
-            LoginTaskParams params = null;
-            if(loginRequestType == LOGIN_REQUEST_TYPE_LOGIN){
-                params = new LoginTaskParams(result.user.getUserName(), result.user.getPassword(), activity, true, false);
-            }else if(loginRequestType == LOGIN_REQUEST_TYPE_REGISTER){
-                params = new LoginTaskParams(result.user.getLoginType(), result.user.getUserName(), result.user.getFbId(), result.user.getGcmRegId(), activity, true, false);
-            }
-
-            if(params != null){
-                new LoginTask(params, this).execute();
-            }
-
+            LoginTaskParams params = new LoginTaskParams(activity, result.user);
+            new LoginTask(params, this).execute();
         }else{
             Toast.makeText(activity, "Error ! \nPlease Try Again", Toast.LENGTH_SHORT).show();
         }
@@ -139,6 +145,7 @@ public class AuthenticationController implements LoginResponseHandler, RegisterR
                 userModel.setLoggedIn(true);
                 userModel.setUserName(result.user.getUserName());
                 userModel.setUserId(result.user.getUserId());
+                userModel.getUser().setSocialNetworkUserId(result.user.getSocialNetworkUserId());
                 userModel.getUser().setLoginType(result.user.getLoginType());
                 userModel.getUser().setPictureURL(result.user.getPictureURL());
                 userModel.getUser().setCoverPictureURL(result.user.getCoverPictureURL());
@@ -177,19 +184,24 @@ public class AuthenticationController implements LoginResponseHandler, RegisterR
         }
 
         String pictureURL = userModel.getUser().getPictureURL();
-        Picasso.with(activity.getApplicationContext()).load(pictureURL).into(target);
+        Picasso.with(activity.getApplicationContext()).load(pictureURL).into(profilePictureTarget);
+
+        if(userModel.getUser().getLoginType() ==  LOGIN_TYPE_FACEBOOK){
+            String coverURL = "https://graph.facebook.com/" + userModel.getUser().getSocialNetworkUserId() + "?fields=cover";
+            //Picasso.with(activity.getApplicationContext()).load(coverURL).into(coverPictureTarget);
+        }
 
         activity.addAccount(new MaterialAccount(activity.getResources(), userModel.getUserName(), "e-mail", pictureBitmap, R.drawable.mat));
         activity.setFirstAccountPhoto(activity.getResources().getDrawable(R.drawable.me));//TODO:Get picture from cache
     }
 
-    private Target target = new Target() {
+    private Target profilePictureTarget = new Target() {
         @Override
         public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
             Log.i(TAG, "Profile pic loaded !");
 
-            MaterialAccount account = (MaterialAccount) activity.getAccountList().get(0);
             if(activity.getAccountList().size() > 0 ){
+                MaterialAccount account = (MaterialAccount) activity.getAccountList().get(0);
                 account.setPhoto(bitmap);
                 activity.notifyAccountDataChanged();
             }else{
@@ -208,102 +220,36 @@ public class AuthenticationController implements LoginResponseHandler, RegisterR
         }
     };
 
+    private Target coverPictureTarget = new Target() {
+        @Override
+        public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
+            Log.i(TAG, "Cover pic loaded !");
+
+            if(activity.getAccountList().size() > 0 ){
+                MaterialAccount account = (MaterialAccount) activity.getAccountList().get(0);
+                account.setBackground(bitmap);
+                activity.notifyAccountDataChanged();
+            }else{
+                coverPictureBitmap = bitmap;
+            }
+        }
+
+        @Override
+        public void onBitmapFailed(Drawable errorDrawable) {
+            Log.e(TAG, "Could not cover profile pic");
+        }
+
+        @Override
+        public void onPrepareLoad(Drawable placeHolderDrawable) {
+            Log.i(TAG, "Loading cover pic ...");
+        }
+    };
+
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         Fragment fragment = activity.getSupportFragmentManager().findFragmentByTag(NavigationController.SOCIAL_NETWORK_TAG);
         if (fragment != null) {
             fragment.onActivityResult(requestCode, resultCode, data);
         }
-    }
-
-    @Override
-    public void onLoginSuccess(int socialNetworkID) {
-        NavigationController.hideProgress();
-
-        switch (socialNetworkID) {
-            case LOGIN_TYPE_DEFAULT:
-                Log.i(TAG, "LOGIN_TYPE_DEFAULT login success !");
-                //facebook.setText("Show Facebook profile");
-                break;
-            case LOGIN_TYPE_FACEBOOK:
-                Log.i(TAG, "LOGIN_TYPE_FACEBOOK login success !");
-                if(loginRequestType == LOGIN_REQUEST_TYPE_REGISTER){
-                    getSocialProfileAndRegister(socialNetworkID);
-                }else if(loginRequestType == LOGIN_REQUEST_TYPE_LOGIN){
-                    getSocialProfileAndLogIn(socialNetworkID);
-                }
-                break;
-            case LOGIN_TYPE_TWITTER:
-                Log.i(TAG, "LOGIN_TYPE_TWITTER login success !");
-                //twitter.setText("Show Twitter profile");
-                break;
-            case LOGIN_TYPE_LINKEDIN:
-                Log.i(TAG, "LOGIN_TYPE_LINKEDIN login success !");
-                //linkedin.setText("Show LinkedIn profile");
-                break;
-        }
-    }
-
-    @Override
-    public void onError(int socialNetworkID, String requestID, String errorMessage, Object data) {
-        NavigationController.hideProgress();
-        Toast.makeText(activity, "ERROR: " + errorMessage, Toast.LENGTH_LONG).show();
-    }
-
-    public void getSocialProfileAndLogIn(int networkId) {
-        socialNetwork = mSocialNetworkManager.getSocialNetwork(networkId);
-        socialNetwork.setOnRequestCurrentPersonCompleteListener(new OnRequestSocialPersonCompleteListener() {
-            @Override
-            public void onRequestSocialPersonSuccess(int socialNetworkId, SocialPerson socialPerson) {
-                switch (socialNetworkId) {
-                    case LOGIN_TYPE_FACEBOOK:
-                        String username = socialPerson.name;
-                        String regId = userModel.getGcmRegId();
-                        String fbId = socialPerson.id;
-
-                        LoginTaskParams params = new LoginTaskParams(socialNetworkId, username, fbId, regId, activity, true, false);
-                        new LoginTask(params, AuthenticationController.this).execute();
-                        break;
-                }
-
-            }
-
-            @Override
-            public void onError(int socialNetworkID, String requestID, String errorMessage, Object data) {
-
-            }
-        });
-        socialNetwork.requestCurrentPerson();
-    }
-
-    public void getSocialProfileAndRegister(int networkId) {
-        socialNetwork = mSocialNetworkManager.getSocialNetwork(networkId);
-        socialNetwork.setOnRequestCurrentPersonCompleteListener(new OnRequestSocialPersonCompleteListener() {
-            @Override
-            public void onRequestSocialPersonSuccess(int socialNetworkId, SocialPerson socialPerson) {
-                switch (socialNetworkId) {
-                    case LOGIN_TYPE_FACEBOOK:
-                        String username = socialPerson.name;
-                        String regId = userModel.getGcmRegId();
-                        String fbId = socialPerson.id;
-
-                        UserVO userVO = new UserVO(-1, username, null, regId);
-                        userVO.setLoginType(socialNetworkId);
-                        userVO.setFbId(fbId);
-                        userVO.setPictureURL(socialPerson.avatarURL);
-                        userVO.setPictureURL(socialPerson.profileURL);
-
-                        UserTaskParams params = new UserTaskParams(activity, UserTaskParams.TYPE_REGISTER, userVO);
-                        new UserTask(params, AuthenticationController.this).execute();
-                        break;
-                }
-            }
-
-            @Override
-            public void onError(int socialNetworkID, String requestID, String errorMessage, Object data) {
-
-            }
-        });
-        socialNetwork.requestCurrentPerson();
     }
 
     public void logInWithSocialNetwork(int networkId) {
@@ -318,10 +264,105 @@ public class AuthenticationController implements LoginResponseHandler, RegisterR
                 Toast.makeText(activity, "Wrong networkId", Toast.LENGTH_LONG).show();
             }
         } else {
-            Log.i(TAG, "Social Network Connected !");
+            Log.i(TAG, "Social Network Connected ! " + networkId);
             NavigationController.showProgress(activity.getString(R.string.login_message));
             getSocialProfileAndLogIn(networkId);
         }
+    }
+
+    @Override
+    public void onLoginSuccess(int socialNetworkID) {
+        NavigationController.hideProgress();
+
+        switch (socialNetworkID) {
+            case LOGIN_TYPE_FACEBOOK:
+                Log.i(TAG, "LOGIN_TYPE_FACEBOOK login success !");
+                break;
+            case LOGIN_TYPE_TWITTER:
+                Log.i(TAG, "LOGIN_TYPE_TWITTER login success !");
+                //twitter.setText("Show Twitter profile");
+                break;
+            case LOGIN_TYPE_LINKEDIN:
+                Log.i(TAG, "LOGIN_TYPE_LINKEDIN login success !");
+                //linkedin.setText("Show LinkedIn profile");
+                break;
+        }
+
+        if(loginRequestType == LOGIN_REQUEST_TYPE_REGISTER){
+            getSocialProfileAndRegister(socialNetworkID);
+        }else if(loginRequestType == LOGIN_REQUEST_TYPE_LOGIN){
+            getSocialProfileAndLogIn(socialNetworkID);
+        }
+    }
+
+    @Override
+    public void onError(int socialNetworkID, String requestID, String errorMessage, Object data) {
+        NavigationController.hideProgress();
+        Toast.makeText(activity, "ERROR: " + errorMessage, Toast.LENGTH_LONG).show();
+        Log.e(TAG, errorMessage);
+    }
+
+    public void getSocialProfileAndLogIn(int networkId) {
+        socialNetwork = mSocialNetworkManager.getSocialNetwork(networkId);
+        socialNetwork.setOnRequestCurrentPersonCompleteListener(new OnRequestSocialPersonCompleteListener() {
+            @Override
+            public void onRequestSocialPersonSuccess(int socialNetworkId, SocialPerson socialPerson) {
+                LoginTaskParams params;
+                String username = socialPerson.name;
+                String regId = userModel.getGcmRegId();
+                String id = socialPerson.id;
+
+                UserVO user = new UserVO(-1, username, "", "", regId, socialNetworkId, id);
+
+                params = new LoginTaskParams(activity, user);
+                new LoginTask(params, AuthenticationController.this).execute();
+            }
+
+            @Override
+            public void onError(int socialNetworkID, String requestID, String errorMessage, Object data) {
+                Log.e(TAG, "Error : " + errorMessage);
+            }
+        });
+        socialNetwork.requestCurrentPerson();
+    }
+
+    public void getSocialProfileAndRegister(int networkId) {
+        socialNetwork = mSocialNetworkManager.getSocialNetwork(networkId);
+        socialNetwork.setOnRequestCurrentPersonCompleteListener(new OnRequestSocialPersonCompleteListener() {
+            @Override
+            public void onRequestSocialPersonSuccess(int socialNetworkId, SocialPerson socialPerson) {
+                switch (socialNetworkId) {
+                    case LOGIN_TYPE_FACEBOOK:
+                        Log.i(TAG, "Succesfuly retreived social profile of type FACEBOOK");
+                        break;
+                    case LOGIN_TYPE_TWITTER:
+                        Log.i(TAG, "Succesfuly retreived social profile of type TWITTER");
+                        break;
+                    case LOGIN_TYPE_GOOGLE:
+                           Log.i(TAG, "Succesfuly retreived social profile of type GOOGLE+");
+                        break;
+                }
+
+                String username = socialPerson.name;
+                String regId = userModel.getGcmRegId();
+                String id = socialPerson.id;
+
+                UserVO userVO = new UserVO(-1, username, null, regId);
+                userVO.setLoginType(socialNetworkId);
+                userVO.setSocialNetworkUserId(id);
+                userVO.setPictureURL(socialPerson.avatarURL);
+                userVO.setCoverPictureURL(socialPerson.profileURL);
+
+                UserTaskParams params = new UserTaskParams(activity, UserTaskParams.TYPE_REGISTER, userVO);
+                new UserTask(params, AuthenticationController.this).execute();
+            }
+
+            @Override
+            public void onError(int socialNetworkID, String requestID, String errorMessage, Object data) {
+                Log.e(TAG, "Error : " + errorMessage);
+            }
+        });
+        socialNetwork.requestCurrentPerson();
     }
 
     public void logOut() {

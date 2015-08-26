@@ -9,7 +9,6 @@ import android.util.Log;
 import com.nemator.needle.controller.AuthenticationController;
 import com.nemator.needle.models.vo.UserVO;
 import com.nemator.needle.utils.AppConstants;
-import com.nemator.needle.tasks.AuthenticationResult;
 import com.nemator.needle.utils.JSONParser;
 
 import org.apache.http.NameValuePair;
@@ -47,22 +46,21 @@ public class LoginTask extends AsyncTask<Void, Void, LoginTaskResult> {
     @Override
     protected LoginTaskResult doInBackground(Void... args) {
         LoginTaskResult result = new LoginTaskResult();
-        result.type = params.socialNetworkId;
+        result.type = params.user.getLoginType();
 
         int success;
         try {
             List<NameValuePair> requestParams = new ArrayList<NameValuePair>();
-            requestParams.add(new BasicNameValuePair("username", params.userName));
-            requestParams.add(new BasicNameValuePair("regId", params.gcmRegId));
-            requestParams.add(new BasicNameValuePair("type", String.valueOf(params.socialNetworkId)));
+            requestParams.add(new BasicNameValuePair("username", params.user.getUserName()));
+            requestParams.add(new BasicNameValuePair("regId", params.user.getGcmRegId()));
+            requestParams.add(new BasicNameValuePair("type", String.valueOf(params.user.getLoginType())));
 
-            if(params.socialNetworkId == AuthenticationController.LOGIN_TYPE_DEFAULT){
-                requestParams.add(new BasicNameValuePair("password", params.password));
-            }else if(params.socialNetworkId == AuthenticationController.LOGIN_TYPE_FACEBOOK){
-                requestParams.add(new BasicNameValuePair("fbId", params.fbId));
+            if(params.user.getLoginType() == AuthenticationController.LOGIN_TYPE_DEFAULT){
+                requestParams.add(new BasicNameValuePair(AppConstants.TAG_PASSWORD, params.user.getPassword()));
+            }else if(params.user.getLoginType() != 0){
+                requestParams.add(new BasicNameValuePair(AppConstants.TAG_SOCIAL_NETWORK_USER_ID, params.user.getSocialNetworkUserId()));
             }
 
-            if(params.verbose) Log.d(TAG, "Attempting Login");
             JSONObject json = jsonParser.makeHttpRequest(LOGIN_URL, "POST", requestParams);
 
             success = json.getInt(AppConstants.TAG_SUCCESS);
@@ -75,23 +73,20 @@ public class LoginTask extends AsyncTask<Void, Void, LoginTaskResult> {
                 SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(params.context);
                 SharedPreferences.Editor edit = sp.edit();
 
-                edit.putString(AppConstants.TAG_USER_NAME, params.userName);
+                edit.putString(AppConstants.TAG_USER_NAME, params.user.getUserName());
                 edit.putInt(AppConstants.TAG_USER_ID, json.getInt(AppConstants.TAG_USER_ID));
-                edit.putBoolean("rememberMe", params.rememberMe);
-
-                if(params.rememberMe){
-                    edit.putString("password", params.password);
-                }
+                edit.putInt(AppConstants.TAG_LOGIN_TYPE, params.user.getLoginType());
+                edit.putString(AppConstants.TAG_PASSWORD, params.user.getPassword());
 
                 edit.commit();
 
                 result.message = json.getString(AppConstants.TAG_MESSAGE);
                 int userId = json.getInt(AppConstants.TAG_USER_ID);
-                result.user = new UserVO(userId, params.userName, "", params.gcmRegId);
-                result.user.setFbId(params.fbId);
-                result.user.setLoginType(params.socialNetworkId);
+                result.user = new UserVO(userId, params.user.getUserName(), "", params.user.getGcmRegId());
+                result.user.setSocialNetworkUserId(params.user.getSocialNetworkUserId());
+                result.user.setLoginType(params.user.getLoginType());
                 result.user.setPictureURL(json.getString(AppConstants.TAG_PICTURE_URL));
-                result.user.setPictureURL(json.getString(AppConstants.TAG_PICTURE_URL));
+                //result.user.setCoverPictureURL(json.getString(AppConstants.TAG_COVER_PICTURE_URL));
                 result.locationSharingCount = json.getInt(AppConstants.TAG_LOCATION_SHARING_COUNT);
                 result.haystackCount = json.getInt(AppConstants.TAG_HAYSTACK_COUNT);
 

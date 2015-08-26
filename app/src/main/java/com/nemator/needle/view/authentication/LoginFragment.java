@@ -18,10 +18,12 @@ import android.widget.FrameLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.common.SignInButton;
 import com.nemator.needle.MainActivity;
 import com.nemator.needle.R;
 import com.nemator.needle.controller.AuthenticationController;
+import com.nemator.needle.models.vo.UserVO;
 import com.nemator.needle.tasks.login.LoginTask;
 import com.nemator.needle.tasks.login.LoginTaskParams;
 import com.nemator.needle.utils.AppConstants;
@@ -139,12 +141,14 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
         String password = pass.getText().toString();
         String regId = ((MainActivity) getActivity()).getUserModel().getGcmRegId();
 
+        UserVO user = new UserVO(-1, username, password, "", regId, AuthenticationController.LOGIN_TYPE_DEFAULT, "-1");
+
         Log.i(TAG, "Trying to login with credentials : " + username + ", " + password + ", " + regId);
 
         if(TextUtils.isEmpty(username) || TextUtils.isEmpty(password)){
             Toast.makeText(getActivity(), "You must enter a username and a password", Toast.LENGTH_LONG).show();
         }else{
-            LoginTaskParams params = new LoginTaskParams(username, password, regId, getActivity(), true, false);
+            LoginTaskParams params = new LoginTaskParams(getActivity(), user);
             new LoginTask(params, ((MainActivity) getActivity()).getAuthenticationController()).execute();
         }
     }

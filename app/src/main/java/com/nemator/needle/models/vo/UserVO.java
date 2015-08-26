@@ -14,9 +14,7 @@ public class UserVO implements Serializable, Parcelable{
     private String coverPictureURL;
 
     private String gcmRegId;
-    private String fbId;
-    private String twitterId;
-    private String googleId;
+    private String socialNetworkUserId;
     private int loginType = 0;
 
     public UserVO(){
@@ -30,13 +28,14 @@ public class UserVO implements Serializable, Parcelable{
         this.gcmRegId = gcmRegId;
     }
 
-    public UserVO(int userId, String userName, String password, String pictureURL, String gcmRegId, int loginType){
+    public UserVO(int userId, String userName, String password, String pictureURL, String gcmRegId, int loginType, String socialNetworkUserId){
         this.userId = userId;
         this.userName = userName;
         this.password = password;
         this.pictureURL = pictureURL;
         this.gcmRegId = gcmRegId;
         this.loginType = loginType;
+        this.socialNetworkUserId = socialNetworkUserId;
     }
 
     public UserVO(Parcel in){
@@ -46,9 +45,7 @@ public class UserVO implements Serializable, Parcelable{
         pictureURL = in.readString();
         gcmRegId = in.readString();
         loginType = in.readInt();
-        fbId = in.readString();
-        twitterId = in.readString();
-        googleId = in.readString();
+        socialNetworkUserId = in.readString();
         coverPictureURL = in.readString();
     }
 
@@ -92,28 +89,12 @@ public class UserVO implements Serializable, Parcelable{
         this.password = password;
     }
 
-    public String getFbId() {
-        return fbId;
+    public String getSocialNetworkUserId() {
+        return socialNetworkUserId;
     }
 
-    public void setFbId(String fbId) {
-        this.fbId = fbId;
-    }
-
-    public String getTwitterId() {
-        return twitterId;
-    }
-
-    public void setTwitterId(String twitterId) {
-        this.twitterId = twitterId;
-    }
-
-    public String getGoogleId() {
-        return googleId;
-    }
-
-    public void setGoogleId(String googleId) {
-        this.googleId = googleId;
+    public void setSocialNetworkUserId(String socialNetworkUserId) {
+        this.socialNetworkUserId = socialNetworkUserId;
     }
 
     public int getLoginType() {
@@ -145,9 +126,7 @@ public class UserVO implements Serializable, Parcelable{
         dest.writeString(pictureURL);
         dest.writeString(gcmRegId);
         dest.writeInt(loginType);
-        dest.writeString(fbId);
-        dest.writeString(twitterId);
-        dest.writeString(googleId);
+        dest.writeString(socialNetworkUserId);
         dest.writeString(coverPictureURL);
     }
 

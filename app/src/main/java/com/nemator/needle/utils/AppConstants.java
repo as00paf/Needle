@@ -30,9 +30,10 @@ public class AppConstants {
     public static final String TAG_USER_NAME = "userName";
     public static final String TAG_PASSWORD = "password";
     public static final String TAG_USER_ID = "userId";
-    public static final String TAG_FB_ID = "fbId";
+    public static final String TAG_FB_ID = "socialNetworkUserId";
     public static final String TAG_TWITTER_ID = "twitterId";
     public static final String TAG_GOOGLE_ID = "googleId";
+    public static final String TAG_SOCIAL_NETWORK_USER_ID = "socialNetworkUserId";
     public static final String TAG_LOGIN_TYPE = "loginType";
     public static final String TAG_GCM_REG_ID = "gcmRegId";
     public static final String TAG_NOTIFICATION_MESSAGE = "notificationMessage";

@@ -4,20 +4,13 @@ import android.app.ProgressDialog;
 import android.os.AsyncTask;
 import android.util.Log;
 
-import com.google.android.gms.maps.model.LatLng;
 import com.nemator.needle.R;
 import com.nemator.needle.controller.AuthenticationController;
-import com.nemator.needle.models.vo.HaystackVO;
-import com.nemator.needle.models.vo.UserVO;
-import com.nemator.needle.tasks.haystack.HaystackTaskParams;
-import com.nemator.needle.tasks.haystack.HaystackTaskResult;
-import com.nemator.needle.tasks.locationSharing.LocationSharingParams;
 import com.nemator.needle.utils.AppConstants;
 import com.nemator.needle.utils.JSONParser;
 
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -175,13 +168,9 @@ public class UserTask extends AsyncTask<Void, Void, UserTaskResult> {
                         requestParams.add(new BasicNameValuePair(AppConstants.TAG_PASSWORD, params.vo.getPassword()));
                         break;
                     case AuthenticationController.LOGIN_TYPE_FACEBOOK:
-                        requestParams.add(new BasicNameValuePair(AppConstants.TAG_FB_ID, params.vo.getFbId()));
-                        break;
                     case AuthenticationController.LOGIN_TYPE_TWITTER:
-                        requestParams.add(new BasicNameValuePair(AppConstants.TAG_TWITTER_ID, params.vo.getTwitterId()));
-                        break;
                     case AuthenticationController.LOGIN_TYPE_GOOGLE:
-                        requestParams.add(new BasicNameValuePair(AppConstants.TAG_GOOGLE_ID, params.vo.getGoogleId()));
+                        requestParams.add(new BasicNameValuePair(AppConstants.TAG_SOCIAL_NETWORK_USER_ID, params.vo.getSocialNetworkUserId()));
                         break;
                 }
 
@@ -214,13 +203,9 @@ public class UserTask extends AsyncTask<Void, Void, UserTaskResult> {
 
             switch (loginType){
                 case AuthenticationController.LOGIN_TYPE_FACEBOOK:
-                    result.user.setFbId(params.vo.getFbId());
-                    break;
                 case AuthenticationController.LOGIN_TYPE_TWITTER:
-                    result.user.setFbId(params.vo.getTwitterId());
-                    break;
                 case AuthenticationController.LOGIN_TYPE_GOOGLE:
-                    result.user.setFbId(params.vo.getGoogleId());
+                    result.user.setSocialNetworkUserId(params.vo.getSocialNetworkUserId());
                     break;
             }
 

@@ -11,7 +11,9 @@
       <module fileurl="file://$PROJECT_DIR$/android-support-v4-preferencefragment-master/android-support-v4-preferencefragment-master.iml" filepath="$PROJECT_DIR$/android-support-v4-preferencefragment-master/android-support-v4-preferencefragment-master.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
       <module fileurl="file://$PROJECT_DIR$/facebook/facebook.iml" filepath="$PROJECT_DIR$/facebook/facebook.iml" />
+      <module fileurl="file://$PROJECT_DIR$/googleplus/googleplus.iml" filepath="$PROJECT_DIR$/googleplus/googleplus.iml" />
       <module fileurl="file://$PROJECT_DIR$/picasso-2.5.2/picasso-2.5.2.iml" filepath="$PROJECT_DIR$/picasso-2.5.2/picasso-2.5.2.iml" />
+      <module fileurl="file://$PROJECT_DIR$/twitter/twitter.iml" filepath="$PROJECT_DIR$/twitter/twitter.iml" />
     </modules>
   </component>
 </project>

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <group
+        android:checkableBehavior="single">
+
+        <item
+            android:id="@+id/drawer_haystacks"
+            android:checked="true"
+            android:icon="@drawable/ic_haystack"
+            android:title="@string/title_haystacks"/>
+
+        <item
+            android:id="@+id/drawer_location_sharing"
+            android:icon="@drawable/ic_action_location_found"
+            android:title="@string/title_location_sharing"/>
+
+        <item
+            android:id="@+id/drawer_notifications"
+            android:icon="@drawable/ic_action_location_found"
+            android:title="@string/title_notifications"/>
+
+        <item
+            android:id="@+id/drawer_log_out"
+            android:icon="@drawable/ic_action_exit"
+            android:title="@string/log_out"/>
+
+    </group>
+</menu>

@@ -1,7 +1,7 @@
 <resources>
 
     <!-- Base application theme. -->
-    <style name="AppTheme2" parent="MaterialNavigationDrawerTheme.Light">
+    <style name="AppTheme2" parent="Theme.AppCompat.Light.NoActionBar">
         <!-- Main theme colors -->
         <!--   your app branding color for the app bar -->
         <item name="colorPrimary">@color/primary</item>
@@ -10,8 +10,14 @@
         <!--   theme UI controls like checkboxes and text fields -->
         <item name="colorAccent">@color/accent</item>
 
-        <item name="drawerType">@integer/DRAWERTYPE_ACCOUNTS</item>
-        <item name="singleAccount">true</item>
+        <item name="drawerArrowStyle">@style/DrawerArrowStyle</item>
+
+        <!-- remove shadow below action bar -->
+        <!-- Support library compatibility -->
+        <item name="elevation">0dp</item>
+
+        <item name="actionBarStyle">@style/Theme.Needle.ActionBar</item>
+        <item name="android:windowContentOverlay">@null</item>
     </style>
 
     <style name="TextAppearance.Needle.FloatLabelSmall" parent="android:TextAppearance.Small">
@@ -27,6 +33,18 @@
     <style name="TextAppearance.Needle.FloatLabelLarge" parent="android:TextAppearance.Large">
         <item name="android:textColor">@android:color/white</item>
         <item name="android:textSize">24sp</item>
+    </style>
+
+    <style name="DrawerArrowStyle" parent="Widget.AppCompat.DrawerArrowToggle">
+        <item name="spinBars">true</item>
+        <item name="color">@android:color/white</item>
+    </style>
+
+    <style name="Theme.Needle.ActionBar" parent="style/Widget.AppCompat.Light.ActionBar.Solid.Inverse">
+        <!-- remove shadow below action bar -->
+        <!-- <item name="android:elevation">0dp</item> -->
+        <!-- Support library compatibility -->
+        <item name="elevation">0dp</item>
     </style>
 
 </resources>

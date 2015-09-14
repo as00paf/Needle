@@ -727,4 +727,9 @@ public abstract class SocialNetwork {
     public void setOnRequestRemoveFriendCompleteListener(OnRequestRemoveFriendCompleteListener onRequestRemoveFriendCompleteListener) {
         mGlobalListeners.put(REQUEST_REMOVE_FRIEND, onRequestRemoveFriendCompleteListener);
     }
+
+    @Override
+    public boolean equals(Object o) {
+        return o == this.getID();
+    }
 }

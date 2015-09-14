@@ -1,9 +1,14 @@
 package com.nemator.needle.models.vo;
 
+import android.content.SharedPreferences;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.nemator.needle.utils.AppConstants;
+
 import java.io.Serializable;
+
+import twitter4j.User;
 
 public class UserVO implements Serializable, Parcelable{
 
@@ -142,4 +147,33 @@ public class UserVO implements Serializable, Parcelable{
             return new UserVO[size];
         }
     };
+
+    public void save(SharedPreferences mSharedPreferences) {
+        mSharedPreferences.edit()
+                .putInt(AppConstants.TAG_USER_ID, userId)
+                .putInt(AppConstants.TAG_LOGIN_TYPE, loginType)
+                .putString(AppConstants.TAG_USER_NAME, userName)
+                .putString(AppConstants.TAG_PASSWORD, password)
+                .putString(AppConstants.TAG_PICTURE_URL, pictureURL)
+                .putString(AppConstants.TAG_COVER_PICTURE_URL, coverPictureURL)
+                .putString(AppConstants.TAG_GCM_REG_ID, gcmRegId)
+                .putString(AppConstants.TAG_SOCIAL_NETWORK_USER_ID, socialNetworkUserId)
+                .commit();
+    }
+
+    public static UserVO retrieve(SharedPreferences mSharedPreferences){
+        UserVO vo = new UserVO();
+
+        vo.userId = mSharedPreferences.getInt(AppConstants.TAG_USER_ID, -1);
+        vo.userName = mSharedPreferences.getString(AppConstants.TAG_USER_NAME, null);
+        vo.password = mSharedPreferences.getString(AppConstants.TAG_PASSWORD, null);
+        vo.pictureURL = mSharedPreferences.getString(AppConstants.TAG_PICTURE_URL, null);
+        vo.coverPictureURL = mSharedPreferences.getString(AppConstants.TAG_COVER_PICTURE_URL, null);
+        vo.gcmRegId = mSharedPreferences.getString(AppConstants.TAG_GCM_REG_ID, null);
+        vo.socialNetworkUserId = mSharedPreferences.getString(AppConstants.TAG_SOCIAL_NETWORK_USER_ID, null);
+        vo.loginType = mSharedPreferences.getInt(AppConstants.TAG_LOGIN_TYPE, 0);
+
+        return vo;
+    }
+
 }

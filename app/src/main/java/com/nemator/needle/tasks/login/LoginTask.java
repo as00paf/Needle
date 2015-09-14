@@ -26,7 +26,6 @@ public class LoginTask extends AsyncTask<Void, Void, LoginTaskResult> {
 
     private LoginTaskParams params;
     private JSONParser jsonParser = new JSONParser(7000, 10000);
-    private ProgressDialog dialog;
 
     public LoginTask(LoginTaskParams params, LoginResponseHandler delegate){
         this.params = params;
@@ -36,11 +35,9 @@ public class LoginTask extends AsyncTask<Void, Void, LoginTaskResult> {
     @Override
     protected void onPreExecute() {
         super.onPreExecute();
-        dialog = new ProgressDialog(params.context);
-        dialog.setMessage("Attempting login...");
-        dialog.setIndeterminate(false);
-        dialog.setCancelable(true);
-        dialog.show();
+
+        //TODO: replace by localized text
+        params.textView.get().setText("Attempting login...");
     }
 
     @Override
@@ -107,7 +104,6 @@ public class LoginTask extends AsyncTask<Void, Void, LoginTaskResult> {
 
     @Override
     protected void onPostExecute(LoginTaskResult result) {
-        if(dialog!=null) dialog.dismiss();
         delegate.onLoginComplete(result);
         super.onPostExecute(result);
     }

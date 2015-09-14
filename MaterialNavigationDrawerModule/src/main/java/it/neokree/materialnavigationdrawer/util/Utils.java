@@ -128,8 +128,10 @@ public class Utils {
     }
 
     public static Bitmap resizeBitmap(Bitmap bitmap, int reqWidth,int reqHeight) {
-        return Bitmap.createScaledBitmap(bitmap,reqWidth,reqHeight,true);
-
+        if(bitmap.isRecycled()){
+            bitmap = Bitmap.createBitmap(bitmap);
+        }
+        return Bitmap.createScaledBitmap(bitmap, reqWidth, reqHeight, true);
     }
 
     public static int calculateSize(

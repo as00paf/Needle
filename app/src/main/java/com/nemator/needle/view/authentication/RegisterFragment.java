@@ -23,8 +23,6 @@ import com.nemator.needle.models.vo.UserVO;
 import com.nemator.needle.tasks.user.UserTask;
 import com.nemator.needle.tasks.user.UserTaskParams;
 
-import it.neokree.materialnavigationdrawer.MaterialNavigationDrawer;
-
 public class RegisterFragment extends Fragment implements View.OnClickListener{
 
     private static final String TAG = "RegisterFragment";
@@ -56,14 +54,14 @@ public class RegisterFragment extends Fragment implements View.OnClickListener{
         user = (EditText) layout.findViewById(R.id.register_input_username);
         pass = (EditText) layout.findViewById(R.id.register_input_password);
 
-        if(!((MaterialNavigationDrawer) getActivity()).isDrawerOpen()){
+      /*  if(!((MaterialNavigationDrawer) getActivity()).isDrawerOpen()){
             if(TextUtils.isEmpty(user.getText())){
                 user.requestFocus();
             }else{
                 pass.requestFocus();
             }
         }
-
+*/
         pass.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
@@ -89,7 +87,7 @@ public class RegisterFragment extends Fragment implements View.OnClickListener{
         googleButton.setOnClickListener(this);
 
         authenticationController = ((MainActivity) getActivity()).getAuthenticationController();
-        authenticationController.initSocialNetworkManager(this);
+        authenticationController.initSocialNetworkManager(this, false);
 
         return layout;
     }

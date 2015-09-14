@@ -5,21 +5,27 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
-import android.util.Base64;
+import android.support.design.widget.NavigationView;
+import android.support.design.widget.Snackbar;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 
 import com.google.android.gms.maps.model.LatLng;
 import com.nemator.needle.controller.AuthenticationController;
 import com.nemator.needle.controller.GCMController;
 import com.nemator.needle.controller.GoogleAPIController;
 import com.nemator.needle.controller.NavigationController;
+import com.nemator.needle.controller.NetworkController;
 import com.nemator.needle.models.UserModel;
 import com.nemator.needle.models.vo.HaystackVO;
 import com.nemator.needle.models.vo.LocationSharingVO;
@@ -27,14 +33,7 @@ import com.nemator.needle.service.NeedleLocationService;
 import com.nemator.needle.utils.AppConstants;
 import com.nemator.needle.utils.AppState;
 
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-
-import it.neokree.materialnavigationdrawer.MaterialNavigationDrawer;
-import it.neokree.materialnavigationdrawer.elements.MaterialSection;
-import it.neokree.materialnavigationdrawer.elements.listeners.MaterialSectionListener;
-
-public class MainActivity extends MaterialNavigationDrawer implements MaterialSectionListener {
+public class MainActivity extends AppCompatActivity {
 
     public static String TAG = "MainActivity";
 
@@ -50,11 +49,40 @@ public class MainActivity extends MaterialNavigationDrawer implements MaterialSe
     private NavigationController navigationController;
     private GCMController gcmController;
     private GoogleAPIController googleApiController;
+    private NetworkController networkController;
+
+    //View
+    private Toolbar toolbar;
+    private DrawerLayout drawerLayout;
+    private View content;
 
     @Override
-    public void init(Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        initToolbar();
+        setupDrawerLayout();
+        initDrawerToggle();
+        initService();
+
+        content = findViewById(R.id.content);
+        mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+
+        networkController = new NetworkController(this);
+        if(networkController.isNetworkConnected()){
+            initUser(savedInstanceState);
+            initView();
+        }else{
+            initView();
+            navigationController.updateSplashLabel(getResources().getString(R.string.no_internet_connection));
+            navigationController.stopSplashProgress();
+        }
+    }
+
+    public void initUser(Bundle  savedInstanceState) {
         userModel = new UserModel(this);
-        navigationController = new NavigationController(this, userModel);
+        navigationController = new NavigationController(this, drawerLayout, content, userModel);
         authenticationController = new AuthenticationController(this, userModel, navigationController);
         gcmController = new GCMController(this, userModel);
         googleApiController = new GoogleAPIController(this);
@@ -63,46 +91,22 @@ public class MainActivity extends MaterialNavigationDrawer implements MaterialSe
         if(savedInstanceState != null){
             userModel.setAutoLogin(savedInstanceState.getBoolean("autoLogin", true));
             userModel.setLoggedIn(savedInstanceState.getBoolean("loggedIn", false));
-            navigationController.setCurrentState(savedInstanceState.getInt(AppConstants.APP_STATE, AppState.PUBLIC_HAYSTACK_TAB));
+            navigationController.setCurrentState(savedInstanceState.getInt(AppConstants.APP_STATE, navigationController.getCurrentState()));
         }
 
-        mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
 
-        //Account
+    }
+
+    private void initView() {
         if(!userModel.isLoggedIn()){
-            navigationController.addSection(AppConstants.SECTION_LOGIN);
-            navigationController.addSection(AppConstants.SECTION_REGISTER);
-
-            navigationController.showSection(AppConstants.SECTION_LOGIN);
+            navigationController.showSection(AppConstants.SECTION_SPLASH_LOGIN);
         }else{
-            authenticationController.setAccount();
-
-            //Add/Remove Sections
-            navigationController.removeSection(AppConstants.SECTION_LOGIN);
-            navigationController.removeSection(AppConstants.SECTION_REGISTER);
-
-            navigationController.addSection(AppConstants.SECTION_HAYSTACKS);
-            navigationController.addSection(AppConstants.SECTION_LOCATION_SHARING_LIST);
-            navigationController.addSection(AppConstants.SECTION_LOG_OUT);
-
+            navigationController.setAccount();
             navigationController.showSection(AppConstants.SECTION_HAYSTACKS);
         }
+    }
 
-        // create sections
-        navigationController.addSection(AppConstants.SECTION_SETTINGS);
-        navigationController.addSection(AppConstants.SECTION_HELP);
-
-        //Navigation Drawer
-        Boolean firstNavDrawerLearned = mSharedPreferences.getBoolean("firstNavDrawerLearned", false);
-
-        if(firstNavDrawerLearned){
-            this.disableLearningPattern();
-        }else{
-            SharedPreferences.Editor edit = mSharedPreferences.edit();
-            edit.putBoolean("firstNavDrawerLearned", true);
-            edit.commit();
-        }
-
+    protected void initService() {
         //Needle Location Service
         mConnection = new ServiceConnection(){
             public void onServiceConnected(ComponentName className, IBinder service) {
@@ -118,6 +122,43 @@ public class MainActivity extends MaterialNavigationDrawer implements MaterialSe
         Intent serviceIntent = new Intent(this, NeedleLocationService.class);
         startService(serviceIntent);
         bindService(serviceIntent, mConnection, Context.BIND_AUTO_CREATE);
+    }
+
+    protected void initToolbar() {
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        final ActionBar actionBar = getSupportActionBar();
+
+        if (actionBar != null) {
+            actionBar.setHomeAsUpIndicator(R.drawable.icon_white);
+            actionBar.setDisplayHomeAsUpEnabled(true);
+            actionBar.setElevation(0);
+        }
+    }
+
+    private void initDrawerToggle(){
+        ActionBarDrawerToggle mDrawerToggle = new ActionBarDrawerToggle(
+                this,  drawerLayout, toolbar,
+                R.string.navigation_drawer_open, R.string.navigation_drawer_close
+        );
+        drawerLayout.setDrawerListener(mDrawerToggle);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setHomeButtonEnabled(true);
+        mDrawerToggle.syncState();
+    }
+
+    private void setupDrawerLayout() {
+        drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+
+        NavigationView view = (NavigationView) findViewById(R.id.navigation_view);
+        view.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
+            @Override public boolean onNavigationItemSelected(MenuItem menuItem) {
+                Snackbar.make(content, menuItem.getTitle() + " pressed", Snackbar.LENGTH_LONG).show();
+                menuItem.setChecked(true);
+                drawerLayout.closeDrawers();
+                return true;
+            }
+        });
     }
 
     @Override
@@ -163,6 +204,8 @@ public class MainActivity extends MaterialNavigationDrawer implements MaterialSe
         super.onNewIntent(intent);
     }
 
+
+
     @Override
     public void onSaveInstanceState(Bundle savedInstanceState) {
         if(navigationController.getHaystackFragment() != null){
@@ -189,7 +232,8 @@ public class MainActivity extends MaterialNavigationDrawer implements MaterialSe
 
     @Override
     public void onBackPressed() {
-        if(navigationController.getCurrentState() != AppState.LOGIN){
+        int state = navigationController.getCurrentState();
+        if(state != AppState.LOGIN && state != AppState.SPLASH_LOGIN && state != AppState.REGISTER ){
             navigationController.onBackPressed();
         }else{
             super.onBackPressed();
@@ -200,20 +244,6 @@ public class MainActivity extends MaterialNavigationDrawer implements MaterialSe
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         authenticationController.onActivityResult(requestCode, resultCode, data);
-    }
-
-    //Material NavDrawer Listener
-    @Override
-    public void onClick(MaterialSection section) {
-        if(section.getTitle().equals(getString(R.string.title_logOut))){
-            this.closeDrawer();
-            navigationController.onClickSection(section);
-        } else if(section.getTitle().equals(getString(R.string.title_settings))){
-            navigationController.onStateChange(AppState.SETTINGS);
-            super.onClick(section);
-        }else{
-            super.onClick(section);
-        }
     }
 
     //Getters/Setters
@@ -233,11 +263,16 @@ public class MainActivity extends MaterialNavigationDrawer implements MaterialSe
         return navigationController;
     }
 
+    public SharedPreferences getSharedPreferences() {
+        return mSharedPreferences;
+    }
+
     public interface NavigationHandler{
         void onBackPressed();
         boolean onCreateOptionsMenu(Menu menu);
         boolean onOptionsItemSelected(MenuItem item);
         Menu getMenu();
-        void onClickSection(MaterialSection section);
     }
+
+
 }

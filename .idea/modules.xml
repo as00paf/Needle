@@ -3,7 +3,6 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/ASNECore/ASNECore.iml" filepath="$PROJECT_DIR$/ASNECore/ASNECore.iml" />
-      <module fileurl="file://$PROJECT_DIR$/MaterialNavigationDrawerModule/MaterialNavigationDrawerModule.iml" filepath="$PROJECT_DIR$/MaterialNavigationDrawerModule/MaterialNavigationDrawerModule.iml" />
       <module fileurl="file://$PROJECT_DIR$/Needle.iml" filepath="$PROJECT_DIR$/Needle.iml" />
       <module fileurl="file://$PROJECT_DIR$/PersistentSearch/PersistentSearch.iml" filepath="$PROJECT_DIR$/PersistentSearch/PersistentSearch.iml" />
       <module fileurl="file://$PROJECT_DIR$/ViewPagerIndicator/ViewPagerIndicator.iml" filepath="$PROJECT_DIR$/ViewPagerIndicator/ViewPagerIndicator.iml" />
@@ -13,6 +12,7 @@
       <module fileurl="file://$PROJECT_DIR$/facebook/facebook.iml" filepath="$PROJECT_DIR$/facebook/facebook.iml" />
       <module fileurl="file://$PROJECT_DIR$/googleplus/googleplus.iml" filepath="$PROJECT_DIR$/googleplus/googleplus.iml" />
       <module fileurl="file://$PROJECT_DIR$/picasso-2.5.2/picasso-2.5.2.iml" filepath="$PROJECT_DIR$/picasso-2.5.2/picasso-2.5.2.iml" />
+      <module fileurl="file://$PROJECT_DIR$/transformations/transformations.iml" filepath="$PROJECT_DIR$/transformations/transformations.iml" />
       <module fileurl="file://$PROJECT_DIR$/twitter/twitter.iml" filepath="$PROJECT_DIR$/twitter/twitter.iml" />
     </modules>
   </component>

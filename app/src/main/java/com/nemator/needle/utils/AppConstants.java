@@ -30,6 +30,7 @@ public class AppConstants {
     public static final String TAG_USER_NAME = "userName";
     public static final String TAG_PASSWORD = "password";
     public static final String TAG_USER_ID = "userId";
+    public static final String TAG_LOGGED_IN = "loggedIn";
     public static final String TAG_FB_ID = "socialNetworkUserId";
     public static final String TAG_TWITTER_ID = "twitterId";
     public static final String TAG_GOOGLE_ID = "googleId";
@@ -78,17 +79,18 @@ public class AppConstants {
     public static final String APP_STATE = "appState";
 
     //App Sections
-    public static final int SECTION_REGISTER = 0;
-    public static final int SECTION_LOGIN = 1;
-    public static final int SECTION_HAYSTACKS = 2;
-    public static final int SECTION_LOCATION_SHARING_LIST = 3;
-    public static final int SECTION_LOG_OUT = 4;
-    public static final int SECTION_SETTINGS = 5;
-    public static final int SECTION_HELP = 6;
-    public static final int SECTION_CREATE_HAYSTACK = 7;
-    public static final int SECTION_CREATE_LOCATION_SHARING = 8;
-    public static final int SECTION_HAYSTACK = 9;
-    public static final int SECTION_LOCATION_SHARING = 10;
+    public static final int SECTION_SPLASH_LOGIN = 0;
+    public static final int SECTION_REGISTER = 1;
+    public static final int SECTION_LOGIN = 2;
+    public static final int SECTION_HAYSTACKS = 3;
+    public static final int SECTION_LOCATION_SHARING_LIST = 4;
+    public static final int SECTION_LOG_OUT = 5;
+    public static final int SECTION_SETTINGS = 6;
+    public static final int SECTION_HELP = 7;
+    public static final int SECTION_CREATE_HAYSTACK = 8;
+    public static final int SECTION_CREATE_LOCATION_SHARING = 9;
+    public static final int SECTION_HAYSTACK = 10;
+    public static final int SECTION_LOCATION_SHARING = 11;
 
 
 }

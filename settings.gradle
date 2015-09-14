@@ -1,2 +1,2 @@
-include ':app', ':MaterialNavigationDrawerModule', ':android-support-v4-preferencefragment-master', 'android-maps-utils', 'PersistentSearch', ':ASNECore', ':picasso-2.5.2', ':facebook', ':twitter', ':googleplus'
+include ':app', ':android-support-v4-preferencefragment-master', 'android-maps-utils', 'PersistentSearch', ':ASNECore', ':picasso-2.5.2', ':facebook', ':twitter', ':googleplus', ':transformations', ':'
 include ':ViewPagerIndicator'

@@ -1,6 +1,7 @@
 package com.nemator.needle.view.haystacks;
 
 import android.app.Activity;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
@@ -87,6 +88,17 @@ public class HaystackListFragment extends Fragment implements HaystackTask.Fetch
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         if(rootView == null){
             rootView = inflater.inflate(R.layout.fragment_haystack_list, container, false);
+
+            //Navigation Drawer
+            Boolean firstNavDrawerLearned = ((MainActivity) getActivity()).getSharedPreferences().getBoolean("firstNavDrawerLearned", false);
+
+            if(!firstNavDrawerLearned){
+                //TODO: Open Nav Drawer
+
+                SharedPreferences.Editor edit = ((MainActivity) getActivity()).getSharedPreferences().edit();
+                edit.putBoolean("firstNavDrawerLearned", true);
+                edit.commit();
+            }
 
             //FAB
             fab = (FloatingActionButton) rootView.findViewById(R.id.fab);

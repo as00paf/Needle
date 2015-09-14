@@ -18,7 +18,6 @@ import android.widget.FrameLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.common.SignInButton;
 import com.nemator.needle.MainActivity;
 import com.nemator.needle.R;
@@ -27,6 +26,8 @@ import com.nemator.needle.models.vo.UserVO;
 import com.nemator.needle.tasks.login.LoginTask;
 import com.nemator.needle.tasks.login.LoginTaskParams;
 import com.nemator.needle.utils.AppConstants;
+
+import java.lang.ref.WeakReference;
 
 public class LoginFragment extends Fragment implements View.OnClickListener {
 
@@ -115,7 +116,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
         googleButton.setOnClickListener(this);
 
         authenticationController = ((MainActivity) getActivity()).getAuthenticationController();
-        authenticationController.initSocialNetworkManager(this);
+        authenticationController.initSocialNetworkManager(this, false);
 
         return layout;
     }
@@ -148,7 +149,8 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
         if(TextUtils.isEmpty(username) || TextUtils.isEmpty(password)){
             Toast.makeText(getActivity(), "You must enter a username and a password", Toast.LENGTH_LONG).show();
         }else{
-            LoginTaskParams params = new LoginTaskParams(getActivity(), user);
+            WeakReference<TextView> textView = new WeakReference<TextView>((TextView) ((MainActivity) getActivity()).findViewById(R.id.login_splash_label));
+            LoginTaskParams params = new LoginTaskParams(getActivity(), user, textView);
             new LoginTask(params, ((MainActivity) getActivity()).getAuthenticationController()).execute();
         }
     }

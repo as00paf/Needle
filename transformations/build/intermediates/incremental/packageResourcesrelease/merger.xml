@@ -1,0 +1,2 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merger version="3"><dataSet config="main"><source path="C:\android_workspace\Needle\transformations\src\main\res"/><source path="C:\android_workspace\Needle\transformations\build\generated\res\rs\release"/><source path="C:\android_workspace\Needle\transformations\build\generated\res\resValues\release"/></dataSet><dataSet config="release"><source path="C:\android_workspace\Needle\transformations\src\release\res"/></dataSet><mergedItems/></merger>

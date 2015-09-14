@@ -4,14 +4,24 @@ import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.view.GravityCompat;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.ImageView;
+import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
-import com.github.gorbin.asne.core.SocialNetworkManager;
 import com.nemator.needle.MainActivity;
 import com.nemator.needle.R;
 import com.nemator.needle.data.LocationServiceDBHelper.PostLocationRequest;
@@ -25,7 +35,9 @@ import com.nemator.needle.tasks.logOut.LogOutTask;
 import com.nemator.needle.tasks.logOut.LogOutTask.LogOutResponseHandler;
 import com.nemator.needle.utils.AppConstants;
 import com.nemator.needle.utils.AppState;
+import com.nemator.needle.utils.RoundedTransformation;
 import com.nemator.needle.view.authentication.LoginFragment;
+import com.nemator.needle.view.authentication.LoginSplashFragment;
 import com.nemator.needle.view.authentication.RegisterFragment;
 import com.nemator.needle.view.haystack.HaystackFragment;
 import com.nemator.needle.view.haystacks.HaystackListFragment;
@@ -35,8 +47,10 @@ import com.nemator.needle.view.locationSharing.LocationSharingListFragment;
 import com.nemator.needle.view.locationSharing.createLocationSharing.CreateLocationSharingFragment;
 import com.nemator.needle.view.locationSharing.locationSharing.LocationSharingFragment;
 import com.nemator.needle.view.settings.SettingsFragment;
+import com.squareup.picasso.Picasso;
+import com.squareup.picasso.Target;
 
-import it.neokree.materialnavigationdrawer.elements.MaterialSection;
+import jp.wasabeef.picasso.transformations.CropCircleTransformation;
 
 import static com.nemator.needle.tasks.locationSharing.LocationSharingTask.CreateLocationSharingResponseHandler;
 import static com.nemator.needle.view.authentication.LoginFragment.LoginFragmentInteractionListener;
@@ -55,51 +69,69 @@ public class NavigationController implements MainActivity.NavigationHandler, OnA
     private UserModel userModel;
 
     //Sections/Fragments
-    private MaterialSection loginSection;
+    //private MaterialSection loginSection;
     private LoginFragment loginFragment;
+    private LoginSplashFragment splashLoginFragment;
 
-    private MaterialSection registerSection;
+   // private MaterialSection registerSection;
     private RegisterFragment registerFragment;
 
-    private MaterialSection haystacksSection;
+   // private MaterialSection haystacksSection;
     private HaystackListFragment haystacksListFragment;
 
-    private MaterialSection locationSharingListSection;
+   // private MaterialSection locationSharingListSection;
     private LocationSharingListFragment locationSharingListFragment;
 
     private CreateHaystackFragment createHaystackFragment;
 
-    private MaterialSection settingsSection;
+   // private MaterialSection settingsSection;
     private SettingsFragment settingsFragment;
 
-    private MaterialSection haystackSection;
+   // private MaterialSection haystackSection;
     private HaystackFragment haystackFragment;
 
-    private MaterialSection logOutSection;
+   // private MaterialSection logOutSection;
     private CreateLocationSharingFragment createLocationSharingFragment;
 
-    private MaterialSection locationSharingSection;
+   // private MaterialSection locationSharingSection;
     private LocationSharingFragment locationSharingFragment;
 
     private Menu menu;
+    private ActionBar actionBar;
+    private View content;
 
     private int currentState = AppState.LOGIN;
     private int previousState;
 
     private static ProgressDialog pd;
-    static Context context;
+    private static Context context;
+    private android.support.v4.widget.DrawerLayout drawerLayout;
+    private FragmentManager manager;
+    private Fragment currentFragment;
 
-    public NavigationController(MainActivity activity, UserModel userModel){
+    public NavigationController(MainActivity activity, DrawerLayout drawerLayout, View content, UserModel userModel){
         this.activity = activity;
+        this.drawerLayout = drawerLayout;
+        this.content = content;
         this.context = activity;
         this.userModel = userModel;
+
+        actionBar = activity.getSupportActionBar();
+        manager = activity.getSupportFragmentManager();
     }
 
     public void addSection(int type){
-        switch(type){
+        /*switch(type){
             case AppConstants.SECTION_LOGIN :
-                loginFragment = new LoginFragment();
-                loginSection = activity.newSection(activity.getString(R.string.login), R.drawable.ic_account, loginFragment);
+                if(userModel.isLoggedIn()){
+                    loginFragment = new LoginFragment();
+                    loginSection = activity.newSection(activity.getString(R.string.login), R.drawable.ic_account, loginFragment);
+                }else{
+                    splashLoginFragment = new LoginSplashFragment();
+                    loginSection = activity.newSection(activity.getString(R.string.login), R.drawable.ic_account, splashLoginFragment);
+                    setCurrentState(AppState.SPLASH_LOGIN);
+                }
+
                 activity.addSection(loginSection);
                 break;
             case AppConstants.SECTION_REGISTER :
@@ -130,7 +162,7 @@ public class NavigationController implements MainActivity.NavigationHandler, OnA
                 //TODO:Use real help fragment
                 activity.addBottomSection(activity.newSection(activity.getString(R.string.title_helpAndSupport), R.drawable.ic_action_help, new LoginFragment()));
                 break;
-        }
+        }*/
     }
 
     public void createMainSections(){
@@ -141,17 +173,24 @@ public class NavigationController implements MainActivity.NavigationHandler, OnA
 
     public void showSection(int type){
         switch(type) {
-            case AppConstants.SECTION_REGISTER:
+            /*case AppConstants.SECTION_REGISTER:
                 activity.setSection(registerSection);
                 activity.setFragment(registerFragment, activity.getString(R.string.register));
                 onStateChange(AppState.REGISTER);
                 break;
             case AppConstants.SECTION_LOGIN:
+                if(loginFragment == null){
+                    loginFragment = new LoginFragment();
+                }
+
                 activity.setSection(loginSection);
                 activity.setFragment(loginFragment, activity.getString(R.string.login));
                 onStateChange(AppState.LOGIN);
                 break;
             case AppConstants.SECTION_HAYSTACKS:
+                if(!actionBar.isShowing()){
+                    actionBar.show();
+                }
                 activity.setSection(haystacksSection);
                 activity.setFragment(haystacksListFragment, activity.getString(R.string.title_haystacks));
                 onStateChange(AppState.PUBLIC_HAYSTACK_TAB);
@@ -180,17 +219,44 @@ public class NavigationController implements MainActivity.NavigationHandler, OnA
                 if(locationSharingFragment == null) locationSharingFragment = new LocationSharingFragment();
                 activity.setFragment(locationSharingFragment, activity.getString(R.string.title_location_sharing));
                 onStateChange(AppState.LOCATION_SHARING);
-                break;
+                break;*/
             case AppConstants.SECTION_HAYSTACK:
                 if(haystackFragment == null) haystackFragment = new HaystackFragment();
-                activity.setFragment(haystackFragment, activity.getString(R.string.title_activity_haystack));
+
+                manager.beginTransaction()
+                .add(content.getId(), haystackFragment)
+                .commit();
+
                 onStateChange(AppState.HAYSTACK);
+                break;
+            case AppConstants.SECTION_HAYSTACKS:
+                if(!actionBar.isShowing()){
+                    actionBar.show();
+                }
+
+                if(haystacksListFragment == null){
+                    haystacksListFragment = new HaystackListFragment();
+                }
+
+                manager.beginTransaction()
+                        .add(content.getId(), haystacksListFragment)
+                        .commit();
+
+                onStateChange(AppState.PUBLIC_HAYSTACK_TAB);
+                break;
+            case AppConstants.SECTION_SPLASH_LOGIN:
+                splashLoginFragment = new LoginSplashFragment();
+                manager.beginTransaction()
+                        .add(content.getId(), splashLoginFragment)
+                        .commit();
+
+                onStateChange(AppState.SPLASH_LOGIN);
                 break;
         }
     }
 
     public void removeSection(int type){
-        switch(type) {
+        /*switch(type) {
             case AppConstants.SECTION_REGISTER:
                 removeFragment(registerFragment);
                 registerFragment = null;
@@ -247,7 +313,7 @@ public class NavigationController implements MainActivity.NavigationHandler, OnA
                 activity.removeSection(locationSharingSection);
                 locationSharingSection = null;
                 break;
-        }
+        }*/
     }
 
     private void removeFragment(Fragment fragment){
@@ -259,6 +325,10 @@ public class NavigationController implements MainActivity.NavigationHandler, OnA
         trans.commit();
     }
 
+    public void removeLoginSplash(){
+        removeFragment(splashLoginFragment);
+    }
+
     @Override
     public void onBackPressed() {
         switch (currentState){
@@ -266,8 +336,12 @@ public class NavigationController implements MainActivity.NavigationHandler, OnA
                 activity.onBackPressed();
                 break;
             case AppState.REGISTER:
-                showSection(AppConstants.SECTION_LOGIN);
-                onStateChange(AppState.LOGIN);
+                if(getPreviousState() == AppState.LOGIN){
+                    showSection(AppConstants.SECTION_LOGIN);
+                    onStateChange(AppState.LOGIN);
+                }else{
+                    activity.onBackPressed();
+                }
                 break;
             case AppState.PUBLIC_HAYSTACK_TAB:
                 logOut();
@@ -329,7 +403,7 @@ public class NavigationController implements MainActivity.NavigationHandler, OnA
                 break;
             case AppState.SETTINGS:
                 removeFragment(settingsFragment);
-                settingsSection.unSelect();
+               // settingsSection.unSelect();
                 restorePreviousState();
                 break;
             default:
@@ -342,7 +416,7 @@ public class NavigationController implements MainActivity.NavigationHandler, OnA
     public boolean onCreateOptionsMenu(Menu menu) {
         this.menu = menu;
 
-        if (!activity.isDrawerOpen()) {
+        //if (!activity.isDrawerOpen()) {
             //TODO: use switch statement
             if(getCurrentState() == AppState.HAYSTACK){
                 activity.getMenuInflater().inflate(R.menu.haystack, menu);
@@ -353,9 +427,9 @@ public class NavigationController implements MainActivity.NavigationHandler, OnA
             }
 
             return true;
-        }
+        //}
 
-        return false;
+       // return false;
     }
 
     @Override
@@ -363,6 +437,9 @@ public class NavigationController implements MainActivity.NavigationHandler, OnA
         int id = item.getItemId();
 
         switch (id) {
+            case android.R.id.home:
+                drawerLayout.openDrawer(GravityCompat.START);
+                return true;
             case R.id.menu_option_settings:
                 showSection(AppConstants.SECTION_SETTINGS);
                 return true;
@@ -379,12 +456,6 @@ public class NavigationController implements MainActivity.NavigationHandler, OnA
         return menu;
     }
 
-    @Override
-    public void onClickSection(MaterialSection section) {
-        if(section == logOutSection){
-            logOut();
-        }
-    }
 
     private void logOut(){
         new AlertDialog.Builder(activity)
@@ -404,7 +475,7 @@ public class NavigationController implements MainActivity.NavigationHandler, OnA
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         //Deselect logOut section
-                        logOutSection.unSelect();
+                       // logOutSection.unSelect();
                     }
                 })
                 .show();
@@ -466,8 +537,8 @@ public class NavigationController implements MainActivity.NavigationHandler, OnA
         //Add/Remove Sections
         haystackFragment = new HaystackFragment();
         haystackFragment.setHaystack(haystack);
-        haystackSection = activity.newSection(haystack.getName(), R.drawable.ic_haystack, haystackFragment);
-        activity.addSectionAt(haystackSection, 1);
+        //haystackSection = activity.newSection(haystack.getName(), R.drawable.ic_haystack, haystackFragment);
+        //activity.addSectionAt(haystackSection, 1);
 
         //showHaystackFragment(haystack.getName());
         showSection(AppConstants.SECTION_HAYSTACK);
@@ -492,8 +563,8 @@ public class NavigationController implements MainActivity.NavigationHandler, OnA
         locationSharingFragment.setLocationSharing(locationSharing);
         locationSharingFragment.setIsSent(isSent);
         String name = isSent ? locationSharing.getReceiverName() : locationSharing.getSenderName();
-        locationSharingSection = activity.newSection(name, R.drawable.ic_action_location_found, locationSharingFragment);
-        activity.addSectionAt(locationSharingSection, 2);
+        //locationSharingSection = activity.newSection(name, R.drawable.ic_action_location_found, locationSharingFragment);
+        //activity.addSectionAt(locationSharingSection, 2);
 
         showSection(AppConstants.SECTION_LOCATION_SHARING);
     }
@@ -544,8 +615,8 @@ public class NavigationController implements MainActivity.NavigationHandler, OnA
             //Add/Remove Sections
             haystackFragment = new HaystackFragment();
             haystackFragment.setHaystack(result.haystack);
-            haystackSection = activity.newSection(result.haystack.getName(), R.drawable.ic_haystack, haystackFragment);
-            activity.addSectionAt(haystackSection, 1);
+            //haystackSection = activity.newSection(result.haystack.getName(), R.drawable.ic_haystack, haystackFragment);
+            //activity.addSectionAt(haystackSection, 1);
 
             //showHaystackFragment(result.haystack.getName());
             showSection(AppConstants.SECTION_HAYSTACK);
@@ -579,8 +650,38 @@ public class NavigationController implements MainActivity.NavigationHandler, OnA
         haystackFragment.setHaystack(vo);
     }
 
-    public void showFacebookFragment(SocialNetworkManager networkManager){
-        activity.setFragment(networkManager, SOCIAL_NETWORK_TAG);
+    public void setAccount(){
+        TextView username = (TextView) activity.findViewById(R.id.username);
+        username.setText(userModel.getUserName());
+
+        ImageView avatarImageView = (ImageView) activity.findViewById(R.id.avatar);
+        String pictureURL = userModel.getUser().getPictureURL();
+        Picasso.with(activity.getApplicationContext()).load(pictureURL)
+                .transform(new CropCircleTransformation())
+                .transform(new RoundedTransformation(64, 2))
+                .into(avatarImageView);
+
+        if(userModel.getUser().getLoginType() ==  AuthenticationController.LOGIN_TYPE_FACEBOOK){
+            String coverURL = "https://graph.facebook.com/" + userModel.getUser().getSocialNetworkUserId() + "?fields=cover";
+            final RelativeLayout drawerHeader = (RelativeLayout) activity.findViewById(R.id.drawer_header);
+
+            Picasso.with(activity.getApplicationContext()).load(coverURL).into(new Target() {
+                @Override
+                public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
+                    drawerHeader.setBackground(new BitmapDrawable(context.getResources(), bitmap));
+                }
+
+                @Override
+                public void onBitmapFailed(Drawable errorDrawable) {
+
+                }
+
+                @Override
+                public void onPrepareLoad(Drawable placeHolderDrawable) {
+
+                }
+            });
+        }
     }
 
     //Getters/Setters
@@ -589,13 +690,13 @@ public class NavigationController implements MainActivity.NavigationHandler, OnA
     }
 
     public void setHaystacksCount(int count){
-        if(count>0)
-            haystacksSection.setNotifications(count);
+       // if(count>0)
+          //  haystacksSection.setNotifications(count);
     }
 
     public void setLocationSharingCount(int count){
-        if(count>0)
-            locationSharingListSection.setNotifications(count);
+        //if(count>0)
+          //  locationSharingListSection.setNotifications(count);
     }
 
     @Override
@@ -628,5 +729,19 @@ public class NavigationController implements MainActivity.NavigationHandler, OnA
 
     public static void hideProgress() {
         pd.dismiss();
+    }
+
+    public void updateSplashLabel(String text){
+        TextView textView = (TextView) activity.findViewById(R.id.login_splash_label);
+        if(textView != null){
+            textView.setText(text);
+        }
+    }
+
+    public void stopSplashProgress(){
+        ProgressBar progress = (ProgressBar) activity.findViewById(R.id.login_splash_progress_bar);
+        if(progress != null){
+            progress.setProgress(0);
+        }
     }
 }

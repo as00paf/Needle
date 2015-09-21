@@ -15,6 +15,7 @@ import android.widget.TextView;
 
 import com.appcompat.view.slidingTab.SlidingTabLayout;
 import com.nemator.needle.MainActivity;
+import com.nemator.needle.Needle;
 import com.nemator.needle.R;
 import com.nemator.needle.models.vo.HaystackVO;
 import com.nemator.needle.models.vo.UserVO;
@@ -156,7 +157,7 @@ public class HaystackFragment extends Fragment {
     }
 
     public boolean isOwner(){
-        int userId = ((MainActivity) getActivity()).getUserModel().getUserId();
+        int userId = Needle.userModel.getUserId();
         int ownerId = haystack.getOwner();
 
         mIsOwner = userId == ownerId;
@@ -294,7 +295,7 @@ public class HaystackFragment extends Fragment {
 
         private void fetchAllUsers(){
             RetrieveUsersParams params = new RetrieveUsersParams();
-            params.userId = String.valueOf(((MainActivity) getActivity()).getUserModel().getUserId());
+            params.userId = String.valueOf(Needle.userModel.getUserId());
             params.type = RetrieveUsersParams.RetrieveUsersParamsType.TYPE_ALL_USERS;
 
             try{

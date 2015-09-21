@@ -14,6 +14,7 @@ import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
 import com.nemator.needle.MainActivity;
+import com.nemator.needle.Needle;
 import com.nemator.needle.R;
 import com.nemator.needle.models.UserModel;
 import com.nemator.needle.utils.AppConstants;
@@ -47,8 +48,7 @@ public class GCMIntentService extends IntentService {
             }else{
                 String registrationId = extras.getString("registration_id");
 
-                UserModel userModel = new UserModel(this);
-                String regId = userModel.getGcmRegId();
+                String regId = Needle.userModel.getGcmRegId();
                 if((regId == null || regId.isEmpty()) && !regId.equals(registrationId)){
                     PreferenceManager.getDefaultSharedPreferences(this).edit().
                             putString(AppConstants.TAG_GCM_REG_ID, registrationId).

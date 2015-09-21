@@ -17,6 +17,7 @@ import android.widget.Toast;
 
 import com.google.android.gms.common.SignInButton;
 import com.nemator.needle.MainActivity;
+import com.nemator.needle.Needle;
 import com.nemator.needle.R;
 import com.nemator.needle.controller.AuthenticationController;
 import com.nemator.needle.models.vo.UserVO;
@@ -32,8 +33,6 @@ public class RegisterFragment extends Fragment implements View.OnClickListener{
     private EditText user, pass;
     private Button registerButton, facebookButton, twitterButton;
     private SignInButton googleButton;
-
-    private AuthenticationController authenticationController;
 
     public static RegisterFragment newInstance() {
         RegisterFragment fragment = new RegisterFragment();
@@ -54,14 +53,6 @@ public class RegisterFragment extends Fragment implements View.OnClickListener{
         user = (EditText) layout.findViewById(R.id.register_input_username);
         pass = (EditText) layout.findViewById(R.id.register_input_password);
 
-      /*  if(!((MaterialNavigationDrawer) getActivity()).isDrawerOpen()){
-            if(TextUtils.isEmpty(user.getText())){
-                user.requestFocus();
-            }else{
-                pass.requestFocus();
-            }
-        }
-*/
         pass.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
@@ -86,8 +77,7 @@ public class RegisterFragment extends Fragment implements View.OnClickListener{
         twitterButton.setOnClickListener(this);
         googleButton.setOnClickListener(this);
 
-        authenticationController = ((MainActivity) getActivity()).getAuthenticationController();
-        authenticationController.initSocialNetworkManager(this, false);
+        Needle.authenticationController.initSocialNetworkManager(this);
 
         return layout;
     }
@@ -101,9 +91,9 @@ public class RegisterFragment extends Fragment implements View.OnClickListener{
         if(TextUtils.isEmpty(username) || TextUtils.isEmpty(password)){
             Toast.makeText(getActivity(), "You must enter a username and a password", Toast.LENGTH_LONG).show();
         }else{
-            UserVO userVO = new UserVO(-1, username, password, "", ((MainActivity) getActivity()).getUserModel().getGcmRegId(), AuthenticationController.LOGIN_TYPE_DEFAULT, "-1");
+            UserVO userVO = new UserVO(-1, username, password, "", Needle.userModel.getGcmRegId(), AuthenticationController.LOGIN_TYPE_DEFAULT, "-1");
             UserTaskParams params = new UserTaskParams(getActivity(), UserTaskParams.TYPE_REGISTER, userVO);
-            new UserTask(params, (((MainActivity) getActivity()).getAuthenticationController())).execute();
+            new UserTask(params, Needle.authenticationController).execute();
         }
     }
 
@@ -114,13 +104,13 @@ public class RegisterFragment extends Fragment implements View.OnClickListener{
                 register();
                 break;
             case R.id.register_btn_facebook:
-                authenticationController.registerWithNetwork(AuthenticationController.LOGIN_TYPE_FACEBOOK);
+                Needle.authenticationController.registerWithNetwork(AuthenticationController.LOGIN_TYPE_FACEBOOK);
                 break;
             case R.id.register_btn_twitter:
-                authenticationController.registerWithNetwork(AuthenticationController.LOGIN_TYPE_TWITTER);
+                Needle.authenticationController.registerWithNetwork(AuthenticationController.LOGIN_TYPE_TWITTER);
                 break;
             case R.id.register_btn_google:
-                authenticationController.registerWithNetwork(AuthenticationController.LOGIN_TYPE_GOOGLE);
+                Needle.authenticationController.registerWithNetwork(AuthenticationController.LOGIN_TYPE_GOOGLE);
                 break;
         }
     }

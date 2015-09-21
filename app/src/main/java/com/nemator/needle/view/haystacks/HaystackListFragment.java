@@ -3,6 +3,7 @@ package com.nemator.needle.view.haystacks;
 import android.app.Activity;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -14,6 +15,7 @@ import android.widget.Toast;
 
 import com.appcompat.view.slidingTab.SlidingTabLayout;
 import com.nemator.needle.MainActivity;
+import com.nemator.needle.Needle;
 import com.nemator.needle.R;
 import com.nemator.needle.models.vo.HaystackVO;
 import com.nemator.needle.tasks.haystack.HaystackTask;
@@ -76,8 +78,8 @@ public class HaystackListFragment extends Fragment implements HaystackTask.Fetch
         super.onAttach(activity);
 
         try {
-            stateChangeCallback = ((OnActivityStateChangeListener) ((MainActivity) getActivity()).getNavigationController());
-            fragmentListener = ((HaystackListFragmentInteractionListener) ((MainActivity) getActivity()).getNavigationController());
+            stateChangeCallback = ((OnActivityStateChangeListener) Needle.navigationController);
+            fragmentListener = ((HaystackListFragmentInteractionListener) Needle.navigationController);
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString()
                     + " must implement OnActivityStateChangeListener");
@@ -90,12 +92,13 @@ public class HaystackListFragment extends Fragment implements HaystackTask.Fetch
             rootView = inflater.inflate(R.layout.fragment_haystack_list, container, false);
 
             //Navigation Drawer
-            Boolean firstNavDrawerLearned = ((MainActivity) getActivity()).getSharedPreferences().getBoolean("firstNavDrawerLearned", false);
+            SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
+            Boolean firstNavDrawerLearned = sharedPreferences.getBoolean("firstNavDrawerLearned", false);
 
             if(!firstNavDrawerLearned){
                 //TODO: Open Nav Drawer
 
-                SharedPreferences.Editor edit = ((MainActivity) getActivity()).getSharedPreferences().edit();
+                SharedPreferences.Editor edit = sharedPreferences.edit();
                 edit.putBoolean("firstNavDrawerLearned", true);
                 edit.commit();
             }
@@ -212,11 +215,11 @@ public class HaystackListFragment extends Fragment implements HaystackTask.Fetch
     }
 
     private int getUserId(){
-        return ((MainActivity) getActivity()).getUserModel().getUserId();
+        return Needle.userModel.getUserId();
     }
 
     private String getUserName(){
-        return ((MainActivity) getActivity()).getUserModel().getUserName();
+        return Needle.userModel.getUserName();
     }
 
     public void goToTab(int tab){

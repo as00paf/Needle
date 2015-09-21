@@ -20,6 +20,7 @@ import android.widget.Toast;
 
 import com.google.android.gms.common.SignInButton;
 import com.nemator.needle.MainActivity;
+import com.nemator.needle.Needle;
 import com.nemator.needle.R;
 import com.nemator.needle.controller.AuthenticationController;
 import com.nemator.needle.models.vo.UserVO;
@@ -43,7 +44,6 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
     //Objects
     private SharedPreferences mSharedPreferences;
     private LoginFragmentInteractionListener fragmentListener;
-    private AuthenticationController authenticationController;
 
     public static LoginFragment newInstance() {
         LoginFragment fragment = new LoginFragment();
@@ -61,7 +61,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
         super.onAttach(activity);
 
         try {
-            fragmentListener = ((LoginFragmentInteractionListener) ((MainActivity) getActivity()).getNavigationController());
+            fragmentListener = ((LoginFragmentInteractionListener) Needle.navigationController);
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString()
                     + " must implement OnActivityStateChangeListener");
@@ -115,8 +115,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
         twitterButtton.setOnClickListener(this);
         googleButton.setOnClickListener(this);
 
-        authenticationController = ((MainActivity) getActivity()).getAuthenticationController();
-        authenticationController.initSocialNetworkManager(this, false);
+        Needle.authenticationController.initSocialNetworkManager(this);
 
         return layout;
     }
@@ -124,8 +123,8 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
     @Override
     public void onResume(){
         boolean rememberMe = mSharedPreferences.getBoolean("rememberMe", false);
-        boolean autoLogin = ((MainActivity) getActivity()).getUserModel().isAutoLogin();
-        boolean willLogin = rememberMe && autoLogin && !((MainActivity) getActivity()).getUserModel().isLoggedIn();
+        boolean autoLogin =Needle.userModel.isAutoLogin();
+        boolean willLogin = rememberMe && autoLogin && ! Needle.userModel.isLoggedIn();
 
         if(!user.getText().toString().isEmpty() && !pass.getText().toString().isEmpty() && willLogin){
             login();
@@ -140,7 +139,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
 
         String username = user.getText().toString();
         String password = pass.getText().toString();
-        String regId = ((MainActivity) getActivity()).getUserModel().getGcmRegId();
+        String regId = Needle.userModel.getGcmRegId();
 
         UserVO user = new UserVO(-1, username, password, "", regId, AuthenticationController.LOGIN_TYPE_DEFAULT, "-1");
 
@@ -151,7 +150,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
         }else{
             WeakReference<TextView> textView = new WeakReference<TextView>((TextView) ((MainActivity) getActivity()).findViewById(R.id.login_splash_label));
             LoginTaskParams params = new LoginTaskParams(getActivity(), user, textView);
-            new LoginTask(params, ((MainActivity) getActivity()).getAuthenticationController()).execute();
+            new LoginTask(params, Needle.authenticationController).execute();
         }
     }
 
@@ -180,10 +179,9 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
         }
 
         if(networkId != 0){
-            authenticationController.logInWithSocialNetwork(networkId);
+            Needle.authenticationController.logInWithSocialNetwork(networkId);
         }
     }
-
 
     public interface LoginFragmentInteractionListener{
         void onClickRegister();

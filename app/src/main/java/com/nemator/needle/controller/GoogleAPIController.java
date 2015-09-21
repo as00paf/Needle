@@ -1,10 +1,13 @@
 package com.nemator.needle.controller;
 
+import android.content.Intent;
 import android.content.IntentSender;
 import android.os.Bundle;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.github.gorbin.asne.googleplus.MomentUtil;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -20,19 +23,33 @@ import com.nemator.needle.view.haystacks.createHaystack.CreateHaystackMapFragmen
  */
 public class GoogleAPIController implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener{
 
+    private static GoogleAPIController instance;
     public final String TAG = "GoogleAPIController";
 
     private GoogleApiClient mGoogleApiClient;
+    private ConnectionResult connectionResult;
     MainActivity activity;
 
     private boolean isConnected;
 
-    public GoogleAPIController(MainActivity activity){
+    public GoogleAPIController(){
+    }
+
+    public static GoogleAPIController getInstance(){
+        if(instance == null){
+            instance = new GoogleAPIController();
+        }
+
+        return instance;
+    }
+
+    public void init(MainActivity activity){
         this.activity = activity;
+        connect();
     }
 
     public void connect(){
-        initApiClient();
+        if(!isConnected ) initApiClient();
     }
 
     public void disconnect(){
@@ -61,6 +78,10 @@ public class GoogleAPIController implements GoogleApiClient.ConnectionCallbacks,
     }
 
     protected synchronized void buildGoogleApiClient() {
+        Plus.PlusOptions plusOptions = new Plus.PlusOptions.Builder()
+                .addActivityTypes(MomentUtil.ACTIONS)
+                .build();
+
         mGoogleApiClient = new GoogleApiClient.Builder(activity)
                 .addConnectionCallbacks(this)
                 .addOnConnectionFailedListener(this)
@@ -69,8 +90,9 @@ public class GoogleAPIController implements GoogleApiClient.ConnectionCallbacks,
                 .addApi(Places.GEO_DATA_API)
                 .addApi(Places.PLACE_DETECTION_API)
                 //Social APIs
-                .addApi(Plus.API)
+                .addApi(Plus.API, plusOptions)
                 .addScope(Plus.SCOPE_PLUS_LOGIN)
+                .addScope(Plus.SCOPE_PLUS_PROFILE)
                 .build();
     }
 
@@ -78,6 +100,11 @@ public class GoogleAPIController implements GoogleApiClient.ConnectionCallbacks,
     @Override
     public void onConnected(Bundle connectionHint) {
         isConnected = true;
+
+        LocalBroadcastManager localBroadcastManager = LocalBroadcastManager.getInstance(activity);
+        Intent intent = new Intent();
+        intent.setAction(AppConstants.GOOGLE_API_CONNECTED);
+        localBroadcastManager.sendBroadcast(intent);
     }
 
     @Override
@@ -87,12 +114,13 @@ public class GoogleAPIController implements GoogleApiClient.ConnectionCallbacks,
 
     @Override
     public void onConnectionFailed(ConnectionResult connectionResult) {
+        this.connectionResult = connectionResult;
         if (connectionResult.hasResolution()) {
-            try {
+           /* try {
                 connectionResult.startResolutionForResult(activity, AppConstants.CONNECTION_FAILURE_RESOLUTION_REQUEST);
             } catch (IntentSender.SendIntentException e) {
                 e.printStackTrace();
-            }
+            }*/
         } else {
             showErrorDialog(connectionResult.getErrorCode());
         }
@@ -109,5 +137,10 @@ public class GoogleAPIController implements GoogleApiClient.ConnectionCallbacks,
 
     public boolean isConnected() {
         return isConnected;
+    }
+
+
+    public ConnectionResult getConnectionResult() {
+        return connectionResult;
     }
 }

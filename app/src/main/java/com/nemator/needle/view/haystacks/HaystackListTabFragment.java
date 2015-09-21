@@ -12,6 +12,7 @@ import android.view.ViewGroup;
 import android.view.ViewParent;
 
 import com.nemator.needle.MainActivity;
+import com.nemator.needle.Needle;
 import com.nemator.needle.R;
 import com.nemator.needle.models.vo.HaystackVO;
 import com.nemator.needle.utils.AppState;
@@ -51,8 +52,8 @@ public class HaystackListTabFragment extends Fragment {
         super.onAttach(activity);
 
         try {
-            stateChangeCallback = ((OnActivityStateChangeListener) ((MainActivity) getActivity()).getNavigationController());
-            interactionListener = ((HaystackListFragment.HaystackListFragmentInteractionListener) ((MainActivity) getActivity()).getNavigationController());
+            stateChangeCallback = Needle.navigationController;
+            interactionListener = Needle.navigationController;
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString()
                     + " must implement OnActivityStateChangeListener");

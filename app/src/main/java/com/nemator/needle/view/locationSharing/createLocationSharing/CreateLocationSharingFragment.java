@@ -18,6 +18,7 @@ import android.widget.TimePicker;
 import android.widget.Toast;
 
 import com.nemator.needle.MainActivity;
+import com.nemator.needle.Needle;
 import com.nemator.needle.R;
 import com.nemator.needle.models.vo.LocationSharingVO;
 import com.nemator.needle.models.vo.UserVO;
@@ -166,7 +167,7 @@ public class CreateLocationSharingFragment extends Fragment implements RetrieveU
 
     private void fetchAllUsers(){
         RetrieveUsersParams params = new RetrieveUsersParams();
-        params.userId = String.valueOf(((MainActivity) getActivity()).getUserModel().getUserId());
+        params.userId = String.valueOf(Needle.userModel.getUserId());
         params.type = RetrieveUsersParams.RetrieveUsersParamsType.TYPE_ALL_USERS;
 
         try{
@@ -198,8 +199,8 @@ public class CreateLocationSharingFragment extends Fragment implements RetrieveU
         locationSharingVO = new LocationSharingVO();
 
         //Sender
-        locationSharingVO.setSenderId(((MainActivity) getActivity()).getUserModel().getUserId());
-        locationSharingVO.setSenderName(((MainActivity) getActivity()).getUserModel().getUserName());
+        locationSharingVO.setSenderId(Needle.userModel.getUserId());
+        locationSharingVO.setSenderName(Needle.userModel.getUserName());
 
         //Receiver
         locationSharingVO.setReceiverId(selectedUser.getUserId());
@@ -210,7 +211,7 @@ public class CreateLocationSharingFragment extends Fragment implements RetrieveU
 
         String regId = selectedUser.getGcmRegId();
         LocationSharingParams params = new LocationSharingParams(getActivity(), LocationSharingParams.TYPE_CREATE, locationSharingVO, regId);
-        LocationSharingTask task = new LocationSharingTask(params, (((MainActivity) getActivity()).getNavigationController()));
+        LocationSharingTask task = new LocationSharingTask(params, Needle.navigationController);
         task.execute();
     }
 

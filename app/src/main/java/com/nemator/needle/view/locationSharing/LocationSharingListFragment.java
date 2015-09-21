@@ -11,6 +11,7 @@ import android.view.ViewGroup;
 
 import com.appcompat.view.slidingTab.SlidingTabLayout;
 import com.nemator.needle.MainActivity;
+import com.nemator.needle.Needle;
 import com.nemator.needle.R;
 import com.nemator.needle.models.vo.LocationSharingVO;
 import com.nemator.needle.tasks.locationSharing.LocationSharingParams;
@@ -74,7 +75,7 @@ public class LocationSharingListFragment extends Fragment implements LocationSha
         super.onAttach(activity);
 
         try {
-            stateChangeCallback = ((OnActivityStateChangeListener) ((MainActivity) getActivity()).getNavigationController());
+            stateChangeCallback = Needle.navigationController;
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString()
                     + " must implement OnActivityStateChangeListener");
@@ -87,7 +88,7 @@ public class LocationSharingListFragment extends Fragment implements LocationSha
             rootView = inflater.inflate(R.layout.fragment_location_sharing_list, container, false);
 
             //FAB
-            fabListener = ((MainActivity) getActivity()).getNavigationController();
+            fabListener = Needle.navigationController;
             fab = (FloatingActionButton) rootView.findViewById(R.id.location_sharing_fab);
             fab.setColor(getResources().getColor(R.color.primary));
             fab.setOnClickListener(new View.OnClickListener() {
@@ -165,7 +166,7 @@ public class LocationSharingListFragment extends Fragment implements LocationSha
         sentLocationsList = result.sentLocationSharingList;
 
         if(receivedLocationsList != null && getActivity() != null){
-            ((MainActivity) getActivity()).getNavigationController().setLocationSharingCount(receivedLocationsList.size());
+            Needle.navigationController.setLocationSharingCount(receivedLocationsList.size());
         }
 
         LocationSharingListTabFragment receivedTab = mLocationSharingPagerAdapter.getReceivedFragment();
@@ -179,7 +180,7 @@ public class LocationSharingListFragment extends Fragment implements LocationSha
     }
 
     private int getUserId() {
-        return ((MainActivity) getActivity()).getUserModel().getUserId();
+        return Needle.userModel.getUserId();
     }
 
     public void goToPage(int page){

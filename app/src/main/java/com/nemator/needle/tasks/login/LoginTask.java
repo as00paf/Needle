@@ -37,7 +37,9 @@ public class LoginTask extends AsyncTask<Void, Void, LoginTaskResult> {
         super.onPreExecute();
 
         //TODO: replace by localized text
-        params.textView.get().setText("Attempting login...");
+        if(params.textView.get() != null){
+            params.textView.get().setText("Attempting login...");
+        }
     }
 
     @Override

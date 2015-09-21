@@ -11,6 +11,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.nemator.needle.MainActivity;
+import com.nemator.needle.Needle;
 import com.nemator.needle.R;
 import com.nemator.needle.models.vo.LocationSharingVO;
 import com.nemator.needle.utils.AppState;
@@ -52,8 +53,8 @@ public class LocationSharingListTabFragment extends Fragment{
         super.onAttach(activity);
 
         try {
-            stateChangeCallback = ((OnActivityStateChangeListener) ((MainActivity) getActivity()).getNavigationController());
-            interactionListener = ((LocationSharingListFragmentInteractionListener) ((MainActivity) getActivity()).getNavigationController());
+            stateChangeCallback = Needle.navigationController;
+            interactionListener = Needle.navigationController;
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString()
                     + " must implement OnActivityStateChangeListener and LocationSharingListFragmentInteractionListener");
@@ -71,7 +72,7 @@ public class LocationSharingListTabFragment extends Fragment{
         mLayoutManager = new LinearLayoutManager(getActivity());
         mRecyclerView.setLayoutManager(mLayoutManager);
 
-        mAdapter = new LocationSharingListCardAdapter(dataList, getActivity(), !isReceived, (((MainActivity) getActivity()).getNavigationController()));
+        mAdapter = new LocationSharingListCardAdapter(dataList, getActivity(), !isReceived, Needle.navigationController);
         mRecyclerView.setAdapter(mAdapter);
 
 
@@ -105,7 +106,7 @@ public class LocationSharingListTabFragment extends Fragment{
 
     public void updateLocationSharingList(ArrayList<LocationSharingVO> data){
         this.dataList = data;
-        mAdapter = new LocationSharingListCardAdapter(dataList, getActivity(), !isReceived, (((MainActivity) getActivity()).getNavigationController()));
+        mAdapter = new LocationSharingListCardAdapter(dataList, getActivity(), !isReceived, Needle.navigationController);
 
         if(mRecyclerView != null){
             mRecyclerView.setAdapter(mAdapter);

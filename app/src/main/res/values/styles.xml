@@ -1,7 +1,7 @@
 <resources>
 
     <!-- Base application theme. -->
-    <style name="AppTheme2" parent="Theme.AppCompat.Light.NoActionBar">
+    <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
         <!-- Main theme colors -->
         <!--   your app branding color for the app bar -->
         <item name="colorPrimary">@color/primary</item>
@@ -12,11 +12,9 @@
 
         <item name="drawerArrowStyle">@style/DrawerArrowStyle</item>
 
-        <!-- remove shadow below action bar -->
-        <!-- Support library compatibility -->
-        <item name="elevation">0dp</item>
+        <item name="android:windowActionBar">true</item>
 
-        <item name="actionBarStyle">@style/Theme.Needle.ActionBar</item>
+        <item name="android:actionBarStyle">@style/Theme.Needle.ActionBar</item>
         <item name="android:windowContentOverlay">@null</item>
     </style>
 
@@ -40,11 +38,9 @@
         <item name="color">@android:color/white</item>
     </style>
 
-    <style name="Theme.Needle.ActionBar" parent="style/Widget.AppCompat.Light.ActionBar.Solid.Inverse">
-        <!-- remove shadow below action bar -->
-        <!-- <item name="android:elevation">0dp</item> -->
-        <!-- Support library compatibility -->
+    <style name="Theme.Needle.ActionBar" parent="@style/Theme.AppCompat.Light">
         <item name="elevation">0dp</item>
+        <item name="android:height">200dp</item>
     </style>
 
 </resources>

@@ -12,6 +12,7 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.nemator.needle.MainActivity;
+import com.nemator.needle.Needle;
 import com.nemator.needle.R;
 import com.nemator.needle.models.UserModel;
 import com.nemator.needle.tasks.user.UserTask;
@@ -30,32 +31,39 @@ public class GCMController implements UserTask.UpdateGCMIDResponseHandler {
     protected static final int MSG_REGISTER_WEB_SERVER_FAILURE = 104;
     private static final String GCM_SENDER_ID = "648034739265";
     private static final int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
+    private static GCMController instance;
 
     private MainActivity activity;
-    private UserModel userModel;
     private SharedPreferences mSharedPreferences;
 
     GoogleCloudMessaging gcm;
     int tryCount = 0;
 
-    public GCMController(MainActivity activity, UserModel userModel){
-        this.activity = activity;
-        this.userModel = userModel;
+    public GCMController(){
 
-        mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(activity);
-
-        init();
     }
 
-    private void init(){
+    public static GCMController getInstance() {
+        if(instance == null){
+            instance = new GCMController();
+        }
+
+        return instance;
+    }
+
+    public void init(MainActivity activity){
+        this.activity = activity;
+        Needle.userModel.init(activity);
+        mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(activity);
+
         //GCM
         if (checkPlayServices()) {
             gcm = GoogleCloudMessaging.getInstance(activity.getApplicationContext());
 
             // Read saved registration id from shared preferences.
-            userModel.setGcmRegId(mSharedPreferences.getString(AppConstants.TAG_GCM_REG_ID, ""));
+            Needle.userModel.setGcmRegId(mSharedPreferences.getString(AppConstants.TAG_GCM_REG_ID, ""));
 
-            if (TextUtils.isEmpty(userModel.getGcmRegId())) {
+            if (TextUtils.isEmpty(Needle.userModel.getGcmRegId())) {
                 handler.sendEmptyMessage(MSG_REGISTER_WITH_GCM);
             }else{
                 new RegisterGCMTask().execute();
@@ -83,7 +91,7 @@ public class GCMController implements UserTask.UpdateGCMIDResponseHandler {
         if(result.successCode != 1){//Retry
             tryCount++;
             if(tryCount < 3){
-                UserTaskParams params = new UserTaskParams(activity, UserTaskParams.TYPE_UPDATE_GCM_ID, userModel.getUser());
+                UserTaskParams params = new UserTaskParams(activity, UserTaskParams.TYPE_UPDATE_GCM_ID, Needle.userModel.getUser());
                 new UserTask(params, GCMController.this).execute();
             }else{
                 Toast.makeText(activity, "Error While Updating GCM RegID", Toast.LENGTH_SHORT).show();
@@ -97,7 +105,7 @@ public class GCMController implements UserTask.UpdateGCMIDResponseHandler {
         protected Void doInBackground(Void... params) {
             //Already registered with GCM
             try {
-                userModel.setGcmRegId(gcm.register(GCM_SENDER_ID));
+                Needle.userModel.setGcmRegId(gcm.register(GCM_SENDER_ID));
             } catch (IOException e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
@@ -116,7 +124,7 @@ public class GCMController implements UserTask.UpdateGCMIDResponseHandler {
                 gcm = GoogleCloudMessaging.getInstance(activity.getApplicationContext());
             }
             try {
-                return userModel.setGcmRegId(gcm.register(activity.getResources().getString(R.string.gcm_defaultSenderId)));
+                return Needle.userModel.setGcmRegId(gcm.register(activity.getResources().getString(R.string.gcm_defaultSenderId)));
             } catch (IOException e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
@@ -128,12 +136,12 @@ public class GCMController implements UserTask.UpdateGCMIDResponseHandler {
         @Override
         protected void onPostExecute(Boolean result) {
             if(result){
-                Log.i(TAG, "Was already registered with GCM " + userModel.getGcmRegId());
+                Log.i(TAG, "Was already registered with GCM " + Needle.userModel.getGcmRegId());
             }else{
-                Log.i(TAG, "Needs to register with GCM " + userModel.getGcmRegId());
+                Log.i(TAG, "Needs to register with GCM " + Needle.userModel.getGcmRegId());
 
-                if(userModel.getUserId() != -1){
-                    UserTaskParams params = new UserTaskParams(activity, UserTaskParams.TYPE_UPDATE_GCM_ID, userModel.getUser());
+                if(Needle.userModel.getUserId() != -1){
+                    UserTaskParams params = new UserTaskParams(activity, UserTaskParams.TYPE_UPDATE_GCM_ID, Needle.userModel.getUser());
                     new UserTask(params, GCMController.this).execute();
                 }
             }

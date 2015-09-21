@@ -6,10 +6,10 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
 import android.support.design.widget.NavigationView;
-import android.support.design.widget.Snackbar;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -37,19 +37,11 @@ public class MainActivity extends AppCompatActivity {
 
     public static String TAG = "MainActivity";
 
-    private SharedPreferences mSharedPreferences;
+    private Handler handler = new Handler();
 
     //Service
     private ServiceConnection mConnection;
     private NeedleLocationService locationService;
-
-    //App Components
-    private UserModel userModel;
-    private AuthenticationController authenticationController;
-    private NavigationController navigationController;
-    private GCMController gcmController;
-    private GoogleAPIController googleApiController;
-    private NetworkController networkController;
 
     //View
     private Toolbar toolbar;
@@ -57,52 +49,52 @@ public class MainActivity extends AppCompatActivity {
     private View content;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        content = findViewById(R.id.content);
 
         initToolbar();
         setupDrawerLayout();
         initDrawerToggle();
-        initService();
 
-        content = findViewById(R.id.content);
-        mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
+                initService();
 
-        networkController = new NetworkController(this);
-        if(networkController.isNetworkConnected()){
-            initUser(savedInstanceState);
-            initView();
-        }else{
-            initView();
-            navigationController.updateSplashLabel(getResources().getString(R.string.no_internet_connection));
-            navigationController.stopSplashProgress();
-        }
+                Needle.networkController.init(MainActivity.this);
+                if(Needle.networkController.isNetworkConnected()){
+                    initUser(savedInstanceState);
+                    initView();
+                }else{
+                    initView();
+                    Needle.navigationController.updateSplashLabel(getResources().getString(R.string.no_internet_connection));
+                    Needle.navigationController.stopSplashProgress();
+                }
+            }
+        });
     }
 
     public void initUser(Bundle  savedInstanceState) {
-        userModel = new UserModel(this);
-        navigationController = new NavigationController(this, drawerLayout, content, userModel);
-        authenticationController = new AuthenticationController(this, userModel, navigationController);
-        gcmController = new GCMController(this, userModel);
-        googleApiController = new GoogleAPIController(this);
+        Needle.googleApiController.init(this);
+        Needle.authenticationController.init(this);
+        Needle.gcmController.init(this);
 
         //Saved Instance State
         if(savedInstanceState != null){
-            userModel.setAutoLogin(savedInstanceState.getBoolean("autoLogin", true));
-            userModel.setLoggedIn(savedInstanceState.getBoolean("loggedIn", false));
-            navigationController.setCurrentState(savedInstanceState.getInt(AppConstants.APP_STATE, navigationController.getCurrentState()));
+            Needle.userModel.setAutoLogin(savedInstanceState.getBoolean("autoLogin", true));
+            Needle.userModel.setLoggedIn(savedInstanceState.getBoolean("loggedIn", false));
+            Needle.navigationController.setCurrentState(savedInstanceState.getInt(AppConstants.APP_STATE, Needle.navigationController.getCurrentState()));
         }
-
-
     }
 
     private void initView() {
-        if(!userModel.isLoggedIn()){
-            navigationController.showSection(AppConstants.SECTION_SPLASH_LOGIN);
+        if(!Needle.userModel.isLoggedIn()){
+            Needle.navigationController.showSection(AppConstants.SECTION_SPLASH_LOGIN);
         }else{
-            navigationController.setAccount();
-            navigationController.showSection(AppConstants.SECTION_HAYSTACKS);
+            Needle.navigationController.onPostLogin();
         }
     }
 
@@ -111,7 +103,7 @@ public class MainActivity extends AppCompatActivity {
         mConnection = new ServiceConnection(){
             public void onServiceConnected(ComponentName className, IBinder service) {
                 locationService = ((NeedleLocationService.LocalBinder)service).getService();
-                locationService.userModel = userModel;
+                locationService.userModel = Needle.userModel;
             }
 
             public void onServiceDisconnected(ComponentName className) {
@@ -149,16 +141,13 @@ public class MainActivity extends AppCompatActivity {
 
     private void setupDrawerLayout() {
         drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+        Needle.navigationController.init(this, drawerLayout, content);
 
-        NavigationView view = (NavigationView) findViewById(R.id.navigation_view);
-        view.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
-            @Override public boolean onNavigationItemSelected(MenuItem menuItem) {
-                Snackbar.make(content, menuItem.getTitle() + " pressed", Snackbar.LENGTH_LONG).show();
-                menuItem.setChecked(true);
-                drawerLayout.closeDrawers();
-                return true;
-            }
-        });
+        NavigationView appDrawer = (NavigationView) findViewById(R.id.navigation_view);
+        appDrawer.setNavigationItemSelectedListener(Needle.navigationController.getDrawerListener());
+
+        NavigationView appDrawerFooter = (NavigationView) findViewById(R.id.navigation_view_footer);
+        appDrawerFooter.setNavigationItemSelectedListener(Needle.navigationController.getDrawerListener());
     }
 
     @Override
@@ -178,7 +167,7 @@ public class MainActivity extends AppCompatActivity {
                         Boolean shareBack = extras.getBoolean(AppConstants.TAG_SHARE_BACK);
 
                         LocationSharingVO vo = new LocationSharingVO(id, senderName, senderId, timeLimit, shareBack);
-                        navigationController.showReceivedLocationSharing(vo);
+                        Needle.navigationController.showReceivedLocationSharing(vo);
                     }else if(type.equals("Haystack")){
                         int owner = Integer.parseInt(extras.getString(AppConstants.TAG_IS_OWNER, "-1"));
                         String name = extras.getString(AppConstants.TAG_HAYSTACK_NAME);
@@ -193,7 +182,7 @@ public class MainActivity extends AppCompatActivity {
 
 
                         HaystackVO vo = new HaystackVO(id, owner, name, isPublic, timeLimit, zoneRadius, isCircle, position, pictureURL, null, null);
-                        navigationController.showReceivedHaystack(vo);
+                        Needle.navigationController.showReceivedHaystack(vo);
                     }
                 }
             }
@@ -204,37 +193,35 @@ public class MainActivity extends AppCompatActivity {
         super.onNewIntent(intent);
     }
 
-
-
     @Override
     public void onSaveInstanceState(Bundle savedInstanceState) {
-        if(navigationController.getHaystackFragment() != null){
-            savedInstanceState.putParcelable(AppConstants.HAYSTACK_DATA_KEY, navigationController.getHaystackFragment().getHaystack());
-            savedInstanceState.putBoolean(AppConstants.TAG_IS_OWNER, navigationController.getHaystackFragment().isOwner(userModel.getUserId()));
+        if( Needle.navigationController.getHaystackFragment() != null){
+            savedInstanceState.putParcelable(AppConstants.HAYSTACK_DATA_KEY,  Needle.navigationController.getHaystackFragment().getHaystack());
+            savedInstanceState.putBoolean(AppConstants.TAG_IS_OWNER,  Needle.navigationController.getHaystackFragment().isOwner(Needle.userModel.getUserId()));
         }
 
-        savedInstanceState.putInt(AppConstants.APP_STATE, navigationController.getCurrentState());
-        savedInstanceState.putBoolean("autoLogin", userModel.isAutoLogin());
-        savedInstanceState.putBoolean("loggedIn", userModel.isLoggedIn());
+        savedInstanceState.putInt(AppConstants.APP_STATE,  Needle.navigationController.getCurrentState());
+        savedInstanceState.putBoolean("autoLogin",  Needle.userModel.isAutoLogin());
+        savedInstanceState.putBoolean("loggedIn", Needle.userModel.isLoggedIn());
 
         super.onSaveInstanceState(savedInstanceState);
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        return navigationController.onCreateOptionsMenu(menu);
+        return Needle.navigationController.onCreateOptionsMenu(menu);
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        return navigationController.onOptionsItemSelected(item);
+        return Needle.navigationController.onOptionsItemSelected(item);
     }
 
     @Override
     public void onBackPressed() {
-        int state = navigationController.getCurrentState();
+        int state = Needle.navigationController.getCurrentState();
         if(state != AppState.LOGIN && state != AppState.SPLASH_LOGIN && state != AppState.REGISTER ){
-            navigationController.onBackPressed();
+            Needle.navigationController.onBackPressed();
         }else{
             super.onBackPressed();
         }
@@ -243,28 +230,12 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        authenticationController.onActivityResult(requestCode, resultCode, data);
+        Needle.authenticationController.onActivityResult(requestCode, resultCode, data);
     }
 
     //Getters/Setters
     public NeedleLocationService getLocationService() {
         return locationService;
-    }
-
-    public UserModel getUserModel() {
-        return userModel;
-    }
-
-    public AuthenticationController getAuthenticationController() {
-        return authenticationController;
-    }
-
-    public NavigationController getNavigationController() {
-        return navigationController;
-    }
-
-    public SharedPreferences getSharedPreferences() {
-        return mSharedPreferences;
     }
 
     public interface NavigationHandler{

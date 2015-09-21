@@ -30,7 +30,9 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.places.Places;
 import com.nemator.needle.MainActivity;
+import com.nemator.needle.Needle;
 import com.nemator.needle.R;
+import com.nemator.needle.controller.NavigationController;
 import com.nemator.needle.models.vo.HaystackVO;
 import com.nemator.needle.models.vo.UserVO;
 import com.nemator.needle.tasks.haystack.HaystackTask;
@@ -96,7 +98,7 @@ public class CreateHaystackFragment extends CreateHaystackBaseFragment implement
         super.onAttach(activity);
 
         try {
-            stateChangeCallback = ((OnActivityStateChangeListener) ((MainActivity) getActivity()).getNavigationController());
+            stateChangeCallback = Needle.navigationController;
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString()
                     + " must implement OnActivityStateChangeListener");
@@ -191,7 +193,7 @@ public class CreateHaystackFragment extends CreateHaystackBaseFragment implement
             @Override
             public void onClick(View v) {
                 int position = createHaystackViewPager.getCurrentItem();
-                switch(position){
+                switch (position) {
                     case 0:
                         //Take Picture
                         Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
@@ -236,7 +238,7 @@ public class CreateHaystackFragment extends CreateHaystackBaseFragment implement
         });
 
         String title = getResources().getString(R.string.create_haystack);
-        ((ActionBarActivity) getActivity()).getSupportActionBar().setTitle(title);
+        Needle.navigationController.setActionBarTitle(title);
 
         return rootView;
     }
@@ -349,7 +351,7 @@ public class CreateHaystackFragment extends CreateHaystackBaseFragment implement
             //Create Haystack
             HaystackTaskParams params = new HaystackTaskParams(getActivity(), HaystackTaskParams.TYPE_CREATE, haystack);
             try{
-                HaystackTask task = new HaystackTask(params, ((MainActivity) getActivity()).getNavigationController());
+                HaystackTask task = new HaystackTask(params, Needle.navigationController);
                 task.execute();
 
             }catch (Exception e) {
@@ -372,7 +374,7 @@ public class CreateHaystackFragment extends CreateHaystackBaseFragment implement
             //Create Haystack
             HaystackTaskParams params = new HaystackTaskParams(getActivity(), HaystackTaskParams.TYPE_CREATE, haystack);
             try{
-                HaystackTask task = new HaystackTask(params, ((MainActivity) getActivity()).getNavigationController());
+                HaystackTask task = new HaystackTask(params, Needle.navigationController);
                 task.execute();
 
             }catch (Exception e) {

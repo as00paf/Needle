@@ -4,12 +4,14 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 
+import com.nemator.needle.Needle;
 import com.nemator.needle.models.vo.UserVO;
 import com.nemator.needle.utils.AppConstants;
 
 public class UserModel {
 
-    private final Context context;
+    private static UserModel instance;
+
     private SharedPreferences mSharedPreferences;
 
     private boolean loggedIn = false;
@@ -17,11 +19,21 @@ public class UserModel {
 
     private UserVO user;
 
-    public UserModel(Context context){
-        this.context = context;
+    public UserModel(){
+    }
 
+    public static UserModel getInstance(){
+        if(instance == null){
+            instance = new UserModel();
+        }
+
+        return instance;
+    }
+
+    public void init(Context context){
         mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
         user = UserVO.retrieve(mSharedPreferences);
+        loggedIn =  mSharedPreferences.getBoolean(AppConstants.TAG_LOGGED_IN, false);
     }
 
     //Getters/Setters
@@ -57,7 +69,7 @@ public class UserModel {
     }
 
     public Boolean setGcmRegId(String gcmRegId) {
-        Boolean wereTheSame = user.getGcmRegId().equals(gcmRegId);
+        Boolean wereTheSame = user.getGcmRegId() != null && !user.getGcmRegId().equals(gcmRegId);
         user.setGcmRegId(gcmRegId);
         mSharedPreferences.edit().putString(AppConstants.TAG_GCM_REG_ID, gcmRegId).commit();
 

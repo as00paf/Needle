@@ -1,14 +1,15 @@
 package com.nemator.needle.controller;
 
-
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
+import android.content.IntentFilter;
 import android.graphics.Bitmap;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
-import android.preference.PreferenceManager;
+import android.os.Handler;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -22,9 +23,10 @@ import com.github.gorbin.asne.facebook.FacebookSocialNetwork;
 import com.github.gorbin.asne.googleplus.GooglePlusSocialNetwork;
 import com.github.gorbin.asne.twitter.TwitterSocialNetwork;
 import com.nemator.needle.MainActivity;
+import com.nemator.needle.Needle;
 import com.nemator.needle.R;
-import com.nemator.needle.models.UserModel;
 import com.nemator.needle.models.vo.UserVO;
+import com.nemator.needle.tasks.facebook.GetFacebookCoverURLTask;
 import com.nemator.needle.tasks.login.LoginTask;
 import com.nemator.needle.tasks.login.LoginTask.LoginResponseHandler;
 import com.nemator.needle.tasks.login.LoginTaskParams;
@@ -34,6 +36,7 @@ import com.nemator.needle.tasks.user.UserTask.RegisterResponseHandler;
 import com.nemator.needle.tasks.user.UserTaskParams;
 import com.nemator.needle.tasks.user.UserTaskResult;
 import com.nemator.needle.utils.AppConstants;
+import com.squareup.picasso.Picasso;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
@@ -43,6 +46,7 @@ import java.util.List;
 public class AuthenticationController implements LoginResponseHandler, RegisterResponseHandler, OnLoginCompleteListener {
 
     private static final String TAG = "AuthenticationCtrl";
+    private static AuthenticationController instance;
 
     public static final int LOGIN_TYPE_DEFAULT = 0;
     public static final int LOGIN_TYPE_TWITTER = 1;
@@ -54,25 +58,31 @@ public class AuthenticationController implements LoginResponseHandler, RegisterR
     public static final int LOGIN_REQUEST_TYPE_LOGIN = 1;
 
     private MainActivity activity;
-    private UserModel userModel;
-    private NavigationController navigationController;
-    private SharedPreferences mSharedPreferences;
     private SocialNetworkManager mSocialNetworkManager;
     private SocialNetwork socialNetwork;
     private Fragment socialNetworkManagerFragment;
     private int loginRequestType;
     public Bitmap pictureBitmap;
     public Bitmap coverPictureBitmap;
+    private Handler handler = new Handler();
 
-    public AuthenticationController(MainActivity activity, UserModel userModel, NavigationController navigationController){
-        this.activity = activity;
-        this.userModel = userModel;
-        this.navigationController = navigationController;
+    public AuthenticationController(){
 
-        mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(activity);
     }
 
-    public void initSocialNetworkManager(Fragment fragment, final Boolean logIn) {
+    public static AuthenticationController getInstance() {
+        if(instance == null){
+            instance = new AuthenticationController();
+        }
+
+        return instance;
+    }
+
+    public void init(MainActivity activity){
+        this.activity = activity;
+    }
+
+    public void initSocialNetworkManager(Fragment fragment) {
         ArrayList<String> fbScope = new ArrayList<String>();
         fbScope.addAll(Arrays.asList("public_profile, email, user_friends, user_location, user_birthday"));
 
@@ -107,20 +117,23 @@ public class AuthenticationController implements LoginResponseHandler, RegisterR
                             socialNetwork.setOnLoginCompleteListener(AuthenticationController.this);
                             Log.i(TAG, "Social Network Initialized ! " + socialNetwork.getID());
                         }
-
-                        if(logIn){
-                            //Login with social network favorising FB
-                            int networkId = LOGIN_TYPE_FACEBOOK;
-                            int count = initializedNetworks.size();
-                            if(count > 0){
-                                if(count == 1 || !initializedNetworks.contains(LOGIN_TYPE_FACEBOOK)){
-                                    networkId = initializedNetworks.get(0).getID();
-                                }
-
-                                logInWithSocialNetwork(networkId);
-                            }
-                        }
                     }
+
+                    //Login with social network favorising FB
+                        /*int networkId = LOGIN_TYPE_FACEBOOK;
+                        int count = initializedNetworks.size();
+                        if(count > 0){
+                            if(count == 1 || !initializedNetworks.contains(LOGIN_TYPE_FACEBOOK)){
+                                networkId = initializedNetworks.get(0).getID();
+                            }
+
+                            logInWithSocialNetwork(networkId);
+                        }*/
+
+                    LocalBroadcastManager broadcastManager = LocalBroadcastManager.getInstance(activity);
+                    Intent intent = new Intent();
+                    intent.setAction(AppConstants.SOCIAL_NETWORKS_INITIALIZED);
+                    broadcastManager.sendBroadcast(intent);
                 }
             });
         }else {
@@ -129,7 +142,6 @@ public class AuthenticationController implements LoginResponseHandler, RegisterR
                 List<SocialNetwork> socialNetworks = mSocialNetworkManager.getInitializedSocialNetworks();
                 for (SocialNetwork socialNetwork : socialNetworks) {
                     socialNetwork.setOnLoginCompleteListener(this);
-                    //getSocialProfile(socialNetwork.getID());
                 }
             }
         }
@@ -138,9 +150,9 @@ public class AuthenticationController implements LoginResponseHandler, RegisterR
     //Handlers
     @Override
     public void onUserRegistered(UserTaskResult result) {
-        navigationController.hideProgress();
+        Needle.navigationController.hideProgress();
 
-        if(result.successCode==1){
+        if(result.successCode == 1 || result.successCode == 409){
             WeakReference<TextView> textView = new WeakReference<TextView>((TextView) activity.findViewById(R.id.login_splash_label));
             LoginTaskParams params = new LoginTaskParams(activity, result.user, textView);
             new LoginTask(params, this).execute();
@@ -151,38 +163,37 @@ public class AuthenticationController implements LoginResponseHandler, RegisterR
 
     @Override
     public void onLoginComplete(LoginTaskResult result) {
-        navigationController.hideProgress();
-
-        if(!userModel.isLoggedIn()) {
+        if(!Needle.userModel.isLoggedIn()) {
             if (result.successCode == 1) {
-                userModel.setLoggedIn(true);
-                userModel.setUserName(result.user.getUserName());
-                userModel.setUserId(result.user.getUserId());
-                userModel.getUser().setSocialNetworkUserId(result.user.getSocialNetworkUserId());
-                userModel.getUser().setLoginType(result.user.getLoginType());
-                userModel.getUser().setPictureURL(result.user.getPictureURL());
-                userModel.getUser().setCoverPictureURL(result.user.getCoverPictureURL());
-                userModel.saveUser();
+                Needle.userModel.setLoggedIn(true);
+                Needle.userModel.setUserName(result.user.getUserName());
+                Needle.userModel.setUserId(result.user.getUserId());
+                Needle.userModel.getUser().setSocialNetworkUserId(result.user.getSocialNetworkUserId());
+                Needle.userModel.getUser().setLoginType(result.user.getLoginType());
+                Needle.userModel.getUser().setPictureURL(result.user.getPictureURL());
+                Needle.userModel.getUser().setCoverPictureURL(result.user.getCoverPictureURL());
+                Needle.userModel.saveUser();
 
-                navigationController.setAccount();
+                Needle.navigationController.onPostLogin();
 
-                navigationController.createMainSections();
-                navigationController.showSection(AppConstants.SECTION_HAYSTACKS);
-
-                navigationController.setHaystacksCount(result.haystackCount);
-                navigationController.setLocationSharingCount(result.locationSharingCount);
+                Needle.navigationController.setHaystacksCount(result.haystackCount);
+                Needle.navigationController.setLocationSharingCount(result.locationSharingCount);
             }
             else if(result.successCode == 404){
                 Toast.makeText(activity, activity.getString(R.string.user_not_found_message), Toast.LENGTH_SHORT).show();
-                //navigationController.removeLoginSplash();
-                //navigationController.showSection(AppConstants.SECTION_REGISTER);
-                getSocialProfileAndRegister(result.type);
+                //getSocialProfileAndRegister(result.type);
             }
-            else {
+            else
+            {
                 Toast.makeText(activity, "An Error Occured\n Please Try Again!", Toast.LENGTH_SHORT).show();
             }
         }else {
             Log.i(TAG, "here");
+
+            if(result.successCode == 404){
+                Toast.makeText(activity, activity.getString(R.string.user_not_found_message), Toast.LENGTH_SHORT).show();
+                getSocialProfileAndRegister(result.type);
+            }
         }
     }
 
@@ -194,27 +205,52 @@ public class AuthenticationController implements LoginResponseHandler, RegisterR
         }
     }
 
+    private BroadcastReceiver googleApiConnectedReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            LocalBroadcastManager.getInstance(activity).unregisterReceiver(this);
+            getSocialProfileAndLogIn(LOGIN_TYPE_GOOGLE);
+        }
+    };
+
     public void logInWithSocialNetwork(int networkId) {
         socialNetwork = mSocialNetworkManager.getSocialNetwork(networkId);
         if(!socialNetwork.isConnected()) {
             if(networkId != 0) {
                 Log.i(TAG, "Requesting login on network with id : !" + networkId);
                 loginRequestType = LOGIN_REQUEST_TYPE_LOGIN;
-                socialNetwork.requestLogin(this);
-                NavigationController.showProgress(activity.getString(R.string.login_message));
+                if(socialNetwork.getID() == LOGIN_TYPE_GOOGLE) {
+                    ((GooglePlusSocialNetwork) socialNetwork).setGoogleApiClient(Needle.googleApiController.getmGoogleApiClient());
+                    ((GooglePlusSocialNetwork) socialNetwork).setConnectionResult(Needle.googleApiController.getConnectionResult());
+                }
+
+                if(socialNetwork.getID() == LOGIN_TYPE_GOOGLE){
+                    if(Needle.googleApiController.isConnected()){
+                        getSocialProfileAndLogIn(LOGIN_TYPE_GOOGLE);
+                    }else{
+                        LocalBroadcastManager localBroadcastManager = LocalBroadcastManager.getInstance(activity);
+                        localBroadcastManager.registerReceiver(googleApiConnectedReceiver, new IntentFilter(AppConstants.GOOGLE_API_CONNECTED));
+
+                        socialNetwork.requestLogin(this);
+                    }
+                }else{
+                    socialNetwork.requestLogin(this);
+                }
+
+                Needle.navigationController.updateSplashLabel(activity.getString(R.string.login_message));
             } else {
                 Toast.makeText(activity, "Wrong networkId", Toast.LENGTH_LONG).show();
             }
         } else {
             Log.i(TAG, "Social Network Connected ! " + networkId);
-            NavigationController.showProgress(activity.getString(R.string.login_message));
+            Needle.navigationController.updateSplashLabel(activity.getString(R.string.login_message));
             getSocialProfileAndLogIn(networkId);
         }
     }
 
     @Override
     public void onLoginSuccess(int socialNetworkID) {
-        NavigationController.hideProgress();
+        //Needle.userModel.setLoggedIn(true);
 
         switch (socialNetworkID) {
             case LOGIN_TYPE_FACEBOOK:
@@ -239,14 +275,21 @@ public class AuthenticationController implements LoginResponseHandler, RegisterR
 
     @Override
     public void onError(int socialNetworkID, String requestID, String errorMessage, Object data) {
-        NavigationController.hideProgress();
+        Needle.navigationController.hideProgress();
         //Toast.makeText(activity, "ERROR: " + errorMessage, Toast.LENGTH_LONG).show();
-        Log.e(TAG, errorMessage);
+        Log.e(TAG, "Error : "+errorMessage);
 
         if(requestID == SocialNetwork.REQUEST_LOGIN){
-            navigationController.hideProgress();
-            navigationController.removeLoginSplash();
-            navigationController.showSection(AppConstants.SECTION_REGISTER);
+            if(errorMessage == null && data == null){//FB
+                return;
+            }
+
+            if(errorMessage.equals("incorrect URI returned: null")){//Twitter
+                return;
+            }
+
+            //Needle.navigationController.removeLoginSplash();
+            //Needle.navigationController.showSection(AppConstants.SECTION_REGISTER);
         }
     }
 
@@ -259,14 +302,15 @@ public class AuthenticationController implements LoginResponseHandler, RegisterR
 
             @Override
             public void onRequestSocialPersonSuccess(int socialNetworkId, SocialPerson socialPerson) {
-                socialNetwork.setOnRequestRemoveFriendCompleteListener(null);
+                socialNetwork.setOnRequestCurrentPersonCompleteListener(null);
 
                 LoginTaskParams params;
                 String username = socialPerson.name;
-                String regId = userModel.getGcmRegId();
+                String regId = Needle.userModel.getGcmRegId();
                 String id = socialPerson.id;
 
                 UserVO user = new UserVO(-1, username, "", "", regId, socialNetworkId, id);
+                Needle.userModel.setUser(user);
 
                 WeakReference<TextView> textView = new WeakReference<TextView>((TextView) activity.findViewById(R.id.login_splash_label));
                 params = new LoginTaskParams(activity, user, textView);
@@ -276,9 +320,17 @@ public class AuthenticationController implements LoginResponseHandler, RegisterR
             @Override
             public void onError(int socialNetworkID, String requestID, String errorMessage, Object data) {
                 Log.e(TAG, "getSocialProfileAndLogIn( " + networkId + " ) :: Error : " + errorMessage);
-                //authorize app
 
-                tryCount++;
+                if (tryCount < 3) {
+                    Needle.navigationController.updateSplashLabel("It's taking longer than usual ...");
+                    tryCount++;
+                    if (errorMessage.contains("Unable to resolve host") || errorMessage.contains("statusCode=NETWORK_ERROR")) {
+                        socialNetwork.requestCurrentPerson();
+                    }
+                } else {
+                    Needle.navigationController.updateSplashLabel("Something went wrong");
+                }
+
             }
         });
         socialNetwork.requestCurrentPerson();
@@ -289,6 +341,7 @@ public class AuthenticationController implements LoginResponseHandler, RegisterR
         socialNetwork.setOnRequestCurrentPersonCompleteListener(new OnRequestSocialPersonCompleteListener() {
             @Override
             public void onRequestSocialPersonSuccess(int socialNetworkId, SocialPerson socialPerson) {
+                socialNetwork.setOnRequestSocialPersonCompleteListener(null);
                 switch (socialNetworkId) {
                     case LOGIN_TYPE_FACEBOOK:
                         Log.i(TAG, "Succesfuly retreived social profile of type FACEBOOK");
@@ -302,7 +355,7 @@ public class AuthenticationController implements LoginResponseHandler, RegisterR
                 }
 
                 String username = socialPerson.name;
-                String regId = userModel.getGcmRegId();
+                String regId = Needle.userModel.getGcmRegId();
                 String id = socialPerson.id;
 
                 UserVO userVO = new UserVO(-1, username, null, regId);
@@ -336,7 +389,28 @@ public class AuthenticationController implements LoginResponseHandler, RegisterR
             if(networkId != 0) {
                 Log.i(TAG, "Requesting login on network with id : !" + networkId);
                 loginRequestType = LOGIN_REQUEST_TYPE_REGISTER;
-                socialNetwork.requestLogin(this);
+
+                if(socialNetwork.getID() == LOGIN_TYPE_GOOGLE){
+                    ((GooglePlusSocialNetwork) socialNetwork).setGoogleApiClient(Needle.googleApiController.getmGoogleApiClient());
+                    ((GooglePlusSocialNetwork) socialNetwork).setConnectionResult(Needle.googleApiController.getConnectionResult());
+
+                    if(Needle.googleApiController.isConnected()){
+                        getSocialProfileAndRegister(LOGIN_TYPE_GOOGLE);
+                    }else{
+                        LocalBroadcastManager localBroadcastManager = LocalBroadcastManager.getInstance(activity);
+                        localBroadcastManager.registerReceiver(new BroadcastReceiver() {
+                            @Override
+                            public void onReceive(Context context, Intent intent) {
+                                getSocialProfileAndRegister(LOGIN_TYPE_GOOGLE);
+                            }
+                        }, new IntentFilter(AppConstants.GOOGLE_API_CONNECTED));
+
+                        socialNetwork.requestLogin(this);
+                    }
+                }else{
+                    socialNetwork.requestLogin(this);
+                }
+
                 NavigationController.showProgress(activity.getString(R.string.registering_message));
             } else {
                 Toast.makeText(activity, "Wrong networkId", Toast.LENGTH_LONG).show();
@@ -347,4 +421,21 @@ public class AuthenticationController implements LoginResponseHandler, RegisterR
             getSocialProfileAndRegister(networkId);
         }
     }
+
+    public void getFacebookCover() {
+        try {
+            String coverUrl = new GetFacebookCoverURLTask((FacebookSocialNetwork) socialNetwork, Needle.userModel.getUser().getSocialNetworkUserId()).execute().get();
+
+            ImageView cover = (ImageView) activity.findViewById(R.id.cover);
+
+            Picasso.with(activity.getApplicationContext())
+                    .load(coverUrl)
+                    .fit()
+                    .into(cover);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
 }

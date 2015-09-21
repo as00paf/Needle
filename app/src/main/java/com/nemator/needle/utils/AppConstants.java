@@ -5,7 +5,7 @@ package com.nemator.needle.utils;
  */
 public class AppConstants {
 
-    public static final String PROJECT_URL = "http://173.176.76.40:2772/Needle/";
+    public static final String PROJECT_URL = "http://66.131.192.108:2772/Needle/";
     public static final String HAYSTACK_PICTURES_URL = PROJECT_URL + "pictures/";
 
     public static final String TWITTER_API_KEY = "wWswYiVtl4FaykxAS4a6ikriG";
@@ -91,6 +91,9 @@ public class AppConstants {
     public static final int SECTION_CREATE_LOCATION_SHARING = 9;
     public static final int SECTION_HAYSTACK = 10;
     public static final int SECTION_LOCATION_SHARING = 11;
+    public static final int SECTION_NOTIFICATIONS = 12;
+    public static final String GOOGLE_API_CONNECTED = "googleApiConnected";
 
 
+    public static String SOCIAL_NETWORKS_INITIALIZED = "socialNetworksInitialized";
 }

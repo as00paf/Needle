@@ -4,38 +4,32 @@
     android:id="@+id/drawer_header"
     android:layout_width="match_parent"
     android:layout_height="172dp"
-    android:background="@drawable/mat"
-    android:orientation="vertical"
-    android:paddingTop="@dimen/status_bar_height"
     android:theme="@style/ThemeOverlay.AppCompat.Dark">
 
     <ImageView
+        android:id="@+id/cover"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
+
+    <ImageView
         android:id="@+id/avatar"
-        android:layout_width="64dp"
-        android:layout_height="64dp"
-        android:layout_margin="@dimen/spacing_large"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_marginLeft="@dimen/spacing_large"
         android:elevation="4dp"
         android:scaleType="fitCenter"
-        tools:src="@drawable/ic_launcher"/>
+        tools:src="@drawable/ic_launcher"
+        android:layout_marginTop="16dp"/>
 
     <TextView
         android:id="@+id/username"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/email"
-        android:layout_marginLeft="@dimen/spacing_large"
-        android:layout_marginStart="@dimen/spacing_large"
-        android:text="Username"
-        android:textAppearance="@style/TextAppearance.AppCompat.Body2"/>
-    <TextView
-        android:id="@+id/email"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_marginLeft="@dimen/spacing_large"
         android:layout_marginStart="@dimen/spacing_large"
-        android:layout_marginBottom="@dimen/spacing_large"
-        android:text="username@mymail.com"
-        android:textAppearance="@style/TextAppearance.AppCompat.Body1"/>
+        android:text="Username"
+        android:textAppearance="@style/TextAppearance.AppCompat.Body2"
+        android:layout_marginBottom="16dp"/>
 
 </RelativeLayout>

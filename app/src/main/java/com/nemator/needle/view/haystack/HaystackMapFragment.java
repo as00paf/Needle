@@ -27,6 +27,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.nemator.needle.MainActivity;
+import com.nemator.needle.Needle;
 import com.nemator.needle.R;
 import com.nemator.needle.broadcastReceiver.LocationServiceBroadcastReceiver;
 import com.nemator.needle.data.LocationServiceDBHelper;
@@ -228,7 +229,7 @@ public class HaystackMapFragment extends SupportMapFragment
                 Double lat = (Double) map.get(AppConstants.TAG_LAT);
                 Double lng = (Double) map.get(AppConstants.TAG_LNG);
 
-                if(!TextUtils.isEmpty(id) && !id.equals(((MainActivity) getActivity()).getUserModel().getUserId())){
+                if(!TextUtils.isEmpty(id) && !id.equals(Needle.userModel.getUserId())){
                     Marker marker;
                     LatLng position = new LatLng(lat, lng);
 
@@ -251,7 +252,7 @@ public class HaystackMapFragment extends SupportMapFragment
                         }
 
                         //marker.showInfoWindow();
-                    }else if(!(id.equals(String.valueOf(((MainActivity) getActivity()).getUserModel().getUserId())))){
+                    }else if(!id.equals(String.valueOf(Needle.userModel.getUserId()))){
                         MarkerOptions markerOptions = new MarkerOptions();
                         markerOptions.position(position);
 
@@ -321,7 +322,7 @@ public class HaystackMapFragment extends SupportMapFragment
                 Double lat = (Double) map.get(AppConstants.TAG_LAT);
                 Double lng = (Double) map.get(AppConstants.TAG_LNG);
 
-                if(!TextUtils.isEmpty(id) && !id.equals(((MainActivity) getActivity()).getUserModel().getUserId())){
+                if(!TextUtils.isEmpty(id) && !id.equals(Needle.userModel.getUserId())){
                     Marker marker;
                     LatLng position = new LatLng(lat, lng);
 
@@ -370,7 +371,7 @@ public class HaystackMapFragment extends SupportMapFragment
     }
 
     public void activateUser(){
-        HaystackUserTaskParams params = new HaystackUserTaskParams(getActivity(), HaystackUserTaskParams.TYPE_ACTIVATION, String.valueOf(((MainActivity) getActivity()).getUserModel().getUserId()), String.valueOf(haystack.getId()), true);
+        HaystackUserTaskParams params = new HaystackUserTaskParams(getActivity(), HaystackUserTaskParams.TYPE_ACTIVATION, String.valueOf(Needle.userModel.getUserId()), String.valueOf(haystack.getId()), true);
         isActivated = false;
 
         try{
@@ -382,7 +383,7 @@ public class HaystackMapFragment extends SupportMapFragment
     }
 
     public void deactivateUser(){
-        HaystackUserTaskParams params = new HaystackUserTaskParams(getActivity(), HaystackUserTaskParams.TYPE_ACTIVATION, String.valueOf(((MainActivity) getActivity()).getUserModel().getUserId()), String.valueOf(haystack.getId()), false);
+        HaystackUserTaskParams params = new HaystackUserTaskParams(getActivity(), HaystackUserTaskParams.TYPE_ACTIVATION, String.valueOf(Needle.userModel.getUserId()), String.valueOf(haystack.getId()), false);
 
         try{
             HaystackUserTask task = new HaystackUserTask(params, this);
@@ -395,7 +396,7 @@ public class HaystackMapFragment extends SupportMapFragment
     public void onUserActivationToggled(HaystackUserTaskResult result){
         isActivated = result.isActive;
 
-        MenuItem item = ((MainActivity) getActivity()).getNavigationController().getMenu().findItem(R.id.location_sharing);
+        MenuItem item = Needle.navigationController.getMenu().findItem(R.id.location_sharing);
         item.setIcon(isActivated ?
                 getResources().getDrawable(R.drawable.ic_action_location_found) :
                 getResources().getDrawable(R.drawable.ic_action_location_off));
@@ -406,7 +407,7 @@ public class HaystackMapFragment extends SupportMapFragment
     }
 
     private void leaveHaystack(){
-        LeaveHaystackParams params = new LeaveHaystackParams(getActivity(), String.valueOf(((MainActivity) getActivity()).getUserModel().getUserId()), String.valueOf(haystack.getId()));
+        LeaveHaystackParams params = new LeaveHaystackParams(getActivity(), String.valueOf(Needle.userModel.getUserId()), String.valueOf(haystack.getId()));
         try{
             LeaveHaystackTask task = new LeaveHaystackTask(params, this);
             task.execute();

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <group
+        android:id="@+id/group_empty">
+        <item
+            android:id="@+id/drawer_empty_item"
+            android:icon="@null"
+            android:title=""/>
+    </group>
+
+    <group
+        android:id="@+id/group_support">
+
+        <item
+            android:checked="true"
+            android:id="@+id/drawer_settings"
+            android:icon="@drawable/ic_action_settings"
+            android:title="@string/title_settings"/>
+
+        <item
+            android:id="@+id/drawer_help"
+            android:icon="@drawable/ic_action_help"
+            android:title="@string/title_helpAndSupport"/>
+
+    </group>
+</menu>

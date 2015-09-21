@@ -17,11 +17,16 @@ import com.nemator.needle.MainActivity;
 public class NetworkController extends BroadcastReceiver {
 
     private static final String TAG = "NetworkController";
+    private static NetworkController instance;
+
     private MainActivity activity;
     private LocalBroadcastManager localBroadcastManager;
     private Boolean isNetworkConnected;
 
-    public NetworkController(MainActivity activity){
+    public NetworkController(){
+    }
+
+    public void init(MainActivity activity){
         this.activity = activity;
         this.localBroadcastManager = LocalBroadcastManager.getInstance(activity);
 
@@ -36,11 +41,19 @@ public class NetworkController extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        Log.d(TAG, "Network Status Changed");
-
         boolean noConnectivity = intent.getBooleanExtra(
                 ConnectivityManager.EXTRA_NO_CONNECTIVITY, false);
 
         isNetworkConnected = !noConnectivity;
+
+        Log.d(TAG, "Network Status Changed, Connection available : " + isNetworkConnected);
+    }
+
+    public static NetworkController getInstance() {
+        if(instance == null){
+            instance = new NetworkController();
+        }
+
+        return instance;
     }
 }

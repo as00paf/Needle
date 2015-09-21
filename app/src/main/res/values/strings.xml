@@ -5,6 +5,7 @@
 
     <string name="app_name">Needle</string>
     <string name="facebook_app_id">1384996395135194</string>
+    <string name="facebook_secret">ac0a4152cea2cd4a6552fa3f16423926</string>
     <string name="title_activity_maps">Needle</string>
     <string name="title_haystacks">Haystacks</string>
     <string name="title_location_sharing">Location Sharing</string>

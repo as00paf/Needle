@@ -63,7 +63,8 @@ public class UserTask extends AsyncTask<Void, Void, UserTaskResult> {
             dialog.setMessage(message);
             dialog.setIndeterminate(false);
             dialog.setCancelable(isCancellable);
-            dialog.show();
+            //dialog.show();
+            Log.i(TAG, message);
         }
 
 
@@ -77,6 +78,7 @@ public class UserTask extends AsyncTask<Void, Void, UserTaskResult> {
 
                 break;
             case UserTaskParams.TYPE_REGISTER :
+                result.user = params.vo;
                 ((RegisterResponseHandler) delegate).onUserRegistered(result);
                 break;
             case UserTaskParams.TYPE_UPDATE_GCM_ID :

@@ -28,6 +28,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.nemator.needle.MainActivity;
+import com.nemator.needle.Needle;
 import com.nemator.needle.R;
 import com.nemator.needle.broadcastReceiver.LocationServiceBroadcastReceiver;
 import com.nemator.needle.models.vo.LocationSharingVO;
@@ -291,13 +292,13 @@ public class LocationSharingMapFragment extends SupportMapFragment
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             dialog.dismiss();
-                            ((MainActivity) getActivity()).getNavigationController().onBackPressed();
+                            Needle.navigationController.onBackPressed();
                         }
                     })
                     .setOnCancelListener(new DialogInterface.OnCancelListener() {
                         @Override
                         public void onCancel(DialogInterface dialog) {
-                            ((MainActivity) getActivity()).getNavigationController().onBackPressed();
+                            Needle.navigationController.onBackPressed();
                         }
                     })
                     .show();

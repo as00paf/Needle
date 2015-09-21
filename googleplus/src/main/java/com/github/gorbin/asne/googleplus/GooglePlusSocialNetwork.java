@@ -80,7 +80,11 @@ public class GooglePlusSocialNetwork extends SocialNetwork implements GoogleApiC
      */
     private static final String SAVE_STATE_KEY_IS_CONNECTED = "GooglePlusSocialNetwork.SAVE_STATE_KEY_OAUTH_TOKEN";
     private static Activity mActivity;
+
     private GoogleApiClient googleApiClient;
+
+
+
     private ConnectionResult mConnectionResult;
     private boolean mConnectRequested;
     private Handler mHandler = new Handler();
@@ -538,7 +542,7 @@ public class GooglePlusSocialNetwork extends SocialNetwork implements GoogleApiC
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mActivity = mSocialNetworkManager.getActivity();
-        Plus.PlusOptions plusOptions = new Plus.PlusOptions.Builder()
+        /*Plus.PlusOptions plusOptions = new Plus.PlusOptions.Builder()
                 .addActivityTypes(MomentUtil.ACTIONS)
                 .build();
         googleApiClient = new GoogleApiClient.Builder(mActivity)
@@ -547,7 +551,7 @@ public class GooglePlusSocialNetwork extends SocialNetwork implements GoogleApiC
                 .addScope(Plus.SCOPE_PLUS_PROFILE)
                 .addConnectionCallbacks(this)
                 .addOnConnectionFailedListener(this)
-                .build();
+                .build();*/
     }
 
     /**
@@ -555,7 +559,7 @@ public class GooglePlusSocialNetwork extends SocialNetwork implements GoogleApiC
      */
     @Override
     public void onStart() {
-        googleApiClient.connect();
+        //googleApiClient.connect();
     }
 
     /**
@@ -563,7 +567,7 @@ public class GooglePlusSocialNetwork extends SocialNetwork implements GoogleApiC
      */
     @Override
     public void onStop() {
-        if (googleApiClient.isConnected()) {
+        if (googleApiClient != null && googleApiClient.isConnected()) {
             googleApiClient.disconnect();
         }
     }
@@ -647,4 +651,13 @@ public class GooglePlusSocialNetwork extends SocialNetwork implements GoogleApiC
 
         mConnectRequested = false;
     }
+
+    public void setConnectionResult(ConnectionResult mConnectionResult) {
+        this.mConnectionResult = mConnectionResult;
+    }
+
+    public void setGoogleApiClient(GoogleApiClient googleApiClient) {
+        this.googleApiClient = googleApiClient;
+    }
+
 }

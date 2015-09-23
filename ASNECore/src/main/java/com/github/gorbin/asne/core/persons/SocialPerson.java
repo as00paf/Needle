@@ -27,6 +27,8 @@ public class SocialPerson implements Parcelable {
     /*** Email of social person from social network if exist.*/
     public String email;
 
+    public String coverURL;
+
     public SocialPerson() {
 
     }
@@ -37,6 +39,7 @@ public class SocialPerson implements Parcelable {
         avatarURL = in.readString();
         profileURL = in.readString();
         email = in.readString();
+        coverURL = in.readString();
     }
 
     @Override
@@ -51,6 +54,7 @@ public class SocialPerson implements Parcelable {
         dest.writeString(avatarURL);
         dest.writeString(profileURL);
         dest.writeString(email);
+        dest.writeString(coverURL);
     }
 
     @Override
@@ -88,6 +92,7 @@ public class SocialPerson implements Parcelable {
                 ", avatarURL='" + avatarURL + '\'' +
                 ", profileURL='" + profileURL + '\'' +
                 ", email='" + email + '\'' +
+                ", cover='" + coverURL + '\'' +
                 '}';
     }
 }

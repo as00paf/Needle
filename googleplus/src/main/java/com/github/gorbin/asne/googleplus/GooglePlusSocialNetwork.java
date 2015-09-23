@@ -346,7 +346,11 @@ public class GooglePlusSocialNetwork extends SocialNetwork implements GoogleApiC
         socialPerson.profileURL = person.getUrl();
         if(userId.equals("me")) {
             socialPerson.email = Plus.AccountApi.getAccountName(googleApiClient);
+            if(person.getCover().hasCoverPhoto())
+                socialPerson.coverURL = person.getCover().getCoverPhoto().getUrl();
+            currentSocialPerson = socialPerson;
         }
+
         return socialPerson;
     }
 

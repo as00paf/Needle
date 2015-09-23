@@ -40,6 +40,7 @@ import com.github.gorbin.asne.core.listener.OnRequestRemoveFriendCompleteListene
 import com.github.gorbin.asne.core.listener.OnRequestSocialPersonCompleteListener;
 import com.github.gorbin.asne.core.listener.OnRequestSocialPersonsCompleteListener;
 import com.github.gorbin.asne.core.listener.base.SocialNetworkListener;
+import com.github.gorbin.asne.core.persons.SocialPerson;
 
 import java.io.File;
 import java.util.HashMap;
@@ -116,6 +117,7 @@ public abstract class SocialNetwork {
     protected SharedPreferences mSharedPreferences;
     protected Map<String, SocialNetworkListener> mGlobalListeners = new HashMap<String, SocialNetworkListener>();
     protected Map<String, SocialNetworkListener> mLocalListeners = new HashMap<String, SocialNetworkListener>();
+    protected SocialPerson currentSocialPerson;
 
     /**
      * @param fragment ant not activity or context, as we will need to call startActivityForResult,
@@ -732,4 +734,8 @@ public abstract class SocialNetwork {
     public boolean equals(Object o) {
         return o == this.getID();
     }
+
+    public SocialPerson getCurrentSocialPerson( ){
+        return currentSocialPerson;
+    };
 }

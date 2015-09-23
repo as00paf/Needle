@@ -310,6 +310,12 @@ public class FacebookSocialNetwork extends SocialNetwork {
         if(user.getProperty("email") != null){
             socialPerson.email = user.getProperty("email").toString();
         }
+        if(user.getProperty("cover") != null){
+            socialPerson.coverURL = user.getProperty("cover").toString();
+        }
+
+        currentSocialPerson = socialPerson;
+
         return socialPerson;
     }
 
@@ -326,6 +332,7 @@ public class FacebookSocialNetwork extends SocialNetwork {
             facebookPerson.city = user.getLocation().getProperty("name").toString();
         }
         facebookPerson.verified = user.getProperty("verified").toString();
+
         return facebookPerson;
     }
 

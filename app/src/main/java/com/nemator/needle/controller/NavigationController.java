@@ -14,6 +14,7 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -152,6 +153,8 @@ public class NavigationController implements MainActivity.NavigationHandler, OnA
         Boolean add = false;
         Boolean showActionBar = false;
         Fragment newFragment = null;
+        int enterAnimation = 0;
+        int exitAnimation = 0;
 
         switch(type) {
             case AppConstants.SECTION_SPLASH_LOGIN:
@@ -165,6 +168,10 @@ public class NavigationController implements MainActivity.NavigationHandler, OnA
                 showActionBar = true;
                 newFragment = loginFragment;
                 onStateChange(AppState.LOGIN);
+                break;
+            case AppConstants.SECTION_LOGIN_PICTURE:
+                enterAnimation = R.anim.enter_from_right;
+                exitAnimation = R.anim.exit_to_left;
                 break;
             case AppConstants.SECTION_REGISTER:
                 if(registerFragment == null){registerFragment = new RegisterFragment();}
@@ -219,6 +226,7 @@ public class NavigationController implements MainActivity.NavigationHandler, OnA
             }else {
                 manager.beginTransaction()
                         .replace(containerViewId, newFragment)
+                        .setCustomAnimations(enterAnimation, exitAnimation)
                         .commit();
             }
         }
@@ -563,6 +571,7 @@ public class NavigationController implements MainActivity.NavigationHandler, OnA
         TextView username = (TextView) activity.findViewById(R.id.username);
         username.setText(userModel.getUserName());
 
+        //Profile Image
         ImageView avatarImageView = (ImageView) activity.findViewById(R.id.avatar);
         String pictureURL = userModel.getUser().getPictureURL();
         Picasso.with(activity.getApplicationContext()).load(pictureURL)
@@ -570,8 +579,20 @@ public class NavigationController implements MainActivity.NavigationHandler, OnA
                 .transform(new RoundedTransformation(100, 1))
                 .into(avatarImageView);
 
-        int loginType = userModel.getUser().getLoginType();
-        Needle.authenticationController.fetchCover(loginType);
+        //Cover Image
+        String coverUrl = userModel.getUser().getCoverPictureURL();
+        if(coverUrl != null){
+            ImageView cover = (ImageView) activity.findViewById(R.id.cover);
+            DisplayMetrics metrics = activity.getResources().getDisplayMetrics();
+            int height = (int) (172 * metrics.density);
+
+            Picasso.with(activity.getApplicationContext())
+                    .load(coverUrl)
+                    .fit()
+                    .into(cover);
+        }else{
+            Log.e(TAG, "Can't fetch cover for login type " + userModel.getUser().getLoginType());
+        }
     }
 
     //Getters/Setters

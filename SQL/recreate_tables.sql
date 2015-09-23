@@ -13,7 +13,8 @@ CREATE TABLE haystack
 	isCircle TINYINT(1),
 	lat decimal(9,7),
 	lng decimal(9,7),
-	pictureURL TEXT
+	pictureURL TEXT,
+	coverURL TEXT
 );
 
 -- User Location Table

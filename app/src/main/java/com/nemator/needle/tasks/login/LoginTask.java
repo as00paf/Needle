@@ -85,7 +85,7 @@ public class LoginTask extends AsyncTask<Void, Void, LoginTaskResult> {
                 result.user.setSocialNetworkUserId(params.user.getSocialNetworkUserId());
                 result.user.setLoginType(params.user.getLoginType());
                 result.user.setPictureURL(json.getString(AppConstants.TAG_PICTURE_URL));
-                //result.user.setCoverPictureURL(json.getString(AppConstants.TAG_COVER_PICTURE_URL));
+                result.user.setCoverPictureURL(json.getString(AppConstants.TAG_COVER_PICTURE_URL));
                 result.locationSharingCount = json.getInt(AppConstants.TAG_LOCATION_SHARING_COUNT);
                 result.haystackCount = json.getInt(AppConstants.TAG_HAYSTACK_COUNT);
 

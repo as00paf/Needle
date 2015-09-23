@@ -92,8 +92,9 @@ public class AppConstants {
     public static final int SECTION_HAYSTACK = 10;
     public static final int SECTION_LOCATION_SHARING = 11;
     public static final int SECTION_NOTIFICATIONS = 12;
+    public static final int SECTION_LOGIN_PICTURE = 13;
+
+    //App
     public static final String GOOGLE_API_CONNECTED = "googleApiConnected";
-
-
     public static String SOCIAL_NETWORKS_INITIALIZED = "socialNetworksInitialized";
 }

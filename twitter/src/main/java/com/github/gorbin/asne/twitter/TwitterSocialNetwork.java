@@ -275,6 +275,9 @@ public class TwitterSocialNetwork extends OAuthSocialNetwork {
         socialPerson.name = user.getName();
         socialPerson.avatarURL = user.getBiggerProfileImageURL();
         socialPerson.profileURL = user.getURL();
+        socialPerson.coverURL = user.getProfileBannerURL();
+
+        currentSocialPerson = socialPerson;
         return socialPerson;
     }
 

@@ -24,14 +24,13 @@ import com.nemator.needle.view.haystacks.createHaystack.CreateHaystackMapFragmen
 /**
  * Created by Alex on 11/08/2015.
  */
-public class GoogleAPIController implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, ResultCallback<People.LoadPeopleResult> {
+public class GoogleAPIController implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
     private static GoogleAPIController instance;
     public final String TAG = "GoogleAPIController";
 
     private GoogleApiClient mGoogleApiClient;
     private ConnectionResult connectionResult;
-    private String coverURL = null;
     private Person currentPerson;
     MainActivity activity;
 
@@ -105,8 +104,7 @@ public class GoogleAPIController implements GoogleApiClient.ConnectionCallbacks,
     @Override
     public void onConnected(Bundle connectionHint) {
         isConnected = true;
-
-        Plus.PeopleApi.loadVisible(mGoogleApiClient, null).setResultCallback(this);
+        sendIntent(AppConstants.GOOGLE_API_CONNECTED);
     }
 
     private void sendIntent(String action) {
@@ -151,17 +149,5 @@ public class GoogleAPIController implements GoogleApiClient.ConnectionCallbacks,
 
     public ConnectionResult getConnectionResult() {
         return connectionResult;
-    }
-
-    public String getCoverURL() {
-        return coverURL;
-    }
-
-    @Override
-    public void onResult(People.LoadPeopleResult loadPeopleResult) {
-        currentPerson = Plus.PeopleApi.getCurrentPerson(mGoogleApiClient);
-        coverURL = currentPerson.getCover().getCoverPhoto().getUrl();
-
-        sendIntent(AppConstants.GOOGLE_API_CONNECTED);
     }
 }

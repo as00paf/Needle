@@ -9,7 +9,6 @@ import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
-import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -36,7 +35,6 @@ import com.nemator.needle.tasks.user.UserTask.RegisterResponseHandler;
 import com.nemator.needle.tasks.user.UserTaskParams;
 import com.nemator.needle.tasks.user.UserTaskResult;
 import com.nemator.needle.utils.AppConstants;
-import com.squareup.picasso.Picasso;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
@@ -84,7 +82,7 @@ public class AuthenticationController implements LoginResponseHandler, RegisterR
 
     public void initSocialNetworkManager(Fragment fragment) {
         ArrayList<String> fbScope = new ArrayList<String>();
-        fbScope.addAll(Arrays.asList("public_profile, email, user_friends, user_location, user_birthday"));
+        fbScope.addAll(Arrays.asList("public_profile, email, user_friends"));
 
         mSocialNetworkManager = (SocialNetworkManager) activity.getSupportFragmentManager().findFragmentByTag(NavigationController.SOCIAL_NETWORK_TAG);
         if (mSocialNetworkManager == null || socialNetworkManagerFragment != fragment) {
@@ -249,22 +247,6 @@ public class AuthenticationController implements LoginResponseHandler, RegisterR
 
     @Override
     public void onLoginSuccess(int socialNetworkID) {
-        //Needle.userModel.setLoggedIn(true);
-
-        switch (socialNetworkID) {
-            case LOGIN_TYPE_FACEBOOK:
-                Log.i(TAG, "LOGIN_TYPE_FACEBOOK login success !");
-                break;
-            case LOGIN_TYPE_TWITTER:
-                Log.i(TAG, "LOGIN_TYPE_TWITTER login success !");
-                //twitter.setText("Show Twitter profile");
-                break;
-            case LOGIN_TYPE_LINKEDIN:
-                Log.i(TAG, "LOGIN_TYPE_LINKEDIN login success !");
-                //linkedin.setText("Show LinkedIn profile");
-                break;
-        }
-
         if(loginRequestType == LOGIN_REQUEST_TYPE_REGISTER){
             getSocialProfileAndRegister(socialNetworkID);
         }else if(loginRequestType == LOGIN_REQUEST_TYPE_LOGIN){
@@ -276,7 +258,7 @@ public class AuthenticationController implements LoginResponseHandler, RegisterR
     public void onError(int socialNetworkID, String requestID, String errorMessage, Object data) {
         Needle.navigationController.hideProgress();
         //Toast.makeText(activity, "ERROR: " + errorMessage, Toast.LENGTH_LONG).show();
-        Log.e(TAG, "Error : "+errorMessage);
+        Log.e(TAG, "Error : " + errorMessage);
 
         if(requestID == SocialNetwork.REQUEST_LOGIN){
             if(errorMessage == null && data == null){//FB
@@ -286,9 +268,6 @@ public class AuthenticationController implements LoginResponseHandler, RegisterR
             if(errorMessage.equals("incorrect URI returned: null")){//Twitter
                 return;
             }
-
-            //Needle.navigationController.removeLoginSplash();
-            //Needle.navigationController.showSection(AppConstants.SECTION_REGISTER);
         }
     }
 
@@ -341,9 +320,17 @@ public class AuthenticationController implements LoginResponseHandler, RegisterR
             @Override
             public void onRequestSocialPersonSuccess(int socialNetworkId, SocialPerson socialPerson) {
                 socialNetwork.setOnRequestSocialPersonCompleteListener(null);
+
+                UserVO userVO = new UserVO();
+
                 switch (socialNetworkId) {
                     case LOGIN_TYPE_FACEBOOK:
                         Log.i(TAG, "Succesfuly retreived social profile of type FACEBOOK");
+                        try {
+                            socialPerson.coverURL = new GetFacebookCoverURLTask((FacebookSocialNetwork) socialNetwork, socialPerson.id).execute().get();
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
                         break;
                     case LOGIN_TYPE_TWITTER:
                         Log.i(TAG, "Succesfuly retreived social profile of type TWITTER");
@@ -357,11 +344,13 @@ public class AuthenticationController implements LoginResponseHandler, RegisterR
                 String regId = Needle.userModel.getGcmRegId();
                 String id = socialPerson.id;
 
-                UserVO userVO = new UserVO(-1, username, null, regId);
+                userVO.setUserId(-1);
+                userVO.setUserName(username);
+                userVO.setGcmRegId(regId);
                 userVO.setLoginType(socialNetworkId);
                 userVO.setSocialNetworkUserId(id);
                 userVO.setPictureURL(socialPerson.avatarURL);
-                userVO.setCoverPictureURL(socialPerson.profileURL);
+                userVO.setCoverPictureURL(socialPerson.coverURL);
 
                 UserTaskParams params = new UserTaskParams(activity.getApplicationContext(), UserTaskParams.TYPE_REGISTER, userVO);
                 new UserTask(params, AuthenticationController.this).execute();
@@ -420,40 +409,4 @@ public class AuthenticationController implements LoginResponseHandler, RegisterR
             getSocialProfileAndRegister(networkId);
         }
     }
-
-    public void fetchCover(final int type) {
-        handler.post(new Runnable() {
-            @Override
-            public void run() {
-                String coverUrl = null;
-                try {
-                    switch(type){
-                        case LOGIN_TYPE_FACEBOOK:
-                            coverUrl = new GetFacebookCoverURLTask((FacebookSocialNetwork) socialNetwork, Needle.userModel.getUser().getSocialNetworkUserId()).execute().get();
-                            break;
-                        case LOGIN_TYPE_GOOGLE:
-                            coverUrl = Needle.googleApiController.getCoverURL();
-                            break;
-                    }
-
-                    if(coverUrl != null){
-                        ImageView cover = (ImageView) activity.findViewById(R.id.cover);
-
-                        Picasso.with(activity.getApplicationContext())
-                                .load(coverUrl)
-                                .fit()
-                                .into(cover);
-                    }else{
-                        Log.e(TAG, "Can't fetch cover for login type " + type);
-                    }
-
-
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        });
-
-    }
-
 }

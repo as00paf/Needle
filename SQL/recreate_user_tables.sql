@@ -10,5 +10,6 @@ CREATE TABLE users
 	fbId text,
 	twitterId text,
 	googleId text,
-	pictureURL text
+	pictureURL text,
+	coverURL text
 );

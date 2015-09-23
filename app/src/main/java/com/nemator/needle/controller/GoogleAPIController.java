@@ -11,9 +11,12 @@ import com.github.gorbin.asne.googleplus.MomentUtil;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.places.Places;
+import com.google.android.gms.plus.People;
 import com.google.android.gms.plus.Plus;
+import com.google.android.gms.plus.model.people.Person;
 import com.nemator.needle.MainActivity;
 import com.nemator.needle.utils.AppConstants;
 import com.nemator.needle.view.haystacks.createHaystack.CreateHaystackMapFragment;
@@ -21,13 +24,15 @@ import com.nemator.needle.view.haystacks.createHaystack.CreateHaystackMapFragmen
 /**
  * Created by Alex on 11/08/2015.
  */
-public class GoogleAPIController implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener{
+public class GoogleAPIController implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, ResultCallback<People.LoadPeopleResult> {
 
     private static GoogleAPIController instance;
     public final String TAG = "GoogleAPIController";
 
     private GoogleApiClient mGoogleApiClient;
     private ConnectionResult connectionResult;
+    private String coverURL = null;
+    private Person currentPerson;
     MainActivity activity;
 
     private boolean isConnected;
@@ -101,9 +106,13 @@ public class GoogleAPIController implements GoogleApiClient.ConnectionCallbacks,
     public void onConnected(Bundle connectionHint) {
         isConnected = true;
 
+        Plus.PeopleApi.loadVisible(mGoogleApiClient, null).setResultCallback(this);
+    }
+
+    private void sendIntent(String action) {
         LocalBroadcastManager localBroadcastManager = LocalBroadcastManager.getInstance(activity);
         Intent intent = new Intent();
-        intent.setAction(AppConstants.GOOGLE_API_CONNECTED);
+        intent.setAction(action);
         localBroadcastManager.sendBroadcast(intent);
     }
 
@@ -142,5 +151,17 @@ public class GoogleAPIController implements GoogleApiClient.ConnectionCallbacks,
 
     public ConnectionResult getConnectionResult() {
         return connectionResult;
+    }
+
+    public String getCoverURL() {
+        return coverURL;
+    }
+
+    @Override
+    public void onResult(People.LoadPeopleResult loadPeopleResult) {
+        currentPerson = Plus.PeopleApi.getCurrentPerson(mGoogleApiClient);
+        coverURL = currentPerson.getCover().getCoverPhoto().getUrl();
+
+        sendIntent(AppConstants.GOOGLE_API_CONNECTED);
     }
 }

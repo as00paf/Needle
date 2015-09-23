@@ -219,12 +219,11 @@ public class AuthenticationController implements LoginResponseHandler, RegisterR
             if(networkId != 0) {
                 Log.i(TAG, "Requesting login on network with id : !" + networkId);
                 loginRequestType = LOGIN_REQUEST_TYPE_LOGIN;
-                if(socialNetwork.getID() == LOGIN_TYPE_GOOGLE) {
-                    ((GooglePlusSocialNetwork) socialNetwork).setGoogleApiClient(Needle.googleApiController.getmGoogleApiClient());
-                    ((GooglePlusSocialNetwork) socialNetwork).setConnectionResult(Needle.googleApiController.getConnectionResult());
-                }
 
                 if(socialNetwork.getID() == LOGIN_TYPE_GOOGLE){
+                    ((GooglePlusSocialNetwork) socialNetwork).setGoogleApiClient(Needle.googleApiController.getmGoogleApiClient());
+                    ((GooglePlusSocialNetwork) socialNetwork).setConnectionResult(Needle.googleApiController.getConnectionResult());
+
                     if(Needle.googleApiController.isConnected()){
                         getSocialProfileAndLogIn(LOGIN_TYPE_GOOGLE);
                     }else{
@@ -422,20 +421,39 @@ public class AuthenticationController implements LoginResponseHandler, RegisterR
         }
     }
 
-    public void getFacebookCover() {
-        try {
-            String coverUrl = new GetFacebookCoverURLTask((FacebookSocialNetwork) socialNetwork, Needle.userModel.getUser().getSocialNetworkUserId()).execute().get();
+    public void fetchCover(final int type) {
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
+                String coverUrl = null;
+                try {
+                    switch(type){
+                        case LOGIN_TYPE_FACEBOOK:
+                            coverUrl = new GetFacebookCoverURLTask((FacebookSocialNetwork) socialNetwork, Needle.userModel.getUser().getSocialNetworkUserId()).execute().get();
+                            break;
+                        case LOGIN_TYPE_GOOGLE:
+                            coverUrl = Needle.googleApiController.getCoverURL();
+                            break;
+                    }
 
-            ImageView cover = (ImageView) activity.findViewById(R.id.cover);
+                    if(coverUrl != null){
+                        ImageView cover = (ImageView) activity.findViewById(R.id.cover);
 
-            Picasso.with(activity.getApplicationContext())
-                    .load(coverUrl)
-                    .fit()
-                    .into(cover);
+                        Picasso.with(activity.getApplicationContext())
+                                .load(coverUrl)
+                                .fit()
+                                .into(cover);
+                    }else{
+                        Log.e(TAG, "Can't fetch cover for login type " + type);
+                    }
 
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+
     }
 
 }

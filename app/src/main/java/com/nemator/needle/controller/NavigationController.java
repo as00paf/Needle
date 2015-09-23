@@ -570,9 +570,8 @@ public class NavigationController implements MainActivity.NavigationHandler, OnA
                 .transform(new RoundedTransformation(100, 1))
                 .into(avatarImageView);
 
-        if(userModel.getUser().getLoginType() ==  AuthenticationController.LOGIN_TYPE_FACEBOOK){
-            Needle.authenticationController.getFacebookCover();
-        }
+        int loginType = userModel.getUser().getLoginType();
+        Needle.authenticationController.fetchCover(loginType);
     }
 
     //Getters/Setters

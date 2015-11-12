@@ -2,6 +2,7 @@ package com.nemator.needle.view.locationSharing;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
@@ -19,7 +20,6 @@ import com.nemator.needle.tasks.locationSharing.LocationSharingResult;
 import com.nemator.needle.tasks.locationSharing.LocationSharingTask;
 import com.nemator.needle.utils.AppState;
 import com.nemator.needle.view.haystacks.OnActivityStateChangeListener;
-import com.shamanland.fab.FloatingActionButton;
 
 import java.util.ArrayList;
 
@@ -90,14 +90,12 @@ public class LocationSharingListFragment extends Fragment implements LocationSha
             //FAB
             fabListener = Needle.navigationController;
             fab = (FloatingActionButton) rootView.findViewById(R.id.location_sharing_fab);
-            fab.setColor(getResources().getColor(R.color.primary));
             fab.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     fabListener.onCreateLocationSharingFabTapped();
                 }
             });
-            fab.initBackground();
 
             //View pager
             mLocationSharingPagerAdapter = new LocationSharingPagerAdapter(getActivity().getSupportFragmentManager(), this);

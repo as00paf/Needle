@@ -3,15 +3,8 @@ package com.nemator.needle.tasks.logOut;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.AsyncTask;
-import android.util.Log;
 
 import com.nemator.needle.utils.AppConstants;
-import com.nemator.needle.utils.JSONParser;
-
-import org.apache.http.NameValuePair;
-import org.json.JSONObject;
-
-import java.util.ArrayList;
 
 /**
  * Created by Alex on 09/07/2015.
@@ -24,7 +17,6 @@ public class LogOutTask extends AsyncTask<Void, Void, Void> {
     private LogOutResponseHandler delegate;
 
     private Context context;
-    private JSONParser jsonParser = new JSONParser();
     private ProgressDialog dialog;
 
     public LogOutTask(Context context, LogOutResponseHandler delegate){
@@ -45,7 +37,7 @@ public class LogOutTask extends AsyncTask<Void, Void, Void> {
     @Override
     protected Void doInBackground(Void... args) {
         int success;
-        try {
+        /*try {
             JSONObject json = jsonParser.makeHttpRequest(LOGOUT_URL, "GET", new ArrayList<NameValuePair>());
 
             success = json.getInt(AppConstants.TAG_SUCCESS);
@@ -58,7 +50,7 @@ public class LogOutTask extends AsyncTask<Void, Void, Void> {
         } catch (Exception e) {
             Log.d("Logout Failure!", "Error : " + e.getMessage());
             return null;
-        }
+        }*/
 
         return null;
     }

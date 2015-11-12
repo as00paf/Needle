@@ -25,7 +25,7 @@
             android:background="@android:color/white"/>
     </LinearLayout>
 
-    <com.shamanland.fab.FloatingActionButton
+    <FloatingActionButton
         android:id="@+id/fab"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -34,7 +34,8 @@
         android:layout_alignParentEnd="true"
         android:layout_marginRight="16dp"
         android:layout_marginBottom="20dp"
-        android:src="@drawable/ic_action_new"/>
+        android:src="@drawable/ic_action_new"
+        android:background="@color/primary_dark"/>
 </RelativeLayout>
 
 

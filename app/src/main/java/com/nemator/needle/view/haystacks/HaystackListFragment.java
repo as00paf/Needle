@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -14,7 +15,6 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.appcompat.view.slidingTab.SlidingTabLayout;
-import com.nemator.needle.MainActivity;
 import com.nemator.needle.Needle;
 import com.nemator.needle.R;
 import com.nemator.needle.models.vo.HaystackVO;
@@ -22,7 +22,6 @@ import com.nemator.needle.tasks.haystack.HaystackTask;
 import com.nemator.needle.tasks.haystack.HaystackTaskParams;
 import com.nemator.needle.tasks.haystack.HaystackTaskResult;
 import com.nemator.needle.utils.AppState;
-import com.shamanland.fab.FloatingActionButton;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -105,14 +104,12 @@ public class HaystackListFragment extends Fragment implements HaystackTask.Fetch
 
             //FAB
             fab = (FloatingActionButton) rootView.findViewById(R.id.fab);
-            fab.setColor(getResources().getColor(R.color.primary));
             fab.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     fragmentListener.onCreateHaystackFabTapped();
                 }
             });
-            fab.initBackground();
 
             //View pager
             mHaystackListPagerAdapter = new HaystackListPagerAdapter(getActivity().getSupportFragmentManager(), this);

@@ -24,16 +24,13 @@ import com.github.gorbin.asne.twitter.TwitterSocialNetwork;
 import com.nemator.needle.MainActivity;
 import com.nemator.needle.Needle;
 import com.nemator.needle.R;
+import com.nemator.needle.api.ApiClient;
 import com.nemator.needle.models.vo.UserVO;
 import com.nemator.needle.tasks.facebook.GetFacebookCoverURLTask;
 import com.nemator.needle.tasks.login.LoginTask;
 import com.nemator.needle.tasks.login.LoginTask.LoginResponseHandler;
 import com.nemator.needle.tasks.login.LoginTaskParams;
 import com.nemator.needle.tasks.login.LoginTaskResult;
-import com.nemator.needle.tasks.user.UserTask;
-import com.nemator.needle.tasks.user.UserTask.RegisterResponseHandler;
-import com.nemator.needle.tasks.user.UserTaskParams;
-import com.nemator.needle.tasks.user.UserTaskResult;
 import com.nemator.needle.utils.AppConstants;
 
 import java.lang.ref.WeakReference;
@@ -41,7 +38,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class AuthenticationController implements LoginResponseHandler, RegisterResponseHandler, OnLoginCompleteListener {
+import retrofit.Callback;
+import retrofit.Response;
+import retrofit.Retrofit;
+
+public class AuthenticationController implements LoginResponseHandler, OnLoginCompleteListener {
 
     private static final String TAG = "AuthenticationCtrl";
     private static AuthenticationController instance;
@@ -64,8 +65,10 @@ public class AuthenticationController implements LoginResponseHandler, RegisterR
     public Bitmap coverPictureBitmap;
     private Handler handler = new Handler();
 
-    public AuthenticationController(){
+    private ApiClient apiClient;
 
+    public AuthenticationController(){
+        apiClient = ApiClient.getInstance();
     }
 
     public static AuthenticationController getInstance() {
@@ -146,7 +149,7 @@ public class AuthenticationController implements LoginResponseHandler, RegisterR
     }
 
     //Handlers
-    @Override
+    /*@Override
     public void onUserRegistered(UserTaskResult result) {
         Needle.navigationController.hideProgress();
 
@@ -157,27 +160,27 @@ public class AuthenticationController implements LoginResponseHandler, RegisterR
         }else{
             Toast.makeText(activity, "Error ! \nPlease Try Again", Toast.LENGTH_SHORT).show();
         }
-    }
+    }*/
 
     @Override
     public void onLoginComplete(LoginTaskResult result) {
         if(!Needle.userModel.isLoggedIn()) {
-            if (result.successCode == 1) {
+            if (result.getSuccessCode() == 1) {
                 Needle.userModel.setLoggedIn(true);
-                Needle.userModel.setUserName(result.user.getUserName());
-                Needle.userModel.setUserId(result.user.getUserId());
-                Needle.userModel.getUser().setSocialNetworkUserId(result.user.getSocialNetworkUserId());
-                Needle.userModel.getUser().setLoginType(result.user.getLoginType());
-                Needle.userModel.getUser().setPictureURL(result.user.getPictureURL());
-                Needle.userModel.getUser().setCoverPictureURL(result.user.getCoverPictureURL());
+                Needle.userModel.setUserName(result.getUser().getUserName());
+                Needle.userModel.setUserId(result.getUser().getUserId());
+                Needle.userModel.getUser().setSocialNetworkUserId(result.getUser().getSocialNetworkUserId());
+                Needle.userModel.getUser().setLoginType(result.getUser().getLoginType());
+                Needle.userModel.getUser().setPictureURL(result.getUser().getPictureURL());
+                Needle.userModel.getUser().setCoverPictureURL(result.getUser().getCoverPictureURL());
                 Needle.userModel.saveUser();
 
                 Needle.navigationController.onPostLogin();
 
-                Needle.navigationController.setHaystacksCount(result.haystackCount);
-                Needle.navigationController.setLocationSharingCount(result.locationSharingCount);
+                Needle.navigationController.setHaystacksCount(result.getHaystackCount());
+                Needle.navigationController.setLocationSharingCount(result.getLocationSharingCount());
             }
-            else if(result.successCode == 404){
+            else if(result.getSuccessCode() == 404){
                 Toast.makeText(activity, activity.getString(R.string.user_not_found_message), Toast.LENGTH_SHORT).show();
                 //getSocialProfileAndRegister(result.type);
             }
@@ -188,9 +191,9 @@ public class AuthenticationController implements LoginResponseHandler, RegisterR
         }else {
             Log.i(TAG, "here");
 
-            if(result.successCode == 404){
+            if(result.getSuccessCode() == 404){
                 Toast.makeText(activity, activity.getString(R.string.user_not_found_message), Toast.LENGTH_SHORT).show();
-                getSocialProfileAndRegister(result.type);
+                getSocialProfileAndRegister(result.getType());
             }
         }
     }
@@ -286,13 +289,16 @@ public class AuthenticationController implements LoginResponseHandler, RegisterR
                 String username = socialPerson.name;
                 String regId = Needle.userModel.getGcmRegId();
                 String id = socialPerson.id;
+                String email = socialPerson.email;
 
-                UserVO user = new UserVO(-1, username, "", "", regId, socialNetworkId, id);
+                UserVO user = new UserVO(-1, username, email, "", "", regId, socialNetworkId, id);
                 Needle.userModel.setUser(user);
 
-                WeakReference<TextView> textView = new WeakReference<TextView>((TextView) activity.findViewById(R.id.login_splash_label));
+                /*WeakReference<TextView> textView = new WeakReference<TextView>((TextView) activity.findViewById(R.id.login_splash_label));
                 params = new LoginTaskParams(activity, user, textView);
-                new LoginTask(params, AuthenticationController.this).execute();
+                new LoginTask(params, AuthenticationController.this).execute();*/
+
+                ApiClient.getInstance().login(user.getLoginType(), user.getEmail(), user.getGcmRegId(), user.getPassword(), userLogInCallback);
             }
 
             @Override
@@ -352,8 +358,8 @@ public class AuthenticationController implements LoginResponseHandler, RegisterR
                 userVO.setPictureURL(socialPerson.avatarURL);
                 userVO.setCoverPictureURL(socialPerson.coverURL);
 
-                UserTaskParams params = new UserTaskParams(activity.getApplicationContext(), UserTaskParams.TYPE_REGISTER, userVO);
-                new UserTask(params, AuthenticationController.this).execute();
+               // UserTaskParams params = new UserTaskParams(activity.getApplicationContext(), UserTaskParams.TYPE_REGISTER, userVO);
+               // new UserTask(params, AuthenticationController.this).execute();
             }
 
             @Override
@@ -409,4 +415,83 @@ public class AuthenticationController implements LoginResponseHandler, RegisterR
             getSocialProfileAndRegister(networkId);
         }
     }
+
+    public void register(UserVO userVO) {
+        ApiClient.getInstance().registerUser(userVO, userRegisteredCallback);
+
+
+        /*UserTaskParams params = new UserTaskParams(getActivity(), UserTaskParams.TYPE_REGISTER, userVO);
+        new UserTask(params, Needle.authenticationController).execute();*/
+    }
+
+    private Callback<UserVO> userRegisteredCallback = new Callback<UserVO>() {
+        @Override
+        public void onResponse(Response<UserVO> response, Retrofit retrofit) {
+            Needle.navigationController.hideProgress();
+
+            UserVO user = response.body();
+            ApiClient.getInstance().login(user.getLoginType(), user.getEmail(), user.getGcmRegId(), user.getPassword(), userLogInCallback);
+
+            //if(result.successCode == 1 || result.successCode == 409){
+                /*WeakReference<TextView> textView = new WeakReference<TextView>((TextView) activity.findViewById(R.id.login_splash_label));
+                LoginTaskParams params = new LoginTaskParams(activity, user, textView);
+                new LoginTask(params, AuthenticationController.this).execute();*/
+
+
+
+            /*}else{
+                Toast.makeText(activity, "Error ! \nPlease Try Again", Toast.LENGTH_SHORT).show();
+            }*/
+        }
+
+        @Override
+        public void onFailure(Throwable t) {
+
+        }
+    };
+
+    private Callback<LoginTaskResult> userLogInCallback = new Callback<LoginTaskResult>() {
+        @Override
+        public void onResponse(Response<LoginTaskResult> response, Retrofit retrofit) {
+            LoginTaskResult result = response.body();
+
+            if(!Needle.userModel.isLoggedIn()) {
+                if (result.getSuccessCode() == 1) {
+                    Needle.userModel.setLoggedIn(true);
+                    Needle.userModel.setUserName(result.getUser().getUserName());
+                    Needle.userModel.setUserId(result.getUser().getUserId());
+                    Needle.userModel.getUser().setSocialNetworkUserId(result.getUser().getSocialNetworkUserId());
+                    Needle.userModel.getUser().setLoginType(result.getUser().getLoginType());
+                    Needle.userModel.getUser().setPictureURL(result.getUser().getPictureURL());
+                    Needle.userModel.getUser().setCoverPictureURL(result.getUser().getCoverPictureURL());
+                    Needle.userModel.saveUser();
+
+                    Needle.navigationController.onPostLogin();
+
+                    Needle.navigationController.setHaystacksCount(result.getHaystackCount());
+                    Needle.navigationController.setLocationSharingCount(result.getLocationSharingCount());
+                }
+                else if(result.getSuccessCode() == 404){
+                    Toast.makeText(activity, activity.getString(R.string.user_not_found_message), Toast.LENGTH_SHORT).show();
+                    //getSocialProfileAndRegister(result.type);
+                }
+                else
+                {
+                    Toast.makeText(activity, "An Error Occured\n Please Try Again!", Toast.LENGTH_SHORT).show();
+                }
+            }else {
+                Log.i(TAG, "here");
+
+                if(result.getSuccessCode() == 404){
+                    Toast.makeText(activity, activity.getString(R.string.user_not_found_message), Toast.LENGTH_SHORT).show();
+                    getSocialProfileAndRegister(result.getType());
+                }
+            }
+        }
+
+        @Override
+        public void onFailure(Throwable t) {
+            Log.i(TAG, "User login failed : "+t.getMessage());
+        }
+    };
 }

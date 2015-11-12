@@ -29,14 +29,14 @@
         android:id="@+id/dragView">
 
         <!-- FAB -->
-        <com.shamanland.fab.FloatingActionButton
+        <FloatingActionButton
             android:id="@+id/fab_add_users"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginRight="16dp"
             android:src="@drawable/ic_action_new"
             android:layout_alignParentRight="true"
-            />
+            android:background="@color/primary_dark"/>
 
         <!-- White BG -->
         <LinearLayout

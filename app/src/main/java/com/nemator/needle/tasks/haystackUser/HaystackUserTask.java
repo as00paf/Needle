@@ -6,18 +6,11 @@ import android.util.Log;
 
 import com.nemator.needle.R;
 import com.nemator.needle.models.vo.UserVO;
-import com.nemator.needle.tasks.locationSharing.LocationSharingParams;
 import com.nemator.needle.utils.AppConstants;
-import com.nemator.needle.utils.JSONParser;
 
-import org.apache.http.NameValuePair;
-import org.apache.http.message.BasicNameValuePair;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class HaystackUserTask extends AsyncTask<Void, Void, HaystackUserTaskResult> {
 
@@ -26,7 +19,6 @@ public class HaystackUserTask extends AsyncTask<Void, Void, HaystackUserTaskResu
 
     private Object delegate;
 
-    private JSONParser jsonParser = new JSONParser();
     private HaystackUserTaskParams params;
     private ProgressDialog dialog;
 
@@ -97,7 +89,7 @@ public class HaystackUserTask extends AsyncTask<Void, Void, HaystackUserTaskResu
         int success;
         String message = "not set";
 
-        try {
+       /*try {
             //Request
             JSONObject json;
             if(params.type == HaystackUserTaskParams.TYPE_GET || params.type == HaystackUserTaskParams.TYPE_ADD || params.type == HaystackUserTaskParams.TYPE_CANCEL){
@@ -139,13 +131,13 @@ public class HaystackUserTask extends AsyncTask<Void, Void, HaystackUserTaskResu
             e.printStackTrace();
             result.isActive = !params.isActive;
             result.successMessage = msg;
-        }
+        }*/
 
         return result;
     }
 
     private Object getRequestParams() {
-        List<NameValuePair> requestParams = new ArrayList<NameValuePair>();
+      /*  List<NameValuePair> requestParams = new ArrayList<NameValuePair>();
         JSONObject jsonObject = new JSONObject();
         switch (params.type){
             case LocationSharingParams.TYPE_GET :
@@ -175,7 +167,7 @@ public class HaystackUserTask extends AsyncTask<Void, Void, HaystackUserTaskResu
 
                 return requestParams;
         }
-
+*/
         return null;
     }
 

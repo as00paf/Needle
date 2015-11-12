@@ -18,13 +18,6 @@
             android:paddingRight="24dp"
             android:focusable="true"
             android:focusableInTouchMode="true">
-
-            <!-- Logo -->
-            <ImageView android:src="@drawable/pin"
-                android:layout_width="wrap_content"
-                android:layout_height="84dp"
-                android:layout_marginBottom="24dp"
-                android:layout_gravity="center_horizontal" />
     
             <!-- Username Label -->
             <android.support.design.widget.TextInputLayout
@@ -52,24 +45,32 @@
                     android:hint="@string/password"/>
             </android.support.design.widget.TextInputLayout>
 
-            <!-- Login Button -->
-            <android.support.v7.widget.AppCompatButton
-                android:id="@+id/btn_login"
-                android:layout_width="fill_parent"
+            <RelativeLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="24dp"
                 android:layout_marginBottom="24dp"
-                android:padding="12dp"
-                android:text="@string/login"/>
+                android:gravity="center_vertical">
 
-            <!-- Register Link -->
-            <TextView android:id="@+id/link_signup"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="24dp"
-                android:text="@string/accout_cta"
-                android:gravity="center"
-                android:textSize="16dip"/>
+                <!-- Register Link -->
+                <TextView android:id="@+id/link_signup"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/accout_cta"
+                    android:layout_alignParentLeft="true"
+                    android:layout_centerVertical="true"
+                    android:textSize="16dip"/>
+
+                <!-- Login Button -->
+                <android.support.v7.widget.AppCompatButton
+                    android:id="@+id/btn_login"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:padding="12dp"
+                    android:text="@string/login"
+                    android:layout_centerVertical="true"
+                    android:layout_alignParentRight="true"/>
+
+            </RelativeLayout>
 
             <!-- OR Label -->
             <TextView

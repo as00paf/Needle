@@ -1,2 +1,2 @@
-cd "C:\Program Files (x86)\MySQL\MySQL Server 5.6\bin\"
-start mysql.exe -h 173.176.76.40 -port=3306 -u alex -passa Needle
+cd "C:\wamp\bin\mysql\mysql5.6.17\bin\"
+start mysql.exe -h 66.131.192.108 -port=3306 -u androidAPI -pneedle

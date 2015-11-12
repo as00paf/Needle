@@ -46,7 +46,7 @@ public class RemovePostLocationRequestTask extends AsyncTask<Void, Void, TaskRes
         Log.i(TAG, "selection : " + selection);
 
         int success = db.delete(LocationServiceDBHelper.PostLocationRequest.TABLE_NAME, selection, null);
-        result.successCode = success;
+        result.setSuccessCode(success);
 
         //ALARM
         Intent intent = new Intent(params.context, PostLocationRequestAlarm.class);

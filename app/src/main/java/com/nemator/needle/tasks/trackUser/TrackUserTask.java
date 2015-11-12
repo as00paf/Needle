@@ -1,19 +1,8 @@
 package com.nemator.needle.tasks.trackUser;
 
 import android.os.AsyncTask;
-import android.util.Log;
 
-import com.google.android.gms.maps.model.LatLng;
 import com.nemator.needle.utils.AppConstants;
-import com.nemator.needle.utils.JSONParser;
-
-import org.apache.http.NameValuePair;
-import org.apache.http.message.BasicNameValuePair;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class TrackUserTask extends AsyncTask<Void, Void, TrackUserResult> {
     private static final String TRACK_USER_URL = AppConstants.PROJECT_URL + "trackUser.php";
@@ -21,7 +10,6 @@ public class TrackUserTask extends AsyncTask<Void, Void, TrackUserResult> {
 
     private TrackUserResponseHandler delegate;
     private TrackUserParams params;
-    private JSONParser jParser = new JSONParser();
 
     public TrackUserTask(TrackUserParams params, TrackUserResponseHandler delegate){
         this.params = params;
@@ -38,7 +26,7 @@ public class TrackUserTask extends AsyncTask<Void, Void, TrackUserResult> {
         TrackUserResult result = new TrackUserResult();
         int success;
 
-        try {
+        /*try {
             List<NameValuePair> requestParams = new ArrayList<NameValuePair>();
             requestParams.add(new BasicNameValuePair("userId", params.userId));
             requestParams.add(new BasicNameValuePair("locationSharingId", params.locationSharingId));
@@ -65,7 +53,9 @@ public class TrackUserTask extends AsyncTask<Void, Void, TrackUserResult> {
             result.successCode = 0;
             result.message = "Error Tracking User";
             return  result;
-        }
+        }*/
+
+        return null;
     }
 
     @Override

@@ -2,6 +2,7 @@ package com.nemator.needle.view.haystack;
 
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
@@ -14,7 +15,6 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.appcompat.view.slidingTab.SlidingTabLayout;
-import com.nemator.needle.MainActivity;
 import com.nemator.needle.Needle;
 import com.nemator.needle.R;
 import com.nemator.needle.models.vo.HaystackVO;
@@ -23,7 +23,6 @@ import com.nemator.needle.tasks.retrieveUsers.RetrieveUsersParams;
 import com.nemator.needle.tasks.retrieveUsers.RetrieveUsersResult;
 import com.nemator.needle.tasks.retrieveUsers.RetrieveUsersTask;
 import com.nemator.needle.utils.AppConstants;
-import com.shamanland.fab.FloatingActionButton;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 
 import java.util.ArrayList;
@@ -128,10 +127,6 @@ public class HaystackFragment extends Fragment {
         //Floating Action Button
         FloatingActionButton fab = (FloatingActionButton) mLayout.findViewById(R.id.fab_add_users);
         if(isOwner()){
-            fab.setSize(FloatingActionButton.SIZE_NORMAL);
-            fab.setColor(getResources().getColor(R.color.primary));
-
-            fab.initBackground();
             fab.setImageResource(R.drawable.ic_action_add_person);
             fab.setVisibility(View.VISIBLE);
 

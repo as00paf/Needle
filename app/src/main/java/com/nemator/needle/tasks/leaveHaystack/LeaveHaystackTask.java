@@ -1,26 +1,15 @@
 package com.nemator.needle.tasks.leaveHaystack;
 
 import android.os.AsyncTask;
-import android.util.Log;
 
-import com.nemator.needle.utils.AppConstants;
 import com.nemator.needle.tasks.TaskResult;
-import com.nemator.needle.utils.JSONParser;
-
-import org.apache.http.NameValuePair;
-import org.apache.http.message.BasicNameValuePair;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.util.ArrayList;
-import java.util.List;
+import com.nemator.needle.utils.AppConstants;
 
 public class LeaveHaystackTask extends AsyncTask<Void, Void, TaskResult> {
     private static final String LEAVE_HAYSTACK_URL = AppConstants.PROJECT_URL + "leaveHaystack.php";
     private static final String TAG = "LeaveHaystackTask";
 
     private LeaveHaystackResponseHandler delegate;
-    private JSONParser jsonParser = new JSONParser();
     private LeaveHaystackParams params;
 
     public LeaveHaystackTask(LeaveHaystackParams params, LeaveHaystackResponseHandler delegate){
@@ -39,7 +28,7 @@ public class LeaveHaystackTask extends AsyncTask<Void, Void, TaskResult> {
 
         int success;
 
-        try {
+       /* try {
             List<NameValuePair> requestParams = new ArrayList<NameValuePair>();
             requestParams.add(new BasicNameValuePair(AppConstants.TAG_USER_ID, params.userId));
             requestParams.add(new BasicNameValuePair(AppConstants.TAG_HAYSTACK_ID, params.haystackId));
@@ -64,7 +53,9 @@ public class LeaveHaystackTask extends AsyncTask<Void, Void, TaskResult> {
             result.successCode = 0;
             result.message = "Error Leaving Haystack";
             return result;
-        }
+        }*/
+
+        return result;
     }
 
     protected void onPostExecute(TaskResult result) {

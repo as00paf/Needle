@@ -1,19 +1,11 @@
 package com.nemator.needle.tasks.retrieveUsers;
 
 import android.os.AsyncTask;
-import android.util.Log;
 
-import com.nemator.needle.utils.AppConstants;
 import com.nemator.needle.models.vo.UserVO;
-import com.nemator.needle.utils.JSONParser;
-
-import org.apache.http.NameValuePair;
-import org.apache.http.message.BasicNameValuePair;
-import org.json.JSONException;
-import org.json.JSONObject;
+import com.nemator.needle.utils.AppConstants;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class RetrieveUsersTask extends AsyncTask<Void, Void, RetrieveUsersResult> {
     private static final String RETRIEVE_USERS_URL = AppConstants.PROJECT_URL + "retrieveAllUsers.php";
@@ -24,7 +16,6 @@ public class RetrieveUsersTask extends AsyncTask<Void, Void, RetrieveUsersResult
 
     private RetrieveUsersResponseHandler delegate;
     private RetrieveUsersParams params;
-    private JSONParser jParser = new JSONParser();
 
     public RetrieveUsersTask(RetrieveUsersParams params, RetrieveUsersResponseHandler delegate){
         this.params = params;
@@ -42,7 +33,7 @@ public class RetrieveUsersTask extends AsyncTask<Void, Void, RetrieveUsersResult
         int success;
 
         result.userList = new ArrayList<UserVO>();
-        try {
+        /*try {
             List<NameValuePair> requestParams = new ArrayList<NameValuePair>();
             requestParams.add(new BasicNameValuePair("userId", params.userId));
 
@@ -112,7 +103,9 @@ public class RetrieveUsersTask extends AsyncTask<Void, Void, RetrieveUsersResult
             result.successCode = 0;
             result.message = "Error Retrieving Users";
             return result;
-        }
+        }*/
+
+        return result;
     }
 
     @Override

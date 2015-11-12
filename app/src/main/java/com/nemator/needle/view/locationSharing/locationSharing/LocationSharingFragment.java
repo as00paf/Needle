@@ -1,34 +1,15 @@
 package com.nemator.needle.view.locationSharing.locationSharing;
 
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentStatePagerAdapter;
-import android.support.v4.view.ViewPager;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ListView;
 import android.widget.TextView;
 
-import com.appcompat.view.slidingTab.SlidingTabLayout;
-import com.google.android.gms.maps.model.LatLng;
-import com.nemator.needle.MainActivity;
 import com.nemator.needle.R;
-import com.nemator.needle.models.vo.HaystackVO;
 import com.nemator.needle.models.vo.LocationSharingVO;
-import com.nemator.needle.models.vo.UserVO;
-import com.nemator.needle.tasks.retrieveUsers.RetrieveUsersParams;
-import com.nemator.needle.tasks.retrieveUsers.RetrieveUsersResult;
-import com.nemator.needle.tasks.retrieveUsers.RetrieveUsersTask;
 import com.nemator.needle.utils.AppConstants;
-import com.nemator.needle.view.haystack.HaystackUserListAdapter;
-import com.shamanland.fab.FloatingActionButton;
-import com.sothree.slidinguppanel.SlidingUpPanelLayout;
-
-import java.util.ArrayList;
 
 
 public class LocationSharingFragment extends Fragment {

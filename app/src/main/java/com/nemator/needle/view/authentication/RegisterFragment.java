@@ -16,13 +16,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.common.SignInButton;
-import com.nemator.needle.MainActivity;
 import com.nemator.needle.Needle;
 import com.nemator.needle.R;
 import com.nemator.needle.controller.AuthenticationController;
 import com.nemator.needle.models.vo.UserVO;
-import com.nemator.needle.tasks.user.UserTask;
-import com.nemator.needle.tasks.user.UserTaskParams;
 
 public class RegisterFragment extends Fragment implements View.OnClickListener{
 
@@ -30,14 +27,12 @@ public class RegisterFragment extends Fragment implements View.OnClickListener{
 
     //Children
     private FrameLayout layout;
-    private EditText user, pass;
+    private EditText user, pass, email;
     private Button registerButton, facebookButton, twitterButton;
     private SignInButton googleButton;
 
     public static RegisterFragment newInstance() {
         RegisterFragment fragment = new RegisterFragment();
-        Bundle args = new Bundle();
-        fragment.setArguments(args);
         return fragment;
     }
 
@@ -52,6 +47,7 @@ public class RegisterFragment extends Fragment implements View.OnClickListener{
         //Username & Password
         user = (EditText) layout.findViewById(R.id.register_input_username);
         pass = (EditText) layout.findViewById(R.id.register_input_password);
+        email = (EditText) layout.findViewById(R.id.register_input_email);
 
         pass.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
@@ -83,17 +79,18 @@ public class RegisterFragment extends Fragment implements View.OnClickListener{
     }
 
     private void register(){
-        Log.i(TAG, "Trying to register with credentials : " + user.getText().toString() + ", " + pass.getText().toString());
-
         String username = user.getText().toString();
         String password = pass.getText().toString();
+        String emailAddress = email.getText().toString();
+
+        Log.i(TAG, "Trying to register with credentials : " + username + ", " + email + ", " + password);
 
         if(TextUtils.isEmpty(username) || TextUtils.isEmpty(password)){
             Toast.makeText(getActivity(), "You must enter a username and a password", Toast.LENGTH_LONG).show();
         }else{
-            UserVO userVO = new UserVO(-1, username, password, "", Needle.userModel.getGcmRegId(), AuthenticationController.LOGIN_TYPE_DEFAULT, "-1");
-            UserTaskParams params = new UserTaskParams(getActivity(), UserTaskParams.TYPE_REGISTER, userVO);
-            new UserTask(params, Needle.authenticationController).execute();
+            UserVO userVO = new UserVO(-1, username, emailAddress, password, "", Needle.userModel.getGcmRegId(), AuthenticationController.LOGIN_TYPE_DEFAULT, "-1");
+
+            Needle.authenticationController.register(userVO);
         }
     }
 

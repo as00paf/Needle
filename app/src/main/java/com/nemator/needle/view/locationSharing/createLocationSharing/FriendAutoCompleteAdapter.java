@@ -11,7 +11,6 @@ import android.widget.TextView;
 
 import com.nemator.needle.R;
 import com.nemator.needle.models.vo.UserVO;
-import com.nemator.needle.tasks.ImageDownloaderTask;
 
 import java.util.ArrayList;
 

@@ -12,8 +12,8 @@ import android.graphics.Matrix;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.provider.MediaStore;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.view.ViewPager;
-import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -29,10 +29,8 @@ import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.places.Places;
-import com.nemator.needle.MainActivity;
 import com.nemator.needle.Needle;
 import com.nemator.needle.R;
-import com.nemator.needle.controller.NavigationController;
 import com.nemator.needle.models.vo.HaystackVO;
 import com.nemator.needle.models.vo.UserVO;
 import com.nemator.needle.tasks.haystack.HaystackTask;
@@ -43,7 +41,6 @@ import com.nemator.needle.tasks.imageUploader.ImageUploaderTask;
 import com.nemator.needle.utils.AppConstants;
 import com.nemator.needle.utils.AppState;
 import com.nemator.needle.view.haystacks.OnActivityStateChangeListener;
-import com.shamanland.fab.FloatingActionButton;
 import com.viewpagerindicator.CirclePageIndicator;
 
 import java.util.ArrayList;
@@ -188,7 +185,6 @@ public class CreateHaystackFragment extends CreateHaystackBaseFragment implement
 
         //FAB
         fab = (FloatingActionButton) rootView.findViewById(R.id.new_haystack_photo_fab);
-        fab.setColor(getResources().getColor(R.color.primary));
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -214,7 +210,6 @@ public class CreateHaystackFragment extends CreateHaystackBaseFragment implement
 
             }
         });
-        fab.initBackground();
 
         //Bottom Sheet Buttons
         nextButton = (Button) rootView.findViewById(R.id.create_haystack_next_button);

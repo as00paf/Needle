@@ -19,7 +19,7 @@
             android:layout_height="0dp"
             android:layout_weight="3"
             android:id="@+id/login_splash_logo"
-            android:src="@drawable/pin_small"
+            android:src="@drawable/ic_app"
             android:paddingBottom="32dp"/>
 
         <ProgressBar

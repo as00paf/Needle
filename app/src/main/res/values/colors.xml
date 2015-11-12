@@ -2,15 +2,15 @@
 <resources>
     <color
         name="primary"
-        >#9C27B0</color>
+        >#f7a827</color>
 
     <color
         name="primary_dark"
-        >#4A148C</color>
+        >#eb9f26</color>
 
     <color
         name="accent"
-        >#BA68C8</color>
+        >#FFF</color>
 
     <color
         name="circleColor"

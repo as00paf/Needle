@@ -1,22 +1,8 @@
 package com.nemator.needle.tasks.login;
 
-import android.app.ProgressDialog;
-import android.content.SharedPreferences;
 import android.os.AsyncTask;
-import android.preference.PreferenceManager;
-import android.util.Log;
 
-import com.nemator.needle.controller.AuthenticationController;
-import com.nemator.needle.models.vo.UserVO;
 import com.nemator.needle.utils.AppConstants;
-import com.nemator.needle.utils.JSONParser;
-
-import org.apache.http.NameValuePair;
-import org.apache.http.message.BasicNameValuePair;
-import org.json.JSONObject;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class LoginTask extends AsyncTask<Void, Void, LoginTaskResult> {
     private static final String LOGIN_URL = AppConstants.PROJECT_URL +"login.php";
@@ -25,7 +11,6 @@ public class LoginTask extends AsyncTask<Void, Void, LoginTaskResult> {
     private LoginResponseHandler delegate;
 
     private LoginTaskParams params;
-    private JSONParser jsonParser = new JSONParser(7000, 10000);
 
     public LoginTask(LoginTaskParams params, LoginResponseHandler delegate){
         this.params = params;
@@ -45,9 +30,9 @@ public class LoginTask extends AsyncTask<Void, Void, LoginTaskResult> {
     @Override
     protected LoginTaskResult doInBackground(Void... args) {
         LoginTaskResult result = new LoginTaskResult();
-        result.type = params.user.getLoginType();
+        result.setType(params.user.getLoginType());
 
-        int success;
+        /*int success;
         try {
             List<NameValuePair> requestParams = new ArrayList<NameValuePair>();
             requestParams.add(new BasicNameValuePair("username", params.user.getUserName()));
@@ -56,7 +41,7 @@ public class LoginTask extends AsyncTask<Void, Void, LoginTaskResult> {
 
             if(params.user.getLoginType() == AuthenticationController.LOGIN_TYPE_DEFAULT){
                 requestParams.add(new BasicNameValuePair(AppConstants.TAG_PASSWORD, params.user.getPassword()));
-            }else if(params.user.getLoginType() != 0){
+            }else {
                 requestParams.add(new BasicNameValuePair(AppConstants.TAG_SOCIAL_NETWORK_USER_ID, params.user.getSocialNetworkUserId()));
             }
 
@@ -101,7 +86,9 @@ public class LoginTask extends AsyncTask<Void, Void, LoginTaskResult> {
             result.successCode = 0;
             result.message = "Login Failure! Error : " + e.getMessage();
             return result;
-        }
+        }*/
+
+        return null;
     }
 
     @Override

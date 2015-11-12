@@ -2,10 +2,9 @@
 <resources>
 
     <!-- App -->
-
     <string name="app_name">Needle</string>
-    <string name="facebook_app_id">1384996395135194</string>
-    <string name="facebook_secret">ac0a4152cea2cd4a6552fa3f16423926</string>
+    <string name="facebook_app_id">1085989064752650</string>
+    <string name="facebook_secret">686ec7dd8b37e4eede018a34bf11ba5b</string>
     <string name="title_activity_maps">Needle</string>
     <string name="title_haystacks">Haystacks</string>
     <string name="title_location_sharing">Location Sharing</string>
@@ -34,7 +33,8 @@
     <string name="registerDialog">Creating User...</string>
     <string name="username">Username</string>
     <string name="password">Password</string>
-    <string name="accout_cta">No account yet? Create one</string>
+    <string name="email">Email</string>
+    <string name="accout_cta">No account yet? Create one!</string>
     <string name="or">OR</string>
 
     <!-- Haystack List Fragment -->

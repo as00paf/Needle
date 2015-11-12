@@ -11,7 +11,6 @@ import android.widget.TextView;
 
 import com.nemator.needle.R;
 import com.nemator.needle.models.vo.HaystackVO;
-import com.nemator.needle.tasks.ImageDownloaderTask;
 import com.nemator.needle.utils.AppConstants;
 
 import java.util.ArrayList;
@@ -79,7 +78,7 @@ public class HaystackListCardAdapter extends RecyclerView.Adapter<HaystackListCa
 
                 if (holder.imageView != null && haystack.getPictureURL() != null) {
                     String encodedURL = AppConstants.HAYSTACK_PICTURES_URL + Uri.encode(haystack.getPictureURL());
-                    new ImageDownloaderTask(holder.imageView, mContext.getResources().getDrawable(R.drawable.haystack_picture_placeholder)).execute(encodedURL);
+                   // new ImageDownloaderTask(holder.imageView, mContext.getResources().getDrawable(R.drawable.haystack_picture_placeholder)).execute(encodedURL);
                 }
 
                 holder.setData(haystack);

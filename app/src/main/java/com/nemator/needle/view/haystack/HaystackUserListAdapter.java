@@ -11,7 +11,6 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.nemator.needle.R;
-import com.nemator.needle.tasks.ImageDownloaderTask;
 import com.nemator.needle.models.vo.UserVO;
 
 import java.util.List;
@@ -69,7 +68,7 @@ public class HaystackUserListAdapter extends BaseAdapter {
 
         String url = dItem.getPictureURL();
         if(!TextUtils.isEmpty(url)){
-            new ImageDownloaderTask(userItemHolder.icon, context.getResources().getDrawable(R.drawable.ic_action_person)).execute(url);
+            //new ImageDownloaderTask(userItemHolder.icon, context.getResources().getDrawable(R.drawable.ic_action_person)).execute(url);
         }else{
             userItemHolder.icon.setImageDrawable(context.getResources().getDrawable(R.drawable.ic_action_person));
         }

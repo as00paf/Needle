@@ -8,6 +8,7 @@ public class AppConstants {
     public static final String PROJECT_URL = "http://66.131.192.108:2772/Needle/";
     public static final String HAYSTACK_PICTURES_URL = PROJECT_URL + "pictures/";
 
+    //TODO: put in strings
     public static final String TWITTER_API_KEY = "wWswYiVtl4FaykxAS4a6ikriG";
     public static final String TWITTER_API_SECRET = "stpTOh5IAKuX1NRdmOhybIETxUQ3Eftn3byNUsX4ZOjr9aUdmF";
 
@@ -28,6 +29,7 @@ public class AppConstants {
     public static final String TAG_IS_ACTIVE = "isActive";
     public static final String TAG_LOCATION_SHARING_ID = "locationSharingId";
     public static final String TAG_USER_NAME = "userName";
+    public static final String TAG_EMAIL = "email";
     public static final String TAG_PASSWORD = "password";
     public static final String TAG_USER_ID = "userId";
     public static final String TAG_LOGGED_IN = "loggedIn";

@@ -12,6 +12,7 @@
       <module fileurl="file://$PROJECT_DIR$/facebook/facebook.iml" filepath="$PROJECT_DIR$/facebook/facebook.iml" />
       <module fileurl="file://$PROJECT_DIR$/googleplus/googleplus.iml" filepath="$PROJECT_DIR$/googleplus/googleplus.iml" />
       <module fileurl="file://$PROJECT_DIR$/picasso-2.5.2/picasso-2.5.2.iml" filepath="$PROJECT_DIR$/picasso-2.5.2/picasso-2.5.2.iml" />
+      <module fileurl="file://$PROJECT_DIR$/retrofit-2.0.0-beta2/retrofit-2.0.0-beta2.iml" filepath="$PROJECT_DIR$/retrofit-2.0.0-beta2/retrofit-2.0.0-beta2.iml" />
       <module fileurl="file://$PROJECT_DIR$/transformations/transformations.iml" filepath="$PROJECT_DIR$/transformations/transformations.iml" />
       <module fileurl="file://$PROJECT_DIR$/twitter/twitter.iml" filepath="$PROJECT_DIR$/twitter/twitter.iml" />
     </modules>

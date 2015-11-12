@@ -6,23 +6,14 @@ import android.util.Base64;
 import android.view.View;
 
 import com.nemator.needle.utils.AppConstants;
-import com.nemator.needle.utils.JSONParser;
-
-import org.apache.http.NameValuePair;
-import org.apache.http.message.BasicNameValuePair;
-import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
-import java.util.ArrayList;
-import java.util.List;
 
 public class ImageUploaderTask extends AsyncTask<ImageUploadParams, Void, ImageUploadResult> {
 
     private static final String UPLOAD_HAYSTACK_IMAGE_URL = AppConstants.PROJECT_URL +"uploadHaystackImage.php";
 
-    private static final String TAG = "FetchHaystacksTask";
-
-    private JSONParser jsonParser = new JSONParser();
+    private static final String TAG = "ImageUploaderTask";
 
     private ImageUploadResponseHandler delegate;
     private ImageUploadParams params;
@@ -58,7 +49,7 @@ public class ImageUploaderTask extends AsyncTask<ImageUploadParams, Void, ImageU
                 String encodedString = Base64.encodeToString(byte_arr, 0);
 
                 //Params
-                List<NameValuePair> requestParams = new ArrayList<NameValuePair>();
+               /* List<NameValuePair> requestParams = new ArrayList<NameValuePair>();
                 requestParams.add(new BasicNameValuePair("data", encodedString));
                 requestParams.add(new BasicNameValuePair("fileName", this.params.fileName));
 
@@ -68,7 +59,7 @@ public class ImageUploaderTask extends AsyncTask<ImageUploadParams, Void, ImageU
                 //Results
                 result.successCode = json.getInt(AppConstants.TAG_SUCCESS);
                 result.successMessage = json.getString(AppConstants.TAG_MESSAGE);
-                result.imageURL = json.getString(AppConstants.TAG_PICTURE_URL);
+                result.imageURL = json.getString(AppConstants.TAG_PICTURE_URL);*/
 
                 return result;
             } catch (Exception e) {

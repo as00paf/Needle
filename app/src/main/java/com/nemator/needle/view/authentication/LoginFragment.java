@@ -2,6 +2,7 @@ package com.nemator.needle.view.authentication;
 
 import android.app.Activity;
 import android.content.SharedPreferences;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
@@ -22,6 +23,7 @@ import com.google.android.gms.common.SignInButton;
 import com.nemator.needle.MainActivity;
 import com.nemator.needle.Needle;
 import com.nemator.needle.R;
+import com.nemator.needle.api.ApiClient;
 import com.nemator.needle.controller.AuthenticationController;
 import com.nemator.needle.models.vo.UserVO;
 import com.nemator.needle.tasks.login.LoginTask;
@@ -141,7 +143,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
         String password = pass.getText().toString();
         String regId = Needle.userModel.getGcmRegId();
 
-        UserVO user = new UserVO(-1, username, password, "", regId, AuthenticationController.LOGIN_TYPE_DEFAULT, "-1");
+        //UserVO user = new UserVO(-1, username, password, "", regId, AuthenticationController.LOGIN_TYPE_DEFAULT, "-1");
 
         Log.i(TAG, "Trying to login with credentials : " + username + ", " + password + ", " + regId);
 
@@ -149,8 +151,10 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
             Toast.makeText(getActivity(), "You must enter a username and a password", Toast.LENGTH_LONG).show();
         }else{
             WeakReference<TextView> textView = new WeakReference<TextView>((TextView) ((MainActivity) getActivity()).findViewById(R.id.login_splash_label));
-            LoginTaskParams params = new LoginTaskParams(getActivity(), user, textView);
-            new LoginTask(params, Needle.authenticationController).execute();
+           // LoginTaskParams params = new LoginTaskParams(getActivity(), user, textView);
+            //new LoginTask(params, Needle.authenticationController).execute();
+
+            //ApiClient.getInstance().login(0, );
         }
     }
 

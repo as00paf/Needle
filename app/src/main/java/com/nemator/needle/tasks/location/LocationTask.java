@@ -6,17 +6,13 @@ import android.util.Log;
 
 import com.nemator.needle.tasks.locationSharing.LocationSharingParams;
 import com.nemator.needle.utils.AppConstants;
-import com.nemator.needle.utils.JSONParser;
 
-import org.apache.http.NameValuePair;
-import org.apache.http.message.BasicNameValuePair;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 
 public class LocationTask extends AsyncTask<Void, Void, LocationTaskResult> {
 
@@ -25,7 +21,6 @@ public class LocationTask extends AsyncTask<Void, Void, LocationTaskResult> {
 
     private Object delegate;
 
-    private JSONParser jsonParser = new JSONParser(7000, 10000);
     private LocationTaskParams params;
     private ProgressDialog dialog;
 
@@ -87,7 +82,7 @@ public class LocationTask extends AsyncTask<Void, Void, LocationTaskResult> {
         int success;
         String message = "not set";
 
-        try {
+        /*try {
             //Request
             JSONObject json;
             if(params.type == LocationSharingParams.TYPE_GET || params.type == LocationSharingParams.TYPE_CANCEL){
@@ -130,13 +125,13 @@ public class LocationTask extends AsyncTask<Void, Void, LocationTaskResult> {
             e.printStackTrace();
             result.successCode = 0;
             result.successMessage = msg;
-        }
+        }*/
 
         return result;
     }
 
     private Object getRequestParams() {
-        List<NameValuePair> requestParams = new ArrayList<NameValuePair>();
+       /* List<NameValuePair> requestParams = new ArrayList<NameValuePair>();
         JSONObject jsonObject = new JSONObject();
         switch (params.type){
             case LocationSharingParams.TYPE_GET :
@@ -152,7 +147,7 @@ public class LocationTask extends AsyncTask<Void, Void, LocationTaskResult> {
                 }
 
                 return jsonObject;
-        }
+        }*/
 
         return null;
     }

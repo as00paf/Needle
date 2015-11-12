@@ -8,18 +8,13 @@ import com.google.android.gms.maps.model.LatLng;
 import com.nemator.needle.R;
 import com.nemator.needle.models.vo.HaystackVO;
 import com.nemator.needle.models.vo.UserVO;
-import com.nemator.needle.tasks.locationSharing.LocationSharingParams;
 import com.nemator.needle.utils.AppConstants;
-import com.nemator.needle.utils.JSONParser;
 
-import org.apache.http.NameValuePair;
-import org.apache.http.message.BasicNameValuePair;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class HaystackTask extends AsyncTask<Void, Void, HaystackTaskResult> {
 
@@ -28,7 +23,6 @@ public class HaystackTask extends AsyncTask<Void, Void, HaystackTaskResult> {
 
     private Object delegate;
 
-    private JSONParser jsonParser = new JSONParser();
     private HaystackTaskParams params;
     private ProgressDialog dialog;
 
@@ -102,7 +96,7 @@ public class HaystackTask extends AsyncTask<Void, Void, HaystackTaskResult> {
         int success;
         String message = "not set";
 
-        try {
+       /* try {
             //Request
             JSONObject json;
             if(params.type == HaystackTaskParams.TYPE_GET || params.type == HaystackTaskParams.TYPE_CREATE || params.type == HaystackTaskParams.TYPE_DELETE){
@@ -150,12 +144,12 @@ public class HaystackTask extends AsyncTask<Void, Void, HaystackTaskResult> {
 
             e.printStackTrace();
         }
-
+*/
         return result;
     }
 
     private Object getRequestParams() {
-        List<NameValuePair> requestParams = new ArrayList<NameValuePair>();
+        /*List<NameValuePair> requestParams = new ArrayList<NameValuePair>();
         JSONObject jsonObject = new JSONObject();
         switch (params.type){
             case HaystackTaskParams.TYPE_GET :
@@ -192,22 +186,7 @@ public class HaystackTask extends AsyncTask<Void, Void, HaystackTaskResult> {
                 }
 
                 return requestParams;
-            case HaystackTaskParams.TYPE_UPDATE :
-                /*try{
-                    jsonObject.put(AppConstants.TAG_RECEIVER_ID, String.valueOf(params.vo.getReceiverId()));
-                    jsonObject.put(AppConstants.TAG_LOCATION_SHARING_ID, String.valueOf(params.vo.getId()));
-                    jsonObject.put(AppConstants.TAG_SHARE_BACK, String.valueOf(!params.vo.getShareBack()));
-                }catch (Exception e){
-                    Log.i(TAG, "Exception : "+e.getMessage());
-                }
-
-                return jsonObject;*/
-            case HaystackTaskParams.TYPE_DELETE :
-               /* requestParams.add(new BasicNameValuePair(AppConstants.TAG_SENDER_ID, String.valueOf(params.vo.getSenderId())));
-                requestParams.add(new BasicNameValuePair(AppConstants.TAG_LOCATION_SHARING_ID, String.valueOf(params.vo.getId())));
-
-                return requestParams;*/
-        }
+        }*/
 
         return null;
     }

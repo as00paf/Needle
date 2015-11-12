@@ -9,7 +9,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.nemator.needle.R;
-import com.nemator.needle.tasks.ImageDownloaderTask;
 import com.nemator.needle.models.vo.UserVO;
 
 import java.util.ArrayList;
@@ -74,7 +73,7 @@ public class CreateHaystackUserListCardAdapter extends RecyclerView.Adapter<Crea
 
         //Image
         if(user.getPictureURL() != null){
-            new ImageDownloaderTask(holder.imageView, mContext.getResources().getDrawable(R.drawable.person_placeholder)).execute(user.getPictureURL());
+            //new ImageDownloaderTask(holder.imageView, mContext.getResources().getDrawable(R.drawable.person_placeholder)).execute(user.getPictureURL());
         }
 
         holder.setData(user);

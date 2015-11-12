@@ -14,15 +14,11 @@ import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.nemator.needle.MainActivity;
 import com.nemator.needle.Needle;
 import com.nemator.needle.R;
-import com.nemator.needle.models.UserModel;
-import com.nemator.needle.tasks.user.UserTask;
-import com.nemator.needle.tasks.user.UserTaskParams;
-import com.nemator.needle.tasks.user.UserTaskResult;
 import com.nemator.needle.utils.AppConstants;
 
 import java.io.IOException;
 
-public class GCMController implements UserTask.UpdateGCMIDResponseHandler {
+public class GCMController /*implements UserTask.UpdateGCMIDResponseHandler*/ {
 
     public static String TAG = "GCMController";
 
@@ -86,8 +82,8 @@ public class GCMController implements UserTask.UpdateGCMIDResponseHandler {
         return true;
     }
 
-    @Override
-    public void onGCMIDUpdated(UserTaskResult result) {
+    /*@Override
+   public void onGCMIDUpdated(UserTaskResult result) {
         if(result.successCode != 1){//Retry
             tryCount++;
             if(tryCount < 3){
@@ -97,7 +93,7 @@ public class GCMController implements UserTask.UpdateGCMIDResponseHandler {
                 Toast.makeText(activity, "Error While Updating GCM RegID", Toast.LENGTH_SHORT).show();
             }
         }
-    }
+    }*/
 
     class RegisterGCMTask extends AsyncTask<Void, Void, Void> {
 
@@ -141,8 +137,8 @@ public class GCMController implements UserTask.UpdateGCMIDResponseHandler {
                 Log.i(TAG, "Needs to register with GCM " + Needle.userModel.getGcmRegId());
 
                 if(Needle.userModel.getUserId() != -1){
-                    UserTaskParams params = new UserTaskParams(activity, UserTaskParams.TYPE_UPDATE_GCM_ID, Needle.userModel.getUser());
-                    new UserTask(params, GCMController.this).execute();
+                    //UserTaskParams params = new UserTaskParams(activity, UserTaskParams.TYPE_UPDATE_GCM_ID, Needle.userModel.getUser());
+                    //new UserTask(params, GCMController.this).execute();
                 }
             }
         }

@@ -10,16 +10,12 @@ import com.nemator.needle.models.vo.LocationSharingVO;
 import com.nemator.needle.tasks.db.addPostLocationRequest.AddPostLocationRequestParams;
 import com.nemator.needle.tasks.db.removePostLocationRequest.RemovePostLocationRequestTask;
 import com.nemator.needle.utils.AppConstants;
-import com.nemator.needle.utils.JSONParser;
 
-import org.apache.http.NameValuePair;
-import org.apache.http.message.BasicNameValuePair;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class LocationSharingTask extends AsyncTask<Void, Void, LocationSharingResult> {
 
@@ -28,7 +24,6 @@ public class LocationSharingTask extends AsyncTask<Void, Void, LocationSharingRe
 
     private Object delegate;
 
-    private JSONParser jsonParser = new JSONParser();
     private LocationSharingParams params;
     private ProgressDialog dialog;
 
@@ -100,7 +95,7 @@ public class LocationSharingTask extends AsyncTask<Void, Void, LocationSharingRe
         LocationSharingResult result = new LocationSharingResult();
         int success;
         String message = "not set";
-
+/*
         try {
             //Request
             JSONObject json;
@@ -141,12 +136,12 @@ public class LocationSharingTask extends AsyncTask<Void, Void, LocationSharingRe
             Log.d(TAG, "LocationSharing Failure ! message :" + message);
             e.printStackTrace();
         }
-
+*/
         return result;
     }
 
     private Object getRequestParams() {
-        List<NameValuePair> requestParams = new ArrayList<NameValuePair>();
+        /*List<NameValuePair> requestParams = new ArrayList<NameValuePair>();
         JSONObject jsonObject = new JSONObject();
         switch (params.type){
             case LocationSharingParams.TYPE_GET :
@@ -178,7 +173,7 @@ public class LocationSharingTask extends AsyncTask<Void, Void, LocationSharingRe
 
                 return requestParams;
         }
-
+*/
         return null;
     }
 

@@ -417,7 +417,7 @@ public class HaystackMapFragment extends SupportMapFragment
     }
 
     public void onHaystackLeft(TaskResult result){
-        if(result.successCode == 1){
+        if(result.getSuccessCode() == 1){
             Toast.makeText(getActivity(), "Haystack Left", Toast.LENGTH_SHORT).show();
 
            /* Intent intent = new Intent(getActivity(), HomeActivity.class);

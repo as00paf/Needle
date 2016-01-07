@@ -1,7 +1,7 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <item android:id="@+id/menu_option_help" android:title="@string/title_helpAndSupport"
+    <item android:id="@+id/menu_option_help" android:description="@string/title_helpAndSupport"
         app:showAsAction="never" android:icon="@drawable/ic_action_help"/>
 
 </menu>

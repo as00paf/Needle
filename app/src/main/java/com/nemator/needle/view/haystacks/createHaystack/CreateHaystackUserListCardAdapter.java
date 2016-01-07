@@ -10,6 +10,7 @@ import android.widget.TextView;
 
 import com.nemator.needle.R;
 import com.nemator.needle.models.vo.UserVO;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 
@@ -73,7 +74,12 @@ public class CreateHaystackUserListCardAdapter extends RecyclerView.Adapter<Crea
 
         //Image
         if(user.getPictureURL() != null){
-            //new ImageDownloaderTask(holder.imageView, mContext.getResources().getDrawable(R.drawable.person_placeholder)).execute(user.getPictureURL());
+            Picasso.with(mContext)
+                    .load(user.getPictureURL())
+                    .resize(250, 250)
+                    .centerCrop()
+                    .error(mContext.getResources().getDrawable(R.drawable.person_placeholder))
+                    .into(holder.imageView);
         }
 
         holder.setData(user);

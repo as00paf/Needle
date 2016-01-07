@@ -12,7 +12,6 @@ import com.google.android.gms.maps.model.LatLngBounds;
 import com.nemator.needle.R;
 import com.nemator.needle.models.vo.PlaceAutoCompleteVO;
 import com.nemator.needle.utils.SphericalUtil;
-import com.quinny898.library.persistentsearch.SearchResult;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -108,11 +107,11 @@ public class GetAutoCompleteResultsTask extends AsyncTask<Void, Void, Void> {
         ArrayList<PlaceAutoCompleteVO> autoCompleteResults = resultList;
         for (int i = 0; i < autoCompleteResults.size(); i++) {
             String searchTerm = autoCompleteResults.get(i).description.toString();
-            SearchResult searchResult = new SearchResult(searchTerm, mParams.getContext().getResources().getDrawable(R.drawable.ic_action_place));
+           /* SearchResult searchResult = new SearchResult(searchTerm, mParams.getContext().getResources().getDrawable(R.drawable.ic_action_place));
             if(!mParams.getSearchBox().getSearchables().contains(searchResult)) {
                 mParams.getSearchBox().addSearchable(searchResult);
 
-            }
+            }*/
         }
 
         super.onPostExecute(aVoid);

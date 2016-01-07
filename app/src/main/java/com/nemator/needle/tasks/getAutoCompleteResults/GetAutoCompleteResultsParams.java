@@ -5,7 +5,6 @@ import android.content.Context;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.places.AutocompleteFilter;
 import com.google.android.gms.maps.model.LatLng;
-import com.quinny898.library.persistentsearch.SearchBox;
 
 /**
  * Created by Alex on 14/05/2015.
@@ -17,20 +16,17 @@ public class GetAutoCompleteResultsParams {
     private LatLng mCurrentPosition;
     private float mZoneRadius;
     private Context mContext;
-    private SearchBox mSearchBox;
 
-    public GetAutoCompleteResultsParams(Context context, SearchBox searchBox, GoogleApiClient googleApiClient, LatLng currentPosition, float zoneRadius, String searchTerm ){
+    public GetAutoCompleteResultsParams(Context context,  GoogleApiClient googleApiClient, LatLng currentPosition, float zoneRadius, String searchTerm ){
         mContext = context;
-        mSearchBox = searchBox;
         mGoogleApiClient = googleApiClient;
         mCurrentPosition = currentPosition;
         mZoneRadius = zoneRadius;
         mSearchTerm = searchTerm;
     }
 
-    public GetAutoCompleteResultsParams(Context context, SearchBox searchBox, GoogleApiClient googleApiClient, LatLng currentPosition, float zoneRadius, String searchTerm, AutocompleteFilter filter ){
+    public GetAutoCompleteResultsParams(Context context, GoogleApiClient googleApiClient, LatLng currentPosition, float zoneRadius, String searchTerm, AutocompleteFilter filter ){
         mContext = context;
-        mSearchBox = searchBox;
         mGoogleApiClient = googleApiClient;
         mCurrentPosition = currentPosition;
         mZoneRadius = zoneRadius;
@@ -84,14 +80,6 @@ public class GetAutoCompleteResultsParams {
 
     public void setContext(Context mContext) {
         this.mContext = mContext;
-    }
-
-    public SearchBox getSearchBox() {
-        return mSearchBox;
-    }
-
-    public void setSearchBox(SearchBox mSearchBox) {
-        this.mSearchBox = mSearchBox;
     }
 }
 

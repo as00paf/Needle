@@ -55,7 +55,7 @@ if (!empty($_POST)) {
 		    <input type="text" name="username" placeholder="username" /> 
 		    <br /><br /> 
 		    Title:<br /> 
-		    <input type="text" name="title" placeholder="post title" /> 
+		    <input type="text" name="description" placeholder="post description" />
 		    <br /><br />
 			Message:<br /> 
 		    <input type="text" name="message" placeholder="post message" /> 

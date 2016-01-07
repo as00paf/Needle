@@ -2,7 +2,7 @@
 <html>
 
 	<head>
-		<title>Needle</title>
+		<description>Needle</description>
 		<LINK REL="SHORTCUT ICON" HREF="FAVICON.ico">
 	</head>
 	

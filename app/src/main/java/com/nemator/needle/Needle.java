@@ -2,6 +2,9 @@ package com.nemator.needle;
 
 import android.app.Application;
 import android.content.Context;
+import android.os.Bundle;
+import android.support.multidex.MultiDex;
+import android.support.multidex.MultiDexApplication;
 
 import com.nemator.needle.controller.AuthenticationController;
 import com.nemator.needle.controller.GCMController;
@@ -13,7 +16,7 @@ import com.nemator.needle.models.UserModel;
 /**
  * Created by Alex on 20/09/2015.
  */
-public class Needle extends Application {
+public class Needle extends MultiDexApplication {
 
     //App Components
     public static final UserModel userModel = UserModel.getInstance();
@@ -25,5 +28,10 @@ public class Needle extends Application {
 
     public Needle() {
         super();
+    }
+
+    public void onCreate(Bundle arguments) {
+        MultiDex.install(getApplicationContext());
+        super.onCreate();
     }
 }

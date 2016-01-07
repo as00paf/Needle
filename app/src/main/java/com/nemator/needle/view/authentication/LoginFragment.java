@@ -1,11 +1,15 @@
 package com.nemator.needle.view.authentication;
 
 import android.app.Activity;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
-import android.graphics.Typeface;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.LocalBroadcastManager;
+import android.support.v7.widget.AppCompatEditText;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -14,7 +18,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -25,12 +28,7 @@ import com.nemator.needle.Needle;
 import com.nemator.needle.R;
 import com.nemator.needle.api.ApiClient;
 import com.nemator.needle.controller.AuthenticationController;
-import com.nemator.needle.models.vo.UserVO;
-import com.nemator.needle.tasks.login.LoginTask;
-import com.nemator.needle.tasks.login.LoginTaskParams;
 import com.nemator.needle.utils.AppConstants;
-
-import java.lang.ref.WeakReference;
 
 public class LoginFragment extends Fragment implements View.OnClickListener {
 
@@ -38,7 +36,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
 
     //Children
     private FrameLayout layout;
-    private EditText user, pass;
+    private AppCompatEditText user, pass;
     private Button mSubmit, facebookButton, twitterButtton;
     private SignInButton googleButton;
     private TextView mRegister;
@@ -74,13 +72,13 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         layout = (FrameLayout) inflater.inflate(R.layout.fragment_login, container, false);
 
-        mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        mSharedPreferences = getActivity().getSharedPreferences("Needle", Context.MODE_PRIVATE);
 
         //Username & Password
-        user = (EditText) layout.findViewById(R.id.usernameEditText);
-        user.setText(mSharedPreferences.getString(AppConstants.TAG_USER_NAME, ""));
+        user = (AppCompatEditText) layout.findViewById(R.id.usernameEditText);
+        user.setText(mSharedPreferences.getString(AppConstants.TAG_EMAIL, ""));
 
-        pass = (EditText) layout.findViewById(R.id.input_password);
+        pass = (AppCompatEditText) layout.findViewById(R.id.input_password);
         pass.setText(mSharedPreferences.getString(AppConstants.TAG_PASSWORD, ""));
 
         /*if(!((MaterialNavigationDrawer) getActivity()).isDrawerOpen()){
@@ -139,22 +137,23 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
         pass.clearFocus();
         user.clearFocus();
 
-        String username = user.getText().toString();
+        String userOrEmail = user.getText().toString();
         String password = pass.getText().toString();
         String regId = Needle.userModel.getGcmRegId();
 
+        Boolean isEmail = userOrEmail.contains("@");
+        String username = isEmail ? null : userOrEmail;
+        String email = isEmail ? userOrEmail : null;
+
         //UserVO user = new UserVO(-1, username, password, "", regId, AuthenticationController.LOGIN_TYPE_DEFAULT, "-1");
 
-        Log.i(TAG, "Trying to login with credentials : " + username + ", " + password + ", " + regId);
+        Log.i(TAG, "Trying to login with credentials : " + username + ", " + email + ", " + password + ", " + regId);
 
-        if(TextUtils.isEmpty(username) || TextUtils.isEmpty(password)){
-            Toast.makeText(getActivity(), "You must enter a username and a password", Toast.LENGTH_LONG).show();
+        if(TextUtils.isEmpty(userOrEmail)|| TextUtils.isEmpty(password)){
+            //TODO : Localization
+            Toast.makeText(getActivity(), "You must enter a username or email and a password", Toast.LENGTH_LONG).show();
         }else{
-            WeakReference<TextView> textView = new WeakReference<TextView>((TextView) ((MainActivity) getActivity()).findViewById(R.id.login_splash_label));
-           // LoginTaskParams params = new LoginTaskParams(getActivity(), user, textView);
-            //new LoginTask(params, Needle.authenticationController).execute();
-
-            //ApiClient.getInstance().login(0, );
+            ApiClient.getInstance().login(0, email, username, regId, password, "", Needle.authenticationController.getUserLoginCallback());
         }
     }
 
@@ -183,7 +182,23 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
         }
 
         if(networkId != 0){
-            Needle.authenticationController.logInWithSocialNetwork(networkId);
+            if(networkId == AuthenticationController.LOGIN_TYPE_GOOGLE){
+                if(!Needle.googleApiController.getBuildPlus()){
+                    LocalBroadcastManager.getInstance(getActivity())
+                            .registerReceiver(new BroadcastReceiver() {
+                                @Override
+                                public void onReceive(Context context, Intent intent) {
+                                    Needle.authenticationController.logInWithSocialNetwork(AuthenticationController.LOGIN_TYPE_GOOGLE);
+                                }
+                            }, new IntentFilter(AppConstants.GOOGLE_API_CONNECTED));
+
+                    Needle.googleApiController.reinitWithPlus(((MainActivity) getActivity()));
+                }else{
+                    Needle.authenticationController.logInWithSocialNetwork(networkId);
+                }
+            }else{
+                Needle.authenticationController.logInWithSocialNetwork(networkId);
+            }
         }
     }
 

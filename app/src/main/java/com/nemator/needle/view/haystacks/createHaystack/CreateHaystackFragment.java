@@ -1,58 +1,65 @@
 package com.nemator.needle.view.haystacks.createHaystack;
 
+import android.animation.Animator;
 import android.app.Activity;
+import android.app.SearchManager;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
-import android.content.IntentSender;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
-import android.content.pm.PackageManager;
-import android.content.pm.ResolveInfo;
 import android.graphics.Bitmap;
 import android.graphics.Matrix;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.provider.MediaStore;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.content.LocalBroadcastManager;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v4.view.ViewPager;
+import android.support.v7.app.ActionBar;
+import android.support.v7.widget.SearchView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.Toast;
 
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.GooglePlayServicesUtil;
-import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.location.places.Places;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.MapView;
+import com.google.android.gms.maps.model.LatLng;
+import com.nemator.needle.MainActivity;
 import com.nemator.needle.Needle;
 import com.nemator.needle.R;
+import com.nemator.needle.adapter.CreateHaystackPagerAdapter;
+import com.nemator.needle.api.ApiClient;
 import com.nemator.needle.models.vo.HaystackVO;
 import com.nemator.needle.models.vo.UserVO;
-import com.nemator.needle.tasks.haystack.HaystackTask;
-import com.nemator.needle.tasks.haystack.HaystackTaskParams;
 import com.nemator.needle.tasks.imageUploader.ImageUploadParams;
 import com.nemator.needle.tasks.imageUploader.ImageUploadResult;
 import com.nemator.needle.tasks.imageUploader.ImageUploaderTask;
 import com.nemator.needle.utils.AppConstants;
 import com.nemator.needle.utils.AppState;
+import com.nemator.needle.utils.CameraUtils;
+import com.nemator.needle.view.SearchFragment;
 import com.nemator.needle.view.haystacks.OnActivityStateChangeListener;
 import com.viewpagerindicator.CirclePageIndicator;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class CreateHaystackFragment extends CreateHaystackBaseFragment implements ImageUploaderTask.ImageUploadResponseHandler,
-        CreateHaystackGeneralInfosFragment.OnPrivacySettingsUpdatedListener,
-        GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener{
+        CreateHaystackGeneralInfosFragment.OnPrivacySettingsUpdatedListener{
     public static final String TAG = "CreateHaystackFragment";
 
     //Activity Results
-    public static int TAKE_PICTURE = 1;
+    public static int TAKE_PICTURE = 226;
 
     //View
     private View rootView;
@@ -65,8 +72,6 @@ public class CreateHaystackFragment extends CreateHaystackBaseFragment implement
     public CreateHaystackMapFragment mCreateHaystackMapFragment;
     public CreateHaystackUsersFragment mCreateHaystackUsersFragment;
 
-    private CreateHaystackMap mMap;
-
     //Data
     private String userName;
     private HaystackVO haystack;
@@ -77,8 +82,10 @@ public class CreateHaystackFragment extends CreateHaystackBaseFragment implement
     private CreateHaystackPagerAdapter mCreateHaystackPagerAdapter;
     private Boolean isPublic = false;
     private OnActivityStateChangeListener stateChangeCallback;
-
-    public static GoogleApiClient mGoogleApiClient;
+    private SearchView searchView;
+    private MenuItem mSearchAction;
+    private boolean isSearchOpened = false;
+    private SearchFragment searchFragment;
 
     public static CreateHaystackFragment newInstance() {
         CreateHaystackFragment fragment = new CreateHaystackFragment();
@@ -107,35 +114,24 @@ public class CreateHaystackFragment extends CreateHaystackBaseFragment implement
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
 
-        if (getArguments() != null) {
-        }
-
-        //Google API Client
-        if (GooglePlayServicesUtil.isGooglePlayServicesAvailable(getActivity()) != ConnectionResult.SUCCESS) {
-            Toast.makeText(getActivity(), "Google Play Services Unavailable", Toast.LENGTH_SHORT).show();
-            Log.e(TAG, "Google Play Services Unavailable");
-        }else{
-            connectToApiClient();
-        }
+        LocalBroadcastManager localBroadcastManager = LocalBroadcastManager.getInstance(getActivity());
+        localBroadcastManager.registerReceiver(apiConnectedReceiver, new IntentFilter(AppConstants.SOCIAL_NETWORKS_INITIALIZED));
     }
 
-    private void connectToApiClient(){
-        if(mGoogleApiClient == null){
-            buildGoogleApiClient();
-            mGoogleApiClient.connect();
-        }else if(!mGoogleApiClient.isConnected()){
-            mGoogleApiClient.connect();
-        }
-    }
+    private BroadcastReceiver apiConnectedReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            LocalBroadcastManager localBroadcastManager = LocalBroadcastManager.getInstance(getActivity());
+            localBroadcastManager.unregisterReceiver(this);
 
-    protected synchronized void buildGoogleApiClient() {
-        mGoogleApiClient = new GoogleApiClient.Builder(getActivity())
-                .addConnectionCallbacks(this)
-                .addOnConnectionFailedListener(this)
-                .addApi(LocationServices.API)
-                .addApi(Places.GEO_DATA_API)
-                .addApi(Places.PLACE_DETECTION_API)
-                .build();
+            initPermissionsAndServices();
+        }
+    };
+
+    private void initPermissionsAndServices() {
+        if(Needle.gcmController.checkPlayServices()){
+            Needle.googleApiController.checkLocationSettings();
+        }
     }
 
     @Override
@@ -143,7 +139,7 @@ public class CreateHaystackFragment extends CreateHaystackBaseFragment implement
         rootView = inflater.inflate(R.layout.fragment_create_haystack, container, false);
 
         //ViewPager
-        mCreateHaystackPagerAdapter = new CreateHaystackPagerAdapter(getActivity().getSupportFragmentManager(), this);
+        mCreateHaystackPagerAdapter = new CreateHaystackPagerAdapter(getActivity().getSupportFragmentManager(), getActivity());
         createHaystackViewPager = (ViewPager) rootView.findViewById(R.id.create_haystack_view_pager);
         createHaystackViewPager.setAdapter(mCreateHaystackPagerAdapter);
 
@@ -183,6 +179,19 @@ public class CreateHaystackFragment extends CreateHaystackBaseFragment implement
             }
         });
 
+        viewPagerIndicator.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                Log.d(TAG, "here");
+
+                if(v instanceof MapView){
+                    return true;
+                }
+
+                return false;
+            }
+        });
+
         //FAB
         fab = (FloatingActionButton) rootView.findViewById(R.id.new_haystack_photo_fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -192,15 +201,14 @@ public class CreateHaystackFragment extends CreateHaystackBaseFragment implement
                 switch (position) {
                     case 0:
                         //Take Picture
-                        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                        Intent intent = CameraUtils.getImageCaptureIntent();
                         intent.putExtra(MediaStore.EXTRA_SCREEN_ORIENTATION, ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
 
                         startActivityForResult(intent, TAKE_PICTURE);
                         break;
                     case 1:
                         //Focus Camera on current position
-                        mMap = ((CreateHaystackMapFragment) getFragmentManager().getFragments().get(4)).getMap();
-                        mMap.moveUserToCurrentPosition();
+                        ((CreateHaystackMapFragment) getFragmentManager().getFragments().get(4)).getCameraController().focusOnMyPosition();
                         break;
                     case 2:
                         //Invite Friend
@@ -235,8 +243,67 @@ public class CreateHaystackFragment extends CreateHaystackBaseFragment implement
         String title = getResources().getString(R.string.create_haystack);
         Needle.navigationController.setActionBarTitle(title);
 
+        //Search
+        searchFragment = (SearchFragment) ((MainActivity) getActivity()).getSupportFragmentManager().findFragmentById(R.id.searchFragment);
+
         return rootView;
     }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == CreateHaystackFragment.TAKE_PICTURE && resultCode== getActivity().RESULT_OK && data != null){
+            Bundle extras = data.getExtras();
+
+            Bitmap bitmap = (Bitmap) extras.get("data");
+            //Rotate if portrait
+            if(bitmap.getHeight() > bitmap.getWidth()){
+                Matrix matrix = new Matrix();
+                matrix.postRotate(90);
+                bitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
+            }
+            CreateHaystackGeneralInfosFragment fragment = (CreateHaystackGeneralInfosFragment) mCreateHaystackPagerAdapter.getFragmentAt(0);
+            fragment.updatePhoto(bitmap);
+        }
+    }
+
+
+    private void initializeBroadcastListener() {
+        LocalBroadcastManager.getInstance(getContext()).registerReceiver(searchStateListener,
+                new IntentFilter(getString(R.string.action_search_started)));
+
+        LocalBroadcastManager.getInstance(getContext()).registerReceiver(searchStateListener,
+                new IntentFilter(getString(R.string.action_search_finished)));
+
+        LocalBroadcastManager.getInstance(getContext()).registerReceiver(searchItemListener,
+                new IntentFilter(getString(R.string.action_search_item_selected)));
+
+    }
+
+    private BroadcastReceiver searchStateListener = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction();
+
+            Boolean showProgressBar = action == getString(R.string.action_search_started);
+            //TODO : add progress bar
+            //progressBar.setVisibility(showProgressBar ? View.VISIBLE : View.INVISIBLE);
+        }
+    };
+
+    private BroadcastReceiver searchItemListener = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction();
+
+            LatLng location = intent.getParcelableExtra(getString(R.string.location));
+            if(location != null){
+                closeSearchMenu();
+                //TODO : move camera if necessary
+                //mapController.cameraController.unfocus(location);
+                //mapController.getRoadSidesNearLocation(location);
+            }
+        }
+    };
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
@@ -249,39 +316,163 @@ public class CreateHaystackFragment extends CreateHaystackBaseFragment implement
                 if(isPublic){
                     inflater.inflate(R.menu.menu_create_haystack_done, menu);
                 }else{
-                    super.onCreateOptionsMenu(menu, inflater);
+                    inflater.inflate(R.menu.menu_create_haystack_search, menu);
                 }
+
+                setupSearchView(menu);
                 break;
             case 2:
                 inflater.inflate(R.menu.menu_create_haystack_done, menu);
+                setupSearchView(menu);
                 break;
         }
+    }
+
+    private void setupSearchView(Menu menu) {
+        MenuItem menuItem = menu.findItem(R.id.action_search);
+        mSearchAction = menu.findItem(R.id.action_search);
+
+        searchView = (SearchView) MenuItemCompat.getActionView(menuItem);
+        SearchManager searchManager = (SearchManager) getContext().getSystemService(getContext().SEARCH_SERVICE);
+        searchView.setSearchableInfo(searchManager.getSearchableInfo(getActivity().getComponentName()));
+        searchView.setIconifiedByDefault(false);
+        searchView.setOnSearchClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                searchView.clearFocus();
+            }
+        });
+
+        MenuItemCompat.setShowAsAction(menuItem, MenuItem.SHOW_AS_ACTION_COLLAPSE_ACTION_VIEW
+                | MenuItem.SHOW_AS_ACTION_ALWAYS);
+
+        MenuItemCompat.setOnActionExpandListener(menuItem, new MenuItemCompat.OnActionExpandListener() {
+            @Override
+            public boolean onMenuItemActionCollapse(MenuItem item) {
+                InputMethodManager imm = (InputMethodManager) getContext().getSystemService(getActivity().INPUT_METHOD_SERVICE);
+                imm.hideSoftInputFromWindow(searchView.getWindowToken(), 0);
+
+                ActionBar action = ((MainActivity) getActivity()).getSupportActionBar();
+                mSearchAction.setIcon(getResources().getDrawable(R.drawable.ic_search_white_24dp));
+                action.setTitle(getResources().getString(R.string.app_name));
+                action.setDisplayShowCustomEnabled(false);
+                action.setDisplayShowTitleEnabled(true);
+                action.setDisplayShowHomeEnabled(true);
+
+                searchFragment.hide();
+                isSearchOpened = false;
+
+                return true;  // Return true to collapse action view
+            }
+
+            @Override
+            public boolean onMenuItemActionExpand(MenuItem item) {
+                return true;  // Return true to expand action view
+            }
+        });
+
+        ActionBar.LayoutParams params = new ActionBar.LayoutParams(ActionBar.LayoutParams.MATCH_PARENT, ActionBar.LayoutParams.MATCH_PARENT);
+        searchView.setLayoutParams(params);
+        searchView.setMaxWidth(2000);
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
 
-        if (id == R.id.create_haystack_action_done) {
-            createHaystack();
-            return true;
+        switch(id) {
+            case R.id.create_haystack_action_done:
+                createHaystack();
+                return true;
+            case R.id.action_search:
+                handleMenuSearch();
+                break;
+            case android.R.id.home:
+                if(isSearchOpened) {
+                    closeSearchMenu();
+                }
+                return true;
         }
 
         return super.onOptionsItemSelected(item);
     }
 
-    // method to check if you have a Camera
-    private boolean hasCamera(){
-        return getActivity().getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA);
+    private void handleMenuSearch() {
+        if(isSearchOpened){
+            closeSearchMenu();
+        } else {
+            openSearchMenu();
+        }
     }
 
-    // method to check you have Camera Apps
-    private boolean hasDefaultCameraApp(String action){
-        final PackageManager packageManager = getActivity().getPackageManager();
-        final Intent intent = new Intent(action);
-        List<ResolveInfo> list = packageManager.queryIntentActivities(intent, PackageManager.MATCH_DEFAULT_ONLY);
+    private void openSearchMenu(){
+        ActionBar action = ((MainActivity) getActivity()).getSupportActionBar();
+        action.setCustomView(R.layout.search_bar);
 
-        return list.size() > 0;
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                doSearch(query);
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(final String newText) {
+                doSearch(newText);
+                return false;
+            }
+        });
+
+        //add the close icon
+        mSearchAction.setIcon(getResources().getDrawable(R.drawable.ic_clear_white_24dp));
+        action.setTitle(getResources().getString(R.string.app_name));
+
+        searchFragment.show(new Animator.AnimatorListener() {
+            @Override
+            public void onAnimationStart(Animator animation) {
+                searchView.clearFocus();
+            }
+
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                //Show keyboard
+                searchView.requestFocus();
+
+                InputMethodManager imm = (InputMethodManager) getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+                imm.showSoftInput(searchView.findViewById(android.support.v7.appcompat.R.id.search_src_text), InputMethodManager.SHOW_FORCED);
+
+                animation.removeListener(this);
+                animation.removeAllListeners();
+            }
+
+            @Override
+            public void onAnimationCancel(Animator animation) {
+
+            }
+
+            @Override
+            public void onAnimationRepeat(Animator animation) {
+
+            }
+        });
+        isSearchOpened = true;
+    }
+
+    private void closeSearchMenu(){
+        //Hide keyboard
+        InputMethodManager imm = (InputMethodManager) getContext().getSystemService(getActivity().INPUT_METHOD_SERVICE);
+        imm.hideSoftInputFromWindow(searchView.getWindowToken(), 0);
+
+        ActionBar action = ((MainActivity) getActivity()).getSupportActionBar();
+        mSearchAction.collapseActionView();
+        mSearchAction.setIcon(getResources().getDrawable(R.drawable.ic_search_white_24dp));
+        action.setTitle(getResources().getString(R.string.app_name));
+        action.setDisplayShowCustomEnabled(false);
+        action.setDisplayShowTitleEnabled(true);
+        action.setDisplayShowHomeEnabled(true);
+
+        searchFragment.hide();
+        isSearchOpened = false;
     }
 
     private void updateButtonsState(){
@@ -344,15 +535,14 @@ public class CreateHaystackFragment extends CreateHaystackBaseFragment implement
             }
         }else{
             //Create Haystack
-            HaystackTaskParams params = new HaystackTaskParams(getActivity(), HaystackTaskParams.TYPE_CREATE, haystack);
-            try{
-                HaystackTask task = new HaystackTask(params, Needle.navigationController);
-                task.execute();
-
-            }catch (Exception e) {
-                Toast.makeText(getActivity(), "An error occured while creating Haystack", Toast.LENGTH_SHORT).show();
-            }
+            ApiClient.getInstance().createHaystack(haystack, Needle.navigationController);
         }
+    }
+
+    private void doSearch(String query) {
+        Log.d(TAG, "doSearch::query : " + query);
+
+        searchFragment.guessLocation(query, mCreateHaystackMapFragment.getCameraTargetBounds());
     }
 
     //TODO: finish validation
@@ -364,17 +554,11 @@ public class CreateHaystackFragment extends CreateHaystackBaseFragment implement
 
     public void onImageUploaded(ImageUploadResult result)
     {
-        if(result.successCode == 1){
+        if(result.successCode == 1) {
             haystack.setPictureURL(result.imageURL);
-            //Create Haystack
-            HaystackTaskParams params = new HaystackTaskParams(getActivity(), HaystackTaskParams.TYPE_CREATE, haystack);
-            try{
-                HaystackTask task = new HaystackTask(params, Needle.navigationController);
-                task.execute();
 
-            }catch (Exception e) {
-                Toast.makeText(getActivity(), "An error occured while creating Haystack", Toast.LENGTH_SHORT).show();
-            }
+            //Create Haystack
+            ApiClient.getInstance().createHaystack(haystack, Needle.navigationController);
         }
     }
 
@@ -400,23 +584,6 @@ public class CreateHaystackFragment extends CreateHaystackBaseFragment implement
         return userId;
     }
 
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == CreateHaystackFragment.TAKE_PICTURE && resultCode== getActivity().RESULT_OK && data != null){
-            Bundle extras = data.getExtras();
-
-            Bitmap bitmap = (Bitmap) extras.get("data");
-            //Rotate if portrait
-            if(bitmap.getHeight() > bitmap.getWidth()){
-                Matrix matrix = new Matrix();
-                matrix.postRotate(90);
-                bitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
-            }
-            CreateHaystackGeneralInfosFragment fragment = (CreateHaystackGeneralInfosFragment) mCreateHaystackPagerAdapter.getFragmentAt(0);
-            fragment.updatePhoto(bitmap);
-        }
-    }
-
     public HaystackVO getHaystack(){
         return haystack;
     }
@@ -431,39 +598,5 @@ public class CreateHaystackFragment extends CreateHaystackBaseFragment implement
 
     public void goToPage(int page){
         createHaystackViewPager.setCurrentItem(page);
-    }
-
-    @Override
-    public void onConnected(Bundle connectionHint) {
-        //Toast.makeText(getActivity(), "Connected", Toast.LENGTH_SHORT).show();
-        mCreateHaystackMapFragment = (CreateHaystackMapFragment) mCreateHaystackPagerAdapter.getFragmentByType(CreateHaystackMapFragment.class);
-        mCreateHaystackMapFragment.mMapFragment.onConnected(connectionHint);
-
-    }
-
-    @Override
-    public void onConnectionSuspended(int i) {
-
-    }
-
-    @Override
-    public void onConnectionFailed(ConnectionResult connectionResult) {
-        if (connectionResult.hasResolution()) {
-            try {
-                connectionResult.startResolutionForResult(getActivity(), AppConstants.CONNECTION_FAILURE_RESOLUTION_REQUEST);
-            } catch (IntentSender.SendIntentException e) {
-                e.printStackTrace();
-            }
-        } else {
-            showErrorDialog(connectionResult.getErrorCode());
-        }
-    }
-
-    private void showErrorDialog(int errorCode){
-        Toast.makeText(getActivity(), "Error encountered\nError # :"+errorCode, Toast.LENGTH_SHORT).show();
-    }
-
-    public static GoogleApiClient getGoogleApiClient() {
-        return mGoogleApiClient;
     }
 }

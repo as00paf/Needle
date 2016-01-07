@@ -232,7 +232,7 @@ public class SlidingTabLayout extends HorizontalScrollView {
                 lp.weight = 1;
             }
 
-            //Set title
+            //Set description
             tabTitleView.setText(adapter.getPageTitle(i), TextView.BufferType.SPANNABLE);
 
             //Set Icon

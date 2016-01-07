@@ -19,13 +19,15 @@ package jp.wasabeef.picasso.transformations;
 import android.graphics.Bitmap;
 import android.graphics.BitmapShader;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Paint;
 import com.squareup.picasso.Transformation;
 
 public class CropCircleTransformation implements Transformation {
 
-  @Override public Bitmap transform(Bitmap source) {
+    @Override
+  public Bitmap transform(Bitmap source) {
     int size = Math.min(source.getWidth(), source.getHeight());
 
     int width = (source.getWidth() - size) / 2;
@@ -46,10 +48,19 @@ public class CropCircleTransformation implements Transformation {
     paint.setShader(shader);
     paint.setAntiAlias(true);
 
-    float r = size / 2f;
+    int r = (size / 2) - 10;
     canvas.drawCircle(r, r, r, paint);
 
     source.recycle();
+
+    Paint paint1 = new Paint();
+    paint1.setColor(Color.WHITE);
+    paint1.setStyle(Paint.Style.STROKE);
+    paint1.setAntiAlias(true);
+    paint1.setStrokeWidth(4);
+    canvas.drawCircle(r, r, r, paint1);
+
+  source.recycle();
 
     return bitmap;
   }

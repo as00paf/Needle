@@ -3,14 +3,14 @@
     <SwitchPreference
         android:id="@+id/appSettingsRememberMeCheckBox"
         android:key="rememberMe"
-        android:title="@string/rememberMe"
+        android:description="@string/rememberMe"
         android:summary="@string/rememberMeSummary"
         android:defaultValue="true" />
 
     <SwitchPreference
         android:id="@+id/appSettingsNotificationsCheckBox"
         android:key="notifications"
-        android:title="@string/notifications"
+        android:description="@string/notifications"
         android:summary="@string/notificationsSummary"
         android:defaultValue="true" />
 

@@ -4,11 +4,10 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
-import android.content.SharedPreferences;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
-import android.preference.PreferenceManager;
 import android.support.design.widget.NavigationView;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
@@ -22,16 +21,14 @@ import android.view.View;
 
 import com.google.android.gms.maps.model.LatLng;
 import com.nemator.needle.controller.AuthenticationController;
-import com.nemator.needle.controller.GCMController;
-import com.nemator.needle.controller.GoogleAPIController;
-import com.nemator.needle.controller.NavigationController;
-import com.nemator.needle.controller.NetworkController;
 import com.nemator.needle.models.UserModel;
 import com.nemator.needle.models.vo.HaystackVO;
 import com.nemator.needle.models.vo.LocationSharingVO;
+import com.nemator.needle.models.vo.UserVO;
 import com.nemator.needle.service.NeedleLocationService;
 import com.nemator.needle.utils.AppConstants;
 import com.nemator.needle.utils.AppState;
+import com.nemator.needle.utils.PermissionManager;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -47,17 +44,19 @@ public class MainActivity extends AppCompatActivity {
     private Toolbar toolbar;
     private DrawerLayout drawerLayout;
     private View content;
+    private boolean isServiceConnected = false;
+
+    private ActionBarDrawerToggle mDrawerToggle;
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
+        PermissionManager.getInstance(this).checkLocationPermission(this);
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        content = findViewById(R.id.content);
-
         initToolbar();
         setupDrawerLayout();
-        initDrawerToggle();
 
         handler.post(new Runnable() {
             @Override
@@ -78,7 +77,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void initUser(Bundle  savedInstanceState) {
-        Needle.googleApiController.init(this);
         Needle.authenticationController.init(this);
         Needle.gcmController.init(this);
 
@@ -94,6 +92,7 @@ public class MainActivity extends AppCompatActivity {
         if(!Needle.userModel.isLoggedIn()){
             Needle.navigationController.showSection(AppConstants.SECTION_SPLASH_LOGIN);
         }else{
+            Needle.userModel.setUser(UserVO.retrieve(getSharedPreferences("Needle", Context.MODE_PRIVATE)));
             Needle.navigationController.onPostLogin();
         }
     }
@@ -104,10 +103,12 @@ public class MainActivity extends AppCompatActivity {
             public void onServiceConnected(ComponentName className, IBinder service) {
                 locationService = ((NeedleLocationService.LocalBinder)service).getService();
                 locationService.userModel = Needle.userModel;
+                isServiceConnected = true;
             }
 
             public void onServiceDisconnected(ComponentName className) {
                 locationService = null;
+                isServiceConnected = false;
             }
         };
 
@@ -122,32 +123,42 @@ public class MainActivity extends AppCompatActivity {
         final ActionBar actionBar = getSupportActionBar();
 
         if (actionBar != null) {
-            actionBar.setHomeAsUpIndicator(R.drawable.icon_white);
             actionBar.setDisplayHomeAsUpEnabled(true);
-            actionBar.setElevation(0);
+            actionBar.setDisplayShowHomeEnabled(true);
         }
     }
 
-    private void initDrawerToggle(){
-        ActionBarDrawerToggle mDrawerToggle = new ActionBarDrawerToggle(
-                this,  drawerLayout, toolbar,
-                R.string.navigation_drawer_open, R.string.navigation_drawer_close
-        );
-        drawerLayout.setDrawerListener(mDrawerToggle);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setHomeButtonEnabled(true);
+    @Override
+    protected void onPostCreate(Bundle savedInstanceState) {
+        super.onPostCreate(savedInstanceState);
+
         mDrawerToggle.syncState();
     }
 
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+
+        mDrawerToggle.onConfigurationChanged(newConfig);
+    }
+
     private void setupDrawerLayout() {
+        content = findViewById(R.id.content);
         drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         Needle.navigationController.init(this, drawerLayout, content);
 
         NavigationView appDrawer = (NavigationView) findViewById(R.id.navigation_view);
         appDrawer.setNavigationItemSelectedListener(Needle.navigationController.getDrawerListener());
 
-        NavigationView appDrawerFooter = (NavigationView) findViewById(R.id.navigation_view_footer);
-        appDrawerFooter.setNavigationItemSelectedListener(Needle.navigationController.getDrawerListener());
+        mDrawerToggle = new ActionBarDrawerToggle(
+                this,  drawerLayout, toolbar,
+                R.string.navigation_drawer_open, R.string.navigation_drawer_close
+        );
+        mDrawerToggle.setDrawerIndicatorEnabled(false);
+        mDrawerToggle.setHomeAsUpIndicator(R.drawable.ic_logo_24dp);
+        drawerLayout.setDrawerListener(mDrawerToggle);
+
+        mDrawerToggle.syncState();
     }
 
     @Override
@@ -230,12 +241,46 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+
         Needle.authenticationController.onActivityResult(requestCode, resultCode, data);
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+        Log.d(TAG, "Permission Granted !");
+
+        if(requestCode == PermissionManager.PERMISSIONS_REQUEST_ACCESS_ACCOUNTS){
+            Needle.authenticationController.logInWithSocialNetwork(Needle.authenticationController.LOGIN_TYPE_GOOGLE);
+        }else if(requestCode == PermissionManager.PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION){
+            Log.d(TAG, "Permission Granted !");
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        Needle.networkController.unregister();
+
+        if(isServiceConnected){
+            try{
+                unbindService(mConnection);
+            }catch (Error e){
+
+            }
+            isServiceConnected = false;
+        }
     }
 
     //Getters/Setters
     public NeedleLocationService getLocationService() {
         return locationService;
+    }
+
+    public ActionBarDrawerToggle getDrawerToggle() {
+        return mDrawerToggle;
     }
 
     public interface NavigationHandler{
@@ -244,6 +289,4 @@ public class MainActivity extends AppCompatActivity {
         boolean onOptionsItemSelected(MenuItem item);
         Menu getMenu();
     }
-
-
 }

@@ -1,7 +1,10 @@
 package com.nemator.needle.view.haystacks.createHaystack;
 
 import android.app.Activity;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.IntentSender;
 import android.content.SharedPreferences;
 import android.graphics.Point;
@@ -10,6 +13,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.SystemClock;
 import android.preference.PreferenceManager;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -31,10 +35,12 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.Circle;
 import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polygon;
 import com.google.android.gms.maps.model.PolygonOptions;
+import com.nemator.needle.Needle;
 import com.nemator.needle.utils.AppConstants;
 import com.nemator.needle.R;
 import com.nemator.needle.utils.SphericalUtil;
@@ -42,11 +48,8 @@ import com.nemator.needle.utils.SphericalUtil;
 import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 
-public class CreateHaystackMap extends SupportMapFragment
-        implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener,
-        LocationListener{
+public class CreateHaystackMap extends SupportMapFragment implements LocationListener{
     public static final String TAG = "CreateHSMapFragment";
 
     private GoogleApiClient mGoogleApiClient;
@@ -90,7 +93,25 @@ public class CreateHaystackMap extends SupportMapFragment
 
         //Action Bar
         setHasOptionsMenu(true);
+
+        mGoogleApiClient = Needle.googleApiController.getGoogleApiClient();
+        if(mGoogleApiClient == null){
+            LocalBroadcastManager.getInstance(getActivity()).registerReceiver(apiConnectedReceiver,
+                     new IntentFilter(AppConstants.GOOGLE_API_CONNECTED));
+        }else{
+            startLocationUpdates();
+        }
     }
+
+    private BroadcastReceiver apiConnectedReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            LocalBroadcastManager localBroadcastManager = LocalBroadcastManager.getInstance(getActivity());
+            localBroadcastManager.unregisterReceiver(this);
+
+            startLocationUpdates();
+        }
+    };
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -170,14 +191,6 @@ public class CreateHaystackMap extends SupportMapFragment
         }
     }
 
-    private void connectToApiClient(){
-        if(mGoogleApiClient == null){
-            mGoogleApiClient = ((CreateHaystackFragment) getParentFragment().getParentFragment()).getGoogleApiClient();
-            createLocationRequest();
-            setUpMapIfNeeded();
-        }
-    }
-
     protected void createLocationRequest() {
         mLocationRequest = new LocationRequest();
         mLocationRequest.setInterval(AppConstants.UPDATE_INTERVAL);
@@ -185,7 +198,11 @@ public class CreateHaystackMap extends SupportMapFragment
         mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
     }
 
-    protected void startLocationUpdates() {
+    public void startLocationUpdates(){
+        if(mLocationRequest == null){
+            createLocationRequest();
+        }
+
         LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
         locationUpdatesStarted = true;
     }
@@ -196,45 +213,6 @@ public class CreateHaystackMap extends SupportMapFragment
         }
 
         locationUpdatesStarted = false;
-    }
-
-    @Override
-    public void onConnected(Bundle connectionHint) {
-        if (mRequestingLocationUpdates) {
-            startLocationUpdates();
-        }
-
-        mCurrentLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
-        if(mCurrentLocation != null){
-            Double lat = mCurrentLocation.getLatitude();
-            Double lng = mCurrentLocation.getLongitude();
-            mCurrentPosition = new LatLng(lat, lng);
-
-            updateMap();
-            moveCamera();
-        }
-    }
-
-    @Override
-    public void onConnectionSuspended(int i) {
-
-    }
-
-    @Override
-    public void onConnectionFailed(ConnectionResult connectionResult) {
-        if (connectionResult.hasResolution()) {
-            try {
-                connectionResult.startResolutionForResult(getActivity(), AppConstants.CONNECTION_FAILURE_RESOLUTION_REQUEST);
-            } catch (IntentSender.SendIntentException e) {
-                e.printStackTrace();
-            }
-        } else {
-            showErrorDialog(connectionResult.getErrorCode());
-        }
-    }
-
-    private void showErrorDialog(int errorCode){
-        Toast.makeText(getActivity(), "Error encountered\nError # :"+errorCode, Toast.LENGTH_SHORT).show();
     }
 
     @Override
@@ -258,10 +236,12 @@ public class CreateHaystackMap extends SupportMapFragment
             mMap = getMap();
 
             if (mMap != null) {
+                mMap.setMyLocationEnabled(true);
                 Log.i(TAG, "Map set up");
-                connectToApiClient();
+
+                createLocationRequest();
             }
-        }else if(mGoogleApiClient.isConnected()){
+        }else {
             resumeOperations();
         }
     }
@@ -290,9 +270,6 @@ public class CreateHaystackMap extends SupportMapFragment
     }
 
     private void resumeOperations(){
-        if(mMap==null)
-            mMap = getMap();
-
         //Add user's marker back
         LatLng position = (mUseCustomPosition) ? mCustomPosition : mCurrentPosition;
         if(position != null){
@@ -345,7 +322,9 @@ public class CreateHaystackMap extends SupportMapFragment
 
     public void moveUserToCurrentPosition(){
         mUseCustomPosition = false;
-        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(mCurrentPosition, 17.0f));
+        if(mCurrentPosition != null){
+            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(mCurrentPosition, 17.0f));
+        }
     }
 
     public void focusCamera(float zoom){
@@ -541,5 +520,9 @@ public class CreateHaystackMap extends SupportMapFragment
 
     public LatLng getPosition(){
         return (mUseCustomPosition) ? mCustomPosition : mCurrentPosition;
+    }
+
+    public LatLngBounds getCameraTargetBounds(){
+        return getMap().getProjection().getVisibleRegion().latLngBounds;
     }
 }

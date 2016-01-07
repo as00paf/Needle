@@ -4,20 +4,12 @@
     android:layout_height="match_parent"
     android:elevation="4dp">
 
-    <!-- Search Box -->
-    <com.quinny898.library.persistentsearch.SearchBox
-        android:id="@+id/create_haystack_users_search_box"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="top|center_horizontal"
-        android:elevation="2dp"/>
-
     <!-- Swipe to Refresh -->
     <android.support.v4.widget.SwipeRefreshLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:id="@+id/create_haystack_swipe_container"
-        android:layout_marginTop="56dp">
+        android:layout_marginTop="8dp">
 
         <!-- User Cards List -->
         <android.support.v7.widget.RecyclerView

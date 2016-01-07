@@ -49,6 +49,10 @@ public class NetworkController extends BroadcastReceiver {
         Log.d(TAG, "Network Status Changed, Connection available : " + isNetworkConnected);
     }
 
+    public void unregister(){
+        activity.unregisterReceiver(this);
+    }
+
     public static NetworkController getInstance() {
         if(instance == null){
             instance = new NetworkController();

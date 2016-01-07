@@ -31,7 +31,7 @@ public class UserModel {
     }
 
     public void init(Context context){
-        mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+        mSharedPreferences = context.getSharedPreferences("Needle", Context.MODE_PRIVATE);
         user = UserVO.retrieve(mSharedPreferences);
         loggedIn =  mSharedPreferences.getBoolean(AppConstants.TAG_LOGGED_IN, false);
     }
@@ -43,6 +43,7 @@ public class UserModel {
 
     public void setUser(UserVO user) {
         this.user = user;
+        saveUser();
     }
 
     public int getUserId(){
@@ -71,7 +72,7 @@ public class UserModel {
     public Boolean setGcmRegId(String gcmRegId) {
         Boolean wereTheSame = user.getGcmRegId() != null && !user.getGcmRegId().equals(gcmRegId);
         user.setGcmRegId(gcmRegId);
-        mSharedPreferences.edit().putString(AppConstants.TAG_GCM_REG_ID, gcmRegId).commit();
+        mSharedPreferences.edit().putString(AppConstants.TAG_GCM_REG_ID, gcmRegId).apply();
 
         return wereTheSame;
     }
@@ -82,7 +83,7 @@ public class UserModel {
 
     public void setLoggedIn(boolean loggedIn) {
         this.loggedIn = loggedIn;
-        mSharedPreferences.edit().putBoolean(AppConstants.TAG_LOGGED_IN, loggedIn).commit();
+        mSharedPreferences.edit().putBoolean(AppConstants.TAG_LOGGED_IN, loggedIn).apply();
     }
 
     public boolean isAutoLogin() {

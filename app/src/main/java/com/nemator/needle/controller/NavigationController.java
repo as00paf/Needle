@@ -4,9 +4,7 @@ import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.graphics.Bitmap;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
+import android.content.Intent;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -14,25 +12,23 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
-import android.util.DisplayMetrics;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.nemator.needle.MainActivity;
 import com.nemator.needle.Needle;
 import com.nemator.needle.R;
+import com.nemator.needle.activities.CreateHaystack;
 import com.nemator.needle.data.LocationServiceDBHelper.PostLocationRequest;
-import com.nemator.needle.models.UserModel;
 import com.nemator.needle.models.vo.HaystackVO;
 import com.nemator.needle.models.vo.LocationSharingVO;
-import com.nemator.needle.tasks.haystack.HaystackTask.CreateHaystackResponseHandler;
 import com.nemator.needle.tasks.haystack.HaystackTaskResult;
 import com.nemator.needle.tasks.locationSharing.LocationSharingResult;
 import com.nemator.needle.tasks.logOut.LogOutTask;
@@ -50,11 +46,14 @@ import com.nemator.needle.view.haystacks.createHaystack.CreateHaystackFragment;
 import com.nemator.needle.view.locationSharing.LocationSharingListFragment;
 import com.nemator.needle.view.locationSharing.createLocationSharing.CreateLocationSharingFragment;
 import com.nemator.needle.view.locationSharing.locationSharing.LocationSharingFragment;
+import com.nemator.needle.view.people.PeopleFragment;
 import com.nemator.needle.view.settings.SettingsFragment;
 import com.squareup.picasso.Picasso;
-import com.squareup.picasso.Target;
 
 import jp.wasabeef.picasso.transformations.CropCircleTransformation;
+import retrofit.Callback;
+import retrofit.Response;
+import retrofit.Retrofit;
 
 import static com.nemator.needle.tasks.locationSharing.LocationSharingTask.CreateLocationSharingResponseHandler;
 import static com.nemator.needle.view.authentication.LoginFragment.LoginFragmentInteractionListener;
@@ -62,8 +61,8 @@ import static com.nemator.needle.view.haystacks.HaystackListFragment.HaystackLis
 import static com.nemator.needle.view.locationSharing.LocationSharingListFragment.LocationSharingListFragmentInteractionListener;
 
 public class NavigationController implements MainActivity.NavigationHandler, OnActivityStateChangeListener,
-        HaystackListFragmentInteractionListener, LocationSharingListFragmentInteractionListener,
-        CreateHaystackResponseHandler, LoginFragmentInteractionListener, LogOutResponseHandler, CreateLocationSharingResponseHandler{
+        HaystackListFragmentInteractionListener, LocationSharingListFragmentInteractionListener,LoginFragmentInteractionListener,
+        LogOutResponseHandler, CreateLocationSharingResponseHandler, Callback<HaystackTaskResult> {
 
     private static final String TAG = "NavigationController";
 
@@ -72,7 +71,6 @@ public class NavigationController implements MainActivity.NavigationHandler, OnA
     private static NavigationController instance;
 
     private MainActivity activity;
-    private UserModel userModel;
 
     //Fragments
     private LoginFragment loginFragment;
@@ -85,13 +83,14 @@ public class NavigationController implements MainActivity.NavigationHandler, OnA
     private HaystackFragment haystackFragment;
     private CreateLocationSharingFragment createLocationSharingFragment;
     private LocationSharingFragment locationSharingFragment;
+    private PeopleFragment peopleFragment;
 
     private Menu menu;
     private ActionBar actionBar;
     private View content;
 
     private int currentState = AppState.LOGIN;
-    private int previousState;
+    private int previousState = -1;
 
     private static ProgressDialog pd;
     private static Context context;
@@ -119,6 +118,9 @@ public class NavigationController implements MainActivity.NavigationHandler, OnA
                 case R.id.drawer_help:
                     showSection(AppConstants.SECTION_HELP);
                     break;
+                case R.id.drawer_people:
+                    showSection(AppConstants.SECTION_PEOPLE);
+                    break;
             }
 
             menuItem.setChecked(true);
@@ -142,10 +144,14 @@ public class NavigationController implements MainActivity.NavigationHandler, OnA
         this.activity = activity;
         this.drawerLayout = drawerLayout;
         this.content = content;
-        this.userModel = Needle.userModel;
 
         actionBar = activity.getSupportActionBar();
         manager = activity.getSupportFragmentManager();
+    }
+
+    public void showSection(int type, Context context){
+       this.context = context;
+        showSection(type);
     }
 
     public void showSection(int type){
@@ -184,6 +190,7 @@ public class NavigationController implements MainActivity.NavigationHandler, OnA
                 if(haystacksListFragment == null){haystacksListFragment = new HaystackListFragment();}
                 newFragment = haystacksListFragment;
                 onStateChange(AppState.PUBLIC_HAYSTACK_TAB);
+                actionBar.setTitle(R.string.title_haystacks);
                 break;
             case AppConstants.SECTION_HAYSTACK:
                 if(haystackFragment == null) haystackFragment = new HaystackFragment();
@@ -191,15 +198,14 @@ public class NavigationController implements MainActivity.NavigationHandler, OnA
                 onStateChange(AppState.HAYSTACK);
                 break;
             case AppConstants.SECTION_CREATE_HAYSTACK:
-                if(createHaystackFragment == null) createHaystackFragment = new CreateHaystackFragment();
-
-                newFragment = createHaystackFragment;
-                onStateChange(AppState.CREATE_HAYSTACK_GENERAL_INFOS);
-                break;
+                Intent intent = new Intent(context, CreateHaystack.class);
+                context.startActivity(intent);
+                return;
             case AppConstants.SECTION_LOCATION_SHARING:
                 if(locationSharingListFragment == null) locationSharingListFragment = new LocationSharingListFragment();
                 newFragment = locationSharingListFragment;
                 onStateChange(AppState.LOCATION_SHARING_RECEIVED_TAB);
+                actionBar.setTitle(R.string.title_location_sharing);
                 break;
             case AppConstants.SECTION_CREATE_LOCATION_SHARING:
                 if(createLocationSharingFragment == null) createLocationSharingFragment = new CreateLocationSharingFragment();
@@ -209,6 +215,11 @@ public class NavigationController implements MainActivity.NavigationHandler, OnA
             case AppConstants.SECTION_SETTINGS:
                 if(settingsFragment == null) settingsFragment = new SettingsFragment();
                 newFragment = settingsFragment;
+                onStateChange(AppState.SETTINGS);
+                break;
+            case AppConstants.SECTION_PEOPLE:
+                if(peopleFragment == null) peopleFragment = new PeopleFragment();
+                newFragment = peopleFragment;
                 onStateChange(AppState.SETTINGS);
                 break;
         }
@@ -462,12 +473,6 @@ public class NavigationController implements MainActivity.NavigationHandler, OnA
         showSection(AppConstants.SECTION_HAYSTACK);
     }
 
-    @Override
-    public void onCreateHaystackFabTapped() {
-        createHaystackFragment = new CreateHaystackFragment();
-        showSection(AppConstants.SECTION_CREATE_HAYSTACK);
-    }
-
     //LocationSharingListFragmentInteractionListener
     @Override
     public void onCreateLocationSharingFabTapped() {
@@ -519,8 +524,9 @@ public class NavigationController implements MainActivity.NavigationHandler, OnA
 
     //CreateHaystackResponseHandler
     @Override
-    public void onHaystackCreated(HaystackTaskResult result){
-        if(result.successCode == 0){
+    public void onResponse(Response<HaystackTaskResult> response, Retrofit retrofit) {
+        HaystackTaskResult result = response.body();
+        if(result.getSuccessCode() == 0){
             Toast.makeText(activity, "An error occured while creating Haystack", Toast.LENGTH_SHORT).show();
         }else{
             FragmentManager manager = activity.getSupportFragmentManager();
@@ -532,7 +538,7 @@ public class NavigationController implements MainActivity.NavigationHandler, OnA
 
             //Add/Remove Sections
             haystackFragment = new HaystackFragment();
-            haystackFragment.setHaystack(result.haystack);
+            haystackFragment.setHaystack(result.getHaystack());
             //haystackSection = activity.newSection(result.haystack.getName(), R.drawable.ic_haystack, haystackFragment);
             //activity.addSectionAt(haystackSection, 1);
 
@@ -540,6 +546,12 @@ public class NavigationController implements MainActivity.NavigationHandler, OnA
             showSection(AppConstants.SECTION_HAYSTACK);
             onStateChange(AppState.HAYSTACK);
         }
+    }
+
+    @Override
+    public void onFailure(Throwable t) {
+        Log.d(TAG, "An error occured while creating Haystack : " + t.getMessage());
+        Toast.makeText(activity, "An error occured while creating Haystack ", Toast.LENGTH_SHORT).show();
     }
 
     //CreateLocationSharingResponseHandler
@@ -568,30 +580,39 @@ public class NavigationController implements MainActivity.NavigationHandler, OnA
     }
 
     public void setAccount(){
+        //ActionBar
+        activity.getSupportActionBar().setDisplayHomeAsUpEnabled(false);
+        activity.getSupportActionBar().setDisplayShowHomeEnabled(false);
+
+        activity.getDrawerToggle().setDrawerIndicatorEnabled(true);
+        activity.getDrawerToggle().syncState();
+
+        //Username
         TextView username = (TextView) activity.findViewById(R.id.username);
-        username.setText(userModel.getUserName());
+        username.setText(Needle.userModel.getUserName());
 
         //Profile Image
         ImageView avatarImageView = (ImageView) activity.findViewById(R.id.avatar);
-        String pictureURL = userModel.getUser().getPictureURL();
-        Picasso.with(activity.getApplicationContext()).load(pictureURL)
-                .transform(new CropCircleTransformation())
-                .transform(new RoundedTransformation(100, 1))
-                .into(avatarImageView);
+        String pictureURL = Needle.userModel.getUser().getPictureURL();
+        if(!TextUtils.isEmpty(pictureURL)){
+            Picasso.with(activity.getApplicationContext()).load(pictureURL)
+                    .transform(new CropCircleTransformation())
+                    .into(avatarImageView);
+        }else {
+            Log.e(TAG, "Can't fetch avatar picture for user " + Needle.userModel.getUserName());
+        }
 
         //Cover Image
-        String coverUrl = userModel.getUser().getCoverPictureURL();
-        if(coverUrl != null){
-            ImageView cover = (ImageView) activity.findViewById(R.id.cover);
-            DisplayMetrics metrics = activity.getResources().getDisplayMetrics();
-            int height = (int) (172 * metrics.density);
+        String coverUrl = Needle.userModel.getUser().getCoverPictureURL();
+        if(!TextUtils.isEmpty(coverUrl)){
+            final ImageView cover = (ImageView) activity.findViewById(R.id.cover);
 
             Picasso.with(activity.getApplicationContext())
                     .load(coverUrl)
                     .fit()
                     .into(cover);
-        }else{
-            Log.e(TAG, "Can't fetch cover for login type " + userModel.getUser().getLoginType());
+        } else {
+            Log.e(TAG, "Can't fetch cover for login type " + Needle.userModel.getUser().getLoginType());
         }
     }
 
@@ -600,20 +621,24 @@ public class NavigationController implements MainActivity.NavigationHandler, OnA
         return haystackFragment;
     }
 
-    public void setHaystacksCount(int count){
-       // if(count>0)
-          //  haystacksSection.setNotifications(count);
+    public void setHaystacksCount(int count) {
+        // if(count>0)
+        //  haystacksSection.setNotifications(count);
     }
 
-    public void setLocationSharingCount(int count){
+    public void setLocationSharingCount(int count) {
         //if(count>0)
-          //  locationSharingListSection.setNotifications(count);
+        //  locationSharingListSection.setNotifications(count);
     }
 
     @Override
     public void onLogOutComplete() {
-        userModel.setLoggedIn(false);
-        userModel.setAutoLogin(false);
+        Needle.userModel.setLoggedIn(false);
+        Needle.userModel.setAutoLogin(false);
+
+        activity.getDrawerToggle().setDrawerIndicatorEnabled(false);
+        activity.getDrawerToggle().setHomeAsUpIndicator(R.drawable.ic_logo_24dp);
+        activity.getDrawerToggle().syncState();
 
         showSection(AppConstants.SECTION_LOGIN);
     }
@@ -672,11 +697,16 @@ public class NavigationController implements MainActivity.NavigationHandler, OnA
     }
 
     public void onPostLogin() {
-        setAccount();
+        if(!Needle.googleApiController.isConnected()){
+            Needle.googleApiController.init(activity, false);
+        }
+
         showSection(AppConstants.SECTION_HAYSTACKS);
 
         navigationView = (NavigationView) activity.findViewById(R.id.navigation_view);
         navigationView.setNavigationItemSelectedListener(navigationItemListener);
+
+        //setAccount();
     }
 
     public NavigationView.OnNavigationItemSelectedListener getDrawerListener() {
@@ -686,4 +716,6 @@ public class NavigationController implements MainActivity.NavigationHandler, OnA
     public void setActionBarTitle(String title){
         actionBar.setTitle(title);
     }
+
+
 }

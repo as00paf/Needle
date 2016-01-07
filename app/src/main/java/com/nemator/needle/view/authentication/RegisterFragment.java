@@ -83,13 +83,13 @@ public class RegisterFragment extends Fragment implements View.OnClickListener{
         String password = pass.getText().toString();
         String emailAddress = email.getText().toString();
 
-        Log.i(TAG, "Trying to register with credentials : " + username + ", " + email + ", " + password);
+        Log.i(TAG, "Trying to register with credentials : " + username + ", " + emailAddress + ", " + password);
 
         if(TextUtils.isEmpty(username) || TextUtils.isEmpty(password)){
             Toast.makeText(getActivity(), "You must enter a username and a password", Toast.LENGTH_LONG).show();
         }else{
             UserVO userVO = new UserVO(-1, username, emailAddress, password, "", Needle.userModel.getGcmRegId(), AuthenticationController.LOGIN_TYPE_DEFAULT, "-1");
-
+            userVO.setCoverPictureURL("");
             Needle.authenticationController.register(userVO);
         }
     }

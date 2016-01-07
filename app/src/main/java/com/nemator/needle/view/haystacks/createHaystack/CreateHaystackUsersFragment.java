@@ -8,34 +8,39 @@ import android.speech.RecognizerIntent;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.nemator.needle.Needle;
 import com.nemator.needle.R;
+import com.nemator.needle.api.ApiClient;
+import com.nemator.needle.api.NeedleApiClient;
+import com.nemator.needle.api.UsersTaskResult;
 import com.nemator.needle.models.vo.UserVO;
 import com.nemator.needle.tasks.retrieveUsers.RetrieveUsersParams;
 import com.nemator.needle.tasks.retrieveUsers.RetrieveUsersResult;
 import com.nemator.needle.tasks.retrieveUsers.RetrieveUsersTask;
 import com.nemator.needle.utils.AppState;
-import com.quinny898.library.persistentsearch.SearchBox;
-import com.quinny898.library.persistentsearch.SearchResult;
 
 import java.util.ArrayList;
 
-public class CreateHaystackUsersFragment extends CreateHaystackBaseFragment implements SwipeRefreshLayout.OnRefreshListener, RetrieveUsersTask.RetrieveUsersResponseHandler{
+import retrofit.Callback;
+import retrofit.Response;
+import retrofit.Retrofit;
 
-    public static final String TAG = "CreateHaystackUsersFragment";
+public class CreateHaystackUsersFragment extends CreateHaystackBaseFragment implements SwipeRefreshLayout.OnRefreshListener{
+
+    public static final String TAG = "CreateHaystackUsers";
 
     //Children
     private RecyclerView mRecyclerView;
     private CreateHaystackUserListCardAdapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
     private SwipeRefreshLayout swipeLayout;
-    private SearchBox searchBox;
 
     //Data
-    private SearchBox.SearchListener searchListener;
     private ArrayList<UserVO> usersList;
     private int userId = -1;
 
@@ -54,9 +59,7 @@ public class CreateHaystackUsersFragment extends CreateHaystackBaseFragment impl
         rootView = inflater.inflate(R.layout.fragment_create_haystack_users, container, false);
 
         //Search Box
-        searchBox = (SearchBox) rootView.findViewById(R.id.create_haystack_users_search_box);
-        searchBox.enableVoiceRecognition(this);
-        searchBox.setLogoText(getString(R.string.search_for_friends));
+        /*
         searchListener = new SearchBox.SearchListener() {
             @Override
             public void onSearchOpened() {
@@ -92,7 +95,7 @@ public class CreateHaystackUsersFragment extends CreateHaystackBaseFragment impl
             }
         };
         searchBox.setSearchListener(searchListener);
-
+*/
         //Recycler View
         mRecyclerView = (RecyclerView) rootView.findViewById(R.id.create_haystack_users_list);
         mRecyclerView.setHasFixedSize(true);
@@ -112,7 +115,7 @@ public class CreateHaystackUsersFragment extends CreateHaystackBaseFragment impl
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (isAdded() && requestCode == SearchBox.VOICE_RECOGNITION_CODE && resultCode == getActivity().RESULT_OK) {
+       /* if (isAdded() && requestCode == SearchBox.VOICE_RECOGNITION_CODE && resultCode == getActivity().RESULT_OK) {
             ArrayList<String> matches = data
                     .getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
             if(matches.size() > 0){
@@ -130,7 +133,7 @@ public class CreateHaystackUsersFragment extends CreateHaystackBaseFragment impl
                                 Boolean alreadyAdded = false;
                                 for (int k = 0; k < searchBox.getSearchables().size(); k++) {
                                     SearchResult oldResult = searchBox.getSearchables().get(k);
-                                    if(oldResult.title.equals(newSearchResult.title)){
+                                    if(oldResult.description.equals(newSearchResult.description)){
                                         alreadyAdded = true;
                                     }
                                 }
@@ -146,7 +149,7 @@ public class CreateHaystackUsersFragment extends CreateHaystackBaseFragment impl
                     }
                 }
             }
-        }
+        }*/
         super.onActivityResult(requestCode, resultCode, data);
     }
 
@@ -162,27 +165,27 @@ public class CreateHaystackUsersFragment extends CreateHaystackBaseFragment impl
     }
 
     public void closeSearchResults(){
-        searchBox.toggleSearch();
+        //searchBox.toggleSearch();
     }
 
     //Actions
     private void fetchAllUsers(){
-        RetrieveUsersParams params = new RetrieveUsersParams();
-        params.userId = String.valueOf(getUserId());
-        params.type = RetrieveUsersParams.RetrieveUsersParamsType.TYPE_ALL_USERS;
+        ApiClient.getInstance().fetchAllUsers(Needle.userModel.getUserId(), new Callback<UsersTaskResult>() {
+            @Override
+            public void onResponse(Response<UsersTaskResult> response, Retrofit retrofit) {
+                UsersTaskResult result = response.body();
+                usersList = result.getUsers();
+                updateUserList();
+            }
 
-        try{
-            RetrieveUsersTask task =  new RetrieveUsersTask(params, this);
-            task.execute();
-        } catch(Exception e){
-            e.printStackTrace();
-        }
-    }
+            @Override
+            public void onFailure(Throwable t) {
+                Log.d(TAG, "Retrieving users failed ! Error : " + t.getMessage());
 
-    //Response Handlers
-    public void onUsersRetrieved(RetrieveUsersResult result){
-        usersList = result.userList;
-        updateUserList();
+                usersList = new ArrayList<UserVO>();
+                updateUserList();
+            }
+        });
     }
 
     private void updateUserList(){
@@ -193,18 +196,6 @@ public class CreateHaystackUsersFragment extends CreateHaystackBaseFragment impl
         mRecyclerView.invalidate();
 
         swipeLayout.setRefreshing(false);
-    }
-
-    //Utils
-    private int getUserId(){
-        if(userId==-1){
-            SharedPreferences sp = PreferenceManager
-                    .getDefaultSharedPreferences(rootView.getContext());
-
-            userId = sp.getInt("userId", -1);
-        }
-
-        return userId;
     }
 
     public ArrayList<UserVO> getSelectedUsers(){

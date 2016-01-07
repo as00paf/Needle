@@ -2,32 +2,20 @@
 <FrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <fragment
+    <com.google.android.gms.maps.MapView
         android:id="@+id/create_haystack_map"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:name="com.nemator.needle.view.haystacks.createHaystack.CreateHaystackMap"
-        android:tag="MAP_FRAGMENT"
-        android:layout_marginBottom="72dp"/>
+        android:tag="MAP_FRAGMENT"/>
 
     <FrameLayout
         android:id="@+id/create_haystack_map_frame"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginBottom="72dp"
         android:measureAllChildren="true">
-
-        <!-- Search Box -->
-        <com.quinny898.library.persistentsearch.SearchBox
-            android:id="@+id/create_haystack_map_search_box"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="top|center_horizontal"
-            />
 
         <!-- Radius Indicator/Map Buttons -->
         <!-- Radius Indicator -->
@@ -35,35 +23,52 @@
             android:id="@+id/radius_label"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="bottom|right"
+            android:layout_gravity="top|right"
             android:layout_marginRight="20dp"
             android:elevation="4dp"
-            android:layout_marginBottom="196dp"
+            android:layout_marginTop="8dp"
             android:textAppearance="?android:attr/textAppearanceMedium"/>
 
-        <!-- Draw State Button -->
-        <ImageButton
-            android:id="@+id/btn_draw_State"
+        <!-- Marker TODO:Use custom view -->
+        <LinearLayout
+            android:id="@+id/locationMarker"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="bottom|right"
-            android:background="@drawable/map_button_skin"
-            android:src="@drawable/ic_vpn_lock_black_24dp"
-            android:layout_marginBottom="64dp"
-            android:elevation="4dp"
-            android:layout_marginRight="16dp" />
+            android:layout_gravity="center"
+            android:layout_marginBottom="30dp"
+            android:gravity="center"
+            android:orientation="vertical" >
 
-        <ImageButton
-            android:id="@+id/btn_polygon"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@drawable/map_button_skin"
-            android:layout_gravity="bottom|right"
-            android:src="@drawable/square24"
-            android:elevation="4dp"
-            android:layout_marginRight="16dp"
-            android:layout_marginBottom="136dp" />
+            <TextView
+                android:id="@+id/locationMarkertext"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/rounded_corner_bg"
+                android:gravity="center"
+                android:paddingLeft="8dp"
+                android:paddingRight="8dp"
+                android:text="@string/set_haystacks_location"
+                android:textColor="@android:color/white" />
+
+            <ImageView
+                android:id="@+id/markerImage"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:adjustViewBounds="true"
+                android:scaleType="centerCrop"
+                android:src="@drawable/ic_add_location_black_24dp"/>
+
+        </LinearLayout>
 
     </FrameLayout>
+
+    <fragment
+        android:name="com.nemator.needle.view.SearchFragment"
+        android:tag="@string/searchFragmentTag"
+        android:id="@+id/searchFragment"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"/>
+
 </FrameLayout>
 

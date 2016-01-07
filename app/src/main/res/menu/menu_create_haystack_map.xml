@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item android:id="@+id/action_search"
+        android:description="@string/search_for_places"
+        android:icon="@drawable/ic_search_white_24dp"
+        app:showAsAction="always|collapseActionView"
+        app:actionViewClass="android.support.v7.widget.SearchView"
+        app:actionLayout="@layout/search_bar" />
+
+    <item
+        android:id="@+id/action_polygon"
+        android:title="@string/action_polygon"
+        android:icon="@drawable/square24"
+        app:showAsAction="always"/>
+
+    <item
+        android:id="@+id/action_lock_map"
+        android:title="@string/action_lock_map"
+        android:icon="@drawable/ic_vpn_lock_white_24dp"
+        app:showAsAction="always"/>
+
+    <item
+        android:id="@+id/action_settings"
+        android:title="@string/action_settings"
+        android:icon="@drawable/ic_action_settings"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/menu_option_help"
+        android:title="@string/title_helpAndSupport"
+        app:showAsAction="never"
+        android:icon="@drawable/ic_action_help"/>
+
+</menu>

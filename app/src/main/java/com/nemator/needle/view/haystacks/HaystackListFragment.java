@@ -17,16 +17,22 @@ import android.widget.Toast;
 import com.appcompat.view.slidingTab.SlidingTabLayout;
 import com.nemator.needle.Needle;
 import com.nemator.needle.R;
+import com.nemator.needle.api.ApiClient;
+import com.nemator.needle.controller.NavigationController;
 import com.nemator.needle.models.vo.HaystackVO;
-import com.nemator.needle.tasks.haystack.HaystackTask;
-import com.nemator.needle.tasks.haystack.HaystackTaskParams;
 import com.nemator.needle.tasks.haystack.HaystackTaskResult;
+import com.nemator.needle.utils.AppConstants;
 import com.nemator.needle.utils.AppState;
+import com.nemator.needle.utils.PermissionManager;
 
 import java.util.ArrayList;
 import java.util.Date;
 
-public class HaystackListFragment extends Fragment implements HaystackTask.FetchHaystackResponseHandler, SwipeRefreshLayout.OnRefreshListener{
+import retrofit.Callback;
+import retrofit.Response;
+import retrofit.Retrofit;
+
+public class HaystackListFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener {
     private static final String TAG = "HaystackListFragment";
 
     //Views
@@ -107,7 +113,7 @@ public class HaystackListFragment extends Fragment implements HaystackTask.Fetch
             fab.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    fragmentListener.onCreateHaystackFabTapped();
+                    NavigationController.getInstance().showSection(AppConstants.SECTION_CREATE_HAYSTACK, getActivity());
                 }
             });
 
@@ -165,50 +171,55 @@ public class HaystackListFragment extends Fragment implements HaystackTask.Fetch
         }
 
         lastUpdate = now;
+        ApiClient.getInstance().fetchHaystacks(getUserId(), new Callback<HaystackTaskResult>() {
 
-        HaystackTaskParams params = new HaystackTaskParams(rootView.getContext(), HaystackTaskParams.TYPE_GET, getUserId());
+            @Override
+            public void onResponse(Response<HaystackTaskResult> response, Retrofit retrofit) {
+                HaystackTaskResult result = response.body();
 
-        try{
-            HaystackTask task = new HaystackTask(params, this);
-            task.execute();
-        }catch(Exception e){
-            Log.e(TAG, "fetchHaystacks exception : " + e.toString());
-        }
-    }
+                Log.d(TAG, "haystacks fetched !");
 
-    @Override
-    public void onResume(){
-        super.onResume();
-        fetchHaystacks(false);
-    }
-
-    @Override public void onRefresh() {
-        fetchHaystacks(true);
-    }
-
-    public void onHaystackFetched(HaystackTaskResult result){
-        HaystackListTabFragment publicTab = mHaystackListPagerAdapter.getPublicHaystackListFragment();
-        HaystackListTabFragment privateTab = mHaystackListPagerAdapter.getPrivateHaystackListFragment();
+                HaystackListTabFragment publicTab = mHaystackListPagerAdapter.getPublicHaystackListFragment();
+                HaystackListTabFragment privateTab = mHaystackListPagerAdapter.getPrivateHaystackListFragment();
 /*
             //Show how many haystacks are available in the Nav Drawer
             int count = publicHaystacks.size() + privateHaystacks.size();
             if(getActivity() != null)
                 ((MainActivity) getActivity()).getNavigationController().setHaystacksCount(count);
 */
-        if(publicTab == null && privateTab == null) return;
+                if(publicTab == null && privateTab == null) return;
 
-        publicTab.getRefreshLayout().setRefreshing(false);
-        privateTab.getRefreshLayout().setRefreshing(false);
+                publicTab.getRefreshLayout().setRefreshing(false);
+                privateTab.getRefreshLayout().setRefreshing(false);
 
-        if(result.successCode == 1){
-            publicHaystacks = result.publicHaystackList;
-            privateHaystacks = result.privateHaystackList;
+                if(result.getSuccessCode() == 1){
+                    publicHaystacks = result.getPublicHaystackList();
+                    privateHaystacks = result.getPrivateHaystackList();
 
-            publicTab.updateHaystackList(publicHaystacks);
-            privateTab.updateHaystackList(privateHaystacks);
-        }else if(getActivity() != null){
-            Toast.makeText(getActivity(), R.string.fetch_haystack_error, Toast.LENGTH_SHORT).show();
-        }
+                    publicTab.updateHaystackList(publicHaystacks);
+                    privateTab.updateHaystackList(privateHaystacks);
+                }else if(getActivity() != null){
+                    Toast.makeText(getActivity(), R.string.fetch_haystack_error, Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Throwable t) {
+                Log.d(TAG, "haystacks fetch failed !");
+            }
+        });
+    }
+
+    @Override
+    public void onResume(){
+        super.onResume();
+        fetchHaystacks(false);
+
+        Needle.navigationController.setAccount();
+    }
+
+    @Override public void onRefresh() {
+        fetchHaystacks(true);
     }
 
     private int getUserId(){
@@ -224,7 +235,6 @@ public class HaystackListFragment extends Fragment implements HaystackTask.Fetch
     }
 
     public interface HaystackListFragmentInteractionListener {
-        void onCreateHaystackFabTapped();
         void onRefreshHaystackList();
         void onClickHaystackCard(HaystackVO haystack);
     }

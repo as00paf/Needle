@@ -35,20 +35,20 @@
         <attr format="dimension" name="footerIndicatorHeight"/>
         <!-- Left and right padding of the underline indicator. -->
         <attr format="dimension" name="footerIndicatorUnderlinePadding"/>
-        <!-- Padding between the bottom of the title and the footer. -->
+        <!-- Padding between the bottom of the description and the footer. -->
         <attr format="dimension" name="footerPadding"/>
         <!-- Position of the line. -->
         <attr name="linePosition">
             <enum name="bottom" value="0"/>
             <enum name="top" value="1"/>
         </attr>
-        <!-- Color of the selected title. -->
+        <!-- Color of the selected description. -->
         <attr name="selectedColor"/>
         <!-- Whether or not the selected item is displayed as bold. -->
         <attr format="boolean" name="selectedBold"/>
         <!-- Color of regular titles. -->
         <attr name="android:textColor"/>
-        <!-- Size of title text. -->
+        <!-- Size of description text. -->
         <attr name="android:textSize"/>
         <!-- Padding between titles when bumping into each other. -->
         <attr format="dimension" name="titlePadding"/>
@@ -74,7 +74,7 @@
         <attr format="reference" name="vpiIconPageIndicatorStyle"/>
         <!-- Style of the line indicator. -->
         <attr format="reference" name="vpiLinePageIndicatorStyle"/>
-        <!-- Style of the title indicator. -->
+        <!-- Style of the description indicator. -->
         <attr format="reference" name="vpiTitlePageIndicatorStyle"/>
         <!-- Style of the tab indicator's tabs. -->
         <attr format="reference" name="vpiTabPageIndicatorStyle"/>

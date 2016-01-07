@@ -21,6 +21,11 @@
             android:icon="@drawable/ic_notifications_black_24dp"
             android:title="@string/title_notifications"/>
 
+        <item
+            android:id="@+id/drawer_people"
+            android:icon="@drawable/ic_action_person"
+            android:title="@string/title_people"/>
+
     </group>
 
     <group

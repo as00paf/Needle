@@ -54,13 +54,6 @@
             app:headerLayout="@layout/drawer_header"
             app:menu="@menu/drawer"/>
 
-        <android.support.design.widget.NavigationView
-            android:id="@+id/navigation_view_footer"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="bottom"
-            app:menu="@menu/drawer_footer"/>
-
     </android.support.design.widget.NavigationView>
 
 </android.support.v4.widget.DrawerLayout>

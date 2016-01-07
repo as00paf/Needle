@@ -18,6 +18,7 @@ import android.widget.TimePicker;
 
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.nemator.needle.R;
+import com.nemator.needle.activities.CreateHaystack;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -47,7 +48,6 @@ public class CreateHaystackGeneralInfosFragment extends CreateHaystackBaseFragme
     private Bitmap mBitmap;
 
     private OnPrivacySettingsUpdatedListener privacySettingsCallback;
-    private GoogleApiClient mGoogleApiClient;
 
     public static CreateHaystackGeneralInfosFragment newInstance() {
         CreateHaystackGeneralInfosFragment fragment = new CreateHaystackGeneralInfosFragment();
@@ -62,7 +62,6 @@ public class CreateHaystackGeneralInfosFragment extends CreateHaystackBaseFragme
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        connectToApiClient();
     }
 
     @Override
@@ -152,7 +151,7 @@ public class CreateHaystackGeneralInfosFragment extends CreateHaystackBaseFragme
         super.onAttach(activity);
 
         try {
-            privacySettingsCallback = (CreateHaystackFragment) getFragmentManager().getFragments().get(0);
+            privacySettingsCallback = (CreateHaystack) getActivity();
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString()
                     + " must implement OnHeadlineSelectedListener");
@@ -163,12 +162,6 @@ public class CreateHaystackGeneralInfosFragment extends CreateHaystackBaseFragme
         mBitmap = bitmap;
         photoView.setScaleType(ImageView.ScaleType.CENTER_CROP);
         photoView.setImageBitmap(mBitmap);
-    }
-
-    private void connectToApiClient(){
-        if(mGoogleApiClient == null){
-            mGoogleApiClient = ((CreateHaystackFragment) getParentFragment()).getGoogleApiClient();
-        }
     }
 
     public String getHaystackName(){

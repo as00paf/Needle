@@ -1,5 +1,6 @@
 package com.nemator.needle.controller;
 
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Handler;
@@ -50,7 +51,7 @@ public class GCMController /*implements UserTask.UpdateGCMIDResponseHandler*/ {
     public void init(MainActivity activity){
         this.activity = activity;
         Needle.userModel.init(activity);
-        mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(activity);
+        mSharedPreferences = activity.getSharedPreferences("Needle", Context.MODE_PRIVATE);
 
         //GCM
         if (checkPlayServices()) {
@@ -67,7 +68,7 @@ public class GCMController /*implements UserTask.UpdateGCMIDResponseHandler*/ {
         }
     }
 
-    private boolean checkPlayServices() {
+    public boolean checkPlayServices() {
         int resultCode = GooglePlayServicesUtil.isGooglePlayServicesAvailable(activity);
         if (resultCode != ConnectionResult.SUCCESS) {
             if (GooglePlayServicesUtil.isUserRecoverableError(resultCode)) {

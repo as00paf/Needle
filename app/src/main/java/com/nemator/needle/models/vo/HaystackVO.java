@@ -8,6 +8,7 @@ import com.google.android.gms.maps.model.LatLng;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Iterator;
 
 public class HaystackVO implements Serializable, Parcelable {
     private int id;
@@ -137,6 +138,17 @@ public class HaystackVO implements Serializable, Parcelable {
 
     public ArrayList<UserVO> getUsers() {
         return users;
+    }
+
+    public ArrayList<Integer> getUserIds() {
+        ArrayList<Integer> result = new ArrayList<Integer>();
+
+        Iterator<UserVO> iterator = users.iterator();
+        while(!iterator.hasNext()){
+            result.add(iterator.next().getUserId());
+        }
+
+        return result;
     }
 
     public void setUsers(ArrayList<UserVO> value) {

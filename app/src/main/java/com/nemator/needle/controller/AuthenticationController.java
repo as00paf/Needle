@@ -1,15 +1,17 @@
 package com.nemator.needle.controller;
 
+import android.Manifest;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.github.gorbin.asne.core.SocialNetwork;
@@ -25,15 +27,14 @@ import com.nemator.needle.MainActivity;
 import com.nemator.needle.Needle;
 import com.nemator.needle.R;
 import com.nemator.needle.api.ApiClient;
+import com.nemator.needle.api.UserRegistrationResult;
 import com.nemator.needle.models.vo.UserVO;
 import com.nemator.needle.tasks.facebook.GetFacebookCoverURLTask;
-import com.nemator.needle.tasks.login.LoginTask;
 import com.nemator.needle.tasks.login.LoginTask.LoginResponseHandler;
-import com.nemator.needle.tasks.login.LoginTaskParams;
 import com.nemator.needle.tasks.login.LoginTaskResult;
 import com.nemator.needle.utils.AppConstants;
+import com.nemator.needle.utils.PermissionManager;
 
-import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -120,17 +121,6 @@ public class AuthenticationController implements LoginResponseHandler, OnLoginCo
                         }
                     }
 
-                    //Login with social network favorising FB
-                        /*int networkId = LOGIN_TYPE_FACEBOOK;
-                        int count = initializedNetworks.size();
-                        if(count > 0){
-                            if(count == 1 || !initializedNetworks.contains(LOGIN_TYPE_FACEBOOK)){
-                                networkId = initializedNetworks.get(0).getID();
-                            }
-
-                            logInWithSocialNetwork(networkId);
-                        }*/
-
                     LocalBroadcastManager broadcastManager = LocalBroadcastManager.getInstance(activity);
                     Intent intent = new Intent();
                     intent.setAction(AppConstants.SOCIAL_NETWORKS_INITIALIZED);
@@ -149,25 +139,13 @@ public class AuthenticationController implements LoginResponseHandler, OnLoginCo
     }
 
     //Handlers
-    /*@Override
-    public void onUserRegistered(UserTaskResult result) {
-        Needle.navigationController.hideProgress();
-
-        if(result.successCode == 1 || result.successCode == 409){
-            WeakReference<TextView> textView = new WeakReference<TextView>((TextView) activity.findViewById(R.id.login_splash_label));
-            LoginTaskParams params = new LoginTaskParams(activity, result.user, textView);
-            new LoginTask(params, this).execute();
-        }else{
-            Toast.makeText(activity, "Error ! \nPlease Try Again", Toast.LENGTH_SHORT).show();
-        }
-    }*/
-
     @Override
     public void onLoginComplete(LoginTaskResult result) {
         if(!Needle.userModel.isLoggedIn()) {
             if (result.getSuccessCode() == 1) {
                 Needle.userModel.setLoggedIn(true);
                 Needle.userModel.setUserName(result.getUser().getUserName());
+                Needle.userModel.getUser().setEmail(result.getUser().getEmail());
                 Needle.userModel.setUserId(result.getUser().getUserId());
                 Needle.userModel.getUser().setSocialNetworkUserId(result.getUser().getSocialNetworkUserId());
                 Needle.userModel.getUser().setLoginType(result.getUser().getLoginType());
@@ -204,17 +182,34 @@ public class AuthenticationController implements LoginResponseHandler, OnLoginCo
         if (fragment != null) {
             fragment.onActivityResult(requestCode, resultCode, data);
         }
+
+        Log.d(TAG, "onActivityResult");
+
+        if(requestCode == 9000 && resultCode == -1){
+            PermissionManager.getInstance(activity).checkAccountsPermission(activity);
+        }
     }
 
     private BroadcastReceiver googleApiConnectedReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
+            Log.d(TAG, "googleApiConnectedReceiver:: Received intent");
+
             LocalBroadcastManager.getInstance(activity).unregisterReceiver(this);
-            getSocialProfileAndLogIn(LOGIN_TYPE_GOOGLE);
+
+            if(ContextCompat.checkSelfPermission(context, Manifest.permission.GET_ACCOUNTS)
+                    == PackageManager.PERMISSION_GRANTED){
+                ((GooglePlusSocialNetwork) socialNetwork).setGoogleApiClient(Needle.googleApiController.getGoogleApiClient());
+                ((GooglePlusSocialNetwork) socialNetwork).setConnectionResult(Needle.googleApiController.getConnectionResult());
+
+                getSocialProfileAndLogIn(LOGIN_TYPE_GOOGLE);
+            }
         }
     };
 
     public void logInWithSocialNetwork(int networkId) {
+        Log.d(TAG, "logInWithSocialNetwork");
+
         socialNetwork = mSocialNetworkManager.getSocialNetwork(networkId);
         if(!socialNetwork.isConnected()) {
             if(networkId != 0) {
@@ -222,16 +217,21 @@ public class AuthenticationController implements LoginResponseHandler, OnLoginCo
                 loginRequestType = LOGIN_REQUEST_TYPE_LOGIN;
 
                 if(socialNetwork.getID() == LOGIN_TYPE_GOOGLE){
-                    ((GooglePlusSocialNetwork) socialNetwork).setGoogleApiClient(Needle.googleApiController.getmGoogleApiClient());
-                    ((GooglePlusSocialNetwork) socialNetwork).setConnectionResult(Needle.googleApiController.getConnectionResult());
-
                     if(Needle.googleApiController.isConnected()){
-                        getSocialProfileAndLogIn(LOGIN_TYPE_GOOGLE);
+                        Log.i(TAG, "Api is Connected");
+                        //if(PermissionManager.getInstance(activity).checkAccountsPermission(activity)){
+                            ((GooglePlusSocialNetwork) socialNetwork).setGoogleApiClient(Needle.googleApiController.getGoogleApiClient());
+                            ((GooglePlusSocialNetwork) socialNetwork).setConnectionResult(Needle.googleApiController.getConnectionResult());
+
+                            getSocialProfileAndLogIn(LOGIN_TYPE_GOOGLE);
+                        //}
                     }else{
+                        Log.i(TAG, "Api is not Connected");
+
                         LocalBroadcastManager localBroadcastManager = LocalBroadcastManager.getInstance(activity);
                         localBroadcastManager.registerReceiver(googleApiConnectedReceiver, new IntentFilter(AppConstants.GOOGLE_API_CONNECTED));
 
-                        socialNetwork.requestLogin(this);
+                        Needle.googleApiController.init(activity, true);
                     }
                 }else{
                     socialNetwork.requestLogin(this);
@@ -283,22 +283,21 @@ public class AuthenticationController implements LoginResponseHandler, OnLoginCo
 
             @Override
             public void onRequestSocialPersonSuccess(int socialNetworkId, SocialPerson socialPerson) {
+                Log.d(TAG, "onRequestSocialPersonSuccess");
+
                 socialNetwork.setOnRequestCurrentPersonCompleteListener(null);
 
-                LoginTaskParams params;
                 String username = socialPerson.name;
                 String regId = Needle.userModel.getGcmRegId();
                 String id = socialPerson.id;
                 String email = socialPerson.email;
 
                 UserVO user = new UserVO(-1, username, email, "", "", regId, socialNetworkId, id);
+                user.setCoverPictureURL(socialPerson.coverURL);
+                user.setPictureURL(socialPerson.avatarURL);
                 Needle.userModel.setUser(user);
 
-                /*WeakReference<TextView> textView = new WeakReference<TextView>((TextView) activity.findViewById(R.id.login_splash_label));
-                params = new LoginTaskParams(activity, user, textView);
-                new LoginTask(params, AuthenticationController.this).execute();*/
-
-                ApiClient.getInstance().login(user.getLoginType(), user.getEmail(), user.getGcmRegId(), user.getPassword(), userLogInCallback);
+                ApiClient.getInstance().login(user.getLoginType(), user.getEmail(), user.getUserName(), user.getGcmRegId(), user.getPassword(), user.getSocialNetworkUserId(), userLogInCallback);
             }
 
             @Override
@@ -317,7 +316,18 @@ public class AuthenticationController implements LoginResponseHandler, OnLoginCo
 
             }
         });
-        socialNetwork.requestCurrentPerson();
+
+        if(networkId == LOGIN_TYPE_GOOGLE){
+            if(ContextCompat.checkSelfPermission(activity, Manifest.permission.GET_ACCOUNTS)
+                    == PackageManager.PERMISSION_GRANTED){
+                socialNetwork.requestCurrentPerson();
+            }else{
+                PermissionManager.getInstance(activity).checkAccountsPermission(activity);
+                Log.d(TAG, "Accounts permission not granted yet");
+            }
+        }else{
+            socialNetwork.requestCurrentPerson();
+        }
     }
 
     public void getSocialProfileAndRegister(final int networkId) {
@@ -351,6 +361,7 @@ public class AuthenticationController implements LoginResponseHandler, OnLoginCo
                 String id = socialPerson.id;
 
                 userVO.setUserId(-1);
+                userVO.setEmail(socialPerson.email);
                 userVO.setUserName(username);
                 userVO.setGcmRegId(regId);
                 userVO.setLoginType(socialNetworkId);
@@ -358,8 +369,9 @@ public class AuthenticationController implements LoginResponseHandler, OnLoginCo
                 userVO.setPictureURL(socialPerson.avatarURL);
                 userVO.setCoverPictureURL(socialPerson.coverURL);
 
-               // UserTaskParams params = new UserTaskParams(activity.getApplicationContext(), UserTaskParams.TYPE_REGISTER, userVO);
-               // new UserTask(params, AuthenticationController.this).execute();
+                Needle.userModel.setUser(userVO);
+
+                ApiClient.getInstance().registerUser(userVO, userRegisteredCallback);
             }
 
             @Override
@@ -385,7 +397,7 @@ public class AuthenticationController implements LoginResponseHandler, OnLoginCo
                 loginRequestType = LOGIN_REQUEST_TYPE_REGISTER;
 
                 if(socialNetwork.getID() == LOGIN_TYPE_GOOGLE){
-                    ((GooglePlusSocialNetwork) socialNetwork).setGoogleApiClient(Needle.googleApiController.getmGoogleApiClient());
+                    ((GooglePlusSocialNetwork) socialNetwork).setGoogleApiClient(Needle.googleApiController.getGoogleApiClient());
                     ((GooglePlusSocialNetwork) socialNetwork).setConnectionResult(Needle.googleApiController.getConnectionResult());
 
                     if(Needle.googleApiController.isConnected()){
@@ -417,36 +429,31 @@ public class AuthenticationController implements LoginResponseHandler, OnLoginCo
     }
 
     public void register(UserVO userVO) {
+        Needle.userModel.setUser(userVO);
         ApiClient.getInstance().registerUser(userVO, userRegisteredCallback);
-
-
-        /*UserTaskParams params = new UserTaskParams(getActivity(), UserTaskParams.TYPE_REGISTER, userVO);
-        new UserTask(params, Needle.authenticationController).execute();*/
     }
 
-    private Callback<UserVO> userRegisteredCallback = new Callback<UserVO>() {
+    private Callback<UserRegistrationResult> userRegisteredCallback = new Callback<UserRegistrationResult>() {
         @Override
-        public void onResponse(Response<UserVO> response, Retrofit retrofit) {
+        public void onResponse(Response<UserRegistrationResult> response, Retrofit retrofit) {
             Needle.navigationController.hideProgress();
 
-            UserVO user = response.body();
-            ApiClient.getInstance().login(user.getLoginType(), user.getEmail(), user.getGcmRegId(), user.getPassword(), userLogInCallback);
+            UserRegistrationResult result = response.body();
+            Needle.userModel.setUserId(result.getUserId());
 
-            //if(result.successCode == 1 || result.successCode == 409){
-                /*WeakReference<TextView> textView = new WeakReference<TextView>((TextView) activity.findViewById(R.id.login_splash_label));
-                LoginTaskParams params = new LoginTaskParams(activity, user, textView);
-                new LoginTask(params, AuthenticationController.this).execute();*/
-
-
-
-            /*}else{
-                Toast.makeText(activity, "Error ! \nPlease Try Again", Toast.LENGTH_SHORT).show();
-            }*/
+            UserVO user = Needle.userModel.getUser();
+            if(result.getSuccessCode() == 1){
+                ApiClient.getInstance().login(user.getLoginType(), user.getEmail(), user.getUserName(), user.getGcmRegId(), user.getPassword(), user.getSocialNetworkUserId(), userLogInCallback);
+            }else if(result.getSuccessCode() == 409){
+                Toast.makeText(activity, result.getMessage(), Toast.LENGTH_SHORT).show();
+            }else{
+                Log.d(TAG, "Error with registration!");
+            }
         }
 
         @Override
         public void onFailure(Throwable t) {
-
+            Log.d(TAG, "User Registration failed : " + t.getMessage());
         }
     };
 
@@ -457,14 +464,10 @@ public class AuthenticationController implements LoginResponseHandler, OnLoginCo
 
             if(!Needle.userModel.isLoggedIn()) {
                 if (result.getSuccessCode() == 1) {
-                    Needle.userModel.setLoggedIn(true);
-                    Needle.userModel.setUserName(result.getUser().getUserName());
-                    Needle.userModel.setUserId(result.getUser().getUserId());
-                    Needle.userModel.getUser().setSocialNetworkUserId(result.getUser().getSocialNetworkUserId());
-                    Needle.userModel.getUser().setLoginType(result.getUser().getLoginType());
-                    Needle.userModel.getUser().setPictureURL(result.getUser().getPictureURL());
-                    Needle.userModel.getUser().setCoverPictureURL(result.getUser().getCoverPictureURL());
+                    Needle.userModel.getUser().setUserId(result.getUser().getUserId());
                     Needle.userModel.saveUser();
+
+                    Needle.userModel.setLoggedIn(true);
 
                     Needle.navigationController.onPostLogin();
 
@@ -494,4 +497,8 @@ public class AuthenticationController implements LoginResponseHandler, OnLoginCo
             Log.i(TAG, "User login failed : "+t.getMessage());
         }
     };
+
+    public Callback<LoginTaskResult> getUserLoginCallback() {
+        return userLogInCallback;
+    }
 }

@@ -70,8 +70,17 @@
         </RelativeLayout>
     </RelativeLayout>
 
+
+    <fragment
+        android:name="com.nemator.needle.view.SearchFragment"
+        android:tag="@string/searchFragmentTag"
+        android:id="@+id/searchFragment"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"/>
+
     <!-- FAB -->
-    <FloatingActionButton
+    <android.support.design.widget.FloatingActionButton
         android:id="@+id/new_haystack_photo_fab"
         android:elevation="4dp"
         android:layout_width="wrap_content"
@@ -81,6 +90,5 @@
         android:layout_alignParentEnd="true"
         android:layout_marginRight="16dp"
         android:layout_marginBottom="60dp"
-        android:src="@drawable/ic_photo_camera_black_24dp"
-        android:background="@color/primary_dark"/>
+        android:src="@drawable/ic_photo_camera_black_24dp"/>
 </RelativeLayout>

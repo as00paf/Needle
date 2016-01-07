@@ -10,11 +10,11 @@
 
     <color
         name="accent"
-        >#FFF</color>
+        >#eb9f26</color>
 
     <color
         name="circleColor"
-        >#F3E5F5</color>
+        >#FFE082</color>
 
     <color name="tabsScrollColor">#FFFFFF</color>
 

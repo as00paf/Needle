@@ -4,7 +4,6 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/ASNECore/ASNECore.iml" filepath="$PROJECT_DIR$/ASNECore/ASNECore.iml" />
       <module fileurl="file://$PROJECT_DIR$/Needle.iml" filepath="$PROJECT_DIR$/Needle.iml" />
-      <module fileurl="file://$PROJECT_DIR$/PersistentSearch/PersistentSearch.iml" filepath="$PROJECT_DIR$/PersistentSearch/PersistentSearch.iml" />
       <module fileurl="file://$PROJECT_DIR$/ViewPagerIndicator/ViewPagerIndicator.iml" filepath="$PROJECT_DIR$/ViewPagerIndicator/ViewPagerIndicator.iml" />
       <module fileurl="file://$PROJECT_DIR$/android-maps-utils/android-maps-utils.iml" filepath="$PROJECT_DIR$/android-maps-utils/android-maps-utils.iml" />
       <module fileurl="file://$PROJECT_DIR$/android-support-v4-preferencefragment-master/android-support-v4-preferencefragment-master.iml" filepath="$PROJECT_DIR$/android-support-v4-preferencefragment-master/android-support-v4-preferencefragment-master.iml" />

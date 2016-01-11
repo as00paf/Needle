@@ -6,7 +6,13 @@ import android.util.Log;
 import com.github.gorbin.asne.core.AccessToken;
 import com.github.gorbin.asne.core.listener.OnRequestAccessTokenCompleteListener;
 import com.github.gorbin.asne.facebook.FacebookSocialNetwork;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.annotations.SerializedName;
 import com.nemator.needle.utils.AppConstants;
+import com.squareup.okhttp.OkHttpClient;
+import com.squareup.okhttp.Request;
+import com.squareup.okhttp.Response;
 
 import org.json.JSONObject;
 
@@ -17,48 +23,49 @@ public class GetFacebookCoverURLTask extends AsyncTask<Void, Void, String>{
 
     private static final String FB_COVER_URL = AppConstants.PROJECT_URL +"haystack.php";
     private static final String TAG = "GetFacebookCoverURL";
-    private FacebookSocialNetwork socialNetwork;
 
     private String url;
     private String coverUrl = "";
-    private JSONObject json;
 
     public GetFacebookCoverURLTask(FacebookSocialNetwork socialNetwork, String userId){
-        this.socialNetwork = socialNetwork;
         url = "https://graph.facebook.com/" +
                 userId
-                +"?fields=cover&access_token=";
+                +"?fields=cover&access_token=" + socialNetwork.getAccessToken().token;
 
         Log.d(TAG, "URL : "+url);
     }
 
     @Override
     protected String doInBackground(Void... voids) {
-        socialNetwork.setOnRequestAccessTokenCompleteListener(new OnRequestAccessTokenCompleteListener() {
-            @Override
-            public void onRequestAccessTokenComplete(int socialNetworkID, AccessToken accessToken) {
-               /* try {
-                    //Request
-                    json = jsonParser.makeHttpRequest(url+accessToken.token, "GET", new ArrayList<NameValuePair>());
-                    coverUrl = json.getJSONObject("cover").getString("source");
-                } catch (Exception e) {
-                    Log.d(TAG, "Exception : " + e.getMessage());
+        try {
+            OkHttpClient client = new OkHttpClient();
 
-                    e.printStackTrace();
-                }*/
-            }
+            Request request = new Request.Builder()
+                    .url(url)
+                    .build();
 
-            @Override
-            public void onError(int socialNetworkID, String requestID, String errorMessage, Object data) {
+            //Request
+            Response response = client.newCall(request).execute();
+            String jsonString = response.body().string();
+            Gson gson = new Gson();
 
-            }
-        });
-        socialNetwork.requestAccessToken();
+            coverUrl = gson.fromJson(jsonString, FacebookCoverResponse.class).cover.url;
+        } catch (Exception e) {
+            Log.d(TAG, "Exception : " + e.getMessage());
 
-
-
+            e.printStackTrace();
+        }
 
         return coverUrl;
     }
 
+    public static class FacebookCoverObject{
+        @SerializedName("source")
+        private String url = null;
+    }
+
+    public static class FacebookCoverResponse{
+        @SerializedName("cover")
+        private FacebookCoverObject cover = null;
+    }
 }

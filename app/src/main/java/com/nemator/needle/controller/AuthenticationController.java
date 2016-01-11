@@ -179,7 +179,7 @@ public class AuthenticationController implements LoginResponseHandler, OnLoginCo
     //Public Mehtods
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         Fragment fragment = activity.getSupportFragmentManager().findFragmentByTag(NavigationController.SOCIAL_NETWORK_TAG);
-        if (fragment != null) {
+        if (fragment != null && hasInitializedSocialNetworks()) {
             fragment.onActivityResult(requestCode, resultCode, data);
         }
 
@@ -197,12 +197,11 @@ public class AuthenticationController implements LoginResponseHandler, OnLoginCo
 
             LocalBroadcastManager.getInstance(activity).unregisterReceiver(this);
 
-            if(ContextCompat.checkSelfPermission(context, Manifest.permission.GET_ACCOUNTS)
-                    == PackageManager.PERMISSION_GRANTED){
-                ((GooglePlusSocialNetwork) socialNetwork).setGoogleApiClient(Needle.googleApiController.getGoogleApiClient());
-                ((GooglePlusSocialNetwork) socialNetwork).setConnectionResult(Needle.googleApiController.getConnectionResult());
+            ((GooglePlusSocialNetwork) socialNetwork).setGoogleApiClient(Needle.googleApiController.getGoogleApiClient());
+            ((GooglePlusSocialNetwork) socialNetwork).setConnectionResult(Needle.googleApiController.getConnectionResult());
 
-                getSocialProfileAndLogIn(LOGIN_TYPE_GOOGLE);
+            if(PermissionManager.getInstance(activity).checkAccountsPermission(activity)){
+                getSocialProfileAndRegister(LOGIN_TYPE_GOOGLE);
             }
         }
     };
@@ -219,12 +218,10 @@ public class AuthenticationController implements LoginResponseHandler, OnLoginCo
                 if(socialNetwork.getID() == LOGIN_TYPE_GOOGLE){
                     if(Needle.googleApiController.isConnected()){
                         Log.i(TAG, "Api is Connected");
-                        //if(PermissionManager.getInstance(activity).checkAccountsPermission(activity)){
-                            ((GooglePlusSocialNetwork) socialNetwork).setGoogleApiClient(Needle.googleApiController.getGoogleApiClient());
-                            ((GooglePlusSocialNetwork) socialNetwork).setConnectionResult(Needle.googleApiController.getConnectionResult());
+                        ((GooglePlusSocialNetwork) socialNetwork).setGoogleApiClient(Needle.googleApiController.getGoogleApiClient());
+                        ((GooglePlusSocialNetwork) socialNetwork).setConnectionResult(Needle.googleApiController.getConnectionResult());
 
-                            getSocialProfileAndLogIn(LOGIN_TYPE_GOOGLE);
-                        //}
+                        getSocialProfileAndLogIn(LOGIN_TYPE_GOOGLE);
                     }else{
                         Log.i(TAG, "Api is not Connected");
 
@@ -331,6 +328,7 @@ public class AuthenticationController implements LoginResponseHandler, OnLoginCo
     }
 
     public void getSocialProfileAndRegister(final int networkId) {
+        Log.d(TAG, "getSocialProfileAndRegister");
         socialNetwork = mSocialNetworkManager.getSocialNetwork(networkId);
         socialNetwork.setOnRequestCurrentPersonCompleteListener(new OnRequestSocialPersonCompleteListener() {
             @Override
@@ -344,6 +342,8 @@ public class AuthenticationController implements LoginResponseHandler, OnLoginCo
                         Log.i(TAG, "Succesfuly retreived social profile of type FACEBOOK");
                         try {
                             socialPerson.coverURL = new GetFacebookCoverURLTask((FacebookSocialNetwork) socialNetwork, socialPerson.id).execute().get();
+                            //socialPerson.coverURL = "https://graph.facebook.com/" + socialPerson.id +"?fields=cover&access_token=" + socialNetwork.getAccessToken().token;
+                            socialPerson.email = "facebook";
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
@@ -383,12 +383,16 @@ public class AuthenticationController implements LoginResponseHandler, OnLoginCo
     }
 
     public void logOut() {
+        Log.i(TAG, "Logging out");
         if(socialNetwork != null){
             socialNetwork.logout();
         }
+
+        Needle.googleApiController.disconnect();
     }
 
-    public void registerWithNetwork(int networkId) {
+    public void registerWithNetwork(final int networkId) {
+        Log.i(TAG, "Registering with network " + networkId);
         socialNetwork = mSocialNetworkManager.getSocialNetwork(networkId);
 
         if(!socialNetwork.isConnected()) {
@@ -404,14 +408,20 @@ public class AuthenticationController implements LoginResponseHandler, OnLoginCo
                         getSocialProfileAndRegister(LOGIN_TYPE_GOOGLE);
                     }else{
                         LocalBroadcastManager localBroadcastManager = LocalBroadcastManager.getInstance(activity);
+                        localBroadcastManager.registerReceiver(googleApiConnectedReceiver, new IntentFilter(AppConstants.GOOGLE_API_CONNECTED));
+                      /*  LocalBroadcastManager.getInstance(activity).unregisterReceiver(googleApiConnectedReceiver);
+
+                        LocalBroadcastManager localBroadcastManager = LocalBroadcastManager.getInstance(activity);
                         localBroadcastManager.registerReceiver(new BroadcastReceiver() {
                             @Override
                             public void onReceive(Context context, Intent intent) {
-                                getSocialProfileAndRegister(LOGIN_TYPE_GOOGLE);
+                                ((GooglePlusSocialNetwork) socialNetwork).setGoogleApiClient(Needle.googleApiController.getGoogleApiClient());
+                                //socialNetwork.requestLogin(AuthenticationController.this);
+                                getSocialProfileAndRegister(networkId);
                             }
                         }, new IntentFilter(AppConstants.GOOGLE_API_CONNECTED));
-
-                        socialNetwork.requestLogin(this);
+*/
+                        Needle.googleApiController.init(activity, true);
                     }
                 }else{
                     socialNetwork.requestLogin(this);
@@ -500,5 +510,13 @@ public class AuthenticationController implements LoginResponseHandler, OnLoginCo
 
     public Callback<LoginTaskResult> getUserLoginCallback() {
         return userLogInCallback;
+    }
+
+    public boolean hasInitializedSocialNetworks() {
+        if(mSocialNetworkManager != null){
+            return mSocialNetworkManager.getInitializedSocialNetworks().size() > 0;
+        }
+
+        return false;
     }
 }

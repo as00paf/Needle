@@ -633,6 +633,8 @@ public class NavigationController implements MainActivity.NavigationHandler, OnA
 
     @Override
     public void onLogOutComplete() {
+        Log.i(TAG, "Log out complete");
+
         Needle.userModel.setLoggedIn(false);
         Needle.userModel.setAutoLogin(false);
 

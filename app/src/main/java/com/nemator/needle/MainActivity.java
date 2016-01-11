@@ -252,7 +252,9 @@ public class MainActivity extends AppCompatActivity {
         Log.d(TAG, "Permission Granted !");
 
         if(requestCode == PermissionManager.PERMISSIONS_REQUEST_ACCESS_ACCOUNTS){
-            Needle.authenticationController.logInWithSocialNetwork(Needle.authenticationController.LOGIN_TYPE_GOOGLE);
+            Needle.authenticationController.getSocialProfileAndRegister(Needle.authenticationController.LOGIN_TYPE_GOOGLE);
+        }else if(requestCode == PermissionManager.PERMISSIONS_REQUEST_ACCESS_ACCOUNTS){
+            Log.d(TAG, "Permission Granted !");
         }else if(requestCode == PermissionManager.PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION){
             Log.d(TAG, "Permission Granted !");
         }

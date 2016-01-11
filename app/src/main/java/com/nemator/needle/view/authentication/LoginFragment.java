@@ -76,18 +76,13 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
 
         //Username & Password
         user = (AppCompatEditText) layout.findViewById(R.id.usernameEditText);
-        user.setText(mSharedPreferences.getString(AppConstants.TAG_EMAIL, ""));
+        String userName = mSharedPreferences.getString(AppConstants.TAG_EMAIL, "");
+        if(!userName.equals("facebook")){
+            user.setText(userName);
+        }
 
         pass = (AppCompatEditText) layout.findViewById(R.id.input_password);
         pass.setText(mSharedPreferences.getString(AppConstants.TAG_PASSWORD, ""));
-
-        /*if(!((MaterialNavigationDrawer) getActivity()).isDrawerOpen()){
-            if(TextUtils.isEmpty(user.getText())){
-                user.requestFocus();
-            }else{
-                pass.requestFocus();
-            }
-        }*/
 
         pass.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
@@ -115,7 +110,9 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
         twitterButtton.setOnClickListener(this);
         googleButton.setOnClickListener(this);
 
-        Needle.authenticationController.initSocialNetworkManager(this);
+        if(!Needle.authenticationController.hasInitializedSocialNetworks()){
+            Needle.authenticationController.initSocialNetworkManager(this);
+        }
 
         return layout;
     }

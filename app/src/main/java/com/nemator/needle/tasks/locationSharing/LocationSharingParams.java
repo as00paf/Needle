@@ -1,11 +1,9 @@
 package com.nemator.needle.tasks.locationSharing;
 
 import android.content.Context;
-import android.location.Location;
 
 import com.nemator.needle.models.vo.LocationSharingVO;
-import com.nemator.needle.view.locationSharing.LocationSharingListCardAdapter;
-import com.nemator.needle.view.locationSharing.LocationSharingListCardAdapter.LocationSharingCardViewHolder;
+import com.nemator.needle.adapter.LocationSharingListCardAdapter.LocationSharingCardViewHolder;
 
 import java.lang.ref.WeakReference;
 

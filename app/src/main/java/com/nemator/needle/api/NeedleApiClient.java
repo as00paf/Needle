@@ -46,6 +46,9 @@ public interface NeedleApiClient {
                                       @Field("gcmRegId") String gcmRegId, @Field("socialNetworkUserId")
                                       String socialNetworkUserId);
 
+    @GET("logout.php")
+    Call<TaskResult> logOut();
+
     //Haystacks
     @GET("haystack.php")
     Call<HaystackTaskResult> getHaystacks(@Query("userId") String userId);

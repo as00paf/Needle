@@ -9,8 +9,6 @@ import com.nemator.needle.utils.AppConstants;
 
 import java.io.Serializable;
 
-import twitter4j.User;
-
 public class UserVO implements Serializable, Parcelable{
 
     @SerializedName("userId")
@@ -40,10 +38,19 @@ public class UserVO implements Serializable, Parcelable{
     @SerializedName("loginType")
     private int loginType = 0;
 
+    /**
+     *
+     */
     public UserVO(){
 
     }
 
+    /**
+     * @param userId
+     * @param userName
+     * @param pictureURL
+     * @param gcmRegId
+     */
     public UserVO(int userId, String userName, String pictureURL, String gcmRegId){
         this.userId = userId;
         this.userName = userName;
@@ -51,6 +58,16 @@ public class UserVO implements Serializable, Parcelable{
         this.gcmRegId = gcmRegId;
     }
 
+    /**
+     * @param userId id of user
+     * @param userName username
+     * @param email email
+     * @param password password
+     * @param pictureURL picture url
+     * @param gcmRegId Google Registration Id
+     * @param loginType login type
+     * @param socialNetworkUserId Facebook/Google/Twitter id
+     */
     public UserVO(int userId, String userName, String email, String password, String pictureURL, String gcmRegId, int loginType, String socialNetworkUserId){
         this.userId = userId;
         this.userName = userName;
@@ -62,6 +79,9 @@ public class UserVO implements Serializable, Parcelable{
         this.socialNetworkUserId = socialNetworkUserId;
     }
 
+    /**
+     * @param in
+     */
     public UserVO(Parcel in){
         userId = in.readInt();
         userName = in.readString();
@@ -78,72 +98,81 @@ public class UserVO implements Serializable, Parcelable{
         return userId;
     }
 
-    public void setUserId(int userId) {
+    public UserVO setUserId(int userId) {
         this.userId = userId;
+        return this;
     }
 
     public String getUserName() {
         return userName;
     }
 
-    public void setUserName(String userName) {
+    public UserVO setUserName(String userName) {
         this.userName = userName;
+        return this;
     }
 
     public String getEmail() {
         return email;
     }
 
-    public void setEmail(String email) {
+    public UserVO setEmail(String email) {
         this.email = email;
+        return this;
     }
 
     public String getPictureURL() {
         return pictureURL;
     }
 
-    public void setPictureURL(String pictureURL) {
+    public UserVO setPictureURL(String pictureURL) {
         this.pictureURL = pictureURL;
+        return this;
     }
 
     public String getGcmRegId() {
         return gcmRegId;
     }
 
-    public void setGcmRegId(String gcmRegId) {
+    public UserVO setGcmRegId(String gcmRegId) {
         this.gcmRegId = gcmRegId;
+        return this;
     }
 
     public String getPassword() {
         return password;
     }
 
-    public void setPassword(String password) {
+    public UserVO setPassword(String password) {
         this.password = password;
+        return this;
     }
 
     public String getSocialNetworkUserId() {
         return socialNetworkUserId;
     }
 
-    public void setSocialNetworkUserId(String socialNetworkUserId) {
+    public UserVO setSocialNetworkUserId(String socialNetworkUserId) {
         this.socialNetworkUserId = socialNetworkUserId;
+        return this;
     }
 
     public int getLoginType() {
         return loginType;
     }
 
-    public void setLoginType(int loginType) {
+    public UserVO setLoginType(int loginType) {
         this.loginType = loginType;
+        return this;
     }
 
     public String getCoverPictureURL() {
         return coverPictureURL;
     }
 
-    public void setCoverPictureURL(String coverPictureURL) {
+    public UserVO setCoverPictureURL(String coverPictureURL) {
         this.coverPictureURL = coverPictureURL;
+        return this;
     }
 
     @Override

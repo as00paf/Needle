@@ -4,9 +4,7 @@ import android.content.Context;
 
 import com.nemator.needle.models.vo.LocationSharingVO;
 import com.nemator.needle.models.vo.UserVO;
-import com.nemator.needle.view.locationSharing.LocationSharingListCardAdapter.LocationSharingCardViewHolder;
 
-import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 
 public class HaystackUserTaskParams {

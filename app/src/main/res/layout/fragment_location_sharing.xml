@@ -7,7 +7,7 @@
     android:id="@+id/map"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:name="com.nemator.needle.view.locationSharing.locationSharing.LocationSharingMapFragment"
+    android:name="com.nemator.needle.fragments.locationSharing.locationSharing.LocationSharingMapFragment"
     android:tag="LOCATION_SHARING_MAP_FRAGMENT"/>
 
     <!-- Distance Indicator -->

@@ -25,7 +25,7 @@
                 app:popupTheme="@style/AppTheme.PopupOverlay" />
 
             <!-- Tabs -->
-            <com.nemator.needle.view.SlidingTabLayout
+            <com.nemator.needle.views.SlidingTabLayout
                 android:id="@+id/sliding_tabs"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

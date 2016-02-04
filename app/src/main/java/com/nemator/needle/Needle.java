@@ -1,8 +1,14 @@
 package com.nemator.needle;
 
+import android.app.Activity;
 import android.app.Application;
+import android.content.ComponentName;
 import android.content.Context;
+import android.content.Intent;
+import android.content.ServiceConnection;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.IBinder;
 import android.support.multidex.MultiDex;
 import android.support.multidex.MultiDexApplication;
 
@@ -12,6 +18,7 @@ import com.nemator.needle.controller.GoogleAPIController;
 import com.nemator.needle.controller.NavigationController;
 import com.nemator.needle.controller.NetworkController;
 import com.nemator.needle.models.UserModel;
+import com.nemator.needle.service.NeedleLocationService;
 
 /**
  * Created by Alex on 20/09/2015.

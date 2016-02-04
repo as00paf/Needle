@@ -3,18 +3,12 @@ package com.nemator.needle.tasks.facebook;
 import android.os.AsyncTask;
 import android.util.Log;
 
-import com.github.gorbin.asne.core.AccessToken;
-import com.github.gorbin.asne.core.listener.OnRequestAccessTokenCompleteListener;
-import com.github.gorbin.asne.facebook.FacebookSocialNetwork;
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.google.gson.annotations.SerializedName;
 import com.nemator.needle.utils.AppConstants;
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
 import com.squareup.okhttp.Response;
-
-import org.json.JSONObject;
 
 /**
  * Created by Alex on 15/09/2015.
@@ -27,10 +21,10 @@ public class GetFacebookCoverURLTask extends AsyncTask<Void, Void, String>{
     private String url;
     private String coverUrl = "";
 
-    public GetFacebookCoverURLTask(FacebookSocialNetwork socialNetwork, String userId){
+    public GetFacebookCoverURLTask(String token, String userId){
         url = "https://graph.facebook.com/" +
                 userId
-                +"?fields=cover&access_token=" + socialNetwork.getAccessToken().token;
+                +"?fields=cover&access_token=" + token;
 
         Log.d(TAG, "URL : "+url);
     }

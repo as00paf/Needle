@@ -59,4 +59,10 @@
 
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 
+    <!-- Google Revoke Button -->
+    <style name="ThemeOverlay.GoogleRevokeButton" parent="ThemeOverlay.AppCompat.Dark">
+        <item name="colorButtonNormal">@color/primary_dark</item>
+        <item name="android:textColor">@android:color/white</item>
+    </style>
+
 </resources>

@@ -4,6 +4,7 @@ import android.util.Log;
 
 import com.nemator.needle.models.vo.HaystackVO;
 import com.nemator.needle.models.vo.UserVO;
+import com.nemator.needle.tasks.TaskResult;
 import com.nemator.needle.tasks.haystack.HaystackTaskResult;
 import com.nemator.needle.tasks.login.LoginTaskResult;
 import com.nemator.needle.utils.AppConstants;
@@ -64,6 +65,11 @@ public class ApiClient {
 
     public void login(int loginType, String email, String username, String gcmRegId, String password, String socialNetworkUserId, Callback<LoginTaskResult> callBack){
         Call<LoginTaskResult> call = client.logIn(loginType, email, username, gcmRegId, password, socialNetworkUserId);
+        call.enqueue(callBack);
+    }
+
+    public void logout(Callback<TaskResult> callBack){
+        Call<TaskResult> call = client.logOut();
         call.enqueue(callBack);
     }
 

@@ -3,10 +3,6 @@ package com.nemator.needle.tasks.location;
 import android.content.Context;
 
 import com.google.android.gms.maps.model.LatLng;
-import com.nemator.needle.models.vo.LocationSharingVO;
-import com.nemator.needle.view.locationSharing.LocationSharingListCardAdapter.LocationSharingCardViewHolder;
-
-import java.lang.ref.WeakReference;
 
 public class LocationTaskParams {
     public static final String TYPE_GET = "GET";

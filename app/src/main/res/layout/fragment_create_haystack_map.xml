@@ -63,7 +63,7 @@
     </FrameLayout>
 
     <fragment
-        android:name="com.nemator.needle.view.SearchFragment"
+        android:name="com.nemator.needle.fragments.SearchFragment"
         android:tag="@string/searchFragmentTag"
         android:id="@+id/searchFragment"
         android:layout_width="match_parent"

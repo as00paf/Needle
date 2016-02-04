@@ -19,6 +19,10 @@
     <string name="rememberMeSummary">Make the Needle remember your credentials</string>
     <string name="notificationsSummary">Allow Needle to Notify you about events that occur</string>
     <string name="app_settings">App Settings</string>
+    <string name="google_account">Google Account</string>
+    <string name="revoke_access">Revoke Access</string>
+    <string name="revoke_google_access">Revoke Google Account Access</string>
+    <string name="revoke_google_access_confirmation_msg">Are you sure you want to revoke Needle\'s access to your Google account?</string>
 
     <!-- Login -->
     <string name="initializing">Initializing ...</string>
@@ -148,5 +152,8 @@
     <string name="set_haystacks_location">Set Haystack\'s Location</string>
     <string name="action_lock_map">Lock Map</string>
     <string name="action_polygon">Polygon</string>
+    <string name="permission_granted">Permission Granted !</string>
+    <string name="permission_denied">Permission Denied !</string>
+    <string name="signing_in">Signing in ...</string>
 
 </resources>

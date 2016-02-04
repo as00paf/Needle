@@ -1,8 +1,7 @@
 package com.nemator.needle.tasks.locationSharing;
 
-import com.nemator.needle.models.vo.HaystackVO;
 import com.nemator.needle.models.vo.LocationSharingVO;
-import com.nemator.needle.view.locationSharing.LocationSharingListCardAdapter;
+import com.nemator.needle.adapter.LocationSharingListCardAdapter;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;

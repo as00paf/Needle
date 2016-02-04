@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Handler;
-import android.preference.PreferenceManager;
 import android.text.TextUtils;
 import android.util.Log;
 import android.widget.Toast;
@@ -12,7 +11,7 @@ import android.widget.Toast;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
-import com.nemator.needle.MainActivity;
+import com.nemator.needle.activities.HomeActivity;
 import com.nemator.needle.Needle;
 import com.nemator.needle.R;
 import com.nemator.needle.utils.AppConstants;
@@ -27,10 +26,10 @@ public class GCMController /*implements UserTask.UpdateGCMIDResponseHandler*/ {
     protected static final int MSG_REGISTER_WEB_SERVER_SUCCESS = 103;
     protected static final int MSG_REGISTER_WEB_SERVER_FAILURE = 104;
     private static final String GCM_SENDER_ID = "648034739265";
-    private static final int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
+    public static final int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
     private static GCMController instance;
 
-    private MainActivity activity;
+    private HomeActivity activity;
     private SharedPreferences mSharedPreferences;
 
     GoogleCloudMessaging gcm;
@@ -48,7 +47,7 @@ public class GCMController /*implements UserTask.UpdateGCMIDResponseHandler*/ {
         return instance;
     }
 
-    public void init(MainActivity activity){
+    public void init(HomeActivity activity){
         this.activity = activity;
         Needle.userModel.init(activity);
         mSharedPreferences = activity.getSharedPreferences("Needle", Context.MODE_PRIVATE);

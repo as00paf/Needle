@@ -21,4 +21,7 @@
 
     <color name="float_label">#999999</color>
 
+
+    <color name="transparent_grey" type="color">#64000000</color>
+
 </resources>

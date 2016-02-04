@@ -1,0 +1,10 @@
+[
+    {
+        "merged": "C:\\android_workspace\\Needle\\ViewPagerIndicator\\build\\intermediates\\res\\merged\\androidTest\\debug\\color\\vpi__dark_theme.xml",
+        "source": "C:\\android_workspace\\Needle\\ViewPagerIndicator\\build\\intermediates\\bundles\\debug\\res\\color\\vpi__dark_theme.xml"
+    },
+    {
+        "merged": "C:\\android_workspace\\Needle\\ViewPagerIndicator\\build\\intermediates\\res\\merged\\androidTest\\debug\\color\\vpi__light_theme.xml",
+        "source": "C:\\android_workspace\\Needle\\ViewPagerIndicator\\build\\intermediates\\bundles\\debug\\res\\color\\vpi__light_theme.xml"
+    }
+]

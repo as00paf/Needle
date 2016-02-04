@@ -8,18 +8,13 @@ import android.content.Intent;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Vibrator;
 import android.preference.PreferenceManager;
 import android.support.v4.app.NotificationCompat;
-import android.util.Log;
 
-import com.nemator.needle.MainActivity;
+import com.nemator.needle.activities.HomeActivity;
 import com.nemator.needle.Needle;
 import com.nemator.needle.R;
-import com.nemator.needle.models.UserModel;
 import com.nemator.needle.utils.AppConstants;
-
-import org.json.JSONObject;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -89,7 +84,7 @@ public class GCMIntentService extends IntentService {
     }
 
     private Intent createIntent(String notificationType, Bundle data){
-        Intent intent = new Intent(this, MainActivity.class);
+        Intent intent = new Intent(this, HomeActivity.class);
         intent.putExtra(AppConstants.TAG_TYPE, notificationType);
         intent.putExtra(AppConstants.TAG_ACTION, "Notification");
         intent.putExtra(AppConstants.TAG_ID, data.getString("id"));

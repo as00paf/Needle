@@ -220,7 +220,7 @@ ADDED from AndroidManifest.xml:30:9
 		ADDED from AndroidManifest.xml:31:13
 	android:value
 		ADDED from AndroidManifest.xml:32:13
-activity#com.nemator.needle.MainActivity
+activity#com.nemator.needle.activities.HomeActivity
 ADDED from AndroidManifest.xml:34:9
 	android:label
 		ADDED from AndroidManifest.xml:36:13

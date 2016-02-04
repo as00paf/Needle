@@ -1,7 +1,7 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.nemator.needle.view.authentication.LoginFragment"
+    tools:context="com.nemator.needle.fragments.authentication.LoginFragment"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="@android:color/white">
 
@@ -55,7 +55,7 @@
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="24dp"
+                android:layout_marginBottom="16dp"
                 android:gravity="center_vertical">
 
                 <!-- Register Link -->
@@ -83,30 +83,27 @@
             <TextView
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="24dp"
+                android:layout_marginBottom="16dp"
                 android:text="@string/or"
                 android:gravity="center"
                 android:textSize="32dip"/>
 
             <!-- Facebook Button -->
-            <android.support.v7.widget.AppCompatButton
-                android:layout_width="fill_parent"
-                android:layout_height="64dp"
-                android:text="@string/login_via_fb"
-                android:drawableStart="@drawable/facebook_logo"
-                android:drawablePadding="8dp"
+            <com.facebook.login.widget.LoginButton
                 android:id="@+id/btn_facebook"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
-                android:background="#3b5998"
-                android:layout_margin="8dp"
-                android:textColor="#ffffffff" />
+                android:padding="4dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="16dp" />
 
             <!-- Twitter Button -->
             <android.support.v7.widget.AppCompatButton
                 android:layout_width="fill_parent"
                 android:layout_height="64dp"
                 android:text="@string/login_via_twitter"
-                android:drawableStart="@drawable/twitter_logo_white"
+                android:drawableLeft="@drawable/twitter_logo_white"
                 android:id="@+id/btn_twitter"
                 android:layout_gravity="center_horizontal"
                 android:background="#55ACEE"
@@ -116,8 +113,8 @@
             <!-- G+ Button -->
             <com.google.android.gms.common.SignInButton
                 android:id="@+id/btn_google"
-                android:layout_width="fill_parent"
-                android:layout_height="64dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
                 android:layout_marginBottom="30dip"
                 android:layout_margin="4dp"

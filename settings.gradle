@@ -1,2 +1,2 @@
-include ':app', ':android-support-v4-preferencefragment-master', 'android-maps-utils', ':ASNECore', ':picasso-2.5.2', ':facebook', ':twitter', ':googleplus', ':transformations', ':', ':retrofit-2.0.0-beta2'
+include ':app', ':android-support-v4-preferencefragment-master', 'android-maps-utils', ':picasso-2.5.2', ':', ':retrofit-2.0.0-beta2'
 include ':ViewPagerIndicator'

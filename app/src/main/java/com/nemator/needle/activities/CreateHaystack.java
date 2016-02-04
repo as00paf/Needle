@@ -1,7 +1,5 @@
 package com.nemator.needle.activities;
 
-import android.animation.Animator;
-import android.app.SearchManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -16,21 +14,16 @@ import android.preference.PreferenceManager;
 import android.provider.MediaStore;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.content.LocalBroadcastManager;
-import android.support.v4.view.MenuItemCompat;
 import android.support.v4.view.ViewPager;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.Toast;
 
-import com.google.android.gms.maps.model.LatLng;
 import com.nemator.needle.Needle;
 import com.nemator.needle.R;
 import com.nemator.needle.api.ApiClient;
@@ -42,15 +35,12 @@ import com.nemator.needle.tasks.imageUploader.ImageUploaderTask;
 import com.nemator.needle.utils.AppConstants;
 import com.nemator.needle.utils.AppState;
 import com.nemator.needle.utils.CameraUtils;
-import com.nemator.needle.view.CustomViewPager;
-import com.nemator.needle.view.SearchFragment;
-import com.nemator.needle.view.SlidingTabLayout;
-import com.nemator.needle.view.haystacks.OnActivityStateChangeListener;
-import com.nemator.needle.view.haystacks.createHaystack.CreateHaystackGeneralInfosFragment;
-import com.nemator.needle.view.haystacks.createHaystack.CreateHaystackMap;
-import com.nemator.needle.view.haystacks.createHaystack.CreateHaystackMapFragment;
+import com.nemator.needle.views.SlidingTabLayout;
+import com.nemator.needle.fragments.haystacks.OnActivityStateChangeListener;
+import com.nemator.needle.fragments.haystacks.createHaystack.CreateHaystackGeneralInfosFragment;
+import com.nemator.needle.fragments.haystacks.createHaystack.CreateHaystackMapFragment;
 import com.nemator.needle.adapter.CreateHaystackPagerAdapter;
-import com.nemator.needle.view.haystacks.createHaystack.CreateHaystackUsersFragment;
+import com.nemator.needle.fragments.haystacks.createHaystack.CreateHaystackUsersFragment;
 
 import java.util.ArrayList;
 

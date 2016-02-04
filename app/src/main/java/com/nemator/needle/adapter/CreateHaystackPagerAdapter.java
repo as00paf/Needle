@@ -7,10 +7,9 @@ import android.support.v4.app.FragmentStatePagerAdapter;
 import android.view.View;
 
 import com.nemator.needle.R;
-import com.nemator.needle.view.haystacks.HaystackListTabFragment;
-import com.nemator.needle.view.haystacks.createHaystack.CreateHaystackGeneralInfosFragment;
-import com.nemator.needle.view.haystacks.createHaystack.CreateHaystackMapFragment;
-import com.nemator.needle.view.haystacks.createHaystack.CreateHaystackUsersFragment;
+import com.nemator.needle.fragments.haystacks.createHaystack.CreateHaystackGeneralInfosFragment;
+import com.nemator.needle.fragments.haystacks.createHaystack.CreateHaystackMapFragment;
+import com.nemator.needle.fragments.haystacks.createHaystack.CreateHaystackUsersFragment;
 
 import java.util.ArrayList;
 

@@ -1,10 +1,12 @@
 package com.nemator.needle.utils;
 
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapShader;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Shader;
+import android.util.TypedValue;
 
 public class CropCircleTransformation implements com.squareup.picasso.Transformation {
 
@@ -12,9 +14,9 @@ public class CropCircleTransformation implements com.squareup.picasso.Transforma
     private int strokeWidth;
     private int strokeColor;
 
-    public CropCircleTransformation(int radius, int strokeWidth, int strokeColor) {
-        this.radius = radius;
-        this.strokeWidth = strokeWidth;
+    public CropCircleTransformation(Context context, int radius, int strokeWidth, int strokeColor) {
+        this.radius = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, radius, context.getResources().getDisplayMetrics());
+        this.strokeWidth = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, strokeWidth, context.getResources().getDisplayMetrics());
         this.strokeColor = strokeColor;
     }
 
@@ -26,7 +28,7 @@ public class CropCircleTransformation implements com.squareup.picasso.Transforma
 
         Bitmap output = Bitmap.createBitmap(source.getWidth(), source.getHeight(), Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(output);
-        canvas.drawCircle((source.getWidth() - strokeWidth)/2, (source.getHeight() - strokeWidth)/2, radius-2, paint);
+        canvas.drawCircle((source.getWidth() - strokeWidth)/2, (source.getHeight() - strokeWidth)/2, radius-strokeWidth, paint);
 
         if (source != output) {
             source.recycle();
@@ -36,8 +38,8 @@ public class CropCircleTransformation implements com.squareup.picasso.Transforma
         paint1.setColor(strokeColor);
         paint1.setStyle(Paint.Style.STROKE);
         paint1.setAntiAlias(true);
-        paint1.setStrokeWidth(2);
-        canvas.drawCircle((source.getWidth() - strokeWidth)/2, (source.getHeight() - strokeWidth)/2, radius-2, paint1);
+        paint1.setStrokeWidth(strokeWidth);
+        canvas.drawCircle((source.getWidth() - strokeWidth)/2, (source.getHeight() - strokeWidth)/2, radius-strokeWidth, paint1);
 
 
         return output;

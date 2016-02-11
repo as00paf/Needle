@@ -15,6 +15,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.text.TextUtils;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -241,6 +242,8 @@ public class NavigationController implements HomeActivity.NavigationHandler, OnA
         if(showActionBar && !actionBar.isShowing()){
             actionBar.show();
             actionBar.setElevation(0);
+            actionBar.setDisplayHomeAsUpEnabled(true);
+            actionBar.setDisplayShowHomeEnabled(true);
         }
 
         if (newFragment != null){
@@ -358,20 +361,17 @@ public class NavigationController implements HomeActivity.NavigationHandler, OnA
     public boolean onCreateOptionsMenu(Menu menu) {
         this.menu = menu;
 
-        //if (!activity.isDrawerOpen()) {
-            //TODO: use switch statement
-            if(getCurrentState() == AppState.HAYSTACK){
-                activity.getMenuInflater().inflate(R.menu.haystack, menu);
-            }else if(getCurrentState() == AppState.SETTINGS){
-                activity.getMenuInflater().inflate(R.menu.menu_settings, menu);
-            }else{
-                activity.getMenuInflater().inflate(R.menu.menu_haystacks, menu);
-            }
+        //TODO: use switch statement
+        int state = getCurrentState();
+        if(state == AppState.HAYSTACK){
+            activity.getMenuInflater().inflate(R.menu.haystack, menu);
+        }else if(state == AppState.SETTINGS){
+            activity.getMenuInflater().inflate(R.menu.menu_settings, menu);
+        }else if(state != AppState.LOGIN && state != AppState.SPLASH_LOGIN && state != AppState.REGISTER){
+            activity.getMenuInflater().inflate(R.menu.menu_haystacks, menu);
+        }
 
-            return true;
-        //}
-
-       // return false;
+        return true;
     }
 
     @Override
@@ -617,16 +617,19 @@ public class NavigationController implements HomeActivity.NavigationHandler, OnA
         activity.getDrawerToggle().setDrawerIndicatorEnabled(true);
         activity.getDrawerToggle().syncState();
 
+        navigationView = (NavigationView) activity.findViewById(R.id.navigation_view);
+        View headerView = navigationView.getHeaderView(0);
+
         //Username
-        TextView username = (TextView) activity.findViewById(R.id.username);
+        TextView username = (TextView) headerView.findViewById(R.id.username);
         username.setText(Needle.userModel.getUserName());
 
         //Profile Image
-        ImageView avatarImageView = (ImageView) activity.findViewById(R.id.avatar);
+        ImageView avatarImageView = (ImageView) headerView.findViewById(R.id.avatar);
         String pictureURL = Needle.userModel.getUser().getPictureURL();
         if(!TextUtils.isEmpty(pictureURL)){
             Picasso.with(activity.getApplicationContext()).load(pictureURL)
-                    .transform(new CropCircleTransformation(100, 4, Color.WHITE))
+                    .transform(new CropCircleTransformation(activity, 100, 4, Color.WHITE))
                     .into(avatarImageView);
         }else {
             Log.e(TAG, "Can't fetch avatar picture for user " + Needle.userModel.getUserName());
@@ -635,7 +638,7 @@ public class NavigationController implements HomeActivity.NavigationHandler, OnA
         //Cover Image
         String coverUrl = Needle.userModel.getUser().getCoverPictureURL();
         if(!TextUtils.isEmpty(coverUrl)){
-            final ImageView cover = (ImageView) activity.findViewById(R.id.cover);
+            final ImageView cover = (ImageView) headerView.findViewById(R.id.cover);
 
             Picasso.with(activity.getApplicationContext())
                     .load(coverUrl)

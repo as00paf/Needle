@@ -1,5 +1,6 @@
 package com.nemator.needle.fragments.authentication;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.text.TextUtils;
@@ -15,10 +16,14 @@ import android.widget.FrameLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.auth.api.Auth;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 import com.google.android.gms.common.SignInButton;
 import com.nemator.needle.Needle;
 import com.nemator.needle.R;
 import com.nemator.needle.controller.AuthenticationController;
+import com.nemator.needle.controller.GoogleAPIController;
 import com.nemator.needle.models.vo.UserVO;
 
 public class RegisterFragment extends Fragment implements View.OnClickListener{
@@ -65,7 +70,10 @@ public class RegisterFragment extends Fragment implements View.OnClickListener{
         registerButton = (Button) layout.findViewById(R.id.btn_register);
         facebookButton = (Button) layout.findViewById(R.id.register_btn_facebook);
         twitterButton = (Button) layout.findViewById(R.id.register_btn_twitter);
+
         googleButton = (SignInButton) layout.findViewById(R.id.register_btn_google);
+        googleButton.setSize(SignInButton.SIZE_STANDARD);
+        googleButton.setScopes(GoogleAPIController.getInstance().getGSO().getScopeArray());
 
         //register listeners
         registerButton.setOnClickListener(this);
@@ -105,8 +113,50 @@ public class RegisterFragment extends Fragment implements View.OnClickListener{
                 //Needle.authenticationController.registerWithNetwork(AuthenticationController.LOGIN_TYPE_TWITTER);
                 break;
             case R.id.register_btn_google:
-                //Needle.authenticationController.registerWithNetwork(AuthenticationController.LOGIN_TYPE_GOOGLE);
+                AuthenticationController.getInstance().googleSignIn();
                 break;
         }
     }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        Log.d(TAG, "onActivityResult");
+
+        // Result returned from launching the Intent from GoogleSignInApi.getSignInIntent(...);
+        if (requestCode == AuthenticationController.RC_GOOGLE_SIGN_IN) {
+            GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
+            handleSignInResult(result);
+        }else{
+            super.onActivityResult(requestCode, resultCode, data);
+        }
+
+        //Facebook
+        //callbackManager.onActivityResult(requestCode, resultCode, data);
+    }
+
+    public void handleSignInResult(GoogleSignInResult result) {
+        Log.d(TAG, "handleSignInResult:" + result.isSuccess());
+        if (result.isSuccess()) {
+            Log.d(TAG, "Signed in successfully with Google account");
+            // Signed in successfully, save to model and log into application.
+            //hideProgressDialog();
+
+            GoogleSignInAccount acct = result.getSignInAccount();
+            Needle.userModel.getUser()
+                    .setLoginType(AuthenticationController.LOGIN_TYPE_GOOGLE)
+                    .setUserName(acct.getDisplayName())
+                    .setEmail(acct.getEmail())
+                    .setSocialNetworkUserId(acct.getId());
+
+            AuthenticationController.getInstance().register();
+        } else {
+            // Google sign in unsuccessful
+            //TODO : do something here
+
+            Log.d(TAG, "Google sign in unsuccessful");
+            // hideProgressDialog();
+
+        }
+    }
+
 }

@@ -11,4 +11,9 @@
         <attr name="floatLabelHint" format="reference|string" />
     </declare-styleable>
 
+    <!-- Custom Font TextView -->
+    <declare-styleable name="FontTextView">
+        <attr name="font" format="string" />
+    </declare-styleable>
+
 </resources>

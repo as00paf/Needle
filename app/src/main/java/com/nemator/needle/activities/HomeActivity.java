@@ -1,6 +1,5 @@
 package com.nemator.needle.activities;
 
-import android.Manifest;
 import android.app.AlertDialog;
 import android.content.ComponentName;
 import android.content.Context;
@@ -12,7 +11,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.support.design.widget.NavigationView;
-import android.support.v4.app.Fragment;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -23,27 +21,19 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
-import com.google.android.gms.auth.api.Auth;
-import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 import com.google.android.gms.maps.model.LatLng;
 import com.nemator.needle.Needle;
 import com.nemator.needle.R;
-import com.nemator.needle.controller.AuthenticationController;
-import com.nemator.needle.controller.NavigationController;
 import com.nemator.needle.models.vo.HaystackVO;
 import com.nemator.needle.models.vo.LocationSharingVO;
 import com.nemator.needle.models.vo.UserVO;
 import com.nemator.needle.service.NeedleLocationService;
 import com.nemator.needle.utils.AppConstants;
 import com.nemator.needle.utils.AppState;
-import com.nemator.needle.utils.PermissionManager;
-import com.nemator.needle.utils.PermissionsConstants;
 
 public class HomeActivity extends AppCompatActivity {
 
     public static String TAG = "HomeActivity";
-
-    private Handler handler = new Handler();
 
     //Service
     private ServiceConnection mConnection;
@@ -62,26 +52,20 @@ public class HomeActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        Needle.networkController.init(HomeActivity.this);
+        if(Needle.networkController.isNetworkConnected()) {
+            initUser(savedInstanceState);
+        }
+
         Needle.googleApiController.init(this);
         initToolbar();
         setupDrawerLayout();
 
-        handler.post(new Runnable() {
-            @Override
-            public void run() {
-                initService();
-
-                Needle.networkController.init(HomeActivity.this);
-                if(Needle.networkController.isNetworkConnected()) {
-                    initUser(savedInstanceState);
-                }
-
-                initView();
-            }
-        });
+        initView();
     }
 
     public void initUser(Bundle  savedInstanceState) {
+        Log.d(TAG, "initUser");
         Needle.authenticationController.init(this);
         Needle.gcmController.init(this);
 
@@ -95,6 +79,7 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     private void initView() {
+        Log.d(TAG, "initView");
         if(!Needle.userModel.isLoggedIn()){
             Needle.navigationController.showSection(AppConstants.SECTION_LOGIN);
         }else{
@@ -124,6 +109,7 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     protected void initToolbar() {
+        Log.d(TAG, "initToolbar");
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         final ActionBar actionBar = getSupportActionBar();
@@ -149,6 +135,7 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     private void setupDrawerLayout() {
+        Log.d(TAG, "setupDrawerLayout");
         content = findViewById(R.id.content);
         drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         Needle.navigationController.init(this, drawerLayout, content);
@@ -217,8 +204,8 @@ public class HomeActivity extends AppCompatActivity {
             savedInstanceState.putBoolean(AppConstants.TAG_IS_OWNER,  Needle.navigationController.getHaystackFragment().isOwner(Needle.userModel.getUserId()));
         }
 
-        savedInstanceState.putInt(AppConstants.APP_STATE,  Needle.navigationController.getCurrentState());
-        savedInstanceState.putBoolean("autoLogin",  Needle.userModel.isAutoLogin());
+        savedInstanceState.putInt(AppConstants.APP_STATE, Needle.navigationController.getCurrentState());
+        savedInstanceState.putBoolean("autoLogin", Needle.userModel.isAutoLogin());
         savedInstanceState.putBoolean("loggedIn", Needle.userModel.isLoggedIn());
 
         super.onSaveInstanceState(savedInstanceState);
@@ -248,9 +235,8 @@ public class HomeActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        Needle.navigationController.getCurrentFragment().onActivityResult(requestCode, resultCode, data);
-
         Log.d(TAG, "onActivityResult");
+        Needle.navigationController.getCurrentFragment().onActivityResult(requestCode, resultCode, data);
     }
 
     @Override
@@ -276,6 +262,7 @@ public class HomeActivity extends AppCompatActivity {
         }
     }
 
+    //TODO : move to authentication controller
     public void onClickRevokeGoogleAccess(View view){
         new AlertDialog.Builder(this)
                 .setIcon(android.R.drawable.ic_dialog_alert)

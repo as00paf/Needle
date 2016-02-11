@@ -41,6 +41,7 @@
     <string name="password">Password</string>
     <string name="email">Email</string>
     <string name="accout_cta">No account yet? Create one!</string>
+    <string name="forgot_password">Forgot Password ?</string>
     <string name="or">OR</string>
 
     <!-- Haystack List Fragment -->

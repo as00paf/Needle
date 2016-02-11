@@ -17,16 +17,14 @@ import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.FrameLayout;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.facebook.CallbackManager;
-import com.facebook.FacebookCallback;
-import com.facebook.FacebookException;
 import com.facebook.FacebookSdk;
 import com.facebook.Profile;
 import com.facebook.ProfileTracker;
-import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
@@ -47,7 +45,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
     private static final String TAG = "LoginFragment";
 
     //Children
-    private FrameLayout layout;
+    private LinearLayout layout;
     private AppCompatEditText usernameText, passwordText;
     private Button mSubmit, twitterButtton;
     private LoginButton facebookButton;
@@ -59,6 +57,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
     private SharedPreferences mSharedPreferences;
     private LoginFragmentInteractionListener fragmentListener;
 
+    //TODO : Move to authentication controller
     //Facebook
     private CallbackManager callbackManager;
     private ProfileTracker profileTracker;
@@ -109,7 +108,10 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
             }
         };
 
-        layout = (FrameLayout) inflater.inflate(R.layout.fragment_login, container, false);
+        layout = (LinearLayout) inflater.inflate(R.layout.fragment_login, container, false);
+
+        //Toolbar
+
 
         mSharedPreferences = getActivity().getSharedPreferences("Needle", Context.MODE_PRIVATE);
 

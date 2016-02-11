@@ -17,18 +17,19 @@
 
     <ImageView
         android:id="@+id/avatar"
-        android:layout_width="100dp"
-        android:layout_height="100dp"
+        android:layout_width="120dp"
+        android:layout_height="120dp"
         android:layout_marginLeft="@dimen/spacing_large"
         android:elevation="4dp"
-        android:scaleType="fitCenter"
+        android:scaleType="centerCrop"
         tools:src="@drawable/ic_launcher"
         android:layout_marginTop="16dp"/>
 
     <TextView
         android:id="@+id/username"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="56dp"
+        android:gravity="left|center_vertical"
         android:layout_alignParentBottom="true"
         android:layout_marginLeft="@dimen/spacing_large"
         android:layout_marginStart="@dimen/spacing_large"

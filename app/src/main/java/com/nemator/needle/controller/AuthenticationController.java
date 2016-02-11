@@ -40,6 +40,7 @@ public class AuthenticationController {
     public static final int LOGIN_TYPE_TWITTER = 3;
 
     public static final int RC_GOOGLE_SIGN_IN = 9001;
+    public static final int RC_GOOGLE_REGISTRATION_SIGN_IN = 9002;
 
     private HomeActivity activity;
     public Bitmap pictureBitmap;
@@ -136,17 +137,28 @@ public class AuthenticationController {
         ApiClient.getInstance().registerUser(userVO, userRegistrationCallback);
     }
 
+    public void register() {
+        ApiClient.getInstance().registerUser(Needle.userModel.getUser(), userRegistrationCallback);
+    }
+
     //Callbacks
     private Callback<UserRegistrationResult> userRegistrationCallback = new Callback<UserRegistrationResult>(){
 
         @Override
         public void onResponse(Response<UserRegistrationResult> response, Retrofit retrofit) {
-
+            UserRegistrationResult result = response.body();
+            if(result.getSuccessCode() == 1){
+                Log.d(TAG, "Needle Application Registration Success");
+                Needle.userModel.getUser().setUserId(result.getUserId());
+                login();
+            }else{
+                Log.d(TAG, "Needle Application Registration Failed");
+            }
         }
 
         @Override
         public void onFailure(Throwable t) {
-
+            Log.d(TAG, "Needle Application Registration Failed");
         }
     };
 
@@ -154,7 +166,7 @@ public class AuthenticationController {
         Log.d(TAG, "Needle Application Login");
         UserVO user = Needle.userModel.getUser();
         ApiClient.getInstance()
-                .login(user.getLoginType(), user.getEmail() ,user.getUserName(), user.getGcmRegId(),
+                .login(user.getLoginType(), user.getEmail(), user.getUserName(), user.getGcmRegId(),
                         user.getPassword(), user.getSocialNetworkUserId(), loginCallback);
     }
 

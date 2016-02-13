@@ -3,16 +3,16 @@ require("config.inc.php");
 
 if (!empty($_POST)) {
 	// Make sure required fields are not empty
-	if (!is_set($_POST['lat']) || !is_set($_POST['lng']) || !is_set($_POST['userId'])) {
+	if (!is_set($_POST['lat']) || !is_set($_POST['lng']) || !is_set($_POST['id'])) {
 		$response["success"] = 0;
 		$response["message"] = "Missing infos";
 
 		die(json_encode($response));
 	}
 	
-	$query = "Select * FROM user_location WHERE userId = :userId";
+	$query = "Select * FROM user_location WHERE id = :id";
     $query_params = array(
-        ':userId' => $_POST['userId']
+        ':id' => $_POST['id']
     );
   
     try {
@@ -27,10 +27,10 @@ if (!empty($_POST)) {
 	$row = $stmt->fetch();
 	if ($row == "" || $row == " ") {
 		//INSERT
-		$query = "INSERT INTO user_location ( userId, lat, lng ) VALUES ( :userId, :lat, :lng ) ";
+		$query = "INSERT INTO user_location ( id, lat, lng ) VALUES ( :id, :lat, :lng ) ";
 		
 		$query_params = array(
-        ':userId' => $_POST['userId'],
+        ':id' => $_POST['id'],
 		':lat' => $_POST['lat'],
 		':lng' => $_POST['lng']
 		);
@@ -48,10 +48,10 @@ if (!empty($_POST)) {
 		$response["message"] = "Location Successfully Added! ".$row;
     }else{//UPDATE
 		//New query
-		$query = "UPDATE user_location SET lat=:lat, lng=:lng WHERE userId=:userId";
+		$query = "UPDATE user_location SET lat=:lat, lng=:lng WHERE id=:id";
 		
 		$query_params = array(
-        ':userId' => $_POST['userId'],
+        ':id' => $_POST['id'],
 		':lat' => $_POST['lat'],
 		':lng' => $_POST['lng']
 		);
@@ -80,7 +80,7 @@ if (!empty($_POST)) {
 		<h1>Update Location</h1> 
 		<form action="updateLocation.php" method="post"> 
 		    User Id:<br /> 
-		    <input type="text" name="userId" placeholder="" /> 
+		    <input type="text" name="id" placeholder="" />
 		    <br /><br /> 
 		    Lattitude:<br /> 
 		    <input type="text" name="lat" placeholder="" /> 

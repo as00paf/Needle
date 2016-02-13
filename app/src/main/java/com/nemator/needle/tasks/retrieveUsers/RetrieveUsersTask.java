@@ -83,8 +83,8 @@ public class RetrieveUsersTask extends AsyncTask<Void, Void, RetrieveUsersResult
                     String gcmRegId = c.getString("gcmRegId");
 
                     UserVO user = new UserVO();
-                    user.setUserName(name);
-                    user.setUserId(id);
+                    user.setName(name);
+                    user.setId(id);
                     user.setGcmRegId(gcmRegId);
 
                     result.userList.add(user);

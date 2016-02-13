@@ -3,39 +3,44 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@android:color/white"
+    android:background="@color/bg_grey"
     android:orientation="vertical"
-    android:weightSum="5">
+    android:weightSum="9">
 
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="2"
-        android:background="@drawable/login_header">
+        android:layout_weight="3"
+        android:background="@color/bg_grey">
 
-        <ImageView
-            android:id="@+id/logo"
-            android:layout_width="100dp"
-            android:layout_height="100dp"
-            android:padding="12dp"
-            android:layout_marginLeft="36dp"
-            android:layout_marginTop="24dp"
-            android:layout_alignParentTop="true"
-            android:src="@drawable/needle_icon_white"/>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal"
+            android:layout_marginBottom="36dp"
+            android:background="@color/primary"
+            android:gravity="center">
 
-        <com.nemator.needle.views.FontTextView
-            android:layout_width="wrap_content"
-            android:layout_height="100dp"
-            android:padding="4dp"
-            android:layout_marginLeft="4dp"
-            android:text="@string/app_name"
-            android:textSize="50sp"
-            android:textColor="@android:color/white"
-            android:layout_toRightOf="@+id/logo"
-            android:layout_alignParentTop="true"
-            android:layout_marginTop="24dp"
-            app:font="CircularStdMedium.otf"
-            android:gravity="center_vertical"/>
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="60dp"
+                android:src="@drawable/needle_icon_white"
+                android:layout_marginBottom="10dp"
+                android:gravity="center"/>
+
+            <com.nemator.needle.views.FontTextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="18dp"
+                android:gravity="center"
+                android:text="@string/app_name"
+                android:textSize="60sp"
+                android:textColor="@android:color/white"
+                app:font="CircularStdMedium.otf"/>
+        </LinearLayout>
+
+
+
 
         <!-- FAB -->
         <android.support.design.widget.FloatingActionButton
@@ -46,7 +51,7 @@
             android:layout_alignParentBottom="true"
             android:layout_alignParentRight="true"
             android:layout_marginRight="16dp"
-            app:backgroundTint="@android:color/white"
+            app:backgroundTint="@color/bg_grey"
             android:layout_marginBottom="16dp"
             android:src="@drawable/ic_action_add_person" />
 
@@ -56,7 +61,7 @@
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1"
+        android:layout_weight="2"
         android:weightSum="2"
         android:layout_marginLeft="36dp"
         android:layout_marginRight="36dp">
@@ -66,15 +71,16 @@
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
-            android:textColorHint="@color/float_label"
             app:hintTextAppearance="@style/TextAppearence.App.TextInputLayout">
             <android.support.v7.widget.AppCompatEditText
                 android:id="@+id/usernameEditText"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:inputType="text"
-                android:hint="@string/username_hint"
-                android:drawableLeft="@drawable/ic_email"/>
+                android:hint="@string/email_hint"
+                android:drawableLeft="@drawable/ic_email_black_24dp"
+                android:drawableTint="@color/primary"
+                android:drawablePadding="10dp"/>
         </android.support.design.widget.TextInputLayout>
 
         <!-- Password Label -->
@@ -88,16 +94,19 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:inputType="textPassword"
-                android:hint="@string/password"/>
+                android:hint="@string/email_hint"
+                android:drawableLeft="@drawable/ic_lock_black_24dp"
+                android:drawableTint="@color/primary"
+                android:drawablePadding="12dp"/>
         </android.support.design.widget.TextInputLayout>
 
-        </LinearLayout>
+    </LinearLayout>
 
     <!-- Social Sign-In -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1"
+        android:layout_weight="2"
         android:orientation="horizontal"
         android:gravity="center">
 
@@ -112,17 +121,8 @@
             android:scaleType="centerInside"
             android:src="@drawable/facebook_logo"
             android:layout_marginLeft="12dp"
-            android:layout_marginRight="12dp"/>
-
-        <com.facebook.login.widget.LoginButton
-            android:id="@+id/btn_facebook"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:padding="4dp"
-            android:layout_marginTop="16dp"
-            android:layout_marginBottom="16dp"
-            android:visibility="gone"/>
+            android:layout_marginRight="12dp"
+            app:rippleColor="@android:color/white"/>
 
         <!-- G+ Button -->
         <android.support.design.widget.FloatingActionButton
@@ -132,20 +132,9 @@
             android:layout_height="wrap_content"
             app:backgroundTint="@android:color/white"
             android:src="@drawable/common_google_signin_btn_icon_dark"
-            android:layout_marginLeft="12dp"
-            android:layout_marginRight="12dp"/>
-
-        <com.google.android.gms.common.SignInButton
-            android:id="@+id/btn_google"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginBottom="30dip"
-            android:layout_margin="4dp"
-            android:text="Login via Google+"
-            android:enabled="true"
-            android:visibility="gone" />
-
+            android:layout_marginLeft="32dp"
+            android:layout_marginRight="32dp"
+            app:rippleColor="@color/circleColor"/>
 
         <!-- Twitter Button -->
         <android.support.design.widget.FloatingActionButton
@@ -156,7 +145,8 @@
             app:backgroundTint="@color/twitter_blue"
             android:src="@drawable/twitter_logo_white"
             android:layout_marginLeft="12dp"
-            android:layout_marginRight="12dp"/>
+            android:layout_marginRight="12dp"
+            app:rippleColor="@android:color/white"/>
 
         <android.support.v7.widget.AppCompatButton
             android:layout_width="fill_parent"
@@ -172,40 +162,32 @@
 
     </LinearLayout>
 
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            android:orientation="vertical"
-            android:weightSum="2">
-
-            <!-- Login Button -->
-            <android.support.v7.widget.AppCompatButton
-                android:id="@+id/btn_login"
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="1"
-                android:padding="8dp"
-                android:layout_marginLeft="48dp"
-                android:layout_marginRight="48dp"
-                android:text="@string/login"
-                android:textColor="@android:color/white"
-                android:textStyle="bold"
-                android:textSize="18sp"
-                android:background="@color/primary"
-                android:layout_gravity="center_horizontal"/>
+    <!-- Login Button -->
+    <android.support.v7.widget.AppCompatButton
+        android:id="@+id/btn_login"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:padding="8dp"
+        android:layout_marginLeft="48dp"
+        android:layout_marginRight="48dp"
+        android:text="@string/login"
+        android:textColor="@android:color/white"
+        android:textStyle="bold"
+        android:textSize="18sp"
+        android:background="@color/primary"
+        android:layout_gravity="center_horizontal"/>
 
 
-            <!-- Forgot Password Link -->
-            <TextView android:id="@+id/link_signup"
-                android:layout_width="wrap_content"
-                android:layout_height="0dp"
-                android:layout_weight="1"
-                android:text="@string/accout_cta"
-                android:textSize="14dip"
-                android:paddingTop="16dp"
-                android:layout_gravity="center_horizontal"/>
+    <!-- Forgot Password Link -->
+    <TextView android:id="@+id/link_signup"
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:text="@string/accout_cta"
+        android:textSize="14dip"
+        android:gravity="center"
+        android:paddingTop="4dp"
+        android:layout_gravity="center_horizontal"/>
 
-        </LinearLayout>
 </LinearLayout>

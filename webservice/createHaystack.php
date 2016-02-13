@@ -20,14 +20,14 @@ if (!empty($_POST)) {
     }
 
 	//Create Haystack
-    $query = "INSERT INTO haystack ( name, owner, isPublic, timeLimit, zoneString, pictureURL ) VALUES ( :name, :owner, :isPublic, :timeLimit, :zone, :pictureURL  )";
+    $query = "INSERT INTO haystack ( name, owner, isPublic, timeLimit, zoneString, picture ) VALUES ( :name, :owner, :isPublic, :timeLimit, :zone, :picture  )";
     $query_params = array(
         ':name' => $_POST['name'],
         ':owner' => $_POST['owner'],
         ':isPublic' => $_POST['isPublic'],
         ':timeLimit' => $_POST['timeLimit'],
         ':zone' => $_POST['zone'],
-        ':pictureURL' => $_POST['pictureURL']
+        ':picture' => $_POST['picture']
     );
     
     // Execute query
@@ -45,10 +45,10 @@ if (!empty($_POST)) {
 	if( is_array( $_POST['haystack_user'] ) ) {
 		foreach($_POST['haystack_user'] as $item){
 			//Add users to haystack
-			$query = "INSERT INTO haystack_users ( userId, haystackId ) VALUES ( :userId, :haystackId  )";
+			$query = "INSERT INTO haystack_users ( id, haystackId ) VALUES ( :id, :haystackId  )";
 			$query_params = array(
 				':haystackId' => $haystack_id,
-				':userId' => $item
+				':id' => $item
 			);
 			
 			try {
@@ -70,12 +70,12 @@ if (!empty($_POST)) {
 	
 	if( is_array( $_POST['haystack_active_user'] ) ) {
 		foreach($_POST['haystack_active_user'] as $item){
-			$query = "INSERT INTO haystack_active_users ( userId, haystackId ) VALUES ( :userId, :haystackId  )";
+			$query = "INSERT INTO haystack_active_users ( id, haystackId ) VALUES ( :id, :haystackId  )";
 			
 			//Again, we need to update our tokens with the actual data:
 			$query_params = array(
 				':haystackId' => $haystack_id,
-				':userId' => $item
+				':id' => $item
 			);
 			
 			try {
@@ -124,7 +124,7 @@ if (!empty($_POST)) {
 		    <br /><br /> 
 			
 			Picture URL :<br /> 
-		    <input type="text" name="pictureURL" placeholder="" /> 
+		    <input type="text" name="picture" placeholder="" />
 		    <br /><br />
 
 			Haystack Users :<br /> 

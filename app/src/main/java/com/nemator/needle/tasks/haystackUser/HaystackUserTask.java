@@ -148,7 +148,7 @@ public class HaystackUserTask extends AsyncTask<Void, Void, HaystackUserTaskResu
                 requestParams.add(new BasicNameValuePair(AppConstants.TAG_HAYSTACK_ID, params.haystackId));
 
                 for(UserVO user : params.users){
-                    requestParams.add(new BasicNameValuePair("users[]", String.valueOf(user.getUserId())));
+                    requestParams.add(new BasicNameValuePair("users[]", String.valueOf(user.getId())));
                 }
 
                 return requestParams;

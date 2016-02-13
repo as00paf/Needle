@@ -50,8 +50,8 @@ public class FriendAutoCompleteAdapter extends ArrayAdapter<UserVO> {
 
             ImageView userPicture = (ImageView) v.findViewById(R.id.friend_auto_complete_user_picture);
             if(userPicture != null){
-               /* if(user.getPictureURL() != null){
-                    new ImageDownloaderTask(userPicture, getContext().getResources().getDrawable(R.drawable.person_placeholder)).execute(user.getPictureURL());
+               /* if(user.getPicture() != null){
+                    new ImageDownloaderTask(userPicture, getContext().getResources().getDrawable(R.drawable.person_placeholder)).execute(user.getPicture());
                 }*/
                 userPicture.setImageDrawable(getContext().getResources().getDrawable(R.drawable.person_placeholder));
             }

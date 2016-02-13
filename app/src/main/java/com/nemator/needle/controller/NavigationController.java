@@ -172,7 +172,7 @@ public class NavigationController implements HomeActivity.NavigationHandler, OnA
                 break;
             case AppConstants.SECTION_LOGIN:
                 if(loginFragment == null){loginFragment = new LoginFragment();}
-                showActionBar = true;
+                showActionBar = false;
                 newFragment = loginFragment;
                 if(previousState != AppState.SPLASH_LOGIN ){
                     enterAnimation = R.anim.enter_from_left;
@@ -244,6 +244,10 @@ public class NavigationController implements HomeActivity.NavigationHandler, OnA
             actionBar.setElevation(0);
             actionBar.setDisplayHomeAsUpEnabled(true);
             actionBar.setDisplayShowHomeEnabled(true);
+        }
+
+        if(!showActionBar && actionBar.isShowing()){
+            actionBar.hide();
         }
 
         if (newFragment != null){
@@ -629,7 +633,8 @@ public class NavigationController implements HomeActivity.NavigationHandler, OnA
         String pictureURL = Needle.userModel.getUser().getPictureURL();
         if(!TextUtils.isEmpty(pictureURL)){
             Picasso.with(activity.getApplicationContext()).load(pictureURL)
-                    .transform(new CropCircleTransformation(activity, 100, 4, Color.WHITE))
+                    .transform(new CropCircleTransformation(activity, 50, 2, Color.WHITE))
+                    .fit()
                     .into(avatarImageView);
         }else {
             Log.e(TAG, "Can't fetch avatar picture for user " + Needle.userModel.getUserName());

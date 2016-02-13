@@ -120,9 +120,9 @@ public class CreateHaystackUsersFragment extends CreateHaystackBaseFragment impl
                     String currentMatch = matches.get(i);
                     if(usersList != null && usersList.size() > 0 ){
                         for (int j = 0; j < usersList.size(); j++) {
-                            String currentUserName = usersList.get(j).getUserName().toLowerCase();
+                            String currentUserName = usersList.get(j).getName().toLowerCase();
                             if(currentUserName.contains(currentMatch)){
-                                SearchResult newSearchResult = new SearchResult(usersList.get(j).getUserName(), getResources().getDrawable(R.drawable.person_placeholder_24));
+                                SearchResult newSearchResult = new SearchResult(usersList.get(j).getName(), getResources().getDrawable(R.drawable.person_placeholder_24));
                                 Boolean alreadyAdded = false;
                                 for (int k = 0; k < searchBox.getSearchables().size(); k++) {
                                     SearchResult oldResult = searchBox.getSearchables().get(k);

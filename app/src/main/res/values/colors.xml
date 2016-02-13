@@ -25,4 +25,6 @@
     <color name="transparent_grey" type="color">#64000000</color>
     <color name="twitter_blue">#55acee</color>
 
+    <color name="bg_grey">#F5F5F5</color>
+
 </resources>

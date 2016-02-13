@@ -4,26 +4,48 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.graphics.Bitmap;
-import android.os.Handler;
+import android.content.IntentSender;
+import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.v4.app.Fragment;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
+import com.facebook.FacebookSdk;
+import com.facebook.GraphRequest;
+import com.facebook.GraphResponse;
+import com.facebook.Profile;
+import com.facebook.ProfileTracker;
+import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
 import com.google.android.gms.auth.api.Auth;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.gms.auth.api.signin.GoogleSignInResult;
+import com.google.android.gms.common.api.OptionalPendingResult;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Status;
+import com.google.android.gms.plus.People;
+import com.google.android.gms.plus.Plus;
+import com.google.android.gms.plus.model.people.Person;
+import com.google.gson.Gson;
 import com.nemator.needle.Needle;
 import com.nemator.needle.R;
 import com.nemator.needle.activities.HomeActivity;
 import com.nemator.needle.api.ApiClient;
 import com.nemator.needle.api.UserRegistrationResult;
+import com.nemator.needle.models.vo.FacebookUserVO;
 import com.nemator.needle.models.vo.UserVO;
 import com.nemator.needle.tasks.login.LoginTaskResult;
 import com.nemator.needle.utils.AppConstants;
+import com.nemator.needle.utils.AppState;
+
+import org.json.JSONObject;
+
+import java.util.Arrays;
 
 import retrofit.Callback;
 import retrofit.Response;
@@ -43,14 +65,14 @@ public class AuthenticationController {
     public static final int RC_GOOGLE_REGISTRATION_SIGN_IN = 9002;
 
     private HomeActivity activity;
-    public Bitmap pictureBitmap;
-    public Bitmap coverPictureBitmap;
-    private Handler handler = new Handler();
 
-    private ApiClient apiClient;
+    private ProfileTracker profileTracker;
+
+    //Facebook
+    private CallbackManager facebookCallbackManager;
 
     public AuthenticationController(){
-        apiClient = ApiClient.getInstance();
+
     }
 
     public static AuthenticationController getInstance() {
@@ -70,6 +92,9 @@ public class AuthenticationController {
         @Override
         public void onResponse(Response<LoginTaskResult> response, Retrofit retrofit) {
             LoginTaskResult result = response.body();
+
+            Log.i("Needle loginCallbackk", "Needle loginCallback success : " +(result.getSuccessCode() == 1) );
+
             if (result.getSuccessCode() == 1) {
                 Needle.userModel.setLoggedIn(true);
                 Needle.userModel.setUserName(result.getUser().getUserName());
@@ -87,7 +112,12 @@ public class AuthenticationController {
                 Needle.navigationController.setLocationSharingCount(result.getLocationSharingCount());
             }
             else if(result.getSuccessCode() == 404){
-                Toast.makeText(activity, activity.getString(R.string.user_not_found_message), Toast.LENGTH_SHORT).show();
+                int loginType = Needle.userModel.getUser().getLoginType();
+                if(loginType == LOGIN_TYPE_FACEBOOK || loginType == LOGIN_TYPE_GOOGLE){
+                    register();
+                }else{
+                    Toast.makeText(activity, activity.getString(R.string.user_not_found_message), Toast.LENGTH_SHORT).show();
+                }
             }
             else
             {
@@ -119,15 +149,22 @@ public class AuthenticationController {
             });
         }else if(Needle.userModel.getUser().getLoginType() == AuthenticationController.LOGIN_TYPE_DEFAULT){
             Needle.navigationController.onLogOutComplete();
+        }else if(Needle.userModel.getUser().getLoginType() == AuthenticationController.LOGIN_TYPE_FACEBOOK){
+            if(FacebookSdk.isInitialized()){
+                LoginManager.getInstance().logOut();
+            }
+            Needle.navigationController.onLogOutComplete();
         }
     }
 
     public void logOut(ResultCallback<Status> callback) {
         Log.i(TAG, "Logging out");
 
-        if(Needle.userModel.getUser().getLoginType() == AuthenticationController.LOGIN_TYPE_GOOGLE){
+        if(Needle.userModel.getUser().getLoginType() == LOGIN_TYPE_GOOGLE){
            googleSignOut(callback);
-        }else if(Needle.userModel.getUser().getLoginType() == AuthenticationController.LOGIN_TYPE_DEFAULT){
+        }else if(Needle.userModel.getUser().getLoginType() == LOGIN_TYPE_FACEBOOK){
+            Log.i(TAG, "Log out of Facebook");
+        }else if(Needle.userModel.getUser().getLoginType() == LOGIN_TYPE_DEFAULT){
 
         }
     }
@@ -171,20 +208,98 @@ public class AuthenticationController {
     }
 
     public void googleSignIn() {
+        Log.d(TAG, "Google Login");
         if(Needle.googleApiController.isConnected()){
+            Log.d(TAG, "Google Api is Connected");
             Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(Needle.googleApiController.getGoogleApiClient());
             activity.startActivityForResult(signInIntent, RC_GOOGLE_SIGN_IN);
         }else{
+            Log.d(TAG, "Google Api is not Connected");
             LocalBroadcastManager localBroadcastManager = LocalBroadcastManager.getInstance(activity);
             localBroadcastManager.registerReceiver(new BroadcastReceiver() {
                 @Override
                 public void onReceive(Context context, Intent intent) {
+                    Log.d(TAG, "Google Sign In");
                     Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(Needle.googleApiController.getGoogleApiClient());
                     activity.startActivityForResult(signInIntent, RC_GOOGLE_SIGN_IN);
                 }
             }, new IntentFilter(AppConstants.GOOGLE_API_CONNECTED));
 
             Needle.googleApiController.init(activity);
+        }
+    }
+
+    public void googleSilentSignIn() {
+        //Try to login with Google if did not just log out
+        if(Needle.navigationController.getPreviousState() == AppState.LOGIN){
+            Log.d(TAG, "GoogleSignInApi.silentSignIn");
+            OptionalPendingResult<GoogleSignInResult> opr = Auth.GoogleSignInApi.silentSignIn(Needle.googleApiController.getGoogleApiClient());
+            if (opr.isDone()) {
+                // If the usernameText's cached credentials are valid, the OptionalPendingResult will be "done"
+                // and the GoogleSignInResult will be available instantly.
+                Log.d(TAG, "Got cached sign-in");
+                GoogleSignInResult result = opr.get();
+                handleGoogleSignInResult(result);
+            } else {
+                // If the usernameText has not previously signed in on this device or the sign-in has expired,
+                // this asynchronous branch will attempt to sign in the usernameText silently.  Cross-device
+                // single sign-on will occur in this branch.
+               // showProgressDialog();
+                opr.setResultCallback(new ResultCallback<GoogleSignInResult>() {
+                    @Override
+                    public void onResult(GoogleSignInResult googleSignInResult) {
+                        //hideProgressDialog();
+                        handleGoogleSignInResult(googleSignInResult);
+                    }
+                });
+            }
+        }
+    }
+
+    public void handleGoogleSignInResult(GoogleSignInResult result) {
+        Log.d(TAG, "handleGoogleSignInResult is Success :" + result.isSuccess());
+        if (result.isSuccess()) {
+            Log.d(TAG, "Signed in successfully with Google account");
+            // Signed in successfully, save to model and log into application.
+            //hideProgressDialog();
+
+            GoogleSignInAccount acct = result.getSignInAccount();
+            Needle.userModel.getUser()
+                    .setLoginType(AuthenticationController.LOGIN_TYPE_GOOGLE)
+                    .setUserName(acct.getDisplayName())
+                    .setPictureURL(acct.getPhotoUrl().toString())
+                    .setEmail(acct.getEmail())
+                    .setSocialNetworkUserId(acct.getId());
+
+            Plus.PeopleApi.load(Needle.googleApiController.getGoogleApiClient(), acct.getId()).setResultCallback(new ResultCallback<People.LoadPeopleResult>() {
+                @Override
+                public void onResult(@NonNull People.LoadPeopleResult loadPeopleResult) {
+                    Person person = loadPeopleResult.getPersonBuffer().get(0);
+
+                    String coverURL = person.getCover().getCoverPhoto().getUrl();
+                    Needle.userModel.getUser().setCoverPictureURL(coverURL);
+                    AuthenticationController.getInstance().login();
+                }
+            });
+        } else {
+            // Google sign in unsuccessful
+            //TODO : do something here
+
+            Log.d(TAG, "Google sign in unsuccessful : " + result.getStatus().getStatusMessage());
+            if(result.getStatus().hasResolution()){
+                Log.d(TAG, "Result has resolution, fixing it ...");
+                try {
+                    result.getStatus().startResolutionForResult(activity, RC_GOOGLE_SIGN_IN);
+                } catch (IntentSender.SendIntentException e) {
+                    Log.d(TAG, "Result resolution failed : " + e.getMessage());
+                    e.printStackTrace();
+                }
+            }else{
+                Log.d(TAG, "Result has no resolution");
+            }
+
+            //hideProgressDialog();
+
         }
     }
 
@@ -208,29 +323,74 @@ public class AuthenticationController {
 
 
     //Facebook
+    public void initFacebook(){
+        FacebookSdk.sdkInitialize(activity.getApplicationContext());
+        facebookCallbackManager = CallbackManager.Factory.create();
+
+        profileTracker = new ProfileTracker() {
+            @Override
+            protected void onCurrentProfileChanged( Profile oldProfile, Profile currentProfile) {
+                Log.d(TAG, "onCurrentProfileChanged");
+            }
+        };
+
+        profileTracker.startTracking();
+
+        LoginManager.getInstance().registerCallback(facebookCallbackManager, facebookLoginCallback);
+    }
+
     private FacebookCallback<LoginResult> facebookLoginCallback =  new FacebookCallback<LoginResult>() {
         @Override
         public void onSuccess(LoginResult loginResult) {
             Log.d(TAG, "Facebook log in success");
 
+            //Todo : own class
+            GraphRequest request = GraphRequest.newMeRequest(
+                    loginResult.getAccessToken(),
+                    new GraphRequest.GraphJSONObjectCallback() {
+                        @Override
+                        public void onCompleted(
+                                JSONObject object,
+                                GraphResponse response) {
 
+                            Log.d(TAG, response.toString());
+                           if(response.getError() == null){
+                               Log.d(TAG, "Facebook graph request success");
+
+                               Gson gson = new Gson();
+                               FacebookUserVO user = gson.fromJson(response.getRawResponse(), FacebookUserVO.class);
+                               Needle.userModel.setUserFromFacebookAccount(user);
+
+                               login();
+                           }else{
+                               Log.d(TAG, "Facebook graph request failure");
+                           }
+
+                        }
+                    });
+            Bundle parameters = new Bundle();
+            parameters.putString("fields", "id,name,email,gender, birthday, cover,picture.type(large)");
+            request.setParameters(parameters);
+            request.executeAsync();
         }
 
         @Override
         public void onCancel() {
-            // App code
             Log.d(TAG, "Facebook log in canceled");
         }
 
         @Override
         public void onError(FacebookException exception) {
-            // App code
-
             Log.d(TAG, "Facebook log in error : " + exception.getMessage());
         }
     };
 
-    public FacebookCallback<LoginResult> getFacebookLoginCallback() {
-        return facebookLoginCallback;
+    public void facebookLogin(Fragment fragment) {
+        LoginManager.getInstance().logInWithReadPermissions(fragment, Arrays.asList("public_profile", "user_friends", "email"));
     }
+
+    public CallbackManager getFacebookCallbackManager() {
+        return facebookCallbackManager;
+    }
+
 }

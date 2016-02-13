@@ -7,7 +7,6 @@
       <module fileurl="file://$PROJECT_DIR$/android-maps-utils/android-maps-utils.iml" filepath="$PROJECT_DIR$/android-maps-utils/android-maps-utils.iml" />
       <module fileurl="file://$PROJECT_DIR$/android-support-v4-preferencefragment-master/android-support-v4-preferencefragment-master.iml" filepath="$PROJECT_DIR$/android-support-v4-preferencefragment-master/android-support-v4-preferencefragment-master.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
-      <module fileurl="file://$PROJECT_DIR$/facebook/facebook.iml" filepath="$PROJECT_DIR$/facebook/facebook.iml" />
       <module fileurl="file://$PROJECT_DIR$/picasso-2.5.2/picasso-2.5.2.iml" filepath="$PROJECT_DIR$/picasso-2.5.2/picasso-2.5.2.iml" />
       <module fileurl="file://$PROJECT_DIR$/retrofit-2.0.0-beta2/retrofit-2.0.0-beta2.iml" filepath="$PROJECT_DIR$/retrofit-2.0.0-beta2/retrofit-2.0.0-beta2.iml" />
     </modules>

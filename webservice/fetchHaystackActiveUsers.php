@@ -5,7 +5,7 @@ require("config.inc.php");
 //if posted data is not empty
 if (!empty($_POST)) {
 	// Make sure required fields are set
-	if (!is_set($_POST['userId']) || !is_set($_POST['haystackId'])) {
+	if (!is_set($_POST['id']) || !is_set($_POST['haystackId'])) {
 			$response["success"] = 0;
 			$response["message"] = "Missing infos";
 			
@@ -16,11 +16,11 @@ if (!empty($_POST)) {
 	$query =   "Select * 
 				FROM haystack_active_users 
 				JOIN users
-				ON haystack_active_users.userId = users.id
-				WHERE userId != :userId AND haystackId = :haystackId";
+				ON haystack_active_users.id = users.id
+				WHERE id != :id AND haystackId = :haystackId";
 
 	$query_params = array(
-			':userId' => $_POST['userId'],
+			':id' => $_POST['id'],
 			':haystackId' => $_POST['haystackId']
 		);
 
@@ -31,7 +31,7 @@ if (!empty($_POST)) {
 	}
 	catch (PDOException $ex) {
 		$response["success"] = 0;
-		$response["message"] = "Database Error : userId or haystackId not not found. Exception :" . $ex;
+		$response["message"] = "Database Error : id or haystackId not not found. Exception :" . $ex;
 		die(json_encode($response));
 	}
 
@@ -60,7 +60,7 @@ if (!empty($_POST)) {
 		<h1>Fetch Active Users</h1> 
 		<form action="fetchHaystackActiveUsers.php" method="post"> 
 		    UserId:<br /> 
-		    <input type="text" name="userId" placeholder="" /> 
+		    <input type="text" name="id" placeholder="" />
 			
 		    <br /><br /> 
 			

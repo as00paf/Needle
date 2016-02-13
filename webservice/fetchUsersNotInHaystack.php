@@ -16,8 +16,8 @@ if (!empty($_POST)) {
 	$query =   "SELECT id, username
 				FROM users
 				LEFT JOIN haystack_users
-				ON users.id = haystack_users.userId AND haystack_users.haystackId = :haystackId
-				WHERE haystack_users.userId IS NULL;";
+				ON users.id = haystack_users.id AND haystack_users.haystackId = :haystackId
+				WHERE haystack_users.id IS NULL;";
 
 	$query_params = array(
 			':haystackId' => $_POST['haystackId']

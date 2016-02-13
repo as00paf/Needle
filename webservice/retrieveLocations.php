@@ -12,9 +12,9 @@ if (!empty($_POST)) {
 
 	$query =   "SELECT * 
 				FROM user_location 
-				INNER JOIN haystack_active_users ON user_location.userId = haystack_active_users.userId
+				INNER JOIN haystack_active_users ON user_location.id = haystack_active_users.id
 				INNER JOIN haystack ON haystack.id = haystack_active_users.haystackId
-				INNER JOIN users ON users.id = user_location.userId
+				INNER JOIN users ON users.id = user_location.id
 				WHERE haystack.id = :haystackId";
 				
 	$query_params = array(
@@ -43,8 +43,8 @@ if (!empty($_POST)) {
 		
 		foreach ($rows as $row) {
 			$location             = array();
-			$location["userId"] = $row["userId"];
-			$location["userName"] = $row["username"];
+			$location["id"] = $row["id"];
+			$location["name"] = $row["username"];
 			$location["lat"]    = $row["lat"];
 			$location["lng"]  = $row["lng"];
 			

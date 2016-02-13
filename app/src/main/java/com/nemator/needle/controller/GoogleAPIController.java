@@ -25,6 +25,7 @@ import com.google.android.gms.location.LocationSettingsResult;
 import com.google.android.gms.location.LocationSettingsStatusCodes;
 import com.google.android.gms.location.places.PlaceLikelihoodBuffer;
 import com.google.android.gms.location.places.Places;
+import com.google.android.gms.plus.Plus;
 import com.nemator.needle.activities.HomeActivity;
 import com.nemator.needle.utils.AppConstants;
 import com.nemator.needle.utils.PermissionManager;
@@ -108,6 +109,7 @@ public class GoogleAPIController implements GoogleApiClient.ConnectionCallbacks,
                         //Social APIs
                 .enableAutoManage(activity /* FragmentActivity */, this /* OnConnectionFailedListener */)
                 .addApi(Auth.GOOGLE_SIGN_IN_API, getGSO())
+                .addApi(Plus.API)
                 .build();
     }
 

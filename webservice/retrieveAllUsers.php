@@ -3,16 +3,16 @@
 require("config.inc.php");
 
 if (!empty($_POST)) {
-	if (empty($_POST['userId'])) {
+	if (empty($_POST['id'])) {
 		$response["success"] = 0;
 		$response["message"] = "Missing infos";
 		
 		die(json_encode($response));
 	}
 
-	$query = "Select * FROM users WHERE id != :userId";
+	$query = "Select * FROM users WHERE id != :id";
 	$query_params = array(
-			':userId' => $_POST['userId']
+			':id' => $_POST['id']
 		);
 
 	try {

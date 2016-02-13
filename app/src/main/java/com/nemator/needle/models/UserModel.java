@@ -2,9 +2,9 @@ package com.nemator.needle.models;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.preference.PreferenceManager;
 
-import com.nemator.needle.Needle;
+import com.nemator.needle.controller.AuthenticationController;
+import com.nemator.needle.models.vo.FacebookUserVO;
 import com.nemator.needle.models.vo.UserVO;
 import com.nemator.needle.utils.AppConstants;
 
@@ -96,5 +96,14 @@ public class UserModel {
 
     public void saveUser(){
         user.save(mSharedPreferences);
+    }
+
+    public void setUserFromFacebookAccount(FacebookUserVO fbUser) {
+        this.user.setEmail(fbUser.getEmail());
+        this.user.setPictureURL(fbUser.getPicture().getData().getUrl());
+        this.user.setCoverPictureURL(fbUser.getCover().getSource());
+        this.user.setUserName(fbUser.getName());
+        this.user.setSocialNetworkUserId(fbUser.getId());
+        this.user.setLoginType(AuthenticationController.LOGIN_TYPE_FACEBOOK);
     }
 }

@@ -5,7 +5,7 @@ require("config.inc.php");
 
 if (!empty($_POST)) {
 	// Make sure required fields are set
-    if (!is_set($_POST['userId']) || !is_set($_POST['haystackId'])) {
+    if (!is_set($_POST['id']) || !is_set($_POST['haystackId'])) {
         $response["success"] = 0;
         $response["message"] = "Missing infos";
         
@@ -13,9 +13,9 @@ if (!empty($_POST)) {
     }
 	
 	//Check if user already added to haystack
-	$query = "Select * FROM haystack_users WHERE userId = :userId AND haystackId = :haystackId";
+	$query = "Select * FROM haystack_users WHERE id = :id AND haystackId = :haystackId";
     $query_params = array(
-        ':userId' => $_POST['userId'],
+        ':id' => $_POST['id'],
 		':haystackId' => $_POST['haystackId']
     );
   
@@ -26,17 +26,17 @@ if (!empty($_POST)) {
     }
     catch (PDOException $ex) {
         $response["success"] = 0;
-        $response["message"] = "Database Error : userId or haystackId not not found. Exception :" .$ex ;
+        $response["message"] = "Database Error : id or haystackId not not found. Exception :" .$ex ;
 		die(json_encode($response));
     }
 
 	$row = $stmt->fetch();
 	if ($row == "" || $row == " ") {
 		//Add user to haystack
-		$query = "INSERT IGNORE INTO haystack_users SET userId = :userId, haystackId = :haystackId";
+		$query = "INSERT IGNORE INTO haystack_users SET id = :id, haystackId = :haystackId";
 		
 		$query_params = array(
-			':userId' => $_POST['userId'],
+			':id' => $_POST['id'],
 			':haystackId' => $_POST['haystackId']
 		);
 		
@@ -66,7 +66,7 @@ if (!empty($_POST)) {
 		<h1>Add User</h1> 
 		<form action="addUser.php" method="post"> 
 		    UserId:<br /> 
-		    <input type="text" name="userId" placeholder="" /> 
+		    <input type="text" name="id" placeholder="" />
 			
 		    <br /><br /> 
 			

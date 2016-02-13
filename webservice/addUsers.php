@@ -19,12 +19,12 @@ if (!empty($_POST)) {
 
 	if( is_array( $_POST['users'] ) ) {
 		foreach($_POST['users'] as $item){
-			$query = "INSERT INTO haystack_users ( userId, haystackId ) VALUES ( :userId, :haystackId  )";
+			$query = "INSERT INTO haystack_users ( id, haystackId ) VALUES ( :id, :haystackId  )";
 			
 			//Again, we need to update our tokens with the actual data:
 			$query_params = array(
 				':haystackId' => $_POST['haystackId'],
-				':userId' => $item
+				':id' => $item
 			);
 			
 			try {

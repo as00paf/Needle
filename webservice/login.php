@@ -41,7 +41,7 @@ if (!empty($_POST)) {
     
     if ($login_ok) {
         $response["success"] = 1;
-		$response["userId"] = $row['id'];
+		$response["id"] = $row['id'];
         $response["message"] = "Login successful!";
         die(json_encode($response));
     } else {

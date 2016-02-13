@@ -6,7 +6,7 @@ require("config.inc.php");
 if (!empty($_POST)) {
 
 	// Make sure required fields are not empty
-	if (!is_set($_POST['userId'])) {
+	if (!is_set($_POST['id'])) {
 		$response["success"] = 0;
 		$response["message"] = "Missing infos";
 
@@ -45,13 +45,13 @@ if (!empty($_POST)) {
 			$haystack["isPublic"] 		= $row["isPublic"];
 			$haystack["timeLimit"] 		= $row["timeLimit"];
 			$haystack["zoneString"] 	= $row["zoneString"];
-			$haystack["pictureURL"] 	= $row["pictureURL"];
+			$haystack["picture"] 	= $row["picture"];
 			
 			//user query
 			$query = "SELECT *
 					  FROM haystack_users 
 					  INNER JOIN users
-					  ON users.id = haystack_users.userId				  
+					  ON users.id = haystack_users.id
 					  WHERE haystackId = :id";
 
 			$query_params = array(
@@ -80,7 +80,7 @@ if (!empty($_POST)) {
 			//active user query
 			$query = "Select * FROM haystack_active_users 
 					  INNER JOIN users
-					  ON users.id = haystack_active_users.userId
+					  ON users.id = haystack_active_users.id
 					  WHERE haystackId = :id";
 
 			$query_params = array(
@@ -119,7 +119,7 @@ if (!empty($_POST)) {
 				FROM haystack  
 				INNER JOIN haystack_users
 				ON haystack.id = haystack_users.haystackId 
-				AND haystack_users.userId = :userId
+				AND haystack_users.id = :id
 				WHERE haystack.isPublic = :isPublic";*/
 
 	$query = 	"SELECT * 
@@ -127,11 +127,11 @@ if (!empty($_POST)) {
 				INNER JOIN haystack_users
 				ON haystack.id = haystack_users.haystackId
 				WHERE haystack.isPublic = :isPublic
-				AND haystack_users.userId = :userId";
+				AND haystack_users.id = :id";
 				
 	$query_params = array(
 			':isPublic' => 0,
-			':userId' => $_POST['userId']
+			':id' => $_POST['id']
 		);
 
 	//execute query
@@ -161,12 +161,12 @@ if (!empty($_POST)) {
 			$haystack["isPublic"] 		= $row["isPublic"];
 			$haystack["timeLimit"] 		= $row["timeLimit"];
 			$haystack["zoneString"] 	= $row["zoneString"];
-			$haystack["pictureURL"] 	= $row["pictureURL"];
+			$haystack["picture"] 	= $row["picture"];
 			
 			//user query
 			$query = "Select * FROM haystack_users 
 					  INNER JOIN users
-					  ON users.id = haystack_users.userId
+					  ON users.id = haystack_users.id
 					  WHERE haystackId = :id";
 
 			$query_params = array(
@@ -195,7 +195,7 @@ if (!empty($_POST)) {
 			//active user query
 			$query = "Select * FROM haystack_active_users
 					  INNER JOIN users
-					  ON users.id = haystack_active_users.userId
+					  ON users.id = haystack_active_users.id
 					  WHERE haystackId = :id";
 
 			$query_params = array(
@@ -237,7 +237,7 @@ if (!empty($_POST)) {
 		<h1>GetHaystacks</h1> 
 		<form action="getHaystacks.php" method="post"> 
 		    HaystackId:<br /> 
-		    <input type="text" name="userId" placeholder="" /> 
+		    <input type="text" name="id" placeholder="" />
 		    <br />
 			
 		    <input type="submit" value="Get Haystacks" /> 

@@ -135,7 +135,7 @@ public class RegisterFragment extends Fragment implements View.OnClickListener{
     }
 
     public void handleSignInResult(GoogleSignInResult result) {
-        Log.d(TAG, "handleSignInResult:" + result.isSuccess());
+        Log.d(TAG, "handleGoogleSignInResult:" + result.isSuccess());
         if (result.isSuccess()) {
             Log.d(TAG, "Signed in successfully with Google account");
             // Signed in successfully, save to model and log into application.

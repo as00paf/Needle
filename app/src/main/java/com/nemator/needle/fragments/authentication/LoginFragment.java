@@ -1,7 +1,5 @@
 package com.nemator.needle.fragments.authentication;
 
-import android.app.Activity;
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -26,7 +24,6 @@ import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 import com.nemator.needle.Needle;
 import com.nemator.needle.R;
 import com.nemator.needle.controller.AuthenticationController;
-import com.nemator.needle.models.vo.UserVO;
 import com.nemator.needle.utils.AppConstants;
 
 public class LoginFragment extends Fragment implements View.OnClickListener {
@@ -36,19 +33,15 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
     //Children
     private LinearLayout layout;
     private AppCompatEditText usernameText, passwordText;
-    private Button mSubmit, twitterButtton;
-    private FloatingActionButton facebookButton, googleButton;
-    private TextView mRegister;
-    private ProgressDialog mProgressDialog;
+    private Button loginButton;
+    private FloatingActionButton facebookButton, googleButton, twitterButtton, registerButton;
+    private TextView forgotPasswordLink;
 
     //Objects
     private SharedPreferences mSharedPreferences;
-    private LoginFragmentInteractionListener fragmentListener;
 
     public static LoginFragment newInstance() {
         LoginFragment fragment = new LoginFragment();
-        Bundle args = new Bundle();
-        fragment.setArguments(args);
         return fragment;
     }
 
@@ -57,26 +50,13 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
     }
 
     @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-
-        try {
-            fragmentListener = ((LoginFragmentInteractionListener) Needle.navigationController);
-        } catch (ClassCastException e) {
-            throw new ClassCastException(activity.toString()
-                    + " must implement OnActivityStateChangeListener");
-        }
-    }
-
-    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        Needle.authenticationController.initFacebook();
         layout = (LinearLayout) inflater.inflate(R.layout.fragment_login, container, false);
 
         mSharedPreferences = getActivity().getSharedPreferences("Needle", Context.MODE_PRIVATE);
 
         //Username & Password
-        usernameText = (AppCompatEditText) layout.findViewById(R.id.usernameEditText);
+        usernameText = (AppCompatEditText) layout.findViewById(R.id.input_username);
         String userName = mSharedPreferences.getString(AppConstants.TAG_EMAIL, "");
         if(!userName.equals("facebook")){
             usernameText.setText(userName);
@@ -97,25 +77,21 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
             }
         });
 
-       //setup buttons
-        mSubmit = (Button) layout.findViewById(R.id.btn_login);
-        mRegister = (TextView) layout.findViewById(R.id.link_signup);
-
-        //Facebook
+       //Setup buttons
+        loginButton = (Button) layout.findViewById(R.id.btn_login);
+        forgotPasswordLink = (TextView) layout.findViewById(R.id.link_forgot_password);
         facebookButton = (FloatingActionButton) layout.findViewById(R.id.fab_fb);
-
-        //Twitter
-        twitterButtton = (Button) layout.findViewById(R.id.btn_twitter);
-
-        //Google
+        twitterButtton = (FloatingActionButton) layout.findViewById(R.id.fab_twitter);
         googleButton = (FloatingActionButton) layout.findViewById(R.id.fab_google);
+        registerButton = (FloatingActionButton) layout.findViewById(R.id.fab_register);
 
-        //register listeners
-        mSubmit.setOnClickListener(this);
-        mRegister.setOnClickListener(this);
+        //Register listeners
+        loginButton.setOnClickListener(this);
+        forgotPasswordLink.setOnClickListener(this);
         facebookButton.setOnClickListener(this);
         twitterButtton.setOnClickListener(this);
         googleButton.setOnClickListener(this);
+        registerButton.setOnClickListener(this);
 
         return layout;
     }
@@ -157,44 +133,44 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
             //TODO : Localization
             Toast.makeText(getActivity(), "You must enter a username or email and a password", Toast.LENGTH_LONG).show();
         }else{
-            UserVO user = new UserVO(-1, username, email, password, "", Needle.userModel.getGcmRegId(), AuthenticationController.LOGIN_TYPE_DEFAULT, "-1");
-            Needle.userModel.setUser(user);
+            Needle.userModel.getUser()
+                    .setLoginType(AuthenticationController.LOGIN_TYPE_DEFAULT)
+                    .setUserName(username)
+                    .setEmail(email)
+                    .setPassword(password);
 
             Needle.authenticationController.login();
-            //ApiClient.getInstance().login(0, email, username, regId, password, "");
         }
     }
 
     @Override
     public void onClick(View v) {
-        int networkId = 0;
         switch (v.getId()) {
             case R.id.btn_login:
                 login();
                 return;
-            case R.id.link_signup:
-                fragmentListener.onClickRegister();
+            case R.id.link_forgot_password:
+                forgotPassword();
                 return;
-            case R.id.btn_twitter:
-                networkId = AuthenticationController.LOGIN_TYPE_TWITTER;
+            case R.id.fab_twitter:
+                Needle.authenticationController.twitterSignIn();
                 break;
             case R.id.fab_google:
-                networkId = AuthenticationController.LOGIN_TYPE_GOOGLE;
-                AuthenticationController.getInstance().googleSignIn();
+                Needle.authenticationController.googleSignIn();
                 break;
             case R.id.fab_fb:
-                networkId = AuthenticationController.LOGIN_TYPE_FACEBOOK;
-                AuthenticationController.getInstance().facebookLogin(this);
+                Needle.authenticationController.facebookLogin(this);
                 break;
-
+            case R.id.fab_register:
+                Needle.navigationController.showSection(AppConstants.SECTION_REGISTER);
+                break;
             default:
                 break;
         }
+    }
 
-        if(networkId != 0){
-            //Social Login
-            //AuthenticationController.getInstance().login(networkId);
-        }
+    private void forgotPassword() {
+
     }
 
     @Override
@@ -211,25 +187,5 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
 
         //Facebook
         Needle.authenticationController.getFacebookCallbackManager().onActivityResult(requestCode, resultCode, data);
-    }
-
-    private void showProgressDialog() {
-        if (mProgressDialog == null) {
-            mProgressDialog = new ProgressDialog(getContext());
-            mProgressDialog.setMessage(getString(R.string.signing_in));
-            mProgressDialog.setIndeterminate(true);
-        }
-
-        mProgressDialog.show();
-    }
-
-    private void hideProgressDialog() {
-        if (mProgressDialog != null && mProgressDialog.isShowing()) {
-            mProgressDialog.hide();
-        }
-    }
-
-    public interface LoginFragmentInteractionListener{
-        void onClickRegister();
     }
 }

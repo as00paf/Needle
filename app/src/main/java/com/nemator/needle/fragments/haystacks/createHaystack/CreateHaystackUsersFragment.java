@@ -19,9 +19,10 @@ import com.nemator.needle.models.vo.UserVO;
 
 import java.util.ArrayList;
 
-import retrofit.Callback;
-import retrofit.Response;
-import retrofit.Retrofit;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
 
 public class CreateHaystackUsersFragment extends CreateHaystackBaseFragment implements SwipeRefreshLayout.OnRefreshListener{
 
@@ -165,14 +166,14 @@ public class CreateHaystackUsersFragment extends CreateHaystackBaseFragment impl
     private void fetchAllUsers(){
         ApiClient.getInstance().fetchAllUsers(Needle.userModel.getUserId(), new Callback<UsersTaskResult>() {
             @Override
-            public void onResponse(Response<UsersTaskResult> response, Retrofit retrofit) {
+            public void onResponse(Call<UsersTaskResult> call, Response<UsersTaskResult> response) {
                 UsersTaskResult result = response.body();
                 usersList = result.getUsers();
                 updateUserList();
             }
 
             @Override
-            public void onFailure(Throwable t) {
+            public void onFailure(Call<UsersTaskResult> call, Throwable t) {
                 Log.d(TAG, "Retrieving users failed ! Error : " + t.getMessage());
 
                 usersList = new ArrayList<UserVO>();

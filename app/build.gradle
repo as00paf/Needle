@@ -1,9 +1,11 @@
 apply plugin: 'com.android.application'
+apply plugin: 'io.fabric'
 repositories {
     mavenCentral()
     maven {
         url "https://oss.sonatype.org/content/repositories/snapshots"
     }
+    maven { url 'https://maven.fabric.io/public' }
 }
 
 android {
@@ -73,7 +75,7 @@ android {
     }
 }
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jcar'])
+    compile fileTree(dir: 'libs', include: ['*.jar'])
 
     compile project(':android-support-v4-preferencefragment-master')
     compile project(':ViewPagerIndicator')
@@ -104,16 +106,20 @@ dependencies {
 
     //Square stuff
     compile 'com.squareup.picasso:picasso:2.5.2'
-    compile 'com.squareup.retrofit:retrofit:2.0.0-beta2'
-    compile 'com.squareup.retrofit:converter-gson:2.0.0-beta2'
+    compile 'com.squareup.retrofit2:retrofit:2.0.0-beta4'
+    compile 'com.squareup.retrofit2:converter-gson:2.0.0-beta4'
 
     //DEX
-    compile 'com.android.support:multidex:1.0.0'
+    compile 'com.android.support:multidex:1.0.1'
+    compile('com.twitter.sdk.android:twitter:1.12.1@aar') {
+        transitive = true;
+    }
 }
 
 buildscript {
     repositories {
         jcenter()
+        maven { url 'https://maven.fabric.io/public' }
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:1.5.0'
@@ -121,6 +127,7 @@ buildscript {
 
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
+        classpath 'io.fabric.tools:gradle:1.+'
     }
 }
 

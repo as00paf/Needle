@@ -5,13 +5,15 @@
     android:layout_height="match_parent"
     android:background="@color/bg_grey"
     android:orientation="vertical"
-    android:weightSum="9">
+    android:weightSum="9"
+    android:animateLayoutChanges="true">
 
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="3"
-        android:background="@color/bg_grey">
+        android:background="@color/bg_grey"
+        android:animateLayoutChanges="true">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -25,7 +27,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="60dp"
                 android:src="@drawable/needle_icon_white"
-                android:layout_marginBottom="10dp"
                 android:gravity="center"/>
 
             <com.nemator.needle.views.FontTextView
@@ -40,8 +41,6 @@
         </LinearLayout>
 
 
-
-
         <!-- FAB -->
         <android.support.design.widget.FloatingActionButton
             android:id="@+id/fab_register"
@@ -51,12 +50,12 @@
             android:layout_alignParentBottom="true"
             android:layout_alignParentRight="true"
             android:layout_marginRight="16dp"
-            app:backgroundTint="@color/bg_grey"
+            app:backgroundTint="@android:color/white"
             android:layout_marginBottom="16dp"
-            android:src="@drawable/ic_action_add_person" />
+            android:src="@drawable/ic_person_add_black_24dp"/>
 
     </RelativeLayout>
-
+    
     <LinearLayout
         android:orientation="vertical"
         android:layout_width="match_parent"
@@ -73,7 +72,7 @@
             android:layout_weight="1"
             app:hintTextAppearance="@style/TextAppearence.App.TextInputLayout">
             <android.support.v7.widget.AppCompatEditText
-                android:id="@+id/usernameEditText"
+                android:id="@+id/input_username"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:inputType="text"
@@ -94,7 +93,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:inputType="textPassword"
-                android:hint="@string/email_hint"
+                android:hint="@string/password"
                 android:drawableLeft="@drawable/ic_lock_black_24dp"
                 android:drawableTint="@color/primary"
                 android:drawablePadding="12dp"/>
@@ -148,18 +147,6 @@
             android:layout_marginRight="12dp"
             app:rippleColor="@android:color/white"/>
 
-        <android.support.v7.widget.AppCompatButton
-            android:layout_width="fill_parent"
-            android:layout_height="64dp"
-            android:text="@string/login_via_twitter"
-            android:drawableLeft="@drawable/twitter_logo_white"
-            android:id="@+id/btn_twitter"
-            android:layout_gravity="center_horizontal"
-            android:background="#55ACEE"
-            android:layout_margin="8dp"
-            android:textColor="#ffffffff"
-            android:visibility="gone"/>
-
     </LinearLayout>
 
     <!-- Login Button -->
@@ -176,15 +163,16 @@
         android:textStyle="bold"
         android:textSize="18sp"
         android:background="@color/primary"
+        android:foreground="?android:attr/selectableItemBackground"
         android:layout_gravity="center_horizontal"/>
 
 
     <!-- Forgot Password Link -->
-    <TextView android:id="@+id/link_signup"
+    <TextView android:id="@+id/link_forgot_password"
         android:layout_width="wrap_content"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:text="@string/accout_cta"
+        android:text="@string/forgot_password"
         android:textSize="14dip"
         android:gravity="center"
         android:paddingTop="4dp"

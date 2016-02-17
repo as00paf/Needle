@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Handler;
+import android.preference.PreferenceManager;
 import android.text.TextUtils;
 import android.util.Log;
 import android.widget.Toast;
@@ -50,7 +51,7 @@ public class GCMController /*implements UserTask.UpdateGCMIDResponseHandler*/ {
     public void init(HomeActivity activity){
         this.activity = activity;
         Needle.userModel.init(activity);
-        mSharedPreferences = activity.getSharedPreferences("Needle", Context.MODE_PRIVATE);
+        mSharedPreferences =  PreferenceManager.getDefaultSharedPreferences(activity.getApplicationContext());
 
         //GCM
         if (checkPlayServices()) {

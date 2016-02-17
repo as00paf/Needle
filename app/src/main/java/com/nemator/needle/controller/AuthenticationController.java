@@ -1,5 +1,7 @@
 package com.nemator.needle.controller;
 
+import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -42,14 +44,25 @@ import com.nemator.needle.models.vo.UserVO;
 import com.nemator.needle.tasks.login.LoginTaskResult;
 import com.nemator.needle.utils.AppConstants;
 import com.nemator.needle.utils.AppState;
+import com.twitter.sdk.android.Twitter;
+import com.twitter.sdk.android.core.Result;
+import com.twitter.sdk.android.core.TwitterApiClient;
+import com.twitter.sdk.android.core.TwitterAuthConfig;
+import com.twitter.sdk.android.core.TwitterCore;
+import com.twitter.sdk.android.core.TwitterException;
+import com.twitter.sdk.android.core.TwitterSession;
+import com.twitter.sdk.android.core.identity.TwitterAuthClient;
+import com.twitter.sdk.android.core.models.User;
 
 import org.json.JSONObject;
 
 import java.util.Arrays;
 
-import retrofit.Callback;
-import retrofit.Response;
-import retrofit.Retrofit;
+import io.fabric.sdk.android.Fabric;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
 
 public class AuthenticationController {
 
@@ -66,10 +79,14 @@ public class AuthenticationController {
 
     private HomeActivity activity;
 
-    private ProfileTracker profileTracker;
-
     //Facebook
     private CallbackManager facebookCallbackManager;
+    private ProfileTracker profileTracker;
+
+    //Twitter
+    private TwitterAuthClient twitterAuthClient;
+
+    private ProgressDialog mProgressDialog;
 
     public AuthenticationController(){
 
@@ -90,7 +107,7 @@ public class AuthenticationController {
     //Handlers
     private Callback<LoginTaskResult> loginCallback = new Callback<LoginTaskResult>() {
         @Override
-        public void onResponse(Response<LoginTaskResult> response, Retrofit retrofit) {
+        public void onResponse(Call<LoginTaskResult> call, Response<LoginTaskResult> response) {
             LoginTaskResult result = response.body();
 
             Log.i("Needle loginCallbackk", "Needle loginCallback success : " +(result.getSuccessCode() == 1) );
@@ -113,7 +130,7 @@ public class AuthenticationController {
             }
             else if(result.getSuccessCode() == 404){
                 int loginType = Needle.userModel.getUser().getLoginType();
-                if(loginType == LOGIN_TYPE_FACEBOOK || loginType == LOGIN_TYPE_GOOGLE){
+                if(loginType == LOGIN_TYPE_FACEBOOK || loginType == LOGIN_TYPE_GOOGLE || loginType == LOGIN_TYPE_TWITTER){
                     register();
                 }else{
                     Toast.makeText(activity, activity.getString(R.string.user_not_found_message), Toast.LENGTH_SHORT).show();
@@ -126,7 +143,7 @@ public class AuthenticationController {
         }
 
         @Override
-        public void onFailure(Throwable t) {
+        public void onFailure(Call<LoginTaskResult> call, Throwable t) {
             Log.d(TAG, "log in failed");
         }
     };
@@ -148,6 +165,8 @@ public class AuthenticationController {
                 }
             });
         }else if(Needle.userModel.getUser().getLoginType() == AuthenticationController.LOGIN_TYPE_DEFAULT){
+            Needle.navigationController.onLogOutComplete();
+        }else if(Needle.userModel.getUser().getLoginType() == AuthenticationController.LOGIN_TYPE_TWITTER){
             Needle.navigationController.onLogOutComplete();
         }else if(Needle.userModel.getUser().getLoginType() == AuthenticationController.LOGIN_TYPE_FACEBOOK){
             if(FacebookSdk.isInitialized()){
@@ -182,7 +201,7 @@ public class AuthenticationController {
     private Callback<UserRegistrationResult> userRegistrationCallback = new Callback<UserRegistrationResult>(){
 
         @Override
-        public void onResponse(Response<UserRegistrationResult> response, Retrofit retrofit) {
+        public void onResponse(Call<UserRegistrationResult> call, Response<UserRegistrationResult> response) {
             UserRegistrationResult result = response.body();
             if(result.getSuccessCode() == 1){
                 Log.d(TAG, "Needle Application Registration Success");
@@ -194,7 +213,7 @@ public class AuthenticationController {
         }
 
         @Override
-        public void onFailure(Throwable t) {
+        public void onFailure(Call<UserRegistrationResult> call, Throwable t) {
             Log.d(TAG, "Needle Application Registration Failed");
         }
     };
@@ -297,9 +316,6 @@ public class AuthenticationController {
             }else{
                 Log.d(TAG, "Result has no resolution");
             }
-
-            //hideProgressDialog();
-
         }
     }
 
@@ -323,7 +339,7 @@ public class AuthenticationController {
 
 
     //Facebook
-    public void initFacebook(){
+    private void initFacebook(){
         FacebookSdk.sdkInitialize(activity.getApplicationContext());
         facebookCallbackManager = CallbackManager.Factory.create();
 
@@ -385,12 +401,59 @@ public class AuthenticationController {
         }
     };
 
+    public void facebookLogin(Activity activity) {
+        initFacebook();
+        LoginManager.getInstance().logInWithReadPermissions(activity, Arrays.asList("public_profile", "user_friends", "email"));
+    }
+
     public void facebookLogin(Fragment fragment) {
+        initFacebook();
         LoginManager.getInstance().logInWithReadPermissions(fragment, Arrays.asList("public_profile", "user_friends", "email"));
     }
+
 
     public CallbackManager getFacebookCallbackManager() {
         return facebookCallbackManager;
     }
+
+    //Twitter
+    private TwitterApiClient twitterApiClient;
+    private TwitterSession twitterSession;
+
+    public void initTwitterSDK(){
+        TwitterAuthConfig authConfig =  new TwitterAuthConfig(AppConstants.TWITTER_API_KEY, AppConstants.TWITTER_API_SECRET);
+        Fabric.with(activity, new Twitter(authConfig));
+        twitterAuthClient = new TwitterAuthClient();//Needed for activity results, I think ...
+    }
+
+    public void twitterSignIn() {
+        initTwitterSDK();
+
+        TwitterCore.getInstance().getApiClient().getAccountService().verifyCredentials(false, false, new com.twitter.sdk.android.core.Callback<User>() {
+            @Override
+            public void success(Result<User> result) {
+                Needle.userModel.getUser()
+                        .setPictureURL(result.data.profileImageUrl.replace("_normal", ""))
+                        .setCoverPictureURL(result.data.profileBannerUrl)
+                        .setSocialNetworkUserId(String.valueOf(result.data.id))
+                        .setLoginType(LOGIN_TYPE_TWITTER)
+                        .setUserName(result.data.screenName);
+
+                login();
+            }
+
+            @Override
+            public void failure(TwitterException e) {
+                Log.d(TAG, "Twitter log in error : " + e.getMessage());
+            }
+        });
+    }
+
+    public void onTwitterActivityResult(int requestCode, int responseCode, Intent intent){
+        if(twitterAuthClient != null){
+            twitterAuthClient.onActivityResult(requestCode, responseCode, intent);
+        }
+    }
+
 
 }

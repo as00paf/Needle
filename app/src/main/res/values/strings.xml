@@ -40,7 +40,6 @@
     <string name="email_hint">Email Address</string>
     <string name="password">Password</string>
     <string name="email">Email</string>
-    <string name="accout_cta">No account yet? Create one!</string>
     <string name="forgot_password">Forgot Password ?</string>
     <string name="or">OR</string>
 
@@ -156,5 +155,8 @@
     <string name="permission_granted">Permission Granted !</string>
     <string name="permission_denied">Permission Denied !</string>
     <string name="signing_in">Signing in ...</string>
+    <string name="empty_user_or_password_error">You must enter a username or email and a password</string>
+    <string name="title_activity_login">LoginActivity</string>
+    <string name="terms_and_conditions"><![CDATA[Terms & Conditions]]></string>
 
 </resources>

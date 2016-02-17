@@ -9,8 +9,8 @@ public class AppConstants {
     public static final String HAYSTACK_PICTURES_URL = PROJECT_URL + "pictures/";
 
     //TODO: put in strings
-    public static final String TWITTER_API_KEY = "wWswYiVtl4FaykxAS4a6ikriG";
-    public static final String TWITTER_API_SECRET = "stpTOh5IAKuX1NRdmOhybIETxUQ3Eftn3byNUsX4ZOjr9aUdmF";
+    public static final String TWITTER_API_KEY = "HfLrGzOyH0XduzvBTX1pvnWPL";
+    public static final String TWITTER_API_SECRET = "gXYWKOBs0oBrTSJAE9epiZc8TVRS3GNdl6dq5uTKkp1jHtJDfx";
 
     //Json tags
     public static final String TAG_SUCCESS = "success";

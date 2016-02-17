@@ -128,7 +128,7 @@ public class HaystackFragment extends Fragment {
         //Floating Action Button
         FloatingActionButton fab = (FloatingActionButton) mLayout.findViewById(R.id.fab_add_users);
         if(isOwner()){
-            fab.setImageResource(R.drawable.ic_action_add_person);
+            fab.setImageResource(R.drawable.ic_person_add_black_24dp);
             fab.setVisibility(View.VISIBLE);
 
             fab.setOnClickListener(new View.OnClickListener() {

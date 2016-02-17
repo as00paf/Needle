@@ -118,6 +118,7 @@ public class HomeActivity extends AppCompatActivity {
             actionBar.setDisplayHomeAsUpEnabled(true);
             actionBar.setDisplayShowHomeEnabled(true);
         }
+        actionBar.hide();
     }
 
     @Override
@@ -237,6 +238,7 @@ public class HomeActivity extends AppCompatActivity {
 
         Log.d(TAG, "onActivityResult");
         Needle.navigationController.getCurrentFragment().onActivityResult(requestCode, resultCode, data);
+        Needle.authenticationController.onTwitterActivityResult(requestCode, resultCode, data);
     }
 
     @Override
@@ -291,6 +293,8 @@ public class HomeActivity extends AppCompatActivity {
                 .create()
                 .show();
     }
+
+
 
     //Getters/Setters
     public NeedleLocationService getLocationService() {

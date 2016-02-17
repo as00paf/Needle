@@ -6,9 +6,10 @@ import android.util.Log;
 import com.google.gson.Gson;
 import com.google.gson.annotations.SerializedName;
 import com.nemator.needle.utils.AppConstants;
-import com.squareup.okhttp.OkHttpClient;
-import com.squareup.okhttp.Request;
-import com.squareup.okhttp.Response;
+
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 
 /**
  * Created by Alex on 15/09/2015.

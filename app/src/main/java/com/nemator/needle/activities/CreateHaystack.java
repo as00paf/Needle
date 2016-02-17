@@ -105,7 +105,7 @@ public class CreateHaystack extends AppCompatActivity implements ImageUploaderTa
                         stateChangeCallback.onStateChange(AppState.CREATE_HAYSTACK_MAP);
                         break;
                     case 2:
-                        fab.setImageDrawable(getResources().getDrawable(R.drawable.ic_action_add_person));
+                        fab.setImageDrawable(getResources().getDrawable(R.drawable.ic_person_add_black_24dp));
                         stateChangeCallback.onStateChange(AppState.CREATE_HAYSTACK_USERS);
                         break;
                 }

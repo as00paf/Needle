@@ -2,6 +2,7 @@ package com.nemator.needle.models;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 
 import com.nemator.needle.controller.AuthenticationController;
 import com.nemator.needle.models.vo.FacebookUserVO;
@@ -31,7 +32,7 @@ public class UserModel {
     }
 
     public void init(Context context){
-        mSharedPreferences = context.getSharedPreferences("Needle", Context.MODE_PRIVATE);
+        mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(context.getApplicationContext());
         user = UserVO.retrieve(mSharedPreferences);
         loggedIn =  mSharedPreferences.getBoolean(AppConstants.TAG_LOGGED_IN, false);
     }
@@ -43,6 +44,11 @@ public class UserModel {
 
     public void setUser(UserVO user) {
         this.user = user;
+        saveUser();
+    }
+
+    public void clearUser() {
+        this.user = null;
         saveUser();
     }
 

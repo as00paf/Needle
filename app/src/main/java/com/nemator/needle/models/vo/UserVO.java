@@ -24,10 +24,10 @@ public class UserVO implements Serializable, Parcelable{
     private String password;
 
     @SerializedName("pictureURL")
-    private String pictureURL;
+    private String pictureURL="";
 
     @SerializedName("coverPictureURL")
-    private String coverPictureURL;
+    private String coverPictureURL="";
 
     @SerializedName("gcmRegId")
     private String gcmRegId;
@@ -227,8 +227,8 @@ public class UserVO implements Serializable, Parcelable{
         vo.userName = mSharedPreferences.getString(AppConstants.TAG_USER_NAME, null);
         vo.email = mSharedPreferences.getString(AppConstants.TAG_EMAIL, null);
         vo.password = mSharedPreferences.getString(AppConstants.TAG_PASSWORD, null);
-        vo.pictureURL = mSharedPreferences.getString(AppConstants.TAG_PICTURE_URL, null);
-        vo.coverPictureURL = mSharedPreferences.getString(AppConstants.TAG_COVER_PICTURE_URL, null);
+        vo.pictureURL = mSharedPreferences.getString(AppConstants.TAG_PICTURE_URL, "");
+        vo.coverPictureURL = mSharedPreferences.getString(AppConstants.TAG_COVER_PICTURE_URL, "");
         vo.gcmRegId = mSharedPreferences.getString(AppConstants.TAG_GCM_REG_ID, null);
         vo.socialNetworkUserId = mSharedPreferences.getString(AppConstants.TAG_SOCIAL_NETWORK_USER_ID, null);
         vo.loginType = mSharedPreferences.getInt(AppConstants.TAG_LOGIN_TYPE, 0);

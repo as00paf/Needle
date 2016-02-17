@@ -10,39 +10,47 @@ import android.util.TypedValue;
 
 public class CropCircleTransformation implements com.squareup.picasso.Transformation {
 
-    private int radius;
     private int strokeWidth;
     private int strokeColor;
 
-    public CropCircleTransformation(Context context, int radius, int strokeWidth, int strokeColor) {
-        this.radius = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, radius, context.getResources().getDisplayMetrics());
+    public CropCircleTransformation(Context context, int strokeWidth, int strokeColor) {
         this.strokeWidth = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, strokeWidth, context.getResources().getDisplayMetrics());
         this.strokeColor = strokeColor;
     }
 
     @Override
     public Bitmap transform(final Bitmap source) {
-        final Paint paint = new Paint();
-        paint.setAntiAlias(true);
-        paint.setShader(new BitmapShader(source, Shader.TileMode.CLAMP, Shader.TileMode.CLAMP));
+        int size = Math.min(source.getWidth(), source.getHeight());
 
-        Bitmap output = Bitmap.createBitmap(source.getWidth(), source.getHeight(), Bitmap.Config.ARGB_8888);
-        Canvas canvas = new Canvas(output);
-        canvas.drawCircle((source.getWidth() - strokeWidth)/2, (source.getHeight() - strokeWidth)/2, radius-strokeWidth, paint);
+        int x = (source.getWidth() - size) / 2;
+        int y = (source.getHeight() - size) / 2;
 
-        if (source != output) {
+        Bitmap squaredBitmap = Bitmap.createBitmap(source, x, y, size, size);
+        if (squaredBitmap != source) {
             source.recycle();
         }
 
-        Paint paint1 = new Paint();
-        paint1.setColor(strokeColor);
-        paint1.setStyle(Paint.Style.STROKE);
-        paint1.setAntiAlias(true);
-        paint1.setStrokeWidth(strokeWidth);
-        canvas.drawCircle((source.getWidth() - strokeWidth)/2, (source.getHeight() - strokeWidth)/2, radius-strokeWidth, paint1);
+        Bitmap bitmap = Bitmap.createBitmap(size, size, source.getConfig());
 
+        Canvas canvas = new Canvas(bitmap);
+        Paint paint = new Paint();
+        BitmapShader shader = new BitmapShader(squaredBitmap, BitmapShader.TileMode.CLAMP, BitmapShader.TileMode.CLAMP);
+        paint.setShader(shader);
+        paint.setAntiAlias(true);
 
-        return output;
+        float r = size/2f;
+        int s = strokeWidth * ((size/2)/100);
+        canvas.drawCircle(r , r , r - strokeWidth, paint);
+
+        Paint stroke = new Paint();
+        stroke.setColor(strokeColor);
+        stroke.setStyle(Paint.Style.STROKE);
+        stroke.setAntiAlias(true);
+        stroke.setStrokeWidth(s);
+        canvas.drawCircle(r, r, r - s, stroke);
+
+        squaredBitmap.recycle();
+        return bitmap;
     }
 
     @Override

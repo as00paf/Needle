@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.SharedElementCallback;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.Log;
@@ -27,10 +28,11 @@ import com.nemator.needle.utils.AppState;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
-import retrofit.Callback;
-import retrofit.Response;
-import retrofit.Retrofit;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class HaystackListFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener {
     private static final String TAG = "HaystackListFragment";
@@ -78,6 +80,7 @@ public class HaystackListFragment extends Fragment implements SwipeRefreshLayout
         super.onSaveInstanceState(outState);
     }
 
+    //TODO : remove this
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
@@ -96,6 +99,14 @@ public class HaystackListFragment extends Fragment implements SwipeRefreshLayout
         if(rootView == null){
             rootView = inflater.inflate(R.layout.fragment_haystack_list, container, false);
 
+            setEnterSharedElementCallback(new SharedElementCallback() {
+                @Override
+                public void onSharedElementEnd(List<String> sharedElementNames, List<View> sharedElements, List<View> sharedElementSnapshots) {
+                    super.onSharedElementEnd(sharedElementNames, sharedElements, sharedElementSnapshots);
+                    Needle.navigationController.hideProgress();
+                }
+            });
+
             //Navigation Drawer
             SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
             Boolean firstNavDrawerLearned = sharedPreferences.getBoolean("firstNavDrawerLearned", false);
@@ -113,7 +124,7 @@ public class HaystackListFragment extends Fragment implements SwipeRefreshLayout
             fab.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    NavigationController.getInstance().showSection(AppConstants.SECTION_CREATE_HAYSTACK, getActivity());
+                    NavigationController.getInstance().showSection(AppConstants.SECTION_CREATE_HAYSTACK);
                 }
             });
 
@@ -174,7 +185,7 @@ public class HaystackListFragment extends Fragment implements SwipeRefreshLayout
         ApiClient.getInstance().fetchHaystacks(getUserId(), new Callback<HaystackTaskResult>() {
 
             @Override
-            public void onResponse(Response<HaystackTaskResult> response, Retrofit retrofit) {
+            public void onResponse(Call<HaystackTaskResult> call, Response<HaystackTaskResult> response) {
                 HaystackTaskResult result = response.body();
 
                 Log.d(TAG, "haystacks fetched !");
@@ -204,7 +215,7 @@ public class HaystackListFragment extends Fragment implements SwipeRefreshLayout
             }
 
             @Override
-            public void onFailure(Throwable t) {
+            public void onFailure(Call<HaystackTaskResult> call, Throwable t) {
                 Log.d(TAG, "haystacks fetch failed !");
             }
         });

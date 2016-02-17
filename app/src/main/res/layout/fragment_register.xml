@@ -1,126 +1,129 @@
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.nemator.needle.fragments.authentication.RegisterFragment">
+    android:background="@color/bg_grey"
+    android:orientation="vertical"
+    android:weightSum="9"
+    android:animateLayoutChanges="true">
 
-    <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:fitsSystemWindows="true"
-        android:background="@android:color/white">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:orientation="horizontal"
+        android:background="@color/primary"
+        android:layout_weight="3"
+        android:gravity="center">
 
-        <LinearLayout
-            android:orientation="vertical"
-            android:layout_width="match_parent"
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="60dp"
+            android:src="@drawable/needle_icon_white"
+            android:gravity="center"/>
+
+        <com.nemator.needle.views.FontTextView
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:paddingTop="24dp"
-            android:paddingLeft="24dp"
-            android:paddingRight="24dp"
-            android:focusable="true"
-            android:focusableInTouchMode="true">
+            android:layout_marginRight="18dp"
+            android:gravity="center"
+            android:text="@string/app_name"
+            android:textSize="60sp"
+            android:textColor="@android:color/white"
+            app:font="CircularStdMedium.otf"/>
+    </LinearLayout>
 
-            <!-- Logo -->
-            <ImageView android:src="@drawable/pin"
-                android:layout_width="wrap_content"
-                android:layout_height="84dp"
-                android:layout_marginBottom="24dp"
-                android:layout_gravity="center_horizontal" />
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="4"
+        android:weightSum="3"
+        android:layout_marginLeft="36dp"
+        android:layout_marginRight="36dp"
+        android:layout_marginBottom="36dp">
 
-            <!-- Username Label -->
-            <android.support.design.widget.TextInputLayout
+        <!-- Username Label -->
+        <android.support.design.widget.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            app:hintTextAppearance="@style/TextAppearence.App.TextInputLayout">
+            <android.support.v7.widget.AppCompatEditText
+                android:id="@+id/input_username"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:layout_marginBottom="8dp">
-                <EditText android:id="@+id/register_input_username"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:inputType="text"
-                    android:hint="@string/username" />
-            </android.support.design.widget.TextInputLayout>
+                android:layout_height="match_parent"
+                android:inputType="text"
+                android:hint="@string/username"
+                android:drawableLeft="@drawable/ic_person_black_24dp"
+                android:drawableTint="@color/primary"
+                android:drawablePadding="10dp"/>
+        </android.support.design.widget.TextInputLayout>
 
-            <!-- Email Label -->
-            <android.support.design.widget.TextInputLayout
+        <!-- Email Label -->
+        <android.support.design.widget.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            app:hintTextAppearance="@style/TextAppearence.App.TextInputLayout">
+            <android.support.v7.widget.AppCompatEditText
+                android:id="@+id/input_email"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:layout_marginBottom="8dp">
-                <EditText android:id="@+id/register_input_email"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:inputType="text"
-                    android:hint="@string/email" />
-            </android.support.design.widget.TextInputLayout>
+                android:layout_height="match_parent"
+                android:inputType="text"
+                android:hint="@string/email_hint"
+                android:drawableLeft="@drawable/ic_email_black_24dp"
+                android:drawableTint="@color/primary"
+                android:drawablePadding="10dp"/>
+        </android.support.design.widget.TextInputLayout>
 
-            <!-- Password Label -->
-            <android.support.design.widget.TextInputLayout
+        <!-- Password Label -->
+        <android.support.design.widget.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            app:hintTextAppearance="@style/TextAppearence.App.TextInputLayout">
+            <android.support.v7.widget.AppCompatEditText
+                android:id="@+id/input_password"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:layout_marginBottom="8dp">
-                <EditText android:id="@+id/register_input_password"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:inputType="textPassword"
-                    android:hint="@string/password"/>
-            </android.support.design.widget.TextInputLayout>
+                android:layout_height="match_parent"
+                android:inputType="textPassword"
+                android:hint="@string/password"
+                android:drawableLeft="@drawable/ic_lock_black_24dp"
+                android:drawableTint="@color/primary"
+                android:drawablePadding="12dp"/>
+        </android.support.design.widget.TextInputLayout>
 
-            <!-- Register Button -->
-            <android.support.v7.widget.AppCompatButton
-                android:id="@+id/btn_register"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="24dp"
-                android:layout_marginBottom="24dp"
-                android:padding="12dp"
-                android:text="@string/register"/>
+    </LinearLayout>
 
-            <!-- OR Label -->
-            <TextView
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="24dp"
-                android:text="@string/or"
-                android:gravity="center"
-                android:textSize="32dip"/>
+    <!-- Register Button -->
+    <android.support.v7.widget.AppCompatButton
+        android:id="@+id/btn_register"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:padding="8dp"
+        android:layout_marginLeft="48dp"
+        android:layout_marginRight="48dp"
+        android:text="@string/register"
+        android:textColor="@android:color/white"
+        android:textStyle="bold"
+        android:textSize="18sp"
+        android:background="@color/primary"
+        android:foreground="?android:attr/selectableItemBackground"
+        android:layout_gravity="center_horizontal"/>
 
-            <!-- Facebook Button -->
-            <android.support.v7.widget.AppCompatButton
-                android:layout_width="fill_parent"
-                android:layout_height="64dp"
-                android:text="@string/use_fb_account"
-                android:drawableStart="@drawable/facebook_logo"
-                android:drawablePadding="8dp"
-                android:id="@+id/register_btn_facebook"
-                android:layout_gravity="center_horizontal"
-                android:background="#3b5998"
-                android:layout_margin="8dp"
-                android:textColor="#ffffffff" />
 
-            <!-- Twitter Button -->
-            <android.support.v7.widget.AppCompatButton
-                android:layout_width="fill_parent"
-                android:layout_height="64dp"
-                android:text="@string/use_twitter_account"
-                android:drawableStart="@drawable/twitter_logo_white"
-                android:id="@+id/register_btn_twitter"
-                android:layout_gravity="center_horizontal"
-                android:background="#55ACEE"
-                android:layout_margin="8dp"
-                android:textColor="#ffffffff"/>
+    <!-- Terms Link -->
+    <TextView
+        android:id="@+id/link_terms_conditions"
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:text="@string/terms_and_conditions"
+        android:textSize="14dip"
+        android:gravity="center"
+        android:paddingTop="4dp"
+        android:layout_gravity="center_horizontal"/>
 
-            <!-- G+ Button -->
-            <com.google.android.gms.common.SignInButton
-                android:id="@+id/register_btn_google"
-                android:layout_width="fill_parent"
-                android:layout_height="64dp"
-                android:layout_gravity="center_horizontal"
-                android:layout_marginBottom="30dip"
-                android:layout_margin="4dp"
-                android:text="Login via Google+"
-                android:enabled="true" />
-
-        </LinearLayout>
-    </ScrollView>
-
-</FrameLayout>
+</LinearLayout>

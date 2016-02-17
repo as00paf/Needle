@@ -8,16 +8,16 @@ import com.nemator.needle.tasks.TaskResult;
 import com.nemator.needle.tasks.haystack.HaystackTaskResult;
 import com.nemator.needle.tasks.login.LoginTaskResult;
 import com.nemator.needle.utils.AppConstants;
-import com.squareup.okhttp.Interceptor;
-import com.squareup.okhttp.ResponseBody;
 
 import java.io.IOException;
-import java.util.List;
 
-import retrofit.Call;
-import retrofit.Callback;
-import retrofit.GsonConverterFactory;
-import retrofit.Retrofit;
+import okhttp3.Interceptor;
+import okhttp3.OkHttpClient;
+import okhttp3.ResponseBody;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 /**
  * Created by Alex on 06/10/2015.
@@ -27,26 +27,29 @@ public class ApiClient {
     private static ApiClient instance;
 
     private NeedleApiClient client;
+    private OkHttpClient httpClient;
 
     public ApiClient() {
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(AppConstants.PROJECT_URL)
-                .addConverterFactory(GsonConverterFactory.create())
-                .build();
-
-        client = retrofit.create(NeedleApiClient.class);
-
-        retrofit.client().interceptors().add(new Interceptor() {
+        httpClient = new OkHttpClient.Builder().addInterceptor(new Interceptor() {
             @Override
-            public com.squareup.okhttp.Response intercept(Chain chain) throws IOException {
-                com.squareup.okhttp.Response response = chain.proceed(chain.request());
+            public okhttp3.Response intercept(Chain chain) throws IOException {
+                okhttp3.Response response = chain.proceed(chain.request());
+
                 String content = response.body().string();
                 Log.d("interceptor", "intercepted res = " + content);
                 return response.newBuilder()
                         .body(ResponseBody.create(response.body().contentType(), content))
                         .build();
             }
-        });
+        }).build();
+
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(AppConstants.PROJECT_URL)
+                .client(httpClient)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+
+        client = retrofit.create(NeedleApiClient.class);
     }
 
     public static ApiClient getInstance() {

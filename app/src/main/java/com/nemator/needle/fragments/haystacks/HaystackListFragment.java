@@ -1,9 +1,9 @@
 package com.nemator.needle.fragments.haystacks;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.SharedElementCallback;
@@ -108,13 +108,12 @@ public class HaystackListFragment extends Fragment implements SwipeRefreshLayout
             });
 
             //Navigation Drawer
-            SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
-            Boolean firstNavDrawerLearned = sharedPreferences.getBoolean("firstNavDrawerLearned", false);
+            Boolean firstNavDrawerLearned = getContext().getSharedPreferences("com.nemator.needle", Context.MODE_PRIVATE).getBoolean("firstNavDrawerLearned", false);
 
             if(!firstNavDrawerLearned){
                 //TODO: Open Nav Drawer
 
-                SharedPreferences.Editor edit = sharedPreferences.edit();
+                SharedPreferences.Editor edit = getContext().getSharedPreferences("com.nemator.needle", Context.MODE_PRIVATE).edit();
                 edit.putBoolean("firstNavDrawerLearned", true);
                 edit.commit();
             }

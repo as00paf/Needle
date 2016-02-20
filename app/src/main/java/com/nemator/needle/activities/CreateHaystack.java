@@ -4,13 +4,11 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.Matrix;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.provider.MediaStore;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.content.LocalBroadcastManager;
@@ -26,7 +24,12 @@ import android.widget.Toast;
 
 import com.nemator.needle.Needle;
 import com.nemator.needle.R;
+import com.nemator.needle.adapter.CreateHaystackPagerAdapter;
 import com.nemator.needle.api.ApiClient;
+import com.nemator.needle.fragments.haystacks.OnActivityStateChangeListener;
+import com.nemator.needle.fragments.haystacks.createHaystack.CreateHaystackGeneralInfosFragment;
+import com.nemator.needle.fragments.haystacks.createHaystack.CreateHaystackMapFragment;
+import com.nemator.needle.fragments.haystacks.createHaystack.CreateHaystackUsersFragment;
 import com.nemator.needle.models.vo.HaystackVO;
 import com.nemator.needle.models.vo.UserVO;
 import com.nemator.needle.tasks.imageUploader.ImageUploadParams;
@@ -36,11 +39,6 @@ import com.nemator.needle.utils.AppConstants;
 import com.nemator.needle.utils.AppState;
 import com.nemator.needle.utils.CameraUtils;
 import com.nemator.needle.views.SlidingTabLayout;
-import com.nemator.needle.fragments.haystacks.OnActivityStateChangeListener;
-import com.nemator.needle.fragments.haystacks.createHaystack.CreateHaystackGeneralInfosFragment;
-import com.nemator.needle.fragments.haystacks.createHaystack.CreateHaystackMapFragment;
-import com.nemator.needle.adapter.CreateHaystackPagerAdapter;
-import com.nemator.needle.fragments.haystacks.createHaystack.CreateHaystackUsersFragment;
 
 import java.util.ArrayList;
 
@@ -360,10 +358,8 @@ public class CreateHaystack extends AppCompatActivity implements ImageUploaderTa
 
     private String getUserName(){
         if(userName == null){
-            SharedPreferences sp = PreferenceManager
-                    .getDefaultSharedPreferences(this);
 
-            userName = sp.getString("username", null);
+            userName = getSharedPreferences("com.nemator.needle", Context.MODE_PRIVATE).getString("username", null);
         }
 
         return userName;
@@ -371,10 +367,8 @@ public class CreateHaystack extends AppCompatActivity implements ImageUploaderTa
 
     private int getUserId(){
         if(userId == -1){
-            SharedPreferences sp = PreferenceManager
-                    .getDefaultSharedPreferences(this);
-
-            userId = sp.getInt("userId", -1);
+            //Todo : use constant
+            userId =  getSharedPreferences("com.nemator.needle", Context.MODE_PRIVATE).getInt("userId", -1);
         }
 
         return userId;

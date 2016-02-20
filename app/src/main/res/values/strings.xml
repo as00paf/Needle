@@ -158,5 +158,9 @@
     <string name="empty_user_or_password_error">You must enter a username or email and a password</string>
     <string name="title_activity_login">LoginActivity</string>
     <string name="terms_and_conditions"><![CDATA[Terms & Conditions]]></string>
+    <string name="logged_in_with_needle_account">Needle Account</string>
+    <string name="logged_in_with_google_account">Google Account</string>
+    <string name="logged_in_with_facebook_account">Facebook Account</string>
+    <string name="logged_in_with_twitter_account">Twitter Account</string>
 
 </resources>

@@ -13,12 +13,11 @@ public class UserModel {
 
     private static UserModel instance;
 
-    private SharedPreferences mSharedPreferences;
-
     private boolean loggedIn = false;
     private boolean autoLogin = true;
 
     private UserVO user;
+    private SharedPreferences sharedPreferences;
 
     public UserModel(){
     }
@@ -32,9 +31,9 @@ public class UserModel {
     }
 
     public void init(Context context){
-        mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(context.getApplicationContext());
-        user = UserVO.retrieve(mSharedPreferences);
-        loggedIn =  mSharedPreferences.getBoolean(AppConstants.TAG_LOGGED_IN, false);
+        sharedPreferences = context.getSharedPreferences("com.nemator.needle", Context.MODE_PRIVATE);
+        user = UserVO.retrieve(sharedPreferences);
+        loggedIn =  sharedPreferences.getBoolean(AppConstants.TAG_LOGGED_IN, false);
     }
 
     //Getters/Setters
@@ -58,7 +57,7 @@ public class UserModel {
 
     public void setUserId(int userId){
         user.setUserId(userId);
-        mSharedPreferences.edit().putInt(AppConstants.TAG_USER_ID, userId).commit();
+        sharedPreferences.edit().putInt(AppConstants.TAG_USER_ID, userId).commit();
     }
 
     public String getUserName(){
@@ -68,7 +67,7 @@ public class UserModel {
     public void setUserName(String username){
         user.setUserName(username);
 
-        mSharedPreferences.edit().putString(AppConstants.TAG_USER_NAME, username).commit();
+        sharedPreferences.edit().putString(AppConstants.TAG_USER_NAME, username).commit();
     }
 
     public String getGcmRegId() {
@@ -78,7 +77,7 @@ public class UserModel {
     public Boolean setGcmRegId(String gcmRegId) {
         Boolean wereTheSame = user.getGcmRegId() != null && !user.getGcmRegId().equals(gcmRegId);
         user.setGcmRegId(gcmRegId);
-        mSharedPreferences.edit().putString(AppConstants.TAG_GCM_REG_ID, gcmRegId).apply();
+        sharedPreferences.edit().putString(AppConstants.TAG_GCM_REG_ID, gcmRegId).apply();
 
         return wereTheSame;
     }
@@ -89,7 +88,7 @@ public class UserModel {
 
     public void setLoggedIn(boolean loggedIn) {
         this.loggedIn = loggedIn;
-        mSharedPreferences.edit().putBoolean(AppConstants.TAG_LOGGED_IN, loggedIn).apply();
+        sharedPreferences.edit().putBoolean(AppConstants.TAG_LOGGED_IN, loggedIn).apply();
     }
 
     public boolean isAutoLogin() {
@@ -101,7 +100,7 @@ public class UserModel {
     }
 
     public void saveUser(){
-        user.save(mSharedPreferences);
+        user.save(sharedPreferences);
     }
 
     public void setUserFromFacebookAccount(FacebookUserVO fbUser) {

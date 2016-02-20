@@ -1,10 +1,8 @@
 package com.nemator.needle.controller;
 
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Handler;
-import android.preference.PreferenceManager;
 import android.text.TextUtils;
 import android.util.Log;
 import android.widget.Toast;
@@ -12,9 +10,9 @@ import android.widget.Toast;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
-import com.nemator.needle.activities.HomeActivity;
 import com.nemator.needle.Needle;
 import com.nemator.needle.R;
+import com.nemator.needle.activities.HomeActivity;
 import com.nemator.needle.utils.AppConstants;
 
 import java.io.IOException;
@@ -31,7 +29,6 @@ public class GCMController /*implements UserTask.UpdateGCMIDResponseHandler*/ {
     private static GCMController instance;
 
     private HomeActivity activity;
-    private SharedPreferences mSharedPreferences;
 
     GoogleCloudMessaging gcm;
     int tryCount = 0;
@@ -51,14 +48,13 @@ public class GCMController /*implements UserTask.UpdateGCMIDResponseHandler*/ {
     public void init(HomeActivity activity){
         this.activity = activity;
         Needle.userModel.init(activity);
-        mSharedPreferences =  PreferenceManager.getDefaultSharedPreferences(activity.getApplicationContext());
 
         //GCM
         if (checkPlayServices()) {
             gcm = GoogleCloudMessaging.getInstance(activity.getApplicationContext());
 
             // Read saved registration id from shared preferences.
-            Needle.userModel.setGcmRegId(mSharedPreferences.getString(AppConstants.TAG_GCM_REG_ID, ""));
+            Needle.userModel.setGcmRegId(activity.getSharedPreferences("com.nemator.needle", Context.MODE_PRIVATE).getString(AppConstants.TAG_GCM_REG_ID, ""));
 
             if (TextUtils.isEmpty(Needle.userModel.getGcmRegId())) {
                 handler.sendEmptyMessage(MSG_REGISTER_WITH_GCM);

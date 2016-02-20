@@ -8,7 +8,6 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.res.Configuration;
 import android.os.Bundle;
-import android.os.Handler;
 import android.os.IBinder;
 import android.support.design.widget.NavigationView;
 import android.support.v4.widget.DrawerLayout;
@@ -75,15 +74,19 @@ public class HomeActivity extends AppCompatActivity {
             Needle.userModel.setAutoLogin(savedInstanceState.getBoolean("autoLogin", true));
             Needle.userModel.setLoggedIn(savedInstanceState.getBoolean("loggedIn", false));
             Needle.navigationController.setCurrentState(savedInstanceState.getInt(AppConstants.APP_STATE, Needle.navigationController.getCurrentState()));
+            Needle.navigationController.setPreviousState(savedInstanceState.getInt(AppConstants.APP_PREVIOUS_STATE, Needle.navigationController.getCurrentState()));
         }
     }
 
     private void initView() {
         Log.d(TAG, "initView");
+
+        UserVO user = UserVO.retrieve(getSharedPreferences("com.nemator.needle", Context.MODE_PRIVATE));
+
         if(!Needle.userModel.isLoggedIn()){
             Needle.navigationController.showSection(AppConstants.SECTION_LOGIN);
-        }else{
-            Needle.userModel.setUser(UserVO.retrieve(getSharedPreferences("Needle", Context.MODE_PRIVATE)));
+        }else {
+            Needle.userModel.setUser(user);
             Needle.navigationController.onPostLogin();
         }
     }
@@ -206,6 +209,7 @@ public class HomeActivity extends AppCompatActivity {
         }
 
         savedInstanceState.putInt(AppConstants.APP_STATE, Needle.navigationController.getCurrentState());
+        savedInstanceState.putInt(AppConstants.APP_PREVIOUS_STATE, Needle.navigationController.getPreviousState());
         savedInstanceState.putBoolean("autoLogin", Needle.userModel.isAutoLogin());
         savedInstanceState.putBoolean("loggedIn", Needle.userModel.isLoggedIn());
 
@@ -225,7 +229,7 @@ public class HomeActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         int state = Needle.navigationController.getCurrentState();
-        if(state != AppState.LOGIN && state != AppState.SPLASH_LOGIN && state != AppState.REGISTER ){
+        if(state != AppState.LOGIN && state != AppState.SPLASH_LOGIN ){
             Needle.navigationController.onBackPressed();
         }else{
             super.onBackPressed();
@@ -234,11 +238,11 @@ public class HomeActivity extends AppCompatActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-
         Log.d(TAG, "onActivityResult");
-        Needle.navigationController.getCurrentFragment().onActivityResult(requestCode, resultCode, data);
+        Needle.authenticationController.onGoogleActivityResult(requestCode, resultCode, data);
         Needle.authenticationController.onTwitterActivityResult(requestCode, resultCode, data);
+
+        super.onActivityResult(requestCode, resultCode, data);
     }
 
     @Override

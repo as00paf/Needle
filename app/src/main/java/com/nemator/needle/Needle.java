@@ -12,6 +12,7 @@ import com.nemator.needle.controller.NetworkController;
 import com.nemator.needle.models.UserModel;
 import com.twitter.sdk.android.Twitter;
 import com.twitter.sdk.android.core.TwitterAuthConfig;
+
 import io.fabric.sdk.android.Fabric;
 
 /**

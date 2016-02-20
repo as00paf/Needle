@@ -17,8 +17,8 @@
 
     <ImageView
         android:id="@+id/avatar"
-        android:layout_width="64dp"
-        android:layout_height="64dp"
+        android:layout_width="96dp"
+        android:layout_height="96dp"
         android:layout_marginLeft="@dimen/spacing_large"
         android:elevation="4dp"
         tools:src="@drawable/ic_person_black_24dp"
@@ -27,29 +27,31 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="56dp"
-        android:weightSum="2"
         android:layout_marginLeft="@dimen/spacing_large"
         android:layout_marginStart="@dimen/spacing_large"
         android:layout_marginBottom="8dp"
         android:layout_alignParentBottom="true"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:gravity="bottom">
 
         <TextView
             android:id="@+id/username"
-            android:layout_width="wrap_content"
-            android:layout_height="0dp"
-            android:layout_weight="1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
             android:textSize="14sp"
             android:textStyle="bold"
-            android:text="Username"/>
+            android:text="Username"
+            android:gravity="left|bottom"
+            android:textColor="@android:color/white"/>
 
         <TextView
             android:id="@+id/account_type"
-            android:layout_width="wrap_content"
-            android:layout_height="0dp"
-            android:layout_weight="1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
             android:text="Acccount Type"
-            android:textSize="14sp"/>
+            android:textSize="14sp"
+            android:gravity="left|bottom"
+            android:textColor="@android:color/white"/>
 
     </LinearLayout>
 </RelativeLayout>

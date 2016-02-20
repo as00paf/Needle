@@ -162,7 +162,9 @@ public class NavigationController implements HomeActivity.NavigationHandler, OnA
             case AppConstants.SECTION_LOGIN:
                 if(loginFragment == null){loginFragment = new LoginFragment();}
                 newFragment = loginFragment;
-                if(previousState != AppState.SPLASH_LOGIN ){
+                if(previousState == -1){
+                    enterAnimation = R.anim.enter_from_bottom;
+                }else if(previousState != AppState.SPLASH_LOGIN ){
                     enterAnimation = R.anim.enter_from_left;
                     exitAnimation = R.anim.exit_to_right;
                 }
@@ -262,12 +264,8 @@ public class NavigationController implements HomeActivity.NavigationHandler, OnA
                 activity.onBackPressed();
                 break;
             case AppState.REGISTER:
-                if(getPreviousState() == AppState.LOGIN){
-                    showSection(AppConstants.SECTION_LOGIN);
-                    onStateChange(AppState.LOGIN);
-                }else{
-                    activity.onBackPressed();
-                }
+                showSection(AppConstants.SECTION_LOGIN);
+                onStateChange(AppState.LOGIN);
                 break;
             case AppState.PUBLIC_HAYSTACK_TAB:
                 logOut();
@@ -579,11 +577,6 @@ public class NavigationController implements HomeActivity.NavigationHandler, OnA
         navigationView = (NavigationView) activity.findViewById(R.id.navigation_view);
         View headerView = navigationView.getHeaderView(0);
 
-        //Username
-        TextView username = (TextView) headerView.findViewById(R.id.username);
-        String name = Needle.userModel.getUserName().substring(0, 1).toUpperCase() + Needle.userModel.getUserName().substring(1);
-        username.setText(name);
-
         //Profile Image
         ImageView avatarImageView = (ImageView) headerView.findViewById(R.id.avatar);
         String pictureURL = Needle.userModel.getUser().getPictureURL().replace("_normal", "");
@@ -607,6 +600,30 @@ public class NavigationController implements HomeActivity.NavigationHandler, OnA
         } else {
             Log.e(TAG, "Can't fetch cover for login type " + Needle.userModel.getUser().getLoginType());
         }
+
+        //Username
+        TextView username = (TextView) headerView.findViewById(R.id.username);
+        String name = Needle.userModel.getUserName().substring(0, 1).toUpperCase() + Needle.userModel.getUserName().substring(1);
+        username.setText(name);
+
+        //Logged in with ...
+        TextView accountType = (TextView) headerView.findViewById(R.id.account_type);
+        String type = activity.getString(R.string.logged_in_with_needle_account);
+
+        switch (Needle.userModel.getUser().getLoginType()){
+            case AuthenticationController.LOGIN_TYPE_GOOGLE:
+                type = activity.getString(R.string.logged_in_with_google_account);
+                break;
+            case AuthenticationController.LOGIN_TYPE_FACEBOOK:
+                type = activity.getString(R.string.logged_in_with_facebook_account);
+                break;
+            case AuthenticationController.LOGIN_TYPE_TWITTER:
+                type = activity.getString(R.string.logged_in_with_twitter_account);
+                type = activity.getString(R.string.logged_in_with_twitter_account);
+                break;
+        }
+
+        accountType.setText(type);
     }
 
     //Getters/Setters
@@ -713,4 +730,7 @@ public class NavigationController implements HomeActivity.NavigationHandler, OnA
         actionBar.setTitle(title);
     }
 
+    public void setPreviousState(int previousState) {
+        this.previousState = previousState;
+    }
 }

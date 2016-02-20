@@ -45,12 +45,12 @@ public class GCMIntentService extends IntentService {
 
                 String regId = Needle.userModel.getGcmRegId();
                 if((regId == null || regId.isEmpty()) && !regId.equals(registrationId)){
-                    PreferenceManager.getDefaultSharedPreferences(this).edit().
+                    getSharedPreferences("com.nemator.needle", Context.MODE_PRIVATE).edit().
                             putString(AppConstants.TAG_GCM_REG_ID, registrationId).
                             putBoolean(AppConstants.TAG_GCM_REGISTERD, true).
                             commit();
                 }else{
-                    PreferenceManager.getDefaultSharedPreferences(this).edit().
+                    getSharedPreferences("com.nemator.needle", Context.MODE_PRIVATE).edit().
                             putBoolean(AppConstants.TAG_GCM_REGISTERD, true).
                             commit();
                 }

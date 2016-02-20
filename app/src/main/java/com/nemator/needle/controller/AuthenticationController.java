@@ -248,6 +248,14 @@ public class AuthenticationController {
         }
     }
 
+    public void onGoogleActivityResult(int requestCode, int resultCode, Intent data) {
+        // Result returned from launching the Intent from GoogleSignInApi.getSignInIntent(...);
+        if (requestCode == RC_GOOGLE_SIGN_IN) {
+            GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
+            Needle.authenticationController.handleGoogleSignInResult(result);
+        }
+    }
+
     public void googleSilentSignIn() {
         //Try to login with Google if did not just log out
         if(Needle.navigationController.getPreviousState() == AppState.LOGIN){
@@ -293,11 +301,16 @@ public class AuthenticationController {
             Plus.PeopleApi.load(Needle.googleApiController.getGoogleApiClient(), acct.getId()).setResultCallback(new ResultCallback<People.LoadPeopleResult>() {
                 @Override
                 public void onResult(@NonNull People.LoadPeopleResult loadPeopleResult) {
-                    Person person = loadPeopleResult.getPersonBuffer().get(0);
+                    if(loadPeopleResult.getPersonBuffer() != null){
+                        Person person = loadPeopleResult.getPersonBuffer().get(0);
 
-                    String coverURL = person.getCover().getCoverPhoto().getUrl();
-                    Needle.userModel.getUser().setCoverPictureURL(coverURL);
-                    AuthenticationController.getInstance().login();
+                        String coverURL = person.getCover().getCoverPhoto().getUrl();
+                        Needle.userModel.getUser().setCoverPictureURL(coverURL);
+                        AuthenticationController.getInstance().login();
+                    }else{
+                        Log.d(TAG, "wtf : "+loadPeopleResult.getStatus().getStatusMessage());
+                    }
+
                 }
             });
         } else {
@@ -428,23 +441,32 @@ public class AuthenticationController {
 
     public void twitterSignIn() {
         initTwitterSDK();
-
-        TwitterCore.getInstance().getApiClient().getAccountService().verifyCredentials(false, false, new com.twitter.sdk.android.core.Callback<User>() {
+        twitterAuthClient.authorize(activity, new com.twitter.sdk.android.core.Callback<TwitterSession>() {
             @Override
-            public void success(Result<User> result) {
-                Needle.userModel.getUser()
-                        .setPictureURL(result.data.profileImageUrl.replace("_normal", ""))
-                        .setCoverPictureURL(result.data.profileBannerUrl)
-                        .setSocialNetworkUserId(String.valueOf(result.data.id))
-                        .setLoginType(LOGIN_TYPE_TWITTER)
-                        .setUserName(result.data.screenName);
+            public void success(Result<TwitterSession> result) {
+                Twitter.getInstance().getApiClient().getAccountService().verifyCredentials(false, false, new com.twitter.sdk.android.core.Callback<User>() {
+                    @Override
+                    public void success(Result<User> result) {
+                        Needle.userModel.getUser()
+                                .setPictureURL(result.data.profileImageUrl.replace("_normal", ""))
+                                .setCoverPictureURL(result.data.profileBannerUrl)
+                                .setSocialNetworkUserId(String.valueOf(result.data.id))
+                                .setLoginType(LOGIN_TYPE_TWITTER)
+                                .setUserName(result.data.screenName);
 
-                login();
+                        login();
+                    }
+
+                    @Override
+                    public void failure(TwitterException e) {
+                        Log.d(TAG, "Twitter log in error : " + e.getMessage());
+                    }
+                });
             }
 
             @Override
             public void failure(TwitterException e) {
-                Log.d(TAG, "Twitter log in error : " + e.getMessage());
+
             }
         });
     }

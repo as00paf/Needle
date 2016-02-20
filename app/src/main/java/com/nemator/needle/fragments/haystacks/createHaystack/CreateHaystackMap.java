@@ -5,13 +5,11 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.SharedPreferences;
 import android.graphics.Point;
 import android.location.Location;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.SystemClock;
-import android.preference.PreferenceManager;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -38,8 +36,8 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polygon;
 import com.google.android.gms.maps.model.PolygonOptions;
 import com.nemator.needle.Needle;
-import com.nemator.needle.utils.AppConstants;
 import com.nemator.needle.R;
+import com.nemator.needle.utils.AppConstants;
 import com.nemator.needle.utils.SphericalUtil;
 
 import java.text.DateFormat;
@@ -469,26 +467,6 @@ public class CreateHaystackMap extends SupportMapFragment implements LocationLis
     }
 
     //Getters/Setters
-    private String getUserName(){
-        if(username == ""){
-            SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getActivity());
-            username = sp.getString("username", "");
-        }
-
-        return username;
-    }
-
-    public int getUserId(){
-        if(userId==-1){
-            SharedPreferences sp = PreferenceManager
-                    .getDefaultSharedPreferences(getActivity());
-
-            userId = sp.getInt("userId", -1);
-        }
-
-        return userId;
-    }
-
     public void setScaleFactor(Float scaleFactor){
         mScaleFactor = scaleFactor;
         LatLng position = (mUseCustomPosition) ? mCustomPosition : mCurrentPosition;

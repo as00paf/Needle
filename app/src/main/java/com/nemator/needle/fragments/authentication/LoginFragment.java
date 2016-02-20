@@ -19,8 +19,6 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.auth.api.Auth;
-import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 import com.nemator.needle.Needle;
 import com.nemator.needle.R;
 import com.nemator.needle.controller.AuthenticationController;
@@ -37,9 +35,6 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
     private FloatingActionButton facebookButton, googleButton, twitterButtton, registerButton;
     private TextView forgotPasswordLink;
 
-    //Objects
-    private SharedPreferences mSharedPreferences;
-
     public static LoginFragment newInstance() {
         LoginFragment fragment = new LoginFragment();
         return fragment;
@@ -53,17 +48,16 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         layout = (LinearLayout) inflater.inflate(R.layout.fragment_login, container, false);
 
-        mSharedPreferences = getActivity().getSharedPreferences("Needle", Context.MODE_PRIVATE);
-
         //Username & Password
         usernameText = (AppCompatEditText) layout.findViewById(R.id.input_username);
-        String userName = mSharedPreferences.getString(AppConstants.TAG_EMAIL, "");
+        SharedPreferences preferences = getContext().getSharedPreferences("com.nemator.needle", Context.MODE_PRIVATE);
+        String userName = preferences.getString(AppConstants.TAG_EMAIL, "");
         if(!userName.equals("facebook")){
             usernameText.setText(userName);
         }
 
         passwordText = (AppCompatEditText) layout.findViewById(R.id.input_password);
-        passwordText.setText(mSharedPreferences.getString(AppConstants.TAG_PASSWORD, ""));
+        passwordText.setText(preferences.getString(AppConstants.TAG_PASSWORD, ""));
 
         passwordText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
@@ -104,7 +98,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
 
     @Override
     public void onResume(){
-        boolean rememberMe = mSharedPreferences.getBoolean("rememberMe", false);
+        boolean rememberMe = getContext().getSharedPreferences("com.nemator.needle", Context.MODE_PRIVATE).getBoolean("rememberMe", false);
         boolean autoLogin =Needle.userModel.isAutoLogin();
         boolean willLogin = rememberMe && autoLogin && ! Needle.userModel.isLoggedIn();
 
@@ -177,15 +171,11 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         Log.d(TAG, "onActivityResult");
 
-        // Result returned from launching the Intent from GoogleSignInApi.getSignInIntent(...);
-        if (requestCode == AuthenticationController.RC_GOOGLE_SIGN_IN) {
-            GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
-            Needle.authenticationController.handleGoogleSignInResult(result);
+        //Facebook
+        if(Needle.authenticationController.getFacebookCallbackManager() != null){
+            Needle.authenticationController.getFacebookCallbackManager().onActivityResult(requestCode, resultCode, data);
         }else{
             super.onActivityResult(requestCode, resultCode, data);
         }
-
-        //Facebook
-        Needle.authenticationController.getFacebookCallbackManager().onActivityResult(requestCode, resultCode, data);
     }
 }

@@ -216,6 +216,16 @@ public class HaystackListFragment extends Fragment implements SwipeRefreshLayout
             @Override
             public void onFailure(Call<HaystackTaskResult> call, Throwable t) {
                 Log.d(TAG, "haystacks fetch failed !");
+
+                HaystackListTabFragment publicTab = mHaystackListPagerAdapter.getPublicHaystackListFragment();
+                HaystackListTabFragment privateTab = mHaystackListPagerAdapter.getPrivateHaystackListFragment();
+
+                if(publicTab == null && privateTab == null) return;
+
+                publicTab.getRefreshLayout().setRefreshing(false);
+                privateTab.getRefreshLayout().setRefreshing(false);
+
+                Toast.makeText(getActivity(), R.string.fetch_haystack_error, Toast.LENGTH_SHORT).show();
             }
         });
     }

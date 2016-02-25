@@ -5,33 +5,54 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 import com.google.android.gms.maps.model.LatLng;
+import com.google.gson.annotations.SerializedName;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Iterator;
 
 public class HaystackVO implements Serializable, Parcelable {
+    @SerializedName("id")
     private int id;
+
+    @SerializedName("owner")
     private int owner;
+
+    @SerializedName("name")
     private String name;
+
+    @SerializedName("isPublic")
     private Boolean isPublic;
+
+    @SerializedName("timeLimit")
     private String timeLimit;
 
+    @SerializedName("zoneRadius")
     private int zoneRadius;
+
+    @SerializedName("isCircle")
     private Boolean isCircle;
-    private LatLng position;
+
+    @SerializedName("location")
+    private LocationVO position;
+
+    @SerializedName("pictureURL")
     private String pictureURL = "";
     private Bitmap picture;
 
+    @SerializedName("users")
     private ArrayList<UserVO> users;
+
+    @SerializedName("activeUsers")
     private ArrayList<UserVO> activeUsers;
+
     private ArrayList<UserVO> bannedUsers;
 
     public HaystackVO(){
 
     }
 
-    public HaystackVO(int id, int owner, String name, Boolean isPublic, String timeLimit, int zoneRadius, Boolean isCircle, LatLng position, String pictureURL, ArrayList<UserVO> users, ArrayList<UserVO> activeUsers){
+    public HaystackVO(int id, int owner, String name, Boolean isPublic, String timeLimit, int zoneRadius, Boolean isCircle, LocationVO position, String pictureURL, ArrayList<UserVO> users, ArrayList<UserVO> activeUsers){
         this.id = id;
         this.owner = owner;
         this.name = name;
@@ -59,7 +80,7 @@ public class HaystackVO implements Serializable, Parcelable {
         this.zoneRadius = in.readInt();
         this.isCircle = (Boolean) in.readValue(Boolean.class.getClassLoader());
         this.pictureURL = in.readString();
-        this.position = new LatLng(in.readDouble(), in.readDouble());
+        this.position = new LocationVO(in.readDouble(), in.readDouble());
 
         try{
             this.users = new ArrayList<UserVO>();
@@ -82,8 +103,8 @@ public class HaystackVO implements Serializable, Parcelable {
         parcel.writeString(timeLimit);
         parcel.writeInt(zoneRadius);
         parcel.writeValue(isCircle);
-        parcel.writeDouble(position.latitude);
-        parcel.writeDouble(position.longitude);
+        parcel.writeDouble(position.getLatitude());
+        parcel.writeDouble(position.getLongitude());
         parcel.writeString(pictureURL);
 
         if(users == null) users = new ArrayList<UserVO>();
@@ -144,8 +165,8 @@ public class HaystackVO implements Serializable, Parcelable {
         ArrayList<Integer> result = new ArrayList<Integer>();
 
         Iterator<UserVO> iterator = users.iterator();
-        while(!iterator.hasNext()){
-            result.add(iterator.next().getUserId());
+        while(iterator.hasNext()){
+            result.add(iterator.next().getId());
         }
 
         return result;
@@ -210,12 +231,20 @@ public class HaystackVO implements Serializable, Parcelable {
         this.isCircle = isCircle;
     }
 
-    public LatLng getPosition() {
+    public LocationVO getPosition() {
         return position;
     }
 
-    public void setPosition(LatLng position) {
+    public LatLng getPositionLatLng() {
+        return position.getLatLng();
+    }
+
+    public void setPosition(LocationVO position) {
         this.position = position;
+    }
+
+    public void setPosition(LatLng position) {
+        this.position = new LocationVO(position.latitude, position.longitude);
     }
 
     public Bitmap getPicture() {

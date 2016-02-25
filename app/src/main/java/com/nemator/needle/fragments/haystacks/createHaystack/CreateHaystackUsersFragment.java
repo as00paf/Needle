@@ -183,7 +183,7 @@ public class CreateHaystackUsersFragment extends CreateHaystackBaseFragment impl
     }
 
     private void updateUserList(){
-        mAdapter = new CreateHaystackUserListCardAdapter(usersList, rootView.getContext());
+        mAdapter = new CreateHaystackUserListCardAdapter(usersList, getActivity());
         mRecyclerView.setAdapter(mAdapter);
 
         mAdapter.notifyDataSetChanged();

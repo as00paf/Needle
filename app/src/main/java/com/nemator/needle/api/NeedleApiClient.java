@@ -1,6 +1,6 @@
 package com.nemator.needle.api;
 
-import com.nemator.needle.models.vo.HaystackVO;
+import com.nemator.needle.models.vo.HaystackUserVO;
 import com.nemator.needle.models.vo.UserVO;
 import com.nemator.needle.tasks.TaskResult;
 import com.nemator.needle.tasks.haystack.HaystackTaskResult;
@@ -9,6 +9,7 @@ import com.nemator.needle.tasks.login.LoginTaskResult;
 import java.util.List;
 
 import retrofit2.Call;
+import retrofit2.http.Body;
 import retrofit2.http.Field;
 import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
@@ -51,7 +52,7 @@ public interface NeedleApiClient {
 
     //Haystacks
     @GET("haystack.php")
-    Call<HaystackTaskResult> getHaystacks(@Query("userId") String userId);
+    Call<HaystackTaskResult> getHaystacks(@Query("userId") int userId);
 
     @FormUrlEncoded
     @POST("haystack.php")
@@ -59,7 +60,7 @@ public interface NeedleApiClient {
                               @Field("isPublic") Boolean isPublic ,@Field("zoneRadius") int zoneRadius,
                               @Field("isCircle") Boolean isCircle,  @Field("lat") double lat,
                               @Field("lng") double lng, @Field("pictureURL")  String pictureURL,
-                              @Field("timeLimit") String timeLimit, @Field("haystack_user") List<Integer> haystackUsers);
+                              @Field("timeLimit") String timeLimit, @Field("haystack_user[]") List<Integer> haystackUsers);
 
     //LocationSharing
     @GET("locationSharing.php")
@@ -68,4 +69,15 @@ public interface NeedleApiClient {
     //Users
     @GET("retrieveAllUsers.php")
     Call<UsersTaskResult> fetchAllUsers(@Query("userId") String userId);
+
+    //Location
+    @PUT("location.php")
+    Call<UserTaskResult> updateLocation(@Body UserVO vo);
+
+    @GET("location.php")
+    Call<UsersTaskResult> retrieveHaystackLocations(@Query("haystackId") int haystackId);
+
+    //HaystackUser
+    @PUT("haystackUser.php")
+    Call<TaskResult> toggleUserActivation(@Body HaystackUserVO vo);
 }

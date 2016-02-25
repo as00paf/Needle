@@ -42,7 +42,7 @@
             android:value="@integer/google_play_services_version" />
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="@string/google_maps_key" />
+            android:value="AIzaSyBZS_9kxDcH5hrUZx3TdD9YP9HhU3vAEF4" />
         <meta-data
             android:name="com.facebook.sdk.ApplicationId"
             android:value="@string/facebook_app_id" />
@@ -87,7 +87,7 @@
         <service android:name=".gcm.GCMIntentService" />
 
         <activity
-            android:name=".activities.CreateHaystack"
+            android:name=".activities.CreateHaystackActivity"
             android:label="@string/create_haystack"
             android:parentActivityName=".activities.HomeActivity"
             android:theme="@style/AppTheme"
@@ -105,6 +105,11 @@
         <meta-data
             android:name="io.fabric.ApiKey"
             android:value="f888d603496f378f655a5065ba9fb53cce72f37a" />
+
+        <activity android:name=".activities.HaystackActivity"
+            android:label="Haystack"
+            android:parentActivityName=".activities.HomeActivity"
+            android:theme="@style/AppTheme"/>
 
     </application>
 

@@ -31,7 +31,7 @@ public class AppConstants {
     public static final String TAG_USER_NAME = "userName";
     public static final String TAG_EMAIL = "email";
     public static final String TAG_PASSWORD = "password";
-    public static final String TAG_USER_ID = "userId";
+    public static final String TAG_USER_ID = "id";
     public static final String TAG_LOGGED_IN = "loggedIn";
     public static final String TAG_FB_ID = "socialNetworkUserId";
     public static final String TAG_TWITTER_ID = "twitterId";

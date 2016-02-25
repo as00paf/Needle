@@ -6,6 +6,7 @@ import android.location.Location;
 import android.os.Binder;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -15,26 +16,34 @@ import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.model.LatLng;
-import com.nemator.needle.models.UserModel;
+import com.nemator.needle.Needle;
+import com.nemator.needle.api.ApiClient;
+import com.nemator.needle.api.UserTaskResult;
+import com.nemator.needle.models.vo.HaystackUserVO;
+import com.nemator.needle.models.vo.LocationVO;
+import com.nemator.needle.models.vo.UserVO;
 import com.nemator.needle.tasks.TaskResult;
 import com.nemator.needle.tasks.db.addPostLocationRequest.AddPostLocationRequestParams;
 import com.nemator.needle.tasks.db.addPostLocationRequest.AddPostLocationRequestTask;
 import com.nemator.needle.tasks.db.isPostLocationRequestDBEmpty.IsPostLocationRequestDBEmptyTask;
 import com.nemator.needle.tasks.db.isPostLocationRequestDBEmpty.IsPostLocationRequestDBEmptyTask.IsPostLocationRequestDBEmptyResponseHandler;
-import com.nemator.needle.tasks.location.LocationTask;
-import com.nemator.needle.tasks.location.LocationTaskParams;
 import com.nemator.needle.tasks.db.removePostLocationRequest.RemovePostLocationRequestTask;
 import com.nemator.needle.utils.AppConstants;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class NeedleLocationService extends Service implements
         GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener,
         LocationListener, AddPostLocationRequestTask.AddPostLocationRequestHandler, IsPostLocationRequestDBEmptyResponseHandler{
 
+    private static final String TAG = "NeedleService";
+
     //Objects
     private final IBinder mBinder = new LocalBinder();
     private GoogleApiClient mGoogleApiClient;
-    public UserModel userModel;
 
     //Data
     private Location mCurrentLocation;
@@ -168,7 +177,6 @@ public class NeedleLocationService extends Service implements
 
         //Post Location
         isPostLocationRequestDBEmpty();
-        postLocation();
     }
 
     private void isPostLocationRequestDBEmpty(){
@@ -182,7 +190,7 @@ public class NeedleLocationService extends Service implements
         if(isNotEmpty){
             if(!mRequestingLocationUpdates){
                 mRequestingLocationUpdates = true;
-                startLocationUpdates();
+                shareLocation();
             }
 
         }else if(!mRequestingLocationUpdates){
@@ -200,13 +208,24 @@ public class NeedleLocationService extends Service implements
 
         mLastUpdatedPosition = mCurrentPosition;
 
-        LocationTaskParams params = new LocationTaskParams(this, LocationTaskParams.TYPE_UPDATE, String.valueOf(userModel.getUserId()), mCurrentPosition);
-        new LocationTask(params).execute();
+        Needle.userModel.getUser().setLocation(new LocationVO(mCurrentPosition));
+
+        ApiClient.getInstance().updateLocation(Needle.userModel.getUser(), new Callback<UserTaskResult>() {
+            @Override
+            public void onResponse(Call<UserTaskResult> call, Response<UserTaskResult> response) {
+                Log.d(TAG, "Location Updated");
+            }
+
+            @Override
+            public void onFailure(Call<UserTaskResult> call, Throwable t) {
+                Log.d(TAG, "Location Update Failed");
+            }
+        });
     }
 
     //Public methods
     public void startLocationUpdates() {
-        if(mGoogleApiClient.isConnected()){
+        if(mGoogleApiClient.isConnected()){//TODO: don't think that's needed anymore
             LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
         }
         mRequestingLocationUpdates = true;

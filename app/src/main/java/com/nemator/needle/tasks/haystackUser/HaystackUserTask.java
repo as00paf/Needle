@@ -186,7 +186,7 @@ public class HaystackUserTask extends AsyncTask<Void, Void, HaystackUserTaskResu
 
                 UserVO user = new UserVO();
                 user.setUserName(name);
-                user.setUserId(id);
+                user.setId(id);
                 user.setGcmRegId(gcmRegId);
 
                 result.users.add(user);

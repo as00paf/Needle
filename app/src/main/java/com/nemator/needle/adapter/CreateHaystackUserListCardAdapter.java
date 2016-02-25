@@ -1,7 +1,9 @@
 package com.nemator.needle.adapter;
 
+import android.app.Activity;
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
+import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -59,7 +61,7 @@ public class CreateHaystackUserListCardAdapter extends RecyclerView.Adapter<Crea
         UserCardViewHolder viewHolder;
         View userCard;
 
-        userCard = LayoutInflater.from(parent.getContext()).inflate(R.layout.create_haystack_user_card_layout, parent, false);
+        userCard = LayoutInflater.from(parent.getContext()).inflate(R.layout.card_user, parent, false);
         viewHolder = new UserCardViewHolder(userCard);
 
         return viewHolder;
@@ -72,13 +74,18 @@ public class CreateHaystackUserListCardAdapter extends RecyclerView.Adapter<Crea
         //User name
         holder.userNameView.setText(user.getUserName());
 
+        int padding = 8 * 2;
+        DisplayMetrics dm = new DisplayMetrics();
+        ((Activity) mContext).getWindowManager().getDefaultDisplay().getMetrics(dm);
+        int width = dm.widthPixels / 2 - padding;
+
+        holder.itemView.getLayoutParams().height  = width;
+
         //Image
-        if(user.getPictureURL() != null){
+        if(!user.getPictureURL().isEmpty()){
             Picasso.with(mContext)
                     .load(user.getPictureURL())
-                    .resize(250, 250)
-                    .centerCrop()
-                    .error(mContext.getResources().getDrawable(R.drawable.person_placeholder))
+                    .resize(width,width)
                     .into(holder.imageView);
         }
 
@@ -116,7 +123,7 @@ public class CreateHaystackUserListCardAdapter extends RecyclerView.Adapter<Crea
                         view.findViewById(R.id.create_haystack_user_card_name_label).setBackgroundColor(view.getContext().getResources().getColor(R.color.primary));
                         selectedItems.add(user);
                     }else{
-                        view.findViewById(R.id.create_haystack_user_card_name_label).setBackgroundColor(0xCCFFFFFF);
+                        view.findViewById(R.id.create_haystack_user_card_name_label).setBackgroundColor(view.getContext().getResources().getColor(android.R.color.transparent));
                         selectedItems.remove(user);
                     }
                 }

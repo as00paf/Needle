@@ -17,4 +17,6 @@
     <dimen name="elevation_high">12dp</dimen>
     <dimen name="status_bar_height">25dp</dimen>
     <dimen name="fab_margin">16dp</dimen>
+
+    <dimen name="login_fab_bottom_margin">4dp</dimen>
 </resources>

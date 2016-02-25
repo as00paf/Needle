@@ -6,7 +6,6 @@ import android.location.Location;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.SystemClock;
-import android.text.TextUtils;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.animation.Interpolator;
@@ -26,37 +25,35 @@ import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.nemator.needle.activities.HomeActivity;
 import com.nemator.needle.Needle;
 import com.nemator.needle.R;
+import com.nemator.needle.activities.HaystackActivity;
+import com.nemator.needle.api.ApiClient;
+import com.nemator.needle.api.UsersTaskResult;
 import com.nemator.needle.broadcastReceiver.LocationServiceBroadcastReceiver;
 import com.nemator.needle.data.LocationServiceDBHelper;
 import com.nemator.needle.models.vo.HaystackVO;
-import com.nemator.needle.service.NeedleLocationService;
+import com.nemator.needle.models.vo.UserVO;
 import com.nemator.needle.tasks.TaskResult;
-import com.nemator.needle.tasks.haystackUser.HaystackUserTask;
-import com.nemator.needle.tasks.haystackUser.HaystackUserTaskParams;
-import com.nemator.needle.tasks.haystackUser.HaystackUserTaskResult;
 import com.nemator.needle.tasks.leaveHaystack.LeaveHaystackParams;
 import com.nemator.needle.tasks.leaveHaystack.LeaveHaystackTask;
-import com.nemator.needle.tasks.location.LocationTask;
-import com.nemator.needle.tasks.location.LocationTask.GetLocationsResponseHandler;
-import com.nemator.needle.tasks.location.LocationTaskParams;
-import com.nemator.needle.tasks.location.LocationTaskResult;
 import com.nemator.needle.utils.AppConstants;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
 public class HaystackMapFragment extends SupportMapFragment
-        implements GetLocationsResponseHandler, HaystackUserTask.HaystackUserActivationTaskHandler,
-        LeaveHaystackTask.LeaveHaystackResponseHandler, LocationServiceBroadcastReceiver.LocationServiceDelegate {
+        implements LeaveHaystackTask.LeaveHaystackResponseHandler, LocationServiceBroadcastReceiver.LocationServiceDelegate {
 
     public static final String TAG = "HaystackMapFragment";
 
     //Locations
-    private ArrayList<HashMap<String, Object>> mLocationList = new ArrayList<HashMap<String, Object>>();
+    private ArrayList<UserVO> usersList = new ArrayList<UserVO>();
     private Location mCurrentLocation;
     private LatLng mCurrentPosition;
 
@@ -66,12 +63,11 @@ public class HaystackMapFragment extends SupportMapFragment
     private Circle mCircle;
 
     //Map data
-    private HashMap<String, Marker> mMarkers;
+    private HashMap<Integer, Marker> mMarkers;
     private HaystackVO haystack;
     private Boolean cameraUpdated = false;
 
     //Location Service
-    private NeedleLocationService locationService;
     private LocationServiceBroadcastReceiver locationServiceBroadcastReceiver;
     private Boolean mPostingLocationUpdates = false;
     private Boolean mRequestingLocationUpdates = true;
@@ -102,8 +98,7 @@ public class HaystackMapFragment extends SupportMapFragment
         }
 
         //Location Service
-        locationService = ((HomeActivity) getActivity()).getLocationService();
-        locationService.startLocationUpdates();
+        Needle.serviceController.initServiceAndStartUpdates(getActivity());
 
         //Broadcast Receiver
         locationServiceBroadcastReceiver = new LocationServiceBroadcastReceiver(this);
@@ -125,7 +120,7 @@ public class HaystackMapFragment extends SupportMapFragment
             }
         }
 
-        haystack = ((HaystackFragment) getParentFragment()).getHaystack();
+        haystack = ((HaystackActivity) getActivity()).getHaystack();
     }
 
     @Override
@@ -142,7 +137,7 @@ public class HaystackMapFragment extends SupportMapFragment
 
     @Override
     public void onResume() {
-        haystack = ((HaystackFragment) getParentFragment()).getHaystack();
+        haystack = ((HaystackActivity) getActivity()).getHaystack();
         getActivity().registerReceiver(locationServiceBroadcastReceiver, new IntentFilter(AppConstants.LOCATION_UPDATED));
 
         super.onResume();
@@ -153,7 +148,7 @@ public class HaystackMapFragment extends SupportMapFragment
         super.onDetach();
 
         if(isActivated == false)
-            locationService.stopLocationUpdates();
+            Needle.serviceController.getService().stopLocationUpdates();
     }
 
     @Override
@@ -177,8 +172,8 @@ public class HaystackMapFragment extends SupportMapFragment
             case R.id.location_sharing:
                 toggleLocationSharing();
                 item.setIcon(isPostingLocationUpdates() ?
-                        getResources().getDrawable(R.drawable.ic_action_location_found) :
-                        getResources().getDrawable(R.drawable.ic_action_location_off));
+                        getResources().getDrawable(R.drawable.ic_my_location_white_24dp) :
+                        getResources().getDrawable(R.drawable.ic_location_disabled_white_24dp));
                 return true;
             case R.id.menu_option_leave:
                 leaveHaystack();
@@ -204,7 +199,8 @@ public class HaystackMapFragment extends SupportMapFragment
     public void setUpMapIfNeeded() {
         if (mMap == null) {
             mMap = getMap();
-        }else if(locationService.isConnected()){
+            mMap.getUiSettings().setMyLocationButtonEnabled(true);
+        }else if(Needle.serviceController.isConnected()){
             resumeOperations();
         }
     }
@@ -221,20 +217,21 @@ public class HaystackMapFragment extends SupportMapFragment
             }
         }
 
-        //Log.i(TAG,"Markers to add : "+mLocationList.size());
-        if(mLocationList != null){
-            for (int i = 0; i < mLocationList.size(); i++) {
-                HashMap<String, Object> map = mLocationList.get(i);
-                String id = map.get(AppConstants.TAG_USER_ID).toString();
-                Double lat = (Double) map.get(AppConstants.TAG_LAT);
-                Double lng = (Double) map.get(AppConstants.TAG_LNG);
+        if(usersList != null && usersList.size() > 0){
+            Iterator<UserVO> iterator = usersList.iterator();
+            while(iterator.hasNext()){
+                UserVO user = iterator.next();
 
-                if(!TextUtils.isEmpty(id) && !id.equals(Needle.userModel.getUserId())){
+                int id =  user.getId();
+                Double lat = user.getLocation().getLatitude();
+                Double lng = user.getLocation().getLongitude();
+
+                if(id != Needle.userModel.getUserId()){
                     Marker marker;
                     LatLng position = new LatLng(lat, lng);
 
                     if(mMarkers == null){
-                        mMarkers = new HashMap<String, Marker>();
+                        mMarkers = new HashMap<Integer, Marker>();
                     }
 
                     if(mMarkers.containsKey(id)){
@@ -252,7 +249,7 @@ public class HaystackMapFragment extends SupportMapFragment
                         }
 
                         //marker.showInfoWindow();
-                    }else if(!id.equals(String.valueOf(Needle.userModel.getUserId()))){
+                    }else{
                         MarkerOptions markerOptions = new MarkerOptions();
                         markerOptions.position(position);
 
@@ -262,9 +259,9 @@ public class HaystackMapFragment extends SupportMapFragment
                         marker = mMap.addMarker(markerOptions);
                         marker.setPosition(position);
 
-                        //Log.i(TAG,"Adding marker with id : "+id+" to map.");
+                        Log.i(TAG,"Adding marker with id : "+id+" to map.");
 
-                        String name = map.get(AppConstants.TAG_USER_NAME).toString();
+                        String name = user.getUserName();
                         marker.setTitle(name+"'s Position");
                         marker.showInfoWindow();
 
@@ -278,23 +275,25 @@ public class HaystackMapFragment extends SupportMapFragment
         if(mMarkers != null){
             Iterator markerIterator = mMarkers.keySet().iterator();
             while(markerIterator.hasNext()) {
-                String markerId =(String) markerIterator.next();
+                int markerId = (int) markerIterator.next();
                 Marker marker = (Marker) mMarkers.get(markerId);
 
                 Boolean isActive = false;
 
-                for (int i = 0; i < mLocationList.size(); i++) {
-                    HashMap<String, Object> map = mLocationList.get(i);
-                    String id = map.get(AppConstants.TAG_USER_ID).toString();
+                if(usersList != null){
+                    Iterator<UserVO> iterator = usersList.iterator();
+                    while(iterator.hasNext()){
+                        UserVO user = iterator.next();
 
-                    if(id.equals(markerId)){
-                        isActive = true;
+                        if(user.getId() == markerId){
+                            isActive = true;
+                        }
                     }
-                }
 
-                if(!isActive){
-                    marker.remove();
-                    mMarkers.remove(marker);
+                    if(!isActive){
+                        marker.remove();
+                        mMarkers.remove(marker);
+                    }
                 }
             }
         }
@@ -314,15 +313,17 @@ public class HaystackMapFragment extends SupportMapFragment
         }
 
         //Add other user's markers back
-        if(mLocationList!=null){
-            Log.i(TAG,"Markers to add : "+mLocationList.size());
-            for (int i = 0; i < mLocationList.size(); i++) {
-                HashMap<String, Object> map = mLocationList.get(i);
-                String id = map.get(AppConstants.TAG_USER_ID).toString();
-                Double lat = (Double) map.get(AppConstants.TAG_LAT);
-                Double lng = (Double) map.get(AppConstants.TAG_LNG);
+        if(usersList!=null){
+            Log.i(TAG,"Markers to add : "+usersList.size());
+            Iterator<UserVO> iterator = usersList.iterator();
+            while(iterator.hasNext()){
+                UserVO user = iterator.next();
 
-                if(!TextUtils.isEmpty(id) && !id.equals(Needle.userModel.getUserId())){
+                int id = user.getId();
+                Double lat = user.getLocation().getLatitude();
+                Double lng = user.getLocation().getLongitude();
+
+                if(id != Needle.userModel.getUserId()){
                     Marker marker;
                     LatLng position = new LatLng(lat, lng);
 
@@ -355,55 +356,92 @@ public class HaystackMapFragment extends SupportMapFragment
 
     //Actions
     public void retrieveLocations(){
-        LocationTaskParams params = LocationTaskParams.newLocationHaystackTaskParams(getActivity(), LocationTaskParams.TYPE_GET, String.valueOf(haystack.getId()));
-        try{
-            new LocationTask(params, this).execute();
-        }catch (Exception e){
-            mLocationList = null;
-        }
-    }
+        ApiClient.getInstance().retrieveHaystackUserLocations(haystack.getId(), new Callback<UsersTaskResult>() {
+            @Override
+            public void onResponse(Call<UsersTaskResult> call, Response<UsersTaskResult> response) {
+                UsersTaskResult result = response.body();
 
-    public void onLocationsFetched(LocationTaskResult result){
-        if(result.successCode == 1){
-            mLocationList = result.locationList;
-            updateMap();
-        }
+                if (result.getSuccessCode() == 1) {
+                    //Log.d(TAG, "Retrieving locations success !");
+
+                    usersList = result.getUsers();
+                    updateMap();
+                }else{
+                    Log.d(TAG, "Retrieving locations failed : " + result.getMessage());
+
+                }
+            }
+
+            @Override
+            public void onFailure(Call<UsersTaskResult> call, Throwable t) {
+                Log.d(TAG, "Retrieving locations failed ! Error : " + t.getMessage());
+                usersList = null;
+            }
+        });
     }
 
     public void activateUser(){
-        HaystackUserTaskParams params = new HaystackUserTaskParams(getActivity(), HaystackUserTaskParams.TYPE_ACTIVATION, String.valueOf(Needle.userModel.getUserId()), String.valueOf(haystack.getId()), true);
-        isActivated = false;
+        Log.d(TAG, "Activating user");
 
-        try{
-            HaystackUserTask task = new HaystackUserTask(params, this);
-            task.execute();
-        }catch (Exception e){
-            Toast.makeText(getActivity(), getString(R.string.sharing_location_error), Toast.LENGTH_SHORT).show();
-        }
+        ApiClient.getInstance().activateUser(Needle.userModel.getUser(), haystack, new Callback<TaskResult>() {
+            @Override
+            public void onResponse(Call<TaskResult> call, Response<TaskResult> response) {
+                TaskResult result = response.body();
+                isActivated = result.getSuccessCode() == 1;
+
+                MenuItem item = ((HaystackActivity) getActivity()).getMenu().findItem(R.id.location_sharing);
+                item.setIcon(isActivated ?
+                        getResources().getDrawable(R.drawable.ic_location_disabled_white_24dp) :
+                        getResources().getDrawable(R.drawable.ic_my_location_white_24dp));
+
+                if(!isActivated){
+                    Toast.makeText(getActivity(), "Error Sharing Location", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<TaskResult> call, Throwable t) {
+                MenuItem item = ((HaystackActivity) getActivity()).getMenu().findItem(R.id.location_sharing);
+                item.setIcon(isActivated ?
+                        getResources().getDrawable(R.drawable.ic_location_disabled_white_24dp) :
+                        getResources().getDrawable(R.drawable.ic_my_location_white_24dp));
+
+                Toast.makeText(getActivity(), "Error Sharing Location", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     public void deactivateUser(){
-        HaystackUserTaskParams params = new HaystackUserTaskParams(getActivity(), HaystackUserTaskParams.TYPE_ACTIVATION, String.valueOf(Needle.userModel.getUserId()), String.valueOf(haystack.getId()), false);
+        Log.d(TAG, "Deactivating user");
 
-        try{
-            HaystackUserTask task = new HaystackUserTask(params, this);
-            task.execute();
-        }catch (Exception e){
-            Toast.makeText(getActivity(), getString(R.string.unsharing_location_error), Toast.LENGTH_SHORT).show();
-        }
-    }
+        Needle.userModel.getUser().setIsActive(false);
 
-    public void onUserActivationToggled(HaystackUserTaskResult result){
-        isActivated = result.isActive;
+        ApiClient.getInstance().deactivateUser(Needle.userModel.getUser(), haystack, new Callback<TaskResult>() {
+            @Override
+            public void onResponse(Call<TaskResult> call, Response<TaskResult> response) {
+                TaskResult result = response.body();
+                isActivated = !(result.getSuccessCode() == 1);
 
-        MenuItem item = Needle.navigationController.getMenu().findItem(R.id.location_sharing);
-        item.setIcon(isActivated ?
-                getResources().getDrawable(R.drawable.ic_action_location_found) :
-                getResources().getDrawable(R.drawable.ic_action_location_off));
+                MenuItem item = ((HaystackActivity) getActivity()).getMenu().findItem(R.id.location_sharing);
+                item.setIcon(!isActivated ?
+                        getResources().getDrawable(R.drawable.ic_my_location_white_24dp) :
+                        getResources().getDrawable(R.drawable.ic_location_disabled_white_24dp));
 
-        if(!isActivated){
-            Toast.makeText(getActivity(), "Error Sharing Location", Toast.LENGTH_SHORT).show();
-        }
+                if (response.body().getSuccessCode() == 0) {
+                    Toast.makeText(getActivity(), "Error Deactivating User", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<TaskResult> call, Throwable t) {
+                MenuItem item = ((HaystackActivity) getActivity()).getMenu().findItem(R.id.location_sharing);
+                item.setIcon(isActivated ?
+                        getResources().getDrawable(R.drawable.ic_my_location_white_24dp) :
+                        getResources().getDrawable(R.drawable.ic_location_disabled_white_24dp));
+
+                Toast.makeText(getActivity(), "Error Deactivating User", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     private void leaveHaystack(){
@@ -430,13 +468,17 @@ public class HaystackMapFragment extends SupportMapFragment
     public void shareLocation(){
         mPostingLocationUpdates = true;
         activateUser();
-        locationService.addPostLocationRequest(LocationServiceDBHelper.PostLocationRequest.POSTER_TYPE_HAYSTACK, haystack.getTimeLimit(), haystack.getOwner(), String.valueOf(haystack.getId()));
-        locationService.postLocation();
+        Needle.serviceController.getService()
+                .addPostLocationRequest(LocationServiceDBHelper.PostLocationRequest.POSTER_TYPE_HAYSTACK, haystack.getTimeLimit(), haystack.getOwner(), String.valueOf(haystack.getId()));
+
+        Needle.serviceController.getService()
+                .postLocation();
     }
 
     public void stopSharingLocation(){
         mPostingLocationUpdates = false;
-        locationService.removePostLocationRequest(LocationServiceDBHelper.PostLocationRequest.POSTER_TYPE_HAYSTACK, haystack.getTimeLimit(), haystack.getOwner(), String.valueOf(haystack.getId()));
+        Needle.serviceController.getService()
+                .removePostLocationRequest(LocationServiceDBHelper.PostLocationRequest.POSTER_TYPE_HAYSTACK, haystack.getTimeLimit(), haystack.getOwner(), String.valueOf(haystack.getId()));
         deactivateUser();
     }
 

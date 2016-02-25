@@ -202,7 +202,7 @@ public class CreateLocationSharingFragment extends Fragment implements RetrieveU
         locationSharingVO.setSenderName(Needle.userModel.getUserName());
 
         //Receiver
-        locationSharingVO.setReceiverId(selectedUser.getUserId());
+        locationSharingVO.setReceiverId(selectedUser.getId());
         locationSharingVO.setReceiverName(selectedUser.getUserName());
 
         //Options

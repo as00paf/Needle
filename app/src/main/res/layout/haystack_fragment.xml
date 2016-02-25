@@ -1,15 +1,11 @@
-<com.sothree.slidinguppanel.SlidingUpPanelLayout
+<LinearLayout
     xmlns:sothree="http://schemas.android.com/apk/res-auto"
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/sliding_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:gravity="bottom"
-    sothree:umanoPanelHeight="160dp"
-    sothree:umanoShadowHeight="0dp"
-    sothree:umanoParalaxOffset="1dp"
-    sothree:umanoDragView="@+id/dragView"
-    sothree:umanoOverlay="true">
+    android:orientation="vertical">
 
     <!-- Map -->
     <fragment
@@ -29,7 +25,7 @@
         android:id="@+id/dragView">
 
         <!-- FAB -->
-        <FloatingActionButton
+        <android.support.design.widget.FloatingActionButton
             android:id="@+id/fab_add_users"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -79,4 +75,4 @@
             </LinearLayout>
         </LinearLayout>
     </RelativeLayout>
-</com.sothree.slidinguppanel.SlidingUpPanelLayout>
+</LinearLayout>

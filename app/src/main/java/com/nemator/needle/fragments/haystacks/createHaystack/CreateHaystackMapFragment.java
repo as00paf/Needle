@@ -44,7 +44,7 @@ import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Polygon;
 import com.nemator.needle.Needle;
 import com.nemator.needle.R;
-import com.nemator.needle.activities.CreateHaystack;
+import com.nemator.needle.activities.CreateHaystackActivity;
 import com.nemator.needle.controller.GoogleMapCameraController;
 import com.nemator.needle.controller.GoogleMapCameraControllerConfig;
 import com.nemator.needle.tasks.getAutoCompleteResults.GetAutoCompleteResultsTask;
@@ -222,7 +222,11 @@ public class CreateHaystackMapFragment extends CreateHaystackBaseFragment{
                 if (googleMap != null) {
                     CreateHaystackMapFragment.this.googleMap = googleMap;
 
-                    googleMap.setMyLocationEnabled(true);
+                    if(PermissionManager.getInstance(getActivity()).isPermissionGranted(Manifest.permission.ACCESS_FINE_LOCATION)){
+                        googleMap.setMyLocationEnabled(true);
+                    }else{
+                        PermissionManager.getInstance(getActivity()).requestPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION);
+                    }
                     googleMap.getUiSettings().setMyLocationButtonEnabled(false);
                     googleMap.getUiSettings().setScrollGesturesEnabled(true);
 
@@ -385,7 +389,7 @@ public class CreateHaystackMapFragment extends CreateHaystackBaseFragment{
                 InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(getActivity().INPUT_METHOD_SERVICE);
                 imm.hideSoftInputFromWindow(searchView.getWindowToken(), 0);
 
-                ActionBar action = ((CreateHaystack) getActivity()).getSupportActionBar();
+                ActionBar action = ((CreateHaystackActivity) getActivity()).getSupportActionBar();
                 mSearchAction.setIcon(getResources().getDrawable(R.drawable.ic_search_white_24dp));
                 action.setTitle(getResources().getString(R.string.app_name));
                 action.setDisplayShowCustomEnabled(false);
@@ -523,7 +527,7 @@ public class CreateHaystackMapFragment extends CreateHaystackBaseFragment{
         InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(getActivity().INPUT_METHOD_SERVICE);
         imm.hideSoftInputFromWindow(searchView.getWindowToken(), 0);
 
-        ActionBar action = ((CreateHaystack) getActivity()).getSupportActionBar();
+        ActionBar action = ((CreateHaystackActivity) getActivity()).getSupportActionBar();
         mSearchAction.collapseActionView();
         mSearchAction.setIcon(getResources().getDrawable(R.drawable.ic_search_white_24dp));
         action.setTitle(getResources().getString(R.string.app_name));
@@ -540,6 +544,7 @@ public class CreateHaystackMapFragment extends CreateHaystackBaseFragment{
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
 
         if(permissions[0] == Manifest.permission.ACCESS_FINE_LOCATION && grantResults[0] == PackageManager.PERMISSION_GRANTED){
+            googleMap.setMyLocationEnabled(true);
             addPlaceSuggestion();
         }
     }

@@ -8,6 +8,7 @@ import com.nemator.needle.controller.AuthenticationController;
 import com.nemator.needle.controller.GCMController;
 import com.nemator.needle.controller.GoogleAPIController;
 import com.nemator.needle.controller.NavigationController;
+import com.nemator.needle.controller.NeedleServiceController;
 import com.nemator.needle.controller.NetworkController;
 import com.nemator.needle.models.UserModel;
 import com.twitter.sdk.android.Twitter;
@@ -32,6 +33,7 @@ public class Needle extends MultiDexApplication {
     public static final NavigationController navigationController = NavigationController.getInstance();
     public static final GCMController gcmController = GCMController.getInstance();
     public static final GoogleAPIController googleApiController = GoogleAPIController.getInstance();
+    public static final NeedleServiceController serviceController = NeedleServiceController.getInstance();
 
     public Needle() {
         super();

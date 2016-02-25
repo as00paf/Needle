@@ -1,17 +1,24 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    tools:context=".activities.HomeActivity">
+    xmlns:tools="http://schemas.android.com/tools">
 
-    <item android:id="@+id/location_sharing" android:description="@string/shareLocation"
-        app:showAsAction="always" android:icon="@drawable/ic_action_location_off"/>
+    <item android:id="@+id/location_sharing"
+        android:description="@string/shareLocation"
+        android:title="@string/shareLocation"
+        app:showAsAction="always" android:icon="@drawable/ic_my_location_white_24dp"/>
 
-    <item android:id="@+id/menu_option_leave" android:description="@string/leave_haystack"
+    <item android:id="@+id/menu_option_leave"
+        android:description="@string/leave_haystack"
+        android:title="@string/leave_haystack"
         app:showAsAction="never" android:icon="@drawable/ic_action_exit"/>
 
-    <item android:id="@+id/menu_option_settings" android:description="@string/action_settings"
+    <item android:id="@+id/menu_option_settings"
+        android:description="@string/action_settings"
+        android:title="@string/action_settings"
         app:showAsAction="never" android:icon="@drawable/ic_action_settings"/>
 
-    <item android:id="@+id/menu_option_help" android:description="@string/title_helpAndSupport"
+    <item android:id="@+id/menu_option_help"
+        android:description="@string/title_helpAndSupport"
+        android:title="@string/title_helpAndSupport"
         app:showAsAction="never" android:icon="@drawable/ic_action_help"/>
 </menu>

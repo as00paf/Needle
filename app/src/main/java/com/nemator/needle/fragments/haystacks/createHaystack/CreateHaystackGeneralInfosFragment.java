@@ -17,7 +17,7 @@ import android.widget.TextView;
 import android.widget.TimePicker;
 
 import com.nemator.needle.R;
-import com.nemator.needle.activities.CreateHaystack;
+import com.nemator.needle.activities.CreateHaystackActivity;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -150,7 +150,7 @@ public class CreateHaystackGeneralInfosFragment extends CreateHaystackBaseFragme
         super.onAttach(activity);
 
         try {
-            privacySettingsCallback = (CreateHaystack) getActivity();
+            privacySettingsCallback = (CreateHaystackActivity) getActivity();
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString()
                     + " must implement OnHeadlineSelectedListener");

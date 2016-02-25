@@ -2,10 +2,11 @@ package com.nemator.needle.controller;
 
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
+import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -25,14 +26,14 @@ import android.widget.Toast;
 
 import com.nemator.needle.Needle;
 import com.nemator.needle.R;
-import com.nemator.needle.activities.CreateHaystack;
+import com.nemator.needle.activities.CreateHaystackActivity;
+import com.nemator.needle.activities.HaystackActivity;
 import com.nemator.needle.activities.HomeActivity;
 import com.nemator.needle.api.ApiClient;
 import com.nemator.needle.data.LocationServiceDBHelper.PostLocationRequest;
 import com.nemator.needle.fragments.authentication.LoginFragment;
 import com.nemator.needle.fragments.authentication.LoginSplashFragment;
 import com.nemator.needle.fragments.authentication.RegisterFragment;
-import com.nemator.needle.fragments.haystack.HaystackFragment;
 import com.nemator.needle.fragments.haystacks.HaystackListFragment;
 import com.nemator.needle.fragments.haystacks.OnActivityStateChangeListener;
 import com.nemator.needle.fragments.haystacks.createHaystack.CreateHaystackFragment;
@@ -76,7 +77,6 @@ public class NavigationController implements HomeActivity.NavigationHandler, OnA
     private LocationSharingListFragment locationSharingListFragment;
     private CreateHaystackFragment createHaystackFragment;
     private SettingsFragment settingsFragment;
-    private HaystackFragment haystackFragment;
     private CreateLocationSharingFragment createLocationSharingFragment;
     private LocationSharingFragment locationSharingFragment;
     private PeopleFragment peopleFragment;
@@ -146,6 +146,10 @@ public class NavigationController implements HomeActivity.NavigationHandler, OnA
     }
 
     public void showSection(int type){
+        showSection(type, null);
+    }
+
+    public void showSection(int type, Bundle bundle){
         int containerViewId = (getCurrentFragment() != null) ? getCurrentFragment().getId() : content.getId();
         Boolean add = false;
         Fragment newFragment = null;
@@ -196,14 +200,8 @@ public class NavigationController implements HomeActivity.NavigationHandler, OnA
                     exitAnimation = R.anim.exit_to_right;
                 }
                 break;
-            case AppConstants.SECTION_HAYSTACK:
-                if(haystackFragment == null) haystackFragment = new HaystackFragment();
-                newFragment = haystackFragment;
-
-                onStateChange(AppState.HAYSTACK);
-                break;
             case AppConstants.SECTION_CREATE_HAYSTACK:
-                Intent intent = new Intent(activity, CreateHaystack.class);
+                Intent intent = new Intent(activity, CreateHaystackActivity.class);
                 activity.startActivity(intent);
                 return;
             case AppConstants.SECTION_LOCATION_SHARING:
@@ -241,7 +239,7 @@ public class NavigationController implements HomeActivity.NavigationHandler, OnA
                 manager.beginTransaction()
                         .setCustomAnimations(enterAnimation, exitAnimation)
                         .replace(containerViewId, newFragment)
-                        .commit();
+                        .commitAllowingStateLoss();
             }
         }
 
@@ -450,14 +448,9 @@ public class NavigationController implements HomeActivity.NavigationHandler, OnA
 
     @Override
     public void onClickHaystackCard(HaystackVO haystack) {
-        //Add/Remove Sections
-        haystackFragment = new HaystackFragment();
-        haystackFragment.setHaystack(haystack);
-        //haystackSection = activity.newSection(haystack.getName(), R.drawable.ic_haystack, haystackFragment);
-        //activity.addSectionAt(haystackSection, 1);
-
-        //showHaystackFragment(haystack.getName());
-        showSection(AppConstants.SECTION_HAYSTACK);
+        Intent haystackIntent = new Intent(activity, HaystackActivity.class);
+        haystackIntent.putExtra(AppConstants.TAG_HAYSTACK, (Parcelable) haystack);
+        activity.startActivity(haystackIntent);
     }
 
     //LocationSharingListFragmentInteractionListener
@@ -484,14 +477,14 @@ public class NavigationController implements HomeActivity.NavigationHandler, OnA
     public void onLocationSharingUpdated(LocationSharingResult result) {
         if(result.successCode == 1){
             if(result.vo.getShareBack()){
-                activity.getLocationService().startLocationUpdates();
-                activity.getLocationService().addPostLocationRequest(PostLocationRequest.POSTER_TYPE_LOCATION_SHARING_BACK,
+                Needle.serviceController.startLocationUpdates();
+                Needle.serviceController.getService().addPostLocationRequest(PostLocationRequest.POSTER_TYPE_LOCATION_SHARING_BACK,
                         result.vo.getTimeLimit(), result.vo.getSenderId(),
                         String.valueOf(result.vo.getId()));
 
                 Toast.makeText(activity, "Location shared with " + result.vo.getReceiverName(), Toast.LENGTH_SHORT).show();
             }else{
-                activity.getLocationService().removePostLocationRequest(PostLocationRequest.POSTER_TYPE_LOCATION_SHARING_BACK,
+                Needle.serviceController.getService().removePostLocationRequest(PostLocationRequest.POSTER_TYPE_LOCATION_SHARING_BACK,
                                                                         result.vo.getTimeLimit(), result.vo.getSenderId(),
                                                                         String.valueOf(result.vo.getId()));
 
@@ -516,22 +509,11 @@ public class NavigationController implements HomeActivity.NavigationHandler, OnA
         if(result.getSuccessCode() == 0){
             Toast.makeText(activity, "An error occured while creating Haystack", Toast.LENGTH_SHORT).show();
         }else{
-            FragmentManager manager = activity.getSupportFragmentManager();
-            FragmentTransaction trans = manager.beginTransaction();
-            trans.remove(createHaystackFragment);
-            trans.commit();
-
             Toast.makeText(activity, activity.getResources().getString(R.string.haystack_created), Toast.LENGTH_SHORT).show();
 
-            //Add/Remove Sections
-            haystackFragment = new HaystackFragment();
-            haystackFragment.setHaystack(result.getHaystack());
-            //haystackSection = activity.newSection(result.haystack.getName(), R.drawable.ic_haystack, haystackFragment);
-            //activity.addSectionAt(haystackSection, 1);
-
-            //showHaystackFragment(result.haystack.getName());
-            showSection(AppConstants.SECTION_HAYSTACK);
-            onStateChange(AppState.HAYSTACK);
+            Intent haystackIntent = new Intent(activity, HaystackActivity.class);
+            haystackIntent.putExtra(AppConstants.TAG_HAYSTACK, (Parcelable) result.getHaystack());
+            activity.startActivity(haystackIntent);
         }
     }
 
@@ -545,8 +527,8 @@ public class NavigationController implements HomeActivity.NavigationHandler, OnA
     @Override
     public void onLocationSharingCreated(LocationSharingResult result) {
         if(result.successCode == 1){
-            activity.getLocationService().startLocationUpdates();
-            activity.getLocationService().addPostLocationRequest(PostLocationRequest.POSTER_TYPE_LOCATION_SHARING,
+            Needle.serviceController.startLocationUpdates();
+            Needle.serviceController.getService().addPostLocationRequest(PostLocationRequest.POSTER_TYPE_LOCATION_SHARING,
                     result.vo.getTimeLimit(), result.vo.getSenderId(), String.valueOf(result.vo.getId()));
             Toast.makeText(activity, "Location shared with " + result.vo.getReceiverName(), Toast.LENGTH_SHORT).show();
             showSection(AppConstants.SECTION_LOCATION_SHARING_LIST);
@@ -559,11 +541,6 @@ public class NavigationController implements HomeActivity.NavigationHandler, OnA
         showSection(AppConstants.SECTION_LOCATION_SHARING);
         locationSharingFragment.setLocationSharing(vo);
         locationSharingFragment.setIsSent(false);
-    }
-
-    public void showReceivedHaystack(HaystackVO vo){
-        showSection(AppConstants.SECTION_HAYSTACK);
-        haystackFragment.setHaystack(vo);
     }
 
     public void setAccount(){
@@ -627,10 +604,6 @@ public class NavigationController implements HomeActivity.NavigationHandler, OnA
     }
 
     //Getters/Setters
-    public HaystackFragment getHaystackFragment() {
-        return haystackFragment;
-    }
-
     public void setHaystacksCount(int count) {
         // if(count>0)
         //  haystacksSection.setNotifications(count);
@@ -702,10 +675,14 @@ public class NavigationController implements HomeActivity.NavigationHandler, OnA
             case AppState.PUBLIC_HAYSTACK_TAB:
             case AppState.PRIVATE_HAYSTACK_TAB:
                 return haystacksListFragment;
-            case AppState.HAYSTACK:
-                return haystackFragment;
             case AppState.SETTINGS:
                 return settingsFragment;
+            case AppState.CREATE_HAYSTACK_GENERAL_INFOS:
+            case AppState.CREATE_HAYSTACK_MAP:
+            case AppState.CREATE_HAYSTACK_MAP_SEARCH_OPEN:
+            case AppState.CREATE_HAYSTACK_USERS:
+            case AppState.CREATE_HAYSTACK_USERS_SEARCH_OPEN:
+                return createHaystackFragment;
         }
 
         return null;

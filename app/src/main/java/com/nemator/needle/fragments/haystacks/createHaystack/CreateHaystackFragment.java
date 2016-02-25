@@ -497,7 +497,7 @@ public class CreateHaystackFragment extends CreateHaystackBaseFragment implement
 
         //Current User
         UserVO user = new UserVO();
-        user.setUserId(getUserId());
+        user.setId(getUserId());
         user.setUserName(getUserName());
 
         //Users

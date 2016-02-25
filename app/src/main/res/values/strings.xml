@@ -3,6 +3,7 @@
 
     <!-- App -->
     <string name="app_name">Needle</string>
+    <string name="google_maps_key">AIzaSyBZS_9kxDcH5hrUZx3TdD9YP9HhU3vAEF4</string>
     <string name="facebook_app_id">1085989064752650</string>
     <string name="facebook_secret">686ec7dd8b37e4eede018a34bf11ba5b</string>
     <string name="title_activity_maps">Needle</string>

@@ -2,6 +2,7 @@ package com.nemator.needle.api;
 
 import android.util.Log;
 
+import com.nemator.needle.models.vo.HaystackUserVO;
 import com.nemator.needle.models.vo.HaystackVO;
 import com.nemator.needle.models.vo.UserVO;
 import com.nemator.needle.tasks.TaskResult;
@@ -77,14 +78,14 @@ public class ApiClient {
     }
 
     public void fetchHaystacks(int userId,  Callback<HaystackTaskResult> callBack) {
-        Call<HaystackTaskResult> call = client.getHaystacks(String.valueOf(userId));
+        Call<HaystackTaskResult> call = client.getHaystacks(userId);
         call.enqueue(callBack);
     }
 
     public void createHaystack(HaystackVO vo,  Callback<HaystackTaskResult> callBack){
         Call<HaystackTaskResult> call = client.createHaystack(vo.getName(),
-                vo.getOwner(), vo.getIsPublic(), vo.getZoneRadius(), vo.getIsCircle(), vo.getPosition().latitude,
-                vo.getPosition().longitude, vo.getPictureURL(), vo.getTimeLimit(), vo.getUserIds());
+                vo.getOwner(), vo.getIsPublic(), vo.getZoneRadius(), vo.getIsCircle(), vo.getPosition().getLongitude(),
+                vo.getPosition().getLatitude(), vo.getPictureURL(), vo.getTimeLimit(), vo.getUserIds());
         call.enqueue(callBack);
     }
 
@@ -95,6 +96,27 @@ public class ApiClient {
 
     public void fetchAllUsers(int userId,  Callback<UsersTaskResult> callBack) {
         Call<UsersTaskResult> call = client.fetchAllUsers(String.valueOf(userId));
+        call.enqueue(callBack);
+    }
+
+    public void updateLocation(UserVO user, Callback<UserTaskResult> callBack) {
+        Call<UserTaskResult> call = client.updateLocation(user);
+        call.enqueue(callBack);
+    }
+
+    public void retrieveHaystackUserLocations(int haystackId, Callback<UsersTaskResult> callBack){
+        Call<UsersTaskResult> call = client.retrieveHaystackLocations(haystackId);
+        call.enqueue(callBack);
+    }
+
+    public void activateUser(UserVO user, HaystackVO haystack, Callback<TaskResult> callBack) {
+        user.setIsActive(true);
+        Call<TaskResult> call = client.toggleUserActivation(new HaystackUserVO(haystack, user));
+        call.enqueue(callBack);
+    }
+
+    public void deactivateUser(UserVO user, HaystackVO haystack, Callback<TaskResult> callBack) {
+        Call<TaskResult> call = client.toggleUserActivation(new HaystackUserVO(haystack, user));
         call.enqueue(callBack);
     }
 }

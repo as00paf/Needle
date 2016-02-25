@@ -11,17 +11,20 @@ import java.io.Serializable;
 
 public class UserVO implements Serializable, Parcelable{
 
-    @SerializedName("userId")
-    private int userId = -1;
-
-    @SerializedName("userName")
-    private String userName;
+    @SerializedName("id")
+    private int id = -1;
 
     @SerializedName("email")
     private String email;
 
+    @SerializedName("username")
+    private String userName;
+
     @SerializedName("password")
     private String password;
+
+    @SerializedName("gcmRegId")
+    private String gcmRegId;
 
     @SerializedName("pictureURL")
     private String pictureURL="";
@@ -29,14 +32,17 @@ public class UserVO implements Serializable, Parcelable{
     @SerializedName("coverPictureURL")
     private String coverPictureURL="";
 
-    @SerializedName("gcmRegId")
-    private String gcmRegId;
-
     @SerializedName("socialNetworkUserId")
     private String socialNetworkUserId;
 
     @SerializedName("loginType")
     private int loginType = 0;
+
+    @SerializedName("isActive")
+    private Boolean isActive;
+
+    @SerializedName("location")
+    private LocationVO location;
 
     /**
      *
@@ -46,20 +52,20 @@ public class UserVO implements Serializable, Parcelable{
     }
 
     /**
-     * @param userId
+     * @param id
      * @param userName
      * @param pictureURL
      * @param gcmRegId
      */
-    public UserVO(int userId, String userName, String pictureURL, String gcmRegId){
-        this.userId = userId;
+    public UserVO(int id, String userName, String pictureURL, String gcmRegId){
+        this.id = id;
         this.userName = userName;
         this.pictureURL = pictureURL;
         this.gcmRegId = gcmRegId;
     }
 
     /**
-     * @param userId id of user
+     * @param id id of user
      * @param userName username
      * @param email email
      * @param password password
@@ -67,9 +73,11 @@ public class UserVO implements Serializable, Parcelable{
      * @param gcmRegId Google Registration Id
      * @param loginType login type
      * @param socialNetworkUserId Facebook/Google/Twitter id
+     * @param isActive
+     * @param location
      */
-    public UserVO(int userId, String userName, String email, String password, String pictureURL, String gcmRegId, int loginType, String socialNetworkUserId){
-        this.userId = userId;
+    public UserVO(int id, String userName, String email, String password, String pictureURL, String gcmRegId, int loginType, String socialNetworkUserId, Boolean isActive, LocationVO location){
+        this.id = id;
         this.userName = userName;
         this.email = email;
         this.password = password;
@@ -77,13 +85,15 @@ public class UserVO implements Serializable, Parcelable{
         this.gcmRegId = gcmRegId;
         this.loginType = loginType;
         this.socialNetworkUserId = socialNetworkUserId;
+        this.isActive = isActive;
+        this.location = location;
     }
 
     /**
      * @param in
      */
     public UserVO(Parcel in){
-        userId = in.readInt();
+        id = in.readInt();
         userName = in.readString();
         email = in.readString();
         password = in.readString();
@@ -92,14 +102,15 @@ public class UserVO implements Serializable, Parcelable{
         loginType = in.readInt();
         socialNetworkUserId = in.readString();
         coverPictureURL = in.readString();
+        isActive = (Boolean) in.readValue(Boolean.class.getClassLoader());
     }
 
-    public int getUserId() {
-        return userId;
+    public int getId() {
+        return id;
     }
 
-    public UserVO setUserId(int userId) {
-        this.userId = userId;
+    public UserVO setId(int id) {
+        this.id = id;
         return this;
     }
 
@@ -182,7 +193,7 @@ public class UserVO implements Serializable, Parcelable{
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeInt(userId);
+        dest.writeInt(id);
         dest.writeString(userName);
         dest.writeString(email);
         dest.writeString(password);
@@ -191,6 +202,7 @@ public class UserVO implements Serializable, Parcelable{
         dest.writeInt(loginType);
         dest.writeString(socialNetworkUserId);
         dest.writeString(coverPictureURL);
+        dest.writeValue(isActive);
     }
 
     public static final Parcelable.Creator<UserVO> CREATOR = new Parcelable.Creator<UserVO>() {
@@ -208,7 +220,7 @@ public class UserVO implements Serializable, Parcelable{
 
     public void save(SharedPreferences mSharedPreferences) {
         mSharedPreferences.edit()
-                .putInt(AppConstants.TAG_USER_ID, userId)
+                .putInt(AppConstants.TAG_USER_ID, id)
                 .putInt(AppConstants.TAG_LOGIN_TYPE, loginType)
                 .putString(AppConstants.TAG_USER_NAME, userName)
                 .putString(AppConstants.TAG_EMAIL, email)
@@ -223,7 +235,7 @@ public class UserVO implements Serializable, Parcelable{
     public static UserVO retrieve(SharedPreferences mSharedPreferences){
         UserVO vo = new UserVO();
 
-        vo.userId = mSharedPreferences.getInt(AppConstants.TAG_USER_ID, -1);
+        vo.id = mSharedPreferences.getInt(AppConstants.TAG_USER_ID, -1);
         vo.userName = mSharedPreferences.getString(AppConstants.TAG_USER_NAME, null);
         vo.email = mSharedPreferences.getString(AppConstants.TAG_EMAIL, null);
         vo.password = mSharedPreferences.getString(AppConstants.TAG_PASSWORD, null);
@@ -236,5 +248,23 @@ public class UserVO implements Serializable, Parcelable{
         return vo;
     }
 
+    public Boolean getIsActive() {
+        return isActive;
+    }
 
+    public void setIsActive(Boolean isActive) {
+        this.isActive = isActive;
+    }
+
+    public static Creator<UserVO> getCREATOR() {
+        return CREATOR;
+    }
+
+    public LocationVO getLocation() {
+        return location;
+    }
+
+    public void setLocation(LocationVO location) {
+        this.location = location;
+    }
 }

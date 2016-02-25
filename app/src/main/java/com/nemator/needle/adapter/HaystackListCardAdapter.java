@@ -121,7 +121,7 @@ public class HaystackListCardAdapter extends RecyclerView.Adapter<HaystackListCa
         public HaystackCardViewHolder(View view, Boolean isNotEmpty, HaystackListFragment.HaystackListFragmentInteractionListener listener) {
             super(view);
             mListener = listener;
-            titleView =  (TextView) view.findViewById(R.id.title);
+            titleView =  (TextView) view.findViewById(R.id.description);
             userCountView = (TextView)  view.findViewById(R.id.active_users);
             active_until = (TextView)  view.findViewById(R.id.active_until);
             emptyText = (TextView) view.findViewById(R.id.emptyText);

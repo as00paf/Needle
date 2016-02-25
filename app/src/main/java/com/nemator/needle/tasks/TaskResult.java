@@ -5,10 +5,10 @@ import com.google.gson.annotations.SerializedName;
 public class TaskResult {
 
     @SerializedName("success")
-    private int successCode;
+    protected int successCode;
 
     @SerializedName("message")
-    private String message;
+    protected String message;
 
     public TaskResult(int successCode, String message){
         this.successCode = successCode;

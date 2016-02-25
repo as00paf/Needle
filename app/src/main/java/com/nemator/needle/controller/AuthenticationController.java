@@ -48,7 +48,6 @@ import com.twitter.sdk.android.Twitter;
 import com.twitter.sdk.android.core.Result;
 import com.twitter.sdk.android.core.TwitterApiClient;
 import com.twitter.sdk.android.core.TwitterAuthConfig;
-import com.twitter.sdk.android.core.TwitterCore;
 import com.twitter.sdk.android.core.TwitterException;
 import com.twitter.sdk.android.core.TwitterSession;
 import com.twitter.sdk.android.core.identity.TwitterAuthClient;
@@ -62,7 +61,6 @@ import io.fabric.sdk.android.Fabric;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-import retrofit2.Retrofit;
 
 public class AuthenticationController {
 
@@ -116,7 +114,7 @@ public class AuthenticationController {
                 Needle.userModel.setLoggedIn(true);
                 Needle.userModel.setUserName(result.getUser().getUserName());
                 Needle.userModel.getUser().setEmail(result.getUser().getEmail());
-                Needle.userModel.setUserId(result.getUser().getUserId());
+                Needle.userModel.setUserId(result.getUser().getId());
                 Needle.userModel.getUser().setSocialNetworkUserId(result.getUser().getSocialNetworkUserId());
                 Needle.userModel.getUser().setLoginType(result.getUser().getLoginType());
                 Needle.userModel.getUser().setPictureURL(result.getUser().getPictureURL());
@@ -205,7 +203,7 @@ public class AuthenticationController {
             UserRegistrationResult result = response.body();
             if(result.getSuccessCode() == 1){
                 Log.d(TAG, "Needle Application Registration Success");
-                Needle.userModel.getUser().setUserId(result.getUserId());
+                Needle.userModel.getUser().setId(result.getUserId());
                 login();
             }else{
                 Log.d(TAG, "Needle Application Registration Failed");

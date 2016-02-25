@@ -59,14 +59,13 @@ android {
 
                     output.outputFile = new File(output.outputFile.parent,
                             output.outputFile.name.replace("app-release", "Needle")
-                            //for Debug use output.outputFile = new File(output.outputFile.parent,
-                            //                             output.outputFile.name.replace("-debug", "-" + formattedDate)
                     )
                 }
             }
         }
         debug {
             signingConfig signingConfigs.debug
+            
         }
     }
 
@@ -103,7 +102,7 @@ dependencies {
     compile 'com.android.support:cardview-v7:23.1.1'
     compile 'com.android.support:recyclerview-v7:23.1.1'
     //UI
-    compile 'com.sothree.slidinguppanel:library:3.0.0'
+    compile 'com.flipboard:bottomsheet-core:1.5.0'
     //Square stuff
     compile 'com.squareup.picasso:picasso:2.5.2'
     compile 'com.squareup.retrofit2:retrofit:2.0.0-beta4'

@@ -96,7 +96,7 @@ public class LocationSharingMapFragment extends SupportMapFragment
         }
 
         //Location Service
-        locationService = ((HomeActivity) getActivity()).getLocationService();
+        Needle.serviceController.initServiceAndStartUpdates(getActivity());
         locationService.startLocationUpdates();
 
         locationServiceBroadcastReceiver = new LocationServiceBroadcastReceiver(this);

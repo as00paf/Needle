@@ -84,7 +84,7 @@ public class HaystackUserListAdapter extends BaseAdapter {
             return false;
 
         for(int i = 0;i<alreadyAddedUserList.size();i++){
-            if(user.getUserId() == alreadyAddedUserList.get(i).getUserId()){
+            if(user.getId() == alreadyAddedUserList.get(i).getId()){
                 return true;
             }
         }

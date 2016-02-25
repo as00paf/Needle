@@ -2,7 +2,6 @@ package com.nemator.needle.models;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.preference.PreferenceManager;
 
 import com.nemator.needle.controller.AuthenticationController;
 import com.nemator.needle.models.vo.FacebookUserVO;
@@ -52,11 +51,11 @@ public class UserModel {
     }
 
     public int getUserId(){
-        return user.getUserId();
+        return user.getId();
     }
 
     public void setUserId(int userId){
-        user.setUserId(userId);
+        user.setId(userId);
         sharedPreferences.edit().putInt(AppConstants.TAG_USER_ID, userId).commit();
     }
 

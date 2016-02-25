@@ -1,14 +1,12 @@
 package com.nemator.needle.activities;
 
 import android.app.AlertDialog;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.ServiceConnection;
 import android.content.res.Configuration;
 import android.os.Bundle;
-import android.os.IBinder;
+import android.os.Parcelable;
 import android.support.design.widget.NavigationView;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
@@ -20,13 +18,12 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
-import com.google.android.gms.maps.model.LatLng;
 import com.nemator.needle.Needle;
 import com.nemator.needle.R;
 import com.nemator.needle.models.vo.HaystackVO;
 import com.nemator.needle.models.vo.LocationSharingVO;
+import com.nemator.needle.models.vo.LocationVO;
 import com.nemator.needle.models.vo.UserVO;
-import com.nemator.needle.service.NeedleLocationService;
 import com.nemator.needle.utils.AppConstants;
 import com.nemator.needle.utils.AppState;
 
@@ -34,15 +31,10 @@ public class HomeActivity extends AppCompatActivity {
 
     public static String TAG = "HomeActivity";
 
-    //Service
-    private ServiceConnection mConnection;
-    private NeedleLocationService locationService;
-
     //View
     private Toolbar toolbar;
     private DrawerLayout drawerLayout;
     private View content;
-    private boolean isServiceConnected = false;
 
     private ActionBarDrawerToggle mDrawerToggle;
 
@@ -91,26 +83,6 @@ public class HomeActivity extends AppCompatActivity {
         }
     }
 
-    protected void initService() {
-        //Needle Location Service
-        mConnection = new ServiceConnection(){
-            public void onServiceConnected(ComponentName className, IBinder service) {
-                locationService = ((NeedleLocationService.LocalBinder)service).getService();
-                locationService.userModel = Needle.userModel;
-                isServiceConnected = true;
-            }
-
-            public void onServiceDisconnected(ComponentName className) {
-                locationService = null;
-                isServiceConnected = false;
-            }
-        };
-
-        Intent serviceIntent = new Intent(this, NeedleLocationService.class);
-        startService(serviceIntent);
-        bindService(serviceIntent, mConnection, Context.BIND_AUTO_CREATE);
-    }
-
     protected void initToolbar() {
         Log.d(TAG, "initToolbar");
         toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -121,6 +93,7 @@ public class HomeActivity extends AppCompatActivity {
             actionBar.setDisplayHomeAsUpEnabled(true);
             actionBar.setDisplayShowHomeEnabled(true);
         }
+
         actionBar.hide();
     }
 
@@ -185,12 +158,15 @@ public class HomeActivity extends AppCompatActivity {
                         Boolean isPublic = extras.getBoolean(AppConstants.TAG_IS_PUBLIC);
                         double latitude = extras.getDouble(AppConstants.TAG_LATITUDE);
                         double longitude = extras.getDouble(AppConstants.TAG_LONGITUDE);
-                        LatLng position = new LatLng(latitude, longitude);
+                        LocationVO position = new LocationVO(latitude, longitude);
                         String pictureURL = extras.getString(AppConstants.TAG_PICTURE_URL);
 
 
                         HaystackVO vo = new HaystackVO(id, owner, name, isPublic, timeLimit, zoneRadius, isCircle, position, pictureURL, null, null);
-                        Needle.navigationController.showReceivedHaystack(vo);
+
+                        Intent haystackIntent = new Intent(this, HaystackActivity.class);
+                        haystackIntent.putExtra(AppConstants.TAG_HAYSTACK, (Parcelable) vo);
+                        startActivity(haystackIntent);
                     }
                 }
             }
@@ -202,12 +178,7 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     @Override
-    public void onSaveInstanceState(Bundle savedInstanceState) {
-        if( Needle.navigationController.getHaystackFragment() != null){
-            savedInstanceState.putParcelable(AppConstants.HAYSTACK_DATA_KEY,  Needle.navigationController.getHaystackFragment().getHaystack());
-            savedInstanceState.putBoolean(AppConstants.TAG_IS_OWNER,  Needle.navigationController.getHaystackFragment().isOwner(Needle.userModel.getUserId()));
-        }
-
+    public void onSaveInstanceState(Bundle savedInstanceState){
         savedInstanceState.putInt(AppConstants.APP_STATE, Needle.navigationController.getCurrentState());
         savedInstanceState.putInt(AppConstants.APP_PREVIOUS_STATE, Needle.navigationController.getPreviousState());
         savedInstanceState.putBoolean("autoLogin", Needle.userModel.isAutoLogin());
@@ -257,15 +228,7 @@ public class HomeActivity extends AppCompatActivity {
         super.onDestroy();
 
         Needle.networkController.unregister();
-
-        if(isServiceConnected){
-            try{
-                unbindService(mConnection);
-            }catch (Error e){
-
-            }
-            isServiceConnected = false;
-        }
+        Needle.serviceController.unbindService();
     }
 
     //TODO : move to authentication controller
@@ -301,10 +264,6 @@ public class HomeActivity extends AppCompatActivity {
 
 
     //Getters/Setters
-    public NeedleLocationService getLocationService() {
-        return locationService;
-    }
-
     public ActionBarDrawerToggle getDrawerToggle() {
         return mDrawerToggle;
     }

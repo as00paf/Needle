@@ -188,7 +188,7 @@ public class GoogleAPIController implements GoogleApiClient.ConnectionCallbacks,
                         .getStatus()
                         .startResolutionForResult(activity, SETTINGS_REQUEST_ID);
             } catch (IntentSender.SendIntentException e) {
-                // oops
+            
             }
         } else {
             isConnected = true;

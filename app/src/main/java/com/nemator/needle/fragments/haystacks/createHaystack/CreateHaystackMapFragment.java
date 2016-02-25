@@ -8,7 +8,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
-import android.location.Location;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.MenuItemCompat;
@@ -33,13 +32,7 @@ import com.google.android.gms.common.api.PendingResult;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.location.places.PlaceLikelihoodBuffer;
 import com.google.android.gms.location.places.Places;
-import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.MapFragment;
-import com.google.android.gms.maps.MapView;
-import com.google.android.gms.maps.MapsInitializer;
-import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.Circle;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
@@ -47,14 +40,13 @@ import com.google.android.gms.maps.model.Polygon;
 import com.nemator.needle.Needle;
 import com.nemator.needle.R;
 import com.nemator.needle.activities.CreateHaystackActivity;
-import com.nemator.needle.controller.GoogleMapCameraController;
 import com.nemator.needle.controller.GoogleMapCameraControllerConfig;
 import com.nemator.needle.controller.GoogleMapController;
+import com.nemator.needle.fragments.SearchFragment;
 import com.nemator.needle.tasks.getAutoCompleteResults.GetAutoCompleteResultsTask;
 import com.nemator.needle.utils.AppConstants;
 import com.nemator.needle.utils.GoogleMapDrawingUtils;
 import com.nemator.needle.utils.PermissionManager;
-import com.nemator.needle.fragments.SearchFragment;
 
 public class CreateHaystackMapFragment extends CreateHaystackBaseFragment implements GoogleMapController.GoogleMapCallback {
     public static String TAG = "CreateHaystackMapFragment";
@@ -62,7 +54,6 @@ public class CreateHaystackMapFragment extends CreateHaystackBaseFragment implem
     //Children
     private TextView mRadiusLabel;
     private SupportMapFragment mapFragment;
-    private GoogleMap googleMap;
     private Menu menu;
 
     //Data
@@ -71,9 +62,6 @@ public class CreateHaystackMapFragment extends CreateHaystackBaseFragment implem
     private Polygon mPolygon;
     private Boolean mIsPolygonCircle = true;
     private Float mScaleFactor = 1.0f;
-    private Location mCurrentLocation;
-    private LatLng mCurrentPosition;
-    private boolean initialized = false;
 
     //Objects
     private ScaleGestureDetector mScaleDetector;
@@ -166,13 +154,13 @@ public class CreateHaystackMapFragment extends CreateHaystackBaseFragment implem
         if(position != null){
             if(mIsPolygonCircle){
                 if(mCircle == null){
-                    mCircle = GoogleMapDrawingUtils.drawCircle(googleMap, position, mScaleFactor, getResources(), mCircle);
+                    mCircle = GoogleMapDrawingUtils.drawCircle(mapController.getGoogleMap(), position, mScaleFactor, getResources(), mCircle);
                 }else{
                     mCircle = GoogleMapDrawingUtils.updateCircle(mCircle, position, mScaleFactor);
                 }
             }else{
                 if(mPolygon == null){
-                    mPolygon = GoogleMapDrawingUtils.drawPolygon(googleMap, position, mScaleFactor, getResources(), mPolygon);
+                    mPolygon = GoogleMapDrawingUtils.drawPolygon(mapController.getGoogleMap(), position, mScaleFactor, getResources(), mPolygon);
                 }else{
                     mPolygon = GoogleMapDrawingUtils.updatePolygon(mPolygon, position, mScaleFactor);
                 }
@@ -469,16 +457,12 @@ public class CreateHaystackMapFragment extends CreateHaystackBaseFragment implem
         return (int) Math.round(mScaleFactor * 50.0);
     }
 
-    public LatLng getPosition(){
-        return mCurrentPosition;
-    }
-
     public Boolean getIsCircle() {
         return mIsPolygonCircle;
     }
 
     public LatLngBounds getCameraTargetBounds() {
-        return googleMap.getProjection().getVisibleRegion().latLngBounds;
+        return mapController.getCurrentCameraTargetBounds();
     }
 
     @Override
@@ -488,6 +472,10 @@ public class CreateHaystackMapFragment extends CreateHaystackBaseFragment implem
 
     public GoogleMapController getMapController() {
         return mapController;
+    }
+
+    public LatLng getPosition() {
+        return mapController.getCurrentCameraTarget();
     }
 
     //CLASSES

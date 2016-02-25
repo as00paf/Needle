@@ -9,6 +9,7 @@ import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
 import com.nemator.needle.utils.PermissionManager;
 
 public class GoogleMapController {
@@ -115,6 +116,10 @@ public class GoogleMapController {
 
     public void focusOnMyPosition() {
         cameraController.focusOnMyPosition();
+    }
+
+    public LatLngBounds getCurrentCameraTargetBounds() {
+        return cameraController.getCameraTargetBounds();
     }
 
     public interface GoogleMapCallback{

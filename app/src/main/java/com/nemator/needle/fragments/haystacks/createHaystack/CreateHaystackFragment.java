@@ -205,7 +205,7 @@ public class CreateHaystackFragment extends CreateHaystackBaseFragment implement
                         break;
                     case 1:
                         //Focus Camera on current position
-                        ((CreateHaystackMapFragment) getFragmentManager().getFragments().get(4)).getCameraController().focusOnMyPosition();
+                        ((CreateHaystackMapFragment) getFragmentManager().getFragments().get(4)).getMapController().focusOnMyPosition();
                         break;
                     case 2:
                         //Invite Friend

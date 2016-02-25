@@ -1,5 +1,6 @@
 package com.nemator.needle.controller;
 
+import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 
@@ -22,6 +23,7 @@ public class GoogleMapCameraControllerConfig {
     private float correctionY = 0.0f; //Latitude
     private LatLng initialLocation = DEFAULT_INITIAL_COORDINATES;
     private LatLngBounds initialBounds = DEFAULT_INITIAL_BOUNDS;
+    private int mapType = GoogleMap.MAP_TYPE_NORMAL;
 
     public static GoogleMapCameraControllerConfig create(){
         return new GoogleMapCameraControllerConfig();
@@ -132,5 +134,13 @@ public class GoogleMapCameraControllerConfig {
     public GoogleMapCameraControllerConfig setCorrectionX(float correctionX) {
         this.correctionX = correctionX;
         return this;
+    }
+
+    public int getMapType() {
+        return mapType;
+    }
+
+    public void setMapType(int mapType) {
+        this.mapType = mapType;
     }
 }

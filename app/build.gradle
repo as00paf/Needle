@@ -13,6 +13,13 @@ android {
     signingConfigs {
         debug {
         }
+
+        release {
+            storeFile file("needlekeystore.jks")
+            storePassword "Needle1234"
+            keyAlias "NeedleKey"
+            keyPassword "Needle1234"
+        }
     }
 
     compileSdkVersion 23

@@ -5,11 +5,11 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <com.google.android.gms.maps.MapView
+    <fragment
         android:id="@+id/create_haystack_map"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:tag="MAP_FRAGMENT"/>
+        class="com.google.android.gms.maps.SupportMapFragment"/>
 
     <FrameLayout
         android:id="@+id/create_haystack_map_frame"

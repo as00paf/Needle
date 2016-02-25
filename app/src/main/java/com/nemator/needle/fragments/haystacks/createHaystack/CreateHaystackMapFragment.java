@@ -34,9 +34,11 @@ import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.location.places.PlaceLikelihoodBuffer;
 import com.google.android.gms.location.places.Places;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.Circle;
 import com.google.android.gms.maps.model.LatLng;
@@ -47,18 +49,19 @@ import com.nemator.needle.R;
 import com.nemator.needle.activities.CreateHaystackActivity;
 import com.nemator.needle.controller.GoogleMapCameraController;
 import com.nemator.needle.controller.GoogleMapCameraControllerConfig;
+import com.nemator.needle.controller.GoogleMapController;
 import com.nemator.needle.tasks.getAutoCompleteResults.GetAutoCompleteResultsTask;
 import com.nemator.needle.utils.AppConstants;
 import com.nemator.needle.utils.GoogleMapDrawingUtils;
 import com.nemator.needle.utils.PermissionManager;
 import com.nemator.needle.fragments.SearchFragment;
 
-public class CreateHaystackMapFragment extends CreateHaystackBaseFragment{
+public class CreateHaystackMapFragment extends CreateHaystackBaseFragment implements GoogleMapController.GoogleMapCallback {
     public static String TAG = "CreateHaystackMapFragment";
 
     //Children
     private TextView mRadiusLabel;
-    private MapView mMapView;
+    private SupportMapFragment mapFragment;
     private GoogleMap googleMap;
     private Menu menu;
 
@@ -76,13 +79,13 @@ public class CreateHaystackMapFragment extends CreateHaystackBaseFragment{
     private ScaleGestureDetector mScaleDetector;
     private GetAutoCompleteResultsTask autoCompleteTask;
     private GoogleApiClient mGoogleApiClient;
-    private GoogleMapCameraController cameraController;
 
     //Search
     private SearchView searchView;
     private MenuItem mSearchAction;
     private boolean isSearchOpened = false;
     private SearchFragment searchFragment;
+    private GoogleMapController mapController;
 
     public static CreateHaystackMapFragment newInstance() {
         CreateHaystackMapFragment fragment = new CreateHaystackMapFragment();
@@ -126,17 +129,9 @@ public class CreateHaystackMapFragment extends CreateHaystackBaseFragment{
         rootView = inflater.inflate(R.layout.fragment_create_haystack_map, container, false);
 
         //Map
-        this.mMapView = (MapView) rootView.findViewById(R.id.create_haystack_map);
-        this.mMapView.onCreate(savedInstanceState);
-        this.mMapView.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                Log.d(TAG, "here");
-
-                return false;
-            }
-        });
-
+        mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.create_haystack_map);
+        mapController = new GoogleMapController(getActivity(), new GoogleMapCameraControllerConfig(), this);
+        mapController.initMap(mapFragment);
 
         mScaleDetector = new ScaleGestureDetector(getActivity(), new ScaleListener());
 
@@ -165,113 +160,9 @@ public class CreateHaystackMapFragment extends CreateHaystackBaseFragment{
         return rootView;
     }
 
-    @Override
-    public void onResume()
-    {
-        super.onResume();
-
-        if (this.mMapView != null){
-            this.mMapView.onResume();
-        }
-
-        if(!initialized){
-            initializeMap();
-        }
-    }
-
-    @Override
-    public void onDestroy()
-    {
-        super.onDestroy();
-
-        if (this.mMapView != null)
-        {
-            this.mMapView.onDestroy();
-        }
-    }
-
-    @Override
-    public void onLowMemory()
-    {
-        super.onLowMemory();
-
-        if (this.mMapView != null)
-        {
-            this.mMapView.onLowMemory();
-        }
-    }
-
-    @Override
-    public void onSaveInstanceState(Bundle outState)
-    {
-        super.onSaveInstanceState(outState);
-
-        if (this.mMapView != null)
-        {
-            this.mMapView.onSaveInstanceState(outState);
-        }
-    }
-
-    private void initializeMap()
-    {
-        MapsInitializer.initialize(getActivity().getApplicationContext());
-
-        this.mMapView.getMapAsync(new OnMapReadyCallback() {
-            @Override
-            public void onMapReady(GoogleMap googleMap) {
-                if (googleMap != null) {
-                    CreateHaystackMapFragment.this.googleMap = googleMap;
-
-                    if(PermissionManager.getInstance(getActivity()).isPermissionGranted(Manifest.permission.ACCESS_FINE_LOCATION)){
-                        googleMap.setMyLocationEnabled(true);
-                    }else{
-                        PermissionManager.getInstance(getActivity()).requestPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION);
-                    }
-                    googleMap.getUiSettings().setMyLocationButtonEnabled(false);
-                    googleMap.getUiSettings().setScrollGesturesEnabled(true);
-
-                    //googleMap.setMapType(GoogleMap.MAP_TYPE_SATELLITE);
-
-                    final GoogleMapCameraControllerConfig cameraControllerConfig = GoogleMapCameraControllerConfig.create()
-                            .setCorrectionY(0.00008f);
-                    cameraController = new GoogleMapCameraController(getActivity(), googleMap, cameraControllerConfig);
-                    cameraController.setCameraChangedListener(new GoogleMapCameraController.CameraChangedListener() {
-                        private int cameraChanges = 0;
-
-                        @Override
-                        public void onCameraChanged(CameraPosition cameraPosition) {
-                            cameraChanges++;
-                            updateMap();
-                        }
-                    });
-
-                    googleMap.setOnMyLocationChangeListener(new GoogleMap.OnMyLocationChangeListener() {
-                        private int locationChanges = 0;
-
-                        @Override
-                        public void onMyLocationChange(Location location) {
-                            locationChanges++;
-
-                            mCurrentPosition = new LatLng(location.getLatitude(), location.getLongitude());
-
-                            if (locationChanges == 1) {
-                                cameraController.zoom(mCurrentPosition);
-                            }
-
-                            updateMap();
-                        }
-                    });
-
-                    initialized = true;
-                    updateMap();
-                }
-            }
-        });
-    }
-
     private void updateMap() {
         //Update user's marker and polygon
-        LatLng position = cameraController.getCameraTarget();
+        LatLng position = mapController.getCurrentCameraTarget();
         if(position != null){
             if(mIsPolygonCircle){
                 if(mCircle == null){
@@ -345,8 +236,6 @@ public class CreateHaystackMapFragment extends CreateHaystackBaseFragment{
 
         return super.onOptionsItemSelected(item);
     }
-
-
 
     private void handleMenuSearch() {
         int flag;
@@ -452,8 +341,6 @@ public class CreateHaystackMapFragment extends CreateHaystackBaseFragment{
     private BroadcastReceiver searchItemListener = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            String action = intent.getAction();
-
             LatLng location = intent.getParcelableExtra(getString(R.string.location));
             if(location != null){
                 closeSearchMenu();
@@ -544,7 +431,7 @@ public class CreateHaystackMapFragment extends CreateHaystackBaseFragment{
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
 
         if(permissions[0] == Manifest.permission.ACCESS_FINE_LOCATION && grantResults[0] == PackageManager.PERMISSION_GRANTED){
-            googleMap.setMyLocationEnabled(true);
+            mapController.setLocationUpdates(true);
             addPlaceSuggestion();
         }
     }
@@ -590,12 +477,17 @@ public class CreateHaystackMapFragment extends CreateHaystackBaseFragment{
         return mIsPolygonCircle;
     }
 
-    public GoogleMapCameraController getCameraController() {
-        return cameraController;
-    }
-
     public LatLngBounds getCameraTargetBounds() {
         return googleMap.getProjection().getVisibleRegion().latLngBounds;
+    }
+
+    @Override
+    public void onMapInitialized() {
+        updateMap();
+    }
+
+    public GoogleMapController getMapController() {
+        return mapController;
     }
 
     //CLASSES

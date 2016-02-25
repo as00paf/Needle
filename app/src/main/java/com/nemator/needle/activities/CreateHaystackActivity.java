@@ -191,7 +191,7 @@ public class CreateHaystackActivity extends AppCompatActivity implements ImageUp
                         //TODO : Add method for that
                         //Focus Camera on current position
                         ((CreateHaystackMapFragment) mCreateHaystackPagerAdapter.getFragmentByType(
-                                        CreateHaystackMapFragment.class)).getCameraController().focusOnMyPosition();
+                                        CreateHaystackMapFragment.class)).getMapController().focusOnMyPosition();
                         break;
                     case 2:
                         //Invite Friend

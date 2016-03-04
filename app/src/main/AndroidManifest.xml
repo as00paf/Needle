@@ -91,7 +91,8 @@
             android:label="@string/create_haystack"
             android:parentActivityName=".activities.HomeActivity"
             android:theme="@style/AppTheme"
-            android:windowSoftInputMode="adjustPan">
+            android:windowSoftInputMode="adjustPan"
+            android:noHistory="true">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".activities.HomeActivity" />
@@ -109,6 +110,11 @@
         <activity android:name=".activities.HaystackActivity"
             android:label="Haystack"
             android:parentActivityName=".activities.HomeActivity"
+            android:theme="@style/AppTheme"/>
+
+        <activity android:name=".activities.UserSelectActivity"
+            android:label="Select Users"
+            android:parentActivityName=".activities.HaystackActivity"
             android:theme="@style/AppTheme"/>
 
     </application>

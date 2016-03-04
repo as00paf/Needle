@@ -4,6 +4,7 @@ import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -19,14 +20,12 @@ import android.widget.Toast;
 
 import com.nemator.needle.Needle;
 import com.nemator.needle.R;
+import com.nemator.needle.api.ApiClient;
+import com.nemator.needle.api.result.UsersTaskResult;
 import com.nemator.needle.models.vo.LocationSharingVO;
 import com.nemator.needle.models.vo.UserVO;
 import com.nemator.needle.tasks.locationSharing.LocationSharingParams;
 import com.nemator.needle.tasks.locationSharing.LocationSharingTask;
-import com.nemator.needle.tasks.retrieveUsers.RetrieveUsersParams;
-import com.nemator.needle.tasks.retrieveUsers.RetrieveUsersResult;
-import com.nemator.needle.tasks.retrieveUsers.RetrieveUsersTask;
-import com.nemator.needle.tasks.retrieveUsers.RetrieveUsersTask.RetrieveUsersResponseHandler;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -34,7 +33,11 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 
-public class CreateLocationSharingFragment extends Fragment implements RetrieveUsersResponseHandler {
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
+public class CreateLocationSharingFragment extends Fragment {
     public static String TAG = "CreateLocationSharingFragment";
 
     public static final String SQL_DATE_FORMAT = "yyyy-MM-dd";
@@ -165,22 +168,22 @@ public class CreateLocationSharingFragment extends Fragment implements RetrieveU
     }
 
     private void fetchAllUsers(){
-        RetrieveUsersParams params = new RetrieveUsersParams();
-        params.userId = String.valueOf(Needle.userModel.getUserId());
-        params.type = RetrieveUsersParams.RetrieveUsersParamsType.TYPE_ALL_USERS;
+        ApiClient.getInstance().fetchAllUsers(Needle.userModel.getUserId(), new Callback<UsersTaskResult>() {
+            @Override
+            public void onResponse(Call<UsersTaskResult> call, Response<UsersTaskResult> response) {
+                UsersTaskResult result = response.body();
+                usersList = result.getUsers();
+                updateUserList();
+            }
 
-        try{
-            RetrieveUsersTask task =  new RetrieveUsersTask(params, this);
-            task.execute();
-        } catch(Exception e){
-            e.printStackTrace();
-        }
-    }
+            @Override
+            public void onFailure(Call<UsersTaskResult> call, Throwable t) {
+                Log.d(TAG, "Retrieving users failed ! Error : " + t.getMessage());
 
-    //Response Handlers
-    public void onUsersRetrieved(RetrieveUsersResult result){
-        usersList = result.userList;
-        updateUserList();
+                usersList = new ArrayList<UserVO>();
+                updateUserList();
+            }
+        });
     }
 
     private void updateUserList(){

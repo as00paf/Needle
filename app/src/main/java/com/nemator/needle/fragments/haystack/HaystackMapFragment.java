@@ -29,14 +29,12 @@ import com.nemator.needle.Needle;
 import com.nemator.needle.R;
 import com.nemator.needle.activities.HaystackActivity;
 import com.nemator.needle.api.ApiClient;
-import com.nemator.needle.api.UsersTaskResult;
+import com.nemator.needle.api.result.UsersTaskResult;
 import com.nemator.needle.broadcastReceiver.LocationServiceBroadcastReceiver;
 import com.nemator.needle.data.LocationServiceDBHelper;
 import com.nemator.needle.models.vo.HaystackVO;
 import com.nemator.needle.models.vo.UserVO;
 import com.nemator.needle.tasks.TaskResult;
-import com.nemator.needle.tasks.leaveHaystack.LeaveHaystackParams;
-import com.nemator.needle.tasks.leaveHaystack.LeaveHaystackTask;
 import com.nemator.needle.utils.AppConstants;
 
 import java.util.ArrayList;
@@ -47,8 +45,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class HaystackMapFragment extends SupportMapFragment
-        implements LeaveHaystackTask.LeaveHaystackResponseHandler, LocationServiceBroadcastReceiver.LocationServiceDelegate {
+public class HaystackMapFragment extends SupportMapFragment implements LocationServiceBroadcastReceiver.LocationServiceDelegate {
 
     public static final String TAG = "HaystackMapFragment";
 
@@ -394,7 +391,7 @@ public class HaystackMapFragment extends SupportMapFragment
                         getResources().getDrawable(R.drawable.ic_location_disabled_white_24dp) :
                         getResources().getDrawable(R.drawable.ic_my_location_white_24dp));
 
-                if(!isActivated){
+                if (!isActivated) {
                     Toast.makeText(getActivity(), "Error Sharing Location", Toast.LENGTH_SHORT).show();
                 }
             }
@@ -445,25 +442,37 @@ public class HaystackMapFragment extends SupportMapFragment
     }
 
     private void leaveHaystack(){
-        LeaveHaystackParams params = new LeaveHaystackParams(getActivity(), String.valueOf(Needle.userModel.getUserId()), String.valueOf(haystack.getId()));
-        try{
-            LeaveHaystackTask task = new LeaveHaystackTask(params, this);
-            task.execute();
-        }catch(Exception e){
-            Toast.makeText(getActivity(), "Error Leaving Haystack", Toast.LENGTH_SHORT).show();
-        }
+        ApiClient.getInstance().leaveHaystack(Needle.userModel.getUser(), haystack, haystackLeftCallback);
     }
 
-    public void onHaystackLeft(TaskResult result){
-        if(result.getSuccessCode() == 1){
-            Toast.makeText(getActivity(), "Haystack Left", Toast.LENGTH_SHORT).show();
+    private Callback<TaskResult> haystackLeftCallback = new Callback<TaskResult>(){
 
-           /* Intent intent = new Intent(getActivity(), HomeActivity.class);
-            startActivity(intent);*/
-        }else{
-            Toast.makeText(getActivity(), "Error Leaving Haystack", Toast.LENGTH_SHORT).show();
+        @Override
+        public void onResponse(Call<TaskResult> call, Response<TaskResult> response) {
+            TaskResult result = response.body();
+
+            if(result.getSuccessCode() == 1){
+                Toast.makeText(getActivity(), "Haystack Left", Toast.LENGTH_SHORT).show();
+
+                getActivity().finish();
+            }else if (result.getSuccessCode() == 404){
+                Toast.makeText(getActivity(), "Haystack Left", Toast.LENGTH_SHORT).show();
+
+                getActivity().finish();
+
+                Log.d(TAG, "Should not have been in that haystack, wtf !?");
+            }else{
+                Log.d(TAG, "Should have left haystack, wtf !? Success code : " + result.getSuccessCode());
+                Toast.makeText(getActivity(), "Error Leaving Haystack", Toast.LENGTH_SHORT).show();
+            }
         }
-    }
+
+        @Override
+        public void onFailure(Call<TaskResult> call, Throwable t) {
+            Toast.makeText(getActivity(), "Error Leaving Haystack", Toast.LENGTH_SHORT).show();
+            Log.d(TAG, "Error : " + t.getMessage());
+        }
+    };
 
     public void shareLocation(){
         mPostingLocationUpdates = true;

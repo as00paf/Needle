@@ -14,10 +14,6 @@ public class CreateHaystackBaseFragment extends Fragment {
 
     protected OnActivityStateChangeListener stateChangeCallback;
 
-    public HaystackVO haystack(){
-        return ((CreateHaystackFragment) getParentFragment()).getHaystack();
-    }
-
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);

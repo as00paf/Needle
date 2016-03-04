@@ -109,6 +109,10 @@ public class UserVO implements Serializable, Parcelable{
         return id;
     }
 
+    public String getStringId() {
+        return String.valueOf(id);
+    }
+
     public UserVO setId(int id) {
         this.id = id;
         return this;

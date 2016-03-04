@@ -5,7 +5,8 @@ package com.nemator.needle.utils;
  */
 public class AppConstants {
 
-    public static final String PROJECT_URL = "http://66.131.192.108:2772/Needle/";
+    //public static final String PROJECT_URL = "http://66.131.192.108:2772/Needle/";
+    public static final String PROJECT_URL = "http://192.168.1.107:2772/Needle/";
     public static final String HAYSTACK_PICTURES_URL = PROJECT_URL + "pictures/";
 
     //TODO: put in strings
@@ -101,4 +102,7 @@ public class AppConstants {
     //App
     public static final String GOOGLE_API_CONNECTED = "googleApiConnected";
     public static String SOCIAL_NETWORKS_INITIALIZED = "socialNetworksInitialized";
+
+    //Request Codes
+    public static final int SELECT_NEW_HAYSTACK_USERS = 1000;
 }

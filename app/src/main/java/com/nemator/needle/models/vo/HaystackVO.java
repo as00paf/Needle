@@ -38,6 +38,7 @@ public class HaystackVO implements Serializable, Parcelable {
 
     @SerializedName("pictureURL")
     private String pictureURL = "";
+
     private Bitmap picture;
 
     @SerializedName("users")

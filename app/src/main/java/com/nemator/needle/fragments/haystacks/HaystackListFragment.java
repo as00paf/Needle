@@ -22,7 +22,7 @@ import com.nemator.needle.adapter.HaystackListPagerAdapter;
 import com.nemator.needle.api.ApiClient;
 import com.nemator.needle.controller.NavigationController;
 import com.nemator.needle.models.vo.HaystackVO;
-import com.nemator.needle.tasks.haystack.HaystackTaskResult;
+import com.nemator.needle.api.result.HaystackTaskResult;
 import com.nemator.needle.utils.AppConstants;
 import com.nemator.needle.utils.AppState;
 

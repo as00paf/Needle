@@ -12,9 +12,9 @@ import android.view.ViewGroup;
 
 import com.nemator.needle.Needle;
 import com.nemator.needle.R;
-import com.nemator.needle.adapter.CreateHaystackUserListCardAdapter;
+import com.nemator.needle.adapter.HaystackUserListCardAdapter;
 import com.nemator.needle.api.ApiClient;
-import com.nemator.needle.api.UsersTaskResult;
+import com.nemator.needle.api.result.UsersTaskResult;
 import com.nemator.needle.models.vo.UserVO;
 
 import java.util.ArrayList;
@@ -22,7 +22,6 @@ import java.util.ArrayList;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-import retrofit2.Retrofit;
 
 public class CreateHaystackUsersFragment extends CreateHaystackBaseFragment implements SwipeRefreshLayout.OnRefreshListener{
 
@@ -30,7 +29,7 @@ public class CreateHaystackUsersFragment extends CreateHaystackBaseFragment impl
 
     //Children
     private RecyclerView mRecyclerView;
-    private CreateHaystackUserListCardAdapter mAdapter;
+    private HaystackUserListCardAdapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
     private SwipeRefreshLayout swipeLayout;
 
@@ -183,7 +182,7 @@ public class CreateHaystackUsersFragment extends CreateHaystackBaseFragment impl
     }
 
     private void updateUserList(){
-        mAdapter = new CreateHaystackUserListCardAdapter(usersList, getActivity());
+        mAdapter = new HaystackUserListCardAdapter(usersList, getActivity());
         mRecyclerView.setAdapter(mAdapter);
 
         mAdapter.notifyDataSetChanged();

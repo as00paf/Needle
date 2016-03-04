@@ -28,7 +28,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
-import android.widget.Toast;
 
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.model.LatLng;
@@ -36,13 +35,10 @@ import com.nemator.needle.Needle;
 import com.nemator.needle.R;
 import com.nemator.needle.activities.HomeActivity;
 import com.nemator.needle.adapter.CreateHaystackPagerAdapter;
-import com.nemator.needle.api.ApiClient;
 import com.nemator.needle.fragments.SearchFragment;
 import com.nemator.needle.fragments.haystacks.OnActivityStateChangeListener;
 import com.nemator.needle.models.vo.HaystackVO;
 import com.nemator.needle.models.vo.UserVO;
-import com.nemator.needle.tasks.imageUploader.ImageUploadParams;
-import com.nemator.needle.tasks.imageUploader.ImageUploadResult;
 import com.nemator.needle.tasks.imageUploader.ImageUploaderTask;
 import com.nemator.needle.utils.AppConstants;
 import com.nemator.needle.utils.AppState;
@@ -51,8 +47,7 @@ import com.viewpagerindicator.CirclePageIndicator;
 
 import java.util.ArrayList;
 
-public class CreateHaystackFragment extends CreateHaystackBaseFragment implements ImageUploaderTask.ImageUploadResponseHandler,
-        CreateHaystackGeneralInfosFragment.OnPrivacySettingsUpdatedListener{
+public class CreateHaystackFragment extends CreateHaystackBaseFragment implements CreateHaystackGeneralInfosFragment.OnPrivacySettingsUpdatedListener{
     public static final String TAG = "CreateHaystackFragment";
 
     //Activity Results
@@ -378,9 +373,6 @@ public class CreateHaystackFragment extends CreateHaystackBaseFragment implement
         int id = item.getItemId();
 
         switch(id) {
-            case R.id.create_haystack_action_done:
-                createHaystack();
-                return true;
             case R.id.action_search:
                 handleMenuSearch();
                 break;
@@ -478,105 +470,10 @@ public class CreateHaystackFragment extends CreateHaystackBaseFragment implement
         nextButton.setEnabled((currentItemIndex == 0 || (currentItemIndex == 1 && isPublic == false)));
     }
 
-    private void createHaystack(){
-        haystack = new HaystackVO();
-        mCreateHaystackGenInfosFragment = (CreateHaystackGeneralInfosFragment) mCreateHaystackPagerAdapter.getFragmentByType(CreateHaystackGeneralInfosFragment.class);
-        mCreateHaystackMapFragment = (CreateHaystackMapFragment) mCreateHaystackPagerAdapter.getFragmentByType(CreateHaystackMapFragment.class);
-        mCreateHaystackUsersFragment = (CreateHaystackUsersFragment) mCreateHaystackPagerAdapter.getFragmentByType(CreateHaystackUsersFragment.class);
-
-        //General Infos
-        haystack.setName(mCreateHaystackGenInfosFragment.getHaystackName());
-        haystack.setOwner(getUserId());
-        haystack.setIsPublic(mCreateHaystackGenInfosFragment.getIsPublic());
-        haystack.setTimeLimit(mCreateHaystackGenInfosFragment.getDateLimit() + " " + mCreateHaystackGenInfosFragment.getTimeLimit());
-
-        //Location
-        haystack.setZoneRadius(mCreateHaystackMapFragment.getZoneRadius());
-        haystack.setPosition(mCreateHaystackMapFragment.getPosition());
-        haystack.setIsCircle(mCreateHaystackMapFragment.getIsCircle());
-
-        //Current User
-        UserVO user = new UserVO();
-        user.setId(getUserId());
-        user.setUserName(getUserName());
-
-        //Users
-        userList.add(user);
-        if(mCreateHaystackUsersFragment != null){
-            userList.addAll(mCreateHaystackUsersFragment.getSelectedUsers());
-        }
-        haystack.setUsers(userList);
-
-        //Active users
-        ArrayList<UserVO> activeUsers = new ArrayList<UserVO>();
-        haystack.setActiveUsers(activeUsers);
-
-        //Banned users
-        ArrayList<UserVO> bannedUsers = new ArrayList<UserVO>();
-        haystack.setBannedUsers(bannedUsers);
-
-        if(!validateHaystack(haystack)){
-            Toast.makeText(getActivity(), "Haystack Invalid !", Toast.LENGTH_SHORT);
-            return;
-        }
-
-        //File Upload
-        Bitmap image = mCreateHaystackGenInfosFragment.getPicture();
-        if(image != null){
-            ImageUploadParams uploadParams = new ImageUploadParams(image, haystack.getName(), rootView.getContext());
-            try{
-                ImageUploaderTask uploadTask = new ImageUploaderTask(uploadParams, this);
-                uploadTask.execute();
-            }catch (Exception e) {
-                Toast.makeText(getActivity(), "An error occured while uploading Haystack's Image", Toast.LENGTH_SHORT).show();
-            }
-        }else{
-            //Create Haystack
-            ApiClient.getInstance().createHaystack(haystack, Needle.navigationController);
-        }
-    }
-
     private void doSearch(String query) {
         Log.d(TAG, "doSearch::query : " + query);
 
         searchFragment.guessLocation(query, mCreateHaystackMapFragment.getCameraTargetBounds());
-    }
-
-    //TODO: finish validation
-    private Boolean validateHaystack(HaystackVO haystack){
-        if(haystack.getName().isEmpty()) return false;
-
-        return true;
-    }
-
-    public void onImageUploaded(ImageUploadResult result)
-    {
-        if(result.successCode == 1) {
-            haystack.setPictureURL(result.imageURL);
-
-            //Create Haystack
-            ApiClient.getInstance().createHaystack(haystack, Needle.navigationController);
-        }
-    }
-
-    private String getUserName(){
-        if(userName == null){
-            userName = getContext().getSharedPreferences("com.nemator.needle", Context.MODE_PRIVATE).getString("username", null);
-        }
-
-        return userName;
-    }
-
-    private int getUserId(){
-        if(userId == -1){
-            userId = getContext().getSharedPreferences("com.nemator.needle", Context.MODE_PRIVATE).getInt("userId", -1);
-        }
-
-        return userId;
-    }
-
-    public HaystackVO getHaystack(){
-        return haystack;
     }
 
     @Override

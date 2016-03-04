@@ -32,13 +32,8 @@ android {
 
         versionProps.load(new FileInputStream(versionPropsFile))
 
-        def value = 0
         def runTasks = gradle.startParameter.taskNames
-        if ('assemble' in runTasks || 'assembleRelease' in runTasks || 'aR' in runTasks) {
-            value = 1;
-        }
-
-        def code = versionProps['VERSION_CODE'].toInteger() + value
+        def code = versionProps['VERSION_CODE'].toInteger() + 1
 
         versionProps['VERSION_CODE'] = code.toString()
         versionProps.store(versionPropsFile.newWriter(), null)

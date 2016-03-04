@@ -9,17 +9,10 @@ import android.support.v4.app.FragmentStatePagerAdapter;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ListView;
 import android.widget.TextView;
 
-import com.nemator.needle.Needle;
 import com.nemator.needle.R;
-import com.nemator.needle.models.vo.UserVO;
-import com.nemator.needle.tasks.retrieveUsers.RetrieveUsersParams;
-import com.nemator.needle.tasks.retrieveUsers.RetrieveUsersResult;
-import com.nemator.needle.tasks.retrieveUsers.RetrieveUsersTask;
-
-import java.util.ArrayList;
+import com.nemator.needle.fragments.haystack.HaystackUsersTabFragment;
 
 public class SlidingPanelPagerAdapter extends FragmentStatePagerAdapter {
     private Context context;
@@ -41,7 +34,7 @@ public class SlidingPanelPagerAdapter extends FragmentStatePagerAdapter {
                 fragment = new DemoObjectFragment();
                 break;
             case 2://Users tab
-                fragment = new UsersTabFragment();
+                fragment = new HaystackUsersTabFragment();
                 break;
             default:
                 fragment = new DemoObjectFragment();
@@ -116,57 +109,6 @@ public class SlidingPanelPagerAdapter extends FragmentStatePagerAdapter {
             ((TextView) rootView.findViewById(R.id.view_pager_label)).setText(
                     Integer.toString(args.getInt(ARG_OBJECT)));
             return rootView;
-        }
-    }
-
-    public static class UsersTabFragment extends Fragment implements RetrieveUsersTask.RetrieveUsersResponseHandler{
-        public static final String ARG_OBJECT = "object";
-
-        private ListView listView;
-
-        private ArrayList<UserVO> userList = new ArrayList<UserVO>();
-        private ArrayList<UserVO> addedUserList = new ArrayList<UserVO>();
-        private HaystackUserListAdapter userListAdapter;
-        private LayoutInflater mInflater;
-
-        @Override
-        public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-            mInflater = inflater;
-            View rootView = inflater.inflate(R.layout.fragment_users_tab, container, false);
-
-            listView =  (ListView) rootView.findViewById(R.id.userList);
-            userListAdapter = new HaystackUserListAdapter(getActivity(), R.layout.haystack_drawer_item, userList, addedUserList, inflater);
-            listView.setAdapter(userListAdapter);
-
-            fetchAllUsers();
-
-            return rootView;
-        }
-
-        private void fetchAllUsers(){
-            RetrieveUsersParams params = new RetrieveUsersParams();
-            params.userId = String.valueOf(Needle.userModel.getUserId());
-            params.type = RetrieveUsersParams.RetrieveUsersParamsType.TYPE_ALL_USERS;
-
-            try{
-                RetrieveUsersTask task =  new RetrieveUsersTask(params, this);
-                task.execute();
-            } catch(Exception e){
-                e.printStackTrace();
-            }
-        }
-
-        public void onUsersRetrieved(RetrieveUsersResult result){
-            userList = result.userList;
-            updateUserList();
-        }
-
-        private void updateUserList(){
-            userListAdapter = new HaystackUserListAdapter(getActivity(), R.layout.haystack_drawer_item, userList, addedUserList, mInflater);
-            listView.setAdapter(userListAdapter);
-
-            userListAdapter.notifyDataSetChanged();
-            listView.invalidate();
         }
     }
 }

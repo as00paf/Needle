@@ -188,13 +188,12 @@ public class GoogleAPIController implements GoogleApiClient.ConnectionCallbacks,
                         .getStatus()
                         .startResolutionForResult(activity, SETTINGS_REQUEST_ID);
             } catch (IntentSender.SendIntentException e) {
-            
+
             }
         } else {
             isConnected = true;
             sendIntent(AppConstants.GOOGLE_API_CONNECTED);
         }
-
     }
 
     public void getCurrentPlace(ResultCallback<PlaceLikelihoodBuffer> callback) {

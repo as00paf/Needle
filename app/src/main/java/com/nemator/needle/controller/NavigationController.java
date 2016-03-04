@@ -45,7 +45,7 @@ import com.nemator.needle.fragments.settings.SettingsFragment;
 import com.nemator.needle.models.vo.HaystackVO;
 import com.nemator.needle.models.vo.LocationSharingVO;
 import com.nemator.needle.tasks.TaskResult;
-import com.nemator.needle.tasks.haystack.HaystackTaskResult;
+import com.nemator.needle.api.result.HaystackTaskResult;
 import com.nemator.needle.tasks.locationSharing.LocationSharingResult;
 import com.nemator.needle.utils.AppConstants;
 import com.nemator.needle.utils.AppState;
@@ -61,7 +61,7 @@ import static com.nemator.needle.fragments.locationSharing.LocationSharingListFr
 import static com.nemator.needle.tasks.locationSharing.LocationSharingTask.CreateLocationSharingResponseHandler;
 
 public class NavigationController implements HomeActivity.NavigationHandler, OnActivityStateChangeListener,
-        HaystackListFragmentInteractionListener, LocationSharingListFragmentInteractionListener, CreateLocationSharingResponseHandler, Callback<HaystackTaskResult> {
+        HaystackListFragmentInteractionListener, LocationSharingListFragmentInteractionListener, CreateLocationSharingResponseHandler {
 
     private static final String TAG = "NavigationController";
 
@@ -500,27 +500,6 @@ public class NavigationController implements HomeActivity.NavigationHandler, OnA
     @Override
     public void onRefreshLocationSharingList() {
         locationSharingListFragment.fetchLocationSharing();
-    }
-
-    //CreateHaystackResponseHandler
-    @Override
-    public void onResponse(Call<HaystackTaskResult> call, Response<HaystackTaskResult> response) {
-        HaystackTaskResult result = response.body();
-        if(result.getSuccessCode() == 0){
-            Toast.makeText(activity, "An error occured while creating Haystack", Toast.LENGTH_SHORT).show();
-        }else{
-            Toast.makeText(activity, activity.getResources().getString(R.string.haystack_created), Toast.LENGTH_SHORT).show();
-
-            Intent haystackIntent = new Intent(activity, HaystackActivity.class);
-            haystackIntent.putExtra(AppConstants.TAG_HAYSTACK, (Parcelable) result.getHaystack());
-            activity.startActivity(haystackIntent);
-        }
-    }
-
-    @Override
-    public void onFailure(Call<HaystackTaskResult> call, Throwable t) {
-        Log.d(TAG, "An error occured while creating Haystack : " + t.getMessage());
-        Toast.makeText(activity, "An error occured while creating Haystack ", Toast.LENGTH_SHORT).show();
     }
 
     //CreateLocationSharingResponseHandler

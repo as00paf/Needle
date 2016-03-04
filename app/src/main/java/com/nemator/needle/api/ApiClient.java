@@ -2,15 +2,20 @@ package com.nemator.needle.api;
 
 import android.util.Log;
 
+import com.nemator.needle.api.result.LocationSharingTaskResult;
+import com.nemator.needle.api.result.UserRegistrationResult;
+import com.nemator.needle.api.result.UserTaskResult;
+import com.nemator.needle.api.result.UsersTaskResult;
 import com.nemator.needle.models.vo.HaystackUserVO;
 import com.nemator.needle.models.vo.HaystackVO;
 import com.nemator.needle.models.vo.UserVO;
 import com.nemator.needle.tasks.TaskResult;
-import com.nemator.needle.tasks.haystack.HaystackTaskResult;
-import com.nemator.needle.tasks.login.LoginTaskResult;
+import com.nemator.needle.api.result.HaystackTaskResult;
+import com.nemator.needle.api.result.LoginTaskResult;
 import com.nemator.needle.utils.AppConstants;
 
 import java.io.IOException;
+import java.util.ArrayList;
 
 import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
@@ -118,5 +123,26 @@ public class ApiClient {
     public void deactivateUser(UserVO user, HaystackVO haystack, Callback<TaskResult> callBack) {
         Call<TaskResult> call = client.toggleUserActivation(new HaystackUserVO(haystack, user));
         call.enqueue(callBack);
+    }
+
+    public void leaveHaystack(UserVO user, HaystackVO haystack, Callback<TaskResult> callBack){
+        HaystackUserVO vo = new HaystackUserVO(haystack, user);
+        Call<TaskResult> call = client.leaveHaystack(vo);
+        call.enqueue(callBack);
+    }
+
+    public void fetchHaystackUsers(UserVO user, HaystackVO haystack, Callback<UsersTaskResult> callBack){
+        Call<UsersTaskResult> call = client.fetchHaystackUsers(user.getId(), haystack.getId());
+        call.enqueue(callBack);
+    }
+
+    public void addUsersToHaystack(HaystackVO haystack, ArrayList<UserVO> newUserList, Callback<HaystackTaskResult> callback) {
+        Call<HaystackTaskResult> call = client.addUsersToHaystack(haystack.getId(), newUserList);
+        call.enqueue(callback);
+    }
+
+    public void fetchUsersNotInHaystack(int haystackId, Callback<UsersTaskResult> callback) {
+        Call<UsersTaskResult> call = client.fetchUsersNotInHaystack(haystackId);
+        call.enqueue(callback);
     }
 }

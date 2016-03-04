@@ -1,11 +1,17 @@
 package com.nemator.needle.api;
 
+import com.nemator.needle.api.method.DELETE;
+import com.nemator.needle.api.result.LocationSharingTaskResult;
+import com.nemator.needle.api.result.UserRegistrationResult;
+import com.nemator.needle.api.result.UserTaskResult;
+import com.nemator.needle.api.result.UsersTaskResult;
 import com.nemator.needle.models.vo.HaystackUserVO;
 import com.nemator.needle.models.vo.UserVO;
 import com.nemator.needle.tasks.TaskResult;
-import com.nemator.needle.tasks.haystack.HaystackTaskResult;
-import com.nemator.needle.tasks.login.LoginTaskResult;
+import com.nemator.needle.api.result.HaystackTaskResult;
+import com.nemator.needle.api.result.LoginTaskResult;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import retrofit2.Call;
@@ -13,6 +19,7 @@ import retrofit2.http.Body;
 import retrofit2.http.Field;
 import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
+import retrofit2.http.HTTP;
 import retrofit2.http.POST;
 import retrofit2.http.PUT;
 import retrofit2.http.Path;
@@ -67,6 +74,7 @@ public interface NeedleApiClient {
     Call<LocationSharingTaskResult> getLocationSharings(@Query("userId") String userId);
 
     //Users
+    //TODO : replace by better use of user.php
     @GET("retrieveAllUsers.php")
     Call<UsersTaskResult> fetchAllUsers(@Query("userId") String userId);
 
@@ -80,4 +88,17 @@ public interface NeedleApiClient {
     //HaystackUser
     @PUT("haystackUser.php")
     Call<TaskResult> toggleUserActivation(@Body HaystackUserVO vo);
+
+    @HTTP(method = "DELETE", path = "haystackUser.php", hasBody = true)
+    Call<TaskResult> leaveHaystack(@Body HaystackUserVO vo);
+
+    @GET("haystackUser.php")
+    Call<UsersTaskResult> fetchHaystackUsers(@Query("userId") int userId, @Query("haystackId") int haystackId);
+
+    @FormUrlEncoded
+    @POST("haystackUser.php")
+    Call<HaystackTaskResult> addUsersToHaystack(@Field("haystackId") int id, @Field("users") ArrayList<UserVO> newUserList);
+
+    @GET("fetchUsersNotInHaystack.php")
+    Call<UsersTaskResult> fetchUsersNotInHaystack(@Query("haystackId") int haystackId);
 }

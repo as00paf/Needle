@@ -49,7 +49,13 @@ public class NetworkController extends BroadcastReceiver {
     }
 
     public void unregister(){
-        activity.unregisterReceiver(this);
+        if(activity != null){
+            try{
+                activity.unregisterReceiver(this);
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+        }
     }
 
     public static NetworkController getInstance() {

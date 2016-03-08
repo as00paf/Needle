@@ -164,7 +164,7 @@
     <string name="logged_in_with_facebook_account">Facebook Account</string>
     <string name="logged_in_with_twitter_account">Twitter Account</string>
     <string name="no_users_added">No users were added to the Haystack</string>
-    <string name="users_added"> users added to the Haystack</string>
+    <string name="users_added">users added to the Haystack</string>
     <string name="error_adding_users">Error adding users to the Haystack</string>
     <string name="select_users_to_add">Select users to add</string>
     <string name="fetching_users_failed">Fetching users failed</string>

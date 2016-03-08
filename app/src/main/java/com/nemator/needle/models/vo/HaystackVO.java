@@ -268,4 +268,12 @@ public class HaystackVO implements Serializable, Parcelable {
             return new HaystackVO[size];
         }
     };
+
+    public HaystackVO clone(){
+        return new HaystackVO(this.id, this.owner, this.name, this.isPublic, this.timeLimit, this.zoneRadius, this.isCircle, this.position, this.pictureURL, this.users, this.activeUsers);
+    }
+
+    public void addUsers(ArrayList<UserVO> newUserList) {
+        users.addAll(newUserList);
+    }
 }

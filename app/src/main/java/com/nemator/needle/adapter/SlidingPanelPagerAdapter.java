@@ -14,8 +14,11 @@ import android.widget.TextView;
 import com.nemator.needle.R;
 import com.nemator.needle.fragments.haystack.HaystackUsersTabFragment;
 
+import java.util.ArrayList;
+
 public class SlidingPanelPagerAdapter extends FragmentStatePagerAdapter {
     private Context context;
+    private ArrayList<Fragment> fragmentList = new ArrayList<Fragment>();
 
     public SlidingPanelPagerAdapter(FragmentManager fm, Context context) {
         super(fm);
@@ -40,6 +43,8 @@ public class SlidingPanelPagerAdapter extends FragmentStatePagerAdapter {
                 fragment = new DemoObjectFragment();
                 break;
         }
+
+        fragmentList.add(position, fragment);
 
         Bundle args = new Bundle();
         // Our object is just an integer :-P
@@ -93,6 +98,20 @@ public class SlidingPanelPagerAdapter extends FragmentStatePagerAdapter {
         }
 
         return icon;
+    }
+
+    public Fragment getFragmentByType(Class type){
+        for (int i = 0; i < fragmentList.size() ; i++) {
+            if(type.isInstance(fragmentList.get(i))) return fragmentList.get(i);
+        }
+
+        return null;
+    }
+
+    @Override
+    public void destroyItem(View container, int position, Object object) {
+        super.destroyItem(container, position, object);
+        fragmentList.remove(position);
     }
 
     public static class DemoObjectFragment extends Fragment {

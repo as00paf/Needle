@@ -168,6 +168,12 @@ public class HaystackActivity extends AppCompatActivity{
     }
 
     @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        outState.putParcelable(AppConstants.HAYSTACK_DATA_KEY, haystack);
+        super.onSaveInstanceState(outState);
+    }
+
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         this.menu = menu;
         getMenuInflater().inflate(R.menu.haystack, menu);
@@ -179,30 +185,40 @@ public class HaystackActivity extends AppCompatActivity{
         if (requestCode == AppConstants.SELECT_NEW_HAYSTACK_USERS) {
             if(resultCode == RESULT_OK){
                 final ArrayList<UserVO> newUserList = data.getParcelableArrayListExtra(AppConstants.TAG_USERS);
-                final int count = newUserList.size() - haystack.getUsers().size();
+                if(newUserList != null){
+                    final int count = newUserList.size() - haystack.getUsers().size();
 
-                ApiClient.getInstance().addUsersToHaystack(haystack, newUserList, new Callback<HaystackTaskResult>(){
+                    HaystackVO updatedHaystack = haystack.clone();
+                    updatedHaystack.setUsers(newUserList);
 
-                    @Override
-                    public void onResponse(Call<HaystackTaskResult> call, Response<HaystackTaskResult> response) {
-                        HaystackTaskResult result = response.body();
-                        if(result.getSuccessCode() == 1){
-                           ;
-                            haystack.setUsers(newUserList);
+                    ApiClient.getInstance().addUsersToHaystack(updatedHaystack, new Callback<HaystackTaskResult>(){
 
-                            ((HaystackUsersTabFragment) getSupportFragmentManager().findFragmentByTag(HaystackUsersTabFragment.TAG)).setHaystack(haystack);
+                        @Override
+                        public void onResponse(Call<HaystackTaskResult> call, Response<HaystackTaskResult> response) {
+                            HaystackTaskResult result = response.body();
+                            if(result.getSuccessCode() == 1){
+                                haystack.addUsers(newUserList);
 
-                            Toast.makeText(HaystackActivity.this, count + getString(R.string.users_added), Toast.LENGTH_SHORT).show();
-                        }else{
+                                HaystackUsersTabFragment fragment = (HaystackUsersTabFragment) pagerAdapter.getFragmentByType(HaystackUsersTabFragment.class);
+                                if(fragment != null){
+                                    fragment.setHaystack(haystack);
+                                }
 
+                                //TODO replace number in string
+                                Toast.makeText(HaystackActivity.this, count + " " + getString(R.string.users_added), Toast.LENGTH_SHORT).show();
+                            }else{
+                                Toast.makeText(HaystackActivity.this, getString(R.string.error_adding_users), Toast.LENGTH_SHORT).show();
+                            }
                         }
-                    }
 
-                    @Override
-                    public void onFailure(Call<HaystackTaskResult> call, Throwable t) {
-                        Toast.makeText(HaystackActivity.this, getString(R.string.error_adding_users), Toast.LENGTH_SHORT).show();
-                    }
-                });
+                        @Override
+                        public void onFailure(Call<HaystackTaskResult> call, Throwable t) {
+                            Toast.makeText(HaystackActivity.this, getString(R.string.error_adding_users), Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                }else{
+                    Toast.makeText(HaystackActivity.this, getString(R.string.no_users_added), Toast.LENGTH_SHORT).show();
+                }
             }
             if (resultCode == RESULT_CANCELED) {
                 Toast.makeText(HaystackActivity.this, getString(R.string.no_users_added), Toast.LENGTH_SHORT).show();

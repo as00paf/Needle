@@ -136,8 +136,8 @@ public class ApiClient {
         call.enqueue(callBack);
     }
 
-    public void addUsersToHaystack(HaystackVO haystack, ArrayList<UserVO> newUserList, Callback<HaystackTaskResult> callback) {
-        Call<HaystackTaskResult> call = client.addUsersToHaystack(haystack.getId(), newUserList);
+    public void addUsersToHaystack(HaystackVO haystack, Callback<HaystackTaskResult> callback) {
+        Call<HaystackTaskResult> call = client.addUsersToHaystack(haystack);
         call.enqueue(callback);
     }
 

@@ -1,17 +1,16 @@
 package com.nemator.needle.api;
 
-import com.nemator.needle.api.method.DELETE;
+import com.nemator.needle.api.result.HaystackTaskResult;
 import com.nemator.needle.api.result.LocationSharingTaskResult;
+import com.nemator.needle.api.result.LoginTaskResult;
 import com.nemator.needle.api.result.UserRegistrationResult;
 import com.nemator.needle.api.result.UserTaskResult;
 import com.nemator.needle.api.result.UsersTaskResult;
 import com.nemator.needle.models.vo.HaystackUserVO;
+import com.nemator.needle.models.vo.HaystackVO;
 import com.nemator.needle.models.vo.UserVO;
 import com.nemator.needle.tasks.TaskResult;
-import com.nemator.needle.api.result.HaystackTaskResult;
-import com.nemator.needle.api.result.LoginTaskResult;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import retrofit2.Call;
@@ -95,9 +94,8 @@ public interface NeedleApiClient {
     @GET("haystackUser.php")
     Call<UsersTaskResult> fetchHaystackUsers(@Query("userId") int userId, @Query("haystackId") int haystackId);
 
-    @FormUrlEncoded
     @POST("haystackUser.php")
-    Call<HaystackTaskResult> addUsersToHaystack(@Field("haystackId") int id, @Field("users") ArrayList<UserVO> newUserList);
+    Call<HaystackTaskResult> addUsersToHaystack(@Body HaystackVO haystack);
 
     @GET("fetchUsersNotInHaystack.php")
     Call<UsersTaskResult> fetchUsersNotInHaystack(@Query("haystackId") int haystackId);

@@ -38,7 +38,6 @@ public class HaystackUsersTabFragment extends Fragment{
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         rootView = inflater.inflate(R.layout.fragment_users_tab, container, false);
-        rootView.setTag(TAG);
 
         listView =  (RecyclerView) rootView.findViewById(R.id.userList);
         int spanCount = 2;//TODO : define span depending on screen width

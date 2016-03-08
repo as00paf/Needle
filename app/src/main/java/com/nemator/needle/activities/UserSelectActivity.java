@@ -82,6 +82,7 @@ public class UserSelectActivity extends AppCompatActivity{
     public boolean onOptionsItemSelected(MenuItem item) {
         switch(item.getItemId()){
             case R.id.action_done:
+            case android.R.id.home:
                 returnSelectedUsers();
                 return true;
         }
@@ -119,7 +120,9 @@ public class UserSelectActivity extends AppCompatActivity{
 
     private void returnSelectedUsers(){
         Intent returnIntent = new Intent();
-        returnIntent.putExtra(AppConstants.TAG_USERS, userListAdapter.getSelectedItems());
+        if(userListAdapter != null){
+            returnIntent.putExtra(AppConstants.TAG_USERS, userListAdapter.getSelectedItems());
+        }
         setResult(RESULT_OK, returnIntent);
         finish();
     }

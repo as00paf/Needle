@@ -1,6 +1,7 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/bg_grey"
     tools:context="com.nemator.needle.fragments.locationSharing.createLocationSharing.CreateLocationSharingFragment">
 
     <LinearLayout
@@ -36,11 +37,14 @@
                 android:id="@+id/new_location_friend"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                android:dropDownWidth="match_parent"
+                android:dropDownAnchor="@id/new_location_sharing_friend_label"
                 android:textAppearance="@style/Base.TextAppearance.AppCompat.Medium"
                 android:hint="@string/friend_name_hint"
                 android:singleLine="true"
+                android:autoText="false"
                 android:layout_gravity="bottom"
-                android:inputType="textAutoCorrect"/>
+                android:inputType="textNoSuggestions"/>
 
         </LinearLayout>
 

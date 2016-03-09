@@ -8,6 +8,7 @@ import com.nemator.needle.api.result.UserTaskResult;
 import com.nemator.needle.api.result.UsersTaskResult;
 import com.nemator.needle.models.vo.HaystackUserVO;
 import com.nemator.needle.models.vo.HaystackVO;
+import com.nemator.needle.models.vo.LocationSharingVO;
 import com.nemator.needle.models.vo.UserVO;
 import com.nemator.needle.tasks.TaskResult;
 
@@ -68,10 +69,6 @@ public interface NeedleApiClient {
                               @Field("lng") double lng, @Field("pictureURL")  String pictureURL,
                               @Field("timeLimit") String timeLimit, @Field("haystack_user[]") List<Integer> haystackUsers);
 
-    //LocationSharing
-    @GET("locationSharing.php")
-    Call<LocationSharingTaskResult> getLocationSharings(@Query("userId") String userId);
-
     //Users
     //TODO : replace by better use of user.php
     @GET("retrieveAllUsers.php")
@@ -99,4 +96,11 @@ public interface NeedleApiClient {
 
     @GET("fetchUsersNotInHaystack.php")
     Call<UsersTaskResult> fetchUsersNotInHaystack(@Query("haystackId") int haystackId);
+
+    //LocationSharing
+    @POST("locationSharing.php")
+    Call<LocationSharingTaskResult> createLocationSharing(@Body LocationSharingVO locationSharingVO);
+
+    @GET("locationSharing.php")
+    Call<LocationSharingTaskResult> getLocationSharings(@Query("userId") String userId);
 }

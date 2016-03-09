@@ -1,6 +1,7 @@
 package com.nemator.needle.fragments.locationSharing.createLocationSharing;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,6 +12,8 @@ import android.widget.TextView;
 
 import com.nemator.needle.R;
 import com.nemator.needle.models.vo.UserVO;
+import com.nemator.needle.utils.CropCircleTransformation;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 
@@ -45,15 +48,16 @@ public class FriendAutoCompleteAdapter extends ArrayAdapter<UserVO> {
         if (user != null) {
             TextView userNameLabel = (TextView) v.findViewById(R.id.friend_auto_complete_user_name_label);
             if (userNameLabel != null) {
-                userNameLabel.setText(user.getUserName());
+                userNameLabel.setText(user.getReadableUserName());
             }
 
             ImageView userPicture = (ImageView) v.findViewById(R.id.friend_auto_complete_user_picture);
             if(userPicture != null){
-               /* if(user.getPicture() != null){
-                    new ImageDownloaderTask(userPicture, getContext().getResources().getDrawable(R.drawable.person_placeholder)).execute(user.getPicture());
-                }*/
-                userPicture.setImageDrawable(getContext().getResources().getDrawable(R.drawable.person_placeholder));
+                Picasso.with(getContext()).load(user.getPictureURL())
+                        .transform(new CropCircleTransformation(getContext(), 2, Color.WHITE))
+                        .noFade()
+                        .placeholder(R.drawable.person_placeholder)
+                        .into(userPicture);
             }
         }
         return v;

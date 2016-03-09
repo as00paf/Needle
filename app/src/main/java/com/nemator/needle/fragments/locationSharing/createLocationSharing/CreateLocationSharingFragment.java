@@ -21,11 +21,15 @@ import android.widget.Toast;
 import com.nemator.needle.Needle;
 import com.nemator.needle.R;
 import com.nemator.needle.api.ApiClient;
+import com.nemator.needle.api.result.LocationSharingTaskResult;
 import com.nemator.needle.api.result.UsersTaskResult;
+import com.nemator.needle.data.LocationServiceDBHelper;
 import com.nemator.needle.models.vo.LocationSharingVO;
 import com.nemator.needle.models.vo.UserVO;
 import com.nemator.needle.tasks.locationSharing.LocationSharingParams;
+import com.nemator.needle.tasks.locationSharing.LocationSharingResult;
 import com.nemator.needle.tasks.locationSharing.LocationSharingTask;
+import com.nemator.needle.utils.AppConstants;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -203,19 +207,42 @@ public class CreateLocationSharingFragment extends Fragment {
         //Sender
         locationSharingVO.setSenderId(Needle.userModel.getUserId());
         locationSharingVO.setSenderName(Needle.userModel.getUserName());
+        locationSharingVO.setSenderRegId(Needle.userModel.getGcmRegId());
 
         //Receiver
         locationSharingVO.setReceiverId(selectedUser.getId());
         locationSharingVO.setReceiverName(selectedUser.getUserName());
+        locationSharingVO.setReceiverRegId(selectedUser.getGcmRegId());
 
         //Options
         locationSharingVO.setTimeLimit(dateLimitEditText.getText().toString() + " " + timeLimitEditText.getText().toString());
 
-        String regId = selectedUser.getGcmRegId();
-        LocationSharingParams params = new LocationSharingParams(getActivity(), LocationSharingParams.TYPE_CREATE, locationSharingVO, regId);
-        LocationSharingTask task = new LocationSharingTask(params, Needle.navigationController);
-        task.execute();
+        ApiClient.getInstance().createLocationSharing(locationSharingVO, locationSharingCreatedCallback);
     }
+
+    private Callback<LocationSharingTaskResult> locationSharingCreatedCallback = new Callback<LocationSharingTaskResult>() {
+        @Override
+        public void onResponse(Call<LocationSharingTaskResult> call, Response<LocationSharingTaskResult> response) {
+            LocationSharingTaskResult result = response.body();
+
+            if(result.getSuccessCode() == 1){
+                Needle.serviceController.startLocationUpdates();
+                Needle.serviceController.getService().addPostLocationRequest(LocationServiceDBHelper.PostLocationRequest.POSTER_TYPE_LOCATION_SHARING,
+                        result.getLocationSharing().getTimeLimit(), result.getLocationSharing().getSenderId(), String.valueOf(result.getLocationSharing().getId()));
+                Toast.makeText(getActivity(), "Location shared with " + result.getLocationSharing().getReceiverName(), Toast.LENGTH_SHORT).show();
+                Needle.navigationController.showSection(AppConstants.SECTION_LOCATION_SHARING_LIST);
+            }else{
+                Log.e(TAG, "Location Sharing not created. Error : " + result.getMessage());
+                Toast.makeText(getActivity(), "Location Sharing not created !", Toast.LENGTH_SHORT).show();
+            }
+        }
+
+        @Override
+        public void onFailure(Call<LocationSharingTaskResult> call, Throwable t) {
+            Log.e(TAG, "Location Sharing not created. Error : " + t.getMessage());
+            Toast.makeText(getActivity(), "Location Sharing not created !", Toast.LENGTH_SHORT).show();
+        }
+    };
 
     private Boolean validate(){
         if(selectedUser == null) return false;

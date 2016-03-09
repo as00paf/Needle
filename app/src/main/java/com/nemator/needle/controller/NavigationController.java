@@ -61,7 +61,7 @@ import static com.nemator.needle.fragments.locationSharing.LocationSharingListFr
 import static com.nemator.needle.tasks.locationSharing.LocationSharingTask.CreateLocationSharingResponseHandler;
 
 public class NavigationController implements HomeActivity.NavigationHandler, OnActivityStateChangeListener,
-        HaystackListFragmentInteractionListener, LocationSharingListFragmentInteractionListener, CreateLocationSharingResponseHandler {
+        HaystackListFragmentInteractionListener, LocationSharingListFragmentInteractionListener {
 
     private static final String TAG = "NavigationController";
 
@@ -455,11 +455,6 @@ public class NavigationController implements HomeActivity.NavigationHandler, OnA
 
     //LocationSharingListFragmentInteractionListener
     @Override
-    public void onCreateLocationSharingFabTapped() {
-        showSection(AppConstants.SECTION_CREATE_LOCATION_SHARING);
-    }
-
-    @Override
     public void onClickLocationSharingCard(LocationSharingVO locationSharing, Boolean isSent) {
         //Add/Remove Sections
         locationSharingFragment = new LocationSharingFragment();
@@ -500,20 +495,6 @@ public class NavigationController implements HomeActivity.NavigationHandler, OnA
     @Override
     public void onRefreshLocationSharingList() {
         locationSharingListFragment.fetchLocationSharing();
-    }
-
-    //CreateLocationSharingResponseHandler
-    @Override
-    public void onLocationSharingCreated(LocationSharingResult result) {
-        if(result.successCode == 1){
-            Needle.serviceController.startLocationUpdates();
-            Needle.serviceController.getService().addPostLocationRequest(PostLocationRequest.POSTER_TYPE_LOCATION_SHARING,
-                    result.vo.getTimeLimit(), result.vo.getSenderId(), String.valueOf(result.vo.getId()));
-            Toast.makeText(activity, "Location shared with " + result.vo.getReceiverName(), Toast.LENGTH_SHORT).show();
-            showSection(AppConstants.SECTION_LOCATION_SHARING_LIST);
-        }else{
-            Toast.makeText(activity, "Location Sharing not created !", Toast.LENGTH_SHORT).show();
-        }
     }
 
     public void showReceivedLocationSharing(LocationSharingVO vo){
@@ -559,8 +540,7 @@ public class NavigationController implements HomeActivity.NavigationHandler, OnA
 
         //Username
         TextView username = (TextView) headerView.findViewById(R.id.username);
-        String name = Needle.userModel.getUserName().substring(0, 1).toUpperCase() + Needle.userModel.getUserName().substring(1);
-        username.setText(name);
+        username.setText(Needle.userModel.getUserName());
 
         //Logged in with ...
         TextView accountType = (TextView) headerView.findViewById(R.id.account_type);

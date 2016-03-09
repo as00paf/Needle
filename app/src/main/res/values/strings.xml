@@ -131,6 +131,9 @@
     <string name="stop_sharing_location">Stop Sharing Location</string>
     <string name="share_location_back_confirmation">Are you sure you want to share you location back ?</string>
 
+    <!-- Location Sharing -->
+    <string name="fetch_location_sharings_error">Could Not Fetch Location Sharings</string>
+
     <!-- GCM -->
     <string name="gcm_send_message">Token retrieved and sent to server! You can now use gcmsender to send downstream messages to this app.</string>
     <string name="registering_message">Generating InstanceID token...</string>

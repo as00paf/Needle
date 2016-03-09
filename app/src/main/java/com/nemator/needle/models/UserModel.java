@@ -3,6 +3,7 @@ package com.nemator.needle.models;
 import android.content.Context;
 import android.content.SharedPreferences;
 
+import com.nemator.needle.Needle;
 import com.nemator.needle.controller.AuthenticationController;
 import com.nemator.needle.models.vo.FacebookUserVO;
 import com.nemator.needle.models.vo.UserVO;
@@ -60,7 +61,7 @@ public class UserModel {
     }
 
     public String getUserName(){
-        return user.getUserName();
+        return user.getReadableUserName();
     }
 
     public void setUserName(String username){

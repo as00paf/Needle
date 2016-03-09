@@ -8,6 +8,7 @@ import com.nemator.needle.api.result.UserTaskResult;
 import com.nemator.needle.api.result.UsersTaskResult;
 import com.nemator.needle.models.vo.HaystackUserVO;
 import com.nemator.needle.models.vo.HaystackVO;
+import com.nemator.needle.models.vo.LocationSharingVO;
 import com.nemator.needle.models.vo.UserVO;
 import com.nemator.needle.tasks.TaskResult;
 import com.nemator.needle.api.result.HaystackTaskResult;
@@ -66,6 +67,7 @@ public class ApiClient {
         return instance;
     }
 
+    //Authentication
     public void registerUser(UserVO userVO, Callback<UserRegistrationResult> callBack){
         Call<UserRegistrationResult> call = client.registerUser(userVO.getLoginType(), userVO.getEmail(), userVO.getUserName(),
                 userVO.getPassword(), userVO.getGcmRegId(), userVO.getPictureURL(), userVO.getCoverPictureURL(), userVO.getSocialNetworkUserId());
@@ -82,6 +84,7 @@ public class ApiClient {
         call.enqueue(callBack);
     }
 
+    //Haystacks
     public void fetchHaystacks(int userId,  Callback<HaystackTaskResult> callBack) {
         Call<HaystackTaskResult> call = client.getHaystacks(userId);
         call.enqueue(callBack);
@@ -91,21 +94,6 @@ public class ApiClient {
         Call<HaystackTaskResult> call = client.createHaystack(vo.getName(),
                 vo.getOwner(), vo.getIsPublic(), vo.getZoneRadius(), vo.getIsCircle(), vo.getPosition().getLongitude(),
                 vo.getPosition().getLatitude(), vo.getPictureURL(), vo.getTimeLimit(), vo.getUserIds());
-        call.enqueue(callBack);
-    }
-
-    public void fetchLocationSharings(int userId,  Callback<LocationSharingTaskResult> callBack) {
-        Call<LocationSharingTaskResult> call = client.getLocationSharings(String.valueOf(userId));
-        call.enqueue(callBack);
-    }
-
-    public void fetchAllUsers(int userId,  Callback<UsersTaskResult> callBack) {
-        Call<UsersTaskResult> call = client.fetchAllUsers(String.valueOf(userId));
-        call.enqueue(callBack);
-    }
-
-    public void updateLocation(UserVO user, Callback<UserTaskResult> callBack) {
-        Call<UserTaskResult> call = client.updateLocation(user);
         call.enqueue(callBack);
     }
 
@@ -145,4 +133,30 @@ public class ApiClient {
         Call<UsersTaskResult> call = client.fetchUsersNotInHaystack(haystackId);
         call.enqueue(callback);
     }
+
+    //Location Sharing
+    public void createLocationSharing(LocationSharingVO locationSharingVO, Callback<LocationSharingTaskResult> callBack) {
+        Call<LocationSharingTaskResult> call = client.createLocationSharing(locationSharingVO);
+        call.enqueue(callBack);
+    }
+
+    public void fetchLocationSharings(int userId, Callback<LocationSharingTaskResult> callBack) {
+        Call<LocationSharingTaskResult> call = client.getLocationSharings(String.valueOf(userId));
+        call.enqueue(callBack);
+    }
+
+    //Location
+    public void updateLocation(UserVO user, Callback<UserTaskResult> callBack) {
+        Call<UserTaskResult> call = client.updateLocation(user);
+        call.enqueue(callBack);
+    }
+
+    //General
+    public void fetchAllUsers(int userId,  Callback<UsersTaskResult> callBack) {
+        Call<UsersTaskResult> call = client.fetchAllUsers(String.valueOf(userId));
+        call.enqueue(callBack);
+    }
+
+    //Friends
+
 }

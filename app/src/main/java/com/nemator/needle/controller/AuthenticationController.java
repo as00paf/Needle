@@ -142,7 +142,7 @@ public class AuthenticationController {
 
         @Override
         public void onFailure(Call<LoginTaskResult> call, Throwable t) {
-            Log.d(TAG, "log in failed");
+            Log.d(TAG, "log in failed : " + t.getMessage());
         }
     };
 

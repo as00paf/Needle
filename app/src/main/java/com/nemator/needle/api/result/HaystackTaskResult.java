@@ -11,24 +11,24 @@ public class HaystackTaskResult extends TaskResult {
     @SerializedName("haystack")
     private HaystackVO haystack;
 
-    @SerializedName("haystackList")
-    private ArrayList<Object> haystackList;
+    @SerializedName("haystacks")
+    private ArrayList<Object> haystacks;
 
     @SerializedName("public_haystacks")
-    private ArrayList<HaystackVO> publicHaystackList = null;
+    private ArrayList<HaystackVO> publicHaystacks = null;
 
     @SerializedName("private_haystacks")
-    private ArrayList<HaystackVO> privateHaystackList = null;
+    private ArrayList<HaystackVO> privateHaystacks = null;
 
     public HaystackTaskResult() {
     }
 
-    public HaystackTaskResult(int successCode, String message, HaystackVO haystack, ArrayList<Object> haystackList, ArrayList<HaystackVO> publicHaystackList, ArrayList<HaystackVO> privateHaystackList) {
+    public HaystackTaskResult(int successCode, String message, HaystackVO haystack, ArrayList<Object> haystacks, ArrayList<HaystackVO> publicHaystacks, ArrayList<HaystackVO> privateHaystacks) {
         super(successCode, message);
         this.haystack = haystack;
-        this.haystackList = haystackList;
-        this.publicHaystackList = publicHaystackList;
-        this.privateHaystackList = privateHaystackList;
+        this.haystacks = haystacks;
+        this.publicHaystacks = publicHaystacks;
+        this.privateHaystacks = privateHaystacks;
     }
 
     public HaystackVO getHaystack() {
@@ -39,27 +39,27 @@ public class HaystackTaskResult extends TaskResult {
         this.haystack = haystack;
     }
 
-    public ArrayList<Object> getHaystackList() {
-        return haystackList;
+    public ArrayList<Object> getHaystacks() {
+        return haystacks;
     }
 
-    public void setHaystackList(ArrayList<Object> haystackList) {
-        this.haystackList = haystackList;
+    public void setHaystacks(ArrayList<Object> haystacks) {
+        this.haystacks = haystacks;
     }
 
-    public ArrayList<HaystackVO> getPublicHaystackList() {
-        return publicHaystackList;
+    public ArrayList<HaystackVO> getPublicHaystacks() {
+        return publicHaystacks;
     }
 
-    public void setPublicHaystackList(ArrayList<HaystackVO> publicHaystackList) {
-        this.publicHaystackList = publicHaystackList;
+    public void setPublicHaystacks(ArrayList<HaystackVO> publicHaystacks) {
+        this.publicHaystacks = publicHaystacks;
     }
 
-    public ArrayList<HaystackVO> getPrivateHaystackList() {
-        return privateHaystackList;
+    public ArrayList<HaystackVO> getPrivateHaystacks() {
+        return privateHaystacks;
     }
 
-    public void setPrivateHaystackList(ArrayList<HaystackVO> privateHaystackList) {
-        this.privateHaystackList = privateHaystackList;
+    public void setPrivateHaystacks(ArrayList<HaystackVO> privateHaystacks) {
+        this.privateHaystacks = privateHaystacks;
     }
 }

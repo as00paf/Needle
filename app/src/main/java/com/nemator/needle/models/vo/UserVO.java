@@ -271,4 +271,9 @@ public class UserVO implements Serializable, Parcelable{
     public void setLocation(LocationVO location) {
         this.location = location;
     }
+
+    public String getReadableUserName() {
+        String name = userName.substring(0, 1).toUpperCase() + userName.substring(1);
+        return name;
+    }
 }

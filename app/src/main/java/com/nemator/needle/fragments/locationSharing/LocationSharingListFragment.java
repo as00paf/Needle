@@ -9,22 +9,28 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.appcompat.view.slidingTab.SlidingTabLayout;
 import com.nemator.needle.Needle;
 import com.nemator.needle.R;
 import com.nemator.needle.adapter.LocationSharingPagerAdapter;
-import com.nemator.needle.models.vo.LocationSharingVO;
-import com.nemator.needle.tasks.locationSharing.LocationSharingParams;
-import com.nemator.needle.tasks.locationSharing.LocationSharingResult;
-import com.nemator.needle.tasks.locationSharing.LocationSharingTask;
-import com.nemator.needle.utils.AppState;
+import com.nemator.needle.api.ApiClient;
+import com.nemator.needle.api.result.LocationSharingTaskResult;
 import com.nemator.needle.fragments.haystacks.OnActivityStateChangeListener;
+import com.nemator.needle.models.vo.LocationSharingVO;
+import com.nemator.needle.tasks.locationSharing.LocationSharingResult;
+import com.nemator.needle.utils.AppConstants;
+import com.nemator.needle.utils.AppState;
 
 import java.util.ArrayList;
 
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
-public class LocationSharingListFragment extends Fragment implements LocationSharingTask.FetchLocationSharingResponseHandler {
+
+public class LocationSharingListFragment extends Fragment {
     public static String TAG = "LocationSharingFragment";
 
     //Views
@@ -35,7 +41,6 @@ public class LocationSharingListFragment extends Fragment implements LocationSha
 
     //Objects
     private LocationSharingPagerAdapter mLocationSharingPagerAdapter;
-    private LocationSharingListFragmentInteractionListener fabListener;
 
     //Data
     public ArrayList<LocationSharingVO> receivedLocationsList = new ArrayList<>();
@@ -65,6 +70,7 @@ public class LocationSharingListFragment extends Fragment implements LocationSha
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
+        //TODO : use constants
         outState.putParcelableArrayList("receivedLocationsList", receivedLocationsList);
         outState.putParcelableArrayList("sentLocationsList", sentLocationsList);
         super.onSaveInstanceState(outState);
@@ -88,12 +94,11 @@ public class LocationSharingListFragment extends Fragment implements LocationSha
             rootView = inflater.inflate(R.layout.fragment_location_sharing_list, container, false);
 
             //FAB
-            fabListener = Needle.navigationController;
             fab = (FloatingActionButton) rootView.findViewById(R.id.location_sharing_fab);
             fab.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    fabListener.onCreateLocationSharingFabTapped();
+                    Needle.navigationController.showSection(AppConstants.SECTION_CREATE_LOCATION_SHARING);
                 }
             });
 
@@ -148,34 +153,41 @@ public class LocationSharingListFragment extends Fragment implements LocationSha
     }
 
     public void fetchLocationSharing(){
-       LocationSharingParams params = new LocationSharingParams(rootView.getContext(), LocationSharingParams.TYPE_GET, String.valueOf(getUserId()));
-
-        try{
-            LocationSharingTask task = new LocationSharingTask(params, this);
-            task.execute();
-        }catch(Exception e){
-            Log.e(TAG, "fetchLocationSharing exception : " + e.toString());
-        }
+        ApiClient.getInstance().fetchLocationSharings(Needle.userModel.getUserId(), locationSharingsFetchedCallback);
     }
 
-    @Override
-    public void onLocationSharingFetched(LocationSharingResult result) {
-        receivedLocationsList = result.receivedLocationSharingList;
-        sentLocationsList = result.sentLocationSharingList;
+    private Callback<LocationSharingTaskResult> locationSharingsFetchedCallback = new Callback<LocationSharingTaskResult>() {
+        @Override
+        public void onResponse(Call<LocationSharingTaskResult> call, Response<LocationSharingTaskResult> response) {
+            LocationSharingTaskResult result = response.body();
+            if(result.getSuccessCode() == 1){
+                receivedLocationsList = result.getReceivedLocationSharings();
+                sentLocationsList = result.getSentLocationSharings();
 
-        if(receivedLocationsList != null && getActivity() != null){
-            Needle.navigationController.setLocationSharingCount(receivedLocationsList.size());
+                if(receivedLocationsList != null && getActivity() != null){
+                    Needle.navigationController.setLocationSharingCount(receivedLocationsList.size());
+                }
+
+                LocationSharingListTabFragment receivedTab = mLocationSharingPagerAdapter.getReceivedFragment();
+                LocationSharingListTabFragment sentTab = mLocationSharingPagerAdapter.getSentFragment();
+
+                receivedTab.getRefreshLayout().setRefreshing(false);
+                sentTab.getRefreshLayout().setRefreshing(false);
+
+                receivedTab.updateLocationSharingList(receivedLocationsList);
+                sentTab.updateLocationSharingList(sentLocationsList);
+            }else{
+                Log.e(TAG, "Could not fetch location sharings. Error : " + result.getMessage());
+                Toast.makeText(getActivity(), R.string.fetch_location_sharings_error, Toast.LENGTH_SHORT).show();
+            }
         }
 
-        LocationSharingListTabFragment receivedTab = mLocationSharingPagerAdapter.getReceivedFragment();
-        LocationSharingListTabFragment sentTab = mLocationSharingPagerAdapter.getSentFragment();
-
-        receivedTab.getRefreshLayout().setRefreshing(false);
-        sentTab.getRefreshLayout().setRefreshing(false);
-
-        receivedTab.updateLocationSharingList(receivedLocationsList);
-        sentTab.updateLocationSharingList(sentLocationsList);
-    }
+        @Override
+        public void onFailure(Call<LocationSharingTaskResult> call, Throwable t) {
+            Log.e(TAG, "Could not fetch location sharings. Error : " + t.getMessage());
+            Toast.makeText(getActivity(), R.string.fetch_location_sharings_error, Toast.LENGTH_SHORT).show();
+        }
+    };
 
     private int getUserId() {
         return Needle.userModel.getUserId();
@@ -189,7 +201,6 @@ public class LocationSharingListFragment extends Fragment implements LocationSha
 
     //Interface
     public interface LocationSharingListFragmentInteractionListener {
-        void onCreateLocationSharingFabTapped();
         void onRefreshLocationSharingList();
         void onClickLocationSharingCard(LocationSharingVO locationSharing, Boolean isSent);
         void onLocationSharingUpdated(LocationSharingResult result);

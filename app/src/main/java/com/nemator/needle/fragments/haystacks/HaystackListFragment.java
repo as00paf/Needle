@@ -203,8 +203,8 @@ public class HaystackListFragment extends Fragment implements SwipeRefreshLayout
                 privateTab.getRefreshLayout().setRefreshing(false);
 
                 if(result.getSuccessCode() == 1){
-                    publicHaystacks = result.getPublicHaystackList();
-                    privateHaystacks = result.getPrivateHaystackList();
+                    publicHaystacks = result.getPublicHaystacks();
+                    privateHaystacks = result.getPrivateHaystacks();
 
                     publicTab.updateHaystackList(publicHaystacks);
                     privateTab.updateHaystackList(privateHaystacks);

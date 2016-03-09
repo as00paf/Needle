@@ -1,5 +1,6 @@
 package com.nemator.needle.fragments.haystack;
 
+import android.Manifest;
 import android.content.IntentFilter;
 import android.graphics.Point;
 import android.location.Location;
@@ -14,6 +15,7 @@ import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.Projection;
@@ -36,6 +38,7 @@ import com.nemator.needle.models.vo.HaystackVO;
 import com.nemator.needle.models.vo.UserVO;
 import com.nemator.needle.tasks.TaskResult;
 import com.nemator.needle.utils.AppConstants;
+import com.nemator.needle.utils.PermissionManager;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -95,7 +98,11 @@ public class HaystackMapFragment extends SupportMapFragment implements LocationS
         }
 
         //Location Service
-        Needle.serviceController.initServiceAndStartUpdates(getActivity());
+        if (PermissionManager.getInstance(getContext()).isPermissionGranted(Manifest.permission.ACCESS_FINE_LOCATION)) {
+            Needle.serviceController.initServiceAndStartUpdates(getActivity());
+        }else{
+            PermissionManager.getInstance(getContext()).requestPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION);
+        }
 
         //Broadcast Receiver
         locationServiceBroadcastReceiver = new LocationServiceBroadcastReceiver(this);

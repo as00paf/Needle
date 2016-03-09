@@ -1,5 +1,6 @@
 package com.nemator.needle.service;
 
+import android.Manifest;
 import android.app.Service;
 import android.content.Intent;
 import android.location.Location;
@@ -27,6 +28,7 @@ import com.nemator.needle.tasks.db.isPostLocationRequestDBEmpty.IsPostLocationRe
 import com.nemator.needle.tasks.db.isPostLocationRequestDBEmpty.IsPostLocationRequestDBEmptyTask.IsPostLocationRequestDBEmptyResponseHandler;
 import com.nemator.needle.tasks.db.removePostLocationRequest.RemovePostLocationRequestTask;
 import com.nemator.needle.utils.AppConstants;
+import com.nemator.needle.utils.PermissionManager;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -143,11 +145,12 @@ public class NeedleLocationService extends Service implements
 
     @Override
     public void onConnected(Bundle connectionHint) {
-        if (mRequestingLocationUpdates) {
+        if (mRequestingLocationUpdates && PermissionManager.getInstance(this).isPermissionGranted(Manifest.permission.ACCESS_FINE_LOCATION)) {
             startLocationUpdates();
+
+            mCurrentLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
         }
 
-        mCurrentLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
         if(mCurrentLocation != null) {
             Double lat = mCurrentLocation.getLatitude();
             Double lng = mCurrentLocation.getLongitude();

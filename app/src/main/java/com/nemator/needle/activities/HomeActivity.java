@@ -1,5 +1,6 @@
 package com.nemator.needle.activities;
 
+import android.Manifest;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -26,6 +27,7 @@ import com.nemator.needle.models.vo.LocationVO;
 import com.nemator.needle.models.vo.UserVO;
 import com.nemator.needle.utils.AppConstants;
 import com.nemator.needle.utils.AppState;
+import com.nemator.needle.utils.PermissionManager;
 
 public class HomeActivity extends AppCompatActivity {
 
@@ -53,6 +55,13 @@ public class HomeActivity extends AppCompatActivity {
         setupDrawerLayout();
 
         initView();
+        requestPermission();
+    }
+
+    private void requestPermission() {
+        if(!PermissionManager.getInstance(this).isPermissionGranted(Manifest.permission.ACCESS_FINE_LOCATION)){
+            PermissionManager.getInstance(this).requestPermission(this, Manifest.permission.ACCESS_FINE_LOCATION);
+        }
     }
 
     public void initUser(Bundle  savedInstanceState) {

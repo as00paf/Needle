@@ -131,7 +131,7 @@ public class HaystackListCardAdapter extends RecyclerView.Adapter<HaystackListCa
                 view.setOnClickListener(new View.OnClickListener() {
 
                     @Override
-                    public void onClick(View view) {
+                    public void onClickCard(View view) {
                         Haystack haystackData = (Haystack) getItem(getPosition());
                         Intent intent = new Intent(view.getContext(), HaystackActivity.class);
                         intent.putExtra(AppConstants.HAYSTACK_DATA_KEY, (Parcelable) haystackData);

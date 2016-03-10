@@ -5,6 +5,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 import com.google.gson.annotations.SerializedName;
+import com.nemator.needle.Needle;
 
 import java.io.Serializable;
 
@@ -36,6 +37,7 @@ public class LocationSharingVO implements Serializable, Parcelable {
 
     @SerializedName("shareBack")
     private Boolean shareBack;
+    private boolean sender;
 
     public LocationSharingVO(){
 
@@ -184,5 +186,9 @@ public class LocationSharingVO implements Serializable, Parcelable {
 
     public void setReceiverRegId(String receiverRegId) {
         this.receiverRegId = receiverRegId;
+    }
+
+    public boolean isSender() {
+        return Needle.userModel.getUserId() == senderId;
     }
 }

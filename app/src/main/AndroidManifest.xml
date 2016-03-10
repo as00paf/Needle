@@ -112,6 +112,11 @@
             android:parentActivityName=".activities.HomeActivity"
             android:theme="@style/AppTheme"/>
 
+        <activity android:name=".activities.LocationSharingActivity"
+            android:label="Location Sharing"
+            android:parentActivityName=".activities.HomeActivity"
+            android:theme="@style/AppTheme"/>
+
         <activity android:name=".activities.UserSelectActivity"
             android:label="Select Users"
             android:parentActivityName=".activities.HaystackActivity"

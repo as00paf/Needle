@@ -19,7 +19,6 @@ import com.nemator.needle.api.ApiClient;
 import com.nemator.needle.api.result.LocationSharingTaskResult;
 import com.nemator.needle.fragments.haystacks.OnActivityStateChangeListener;
 import com.nemator.needle.models.vo.LocationSharingVO;
-import com.nemator.needle.tasks.locationSharing.LocationSharingResult;
 import com.nemator.needle.utils.AppConstants;
 import com.nemator.needle.utils.AppState;
 
@@ -153,7 +152,7 @@ public class LocationSharingListFragment extends Fragment {
     }
 
     public void fetchLocationSharing(){
-        ApiClient.getInstance().fetchLocationSharings(Needle.userModel.getUserId(), locationSharingsFetchedCallback);
+        ApiClient.getInstance().fetchLocationSharings(locationSharingsFetchedCallback);
     }
 
     private Callback<LocationSharingTaskResult> locationSharingsFetchedCallback = new Callback<LocationSharingTaskResult>() {
@@ -197,12 +196,5 @@ public class LocationSharingListFragment extends Fragment {
         if(locationSharingViewPager!=null){
             locationSharingViewPager.setCurrentItem(page);
         }
-    }
-
-    //Interface
-    public interface LocationSharingListFragmentInteractionListener {
-        void onRefreshLocationSharingList();
-        void onClickLocationSharingCard(LocationSharingVO locationSharing, Boolean isSent);
-        void onLocationSharingUpdated(LocationSharingResult result);
     }
 }

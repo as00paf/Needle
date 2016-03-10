@@ -141,6 +141,7 @@
     <string name="token_error_message">An error occurred while either fetching the InstanceID token, sending the fetched token to the server or subscribing to the PubSub topic. Please try running the sample again.</string>
     <string name="title_activity_facebook">FacebookActivity</string>
     <string name="user_not_found_message">User not foud. Please Register first</string>
+    <string name="location_of">Location of </string>
 
     <string name="no_internet_connection">No Internet Connection</string>
     <string name="permission_denied_title">Permission Denied</string>

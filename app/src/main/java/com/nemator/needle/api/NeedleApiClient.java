@@ -98,9 +98,15 @@ public interface NeedleApiClient {
     Call<UsersTaskResult> fetchUsersNotInHaystack(@Query("haystackId") int haystackId);
 
     //LocationSharing
+    @GET("locationSharing.php")
+    Call<LocationSharingTaskResult> getLocationSharings(@Query("userId") int userId);
+
     @POST("locationSharing.php")
     Call<LocationSharingTaskResult> createLocationSharing(@Body LocationSharingVO locationSharingVO);
 
-    @GET("locationSharing.php")
-    Call<LocationSharingTaskResult> getLocationSharings(@Query("userId") String userId);
+    @PUT("locationSharing.php")
+    Call<LocationSharingTaskResult> shareLocationBack(@Body LocationSharingVO vo);
+
+    @HTTP(method = "DELETE", path = "locationSharing.php", hasBody = true)
+    Call<LocationSharingTaskResult> cancelLocationSharing(@Body LocationSharingVO vo);
 }

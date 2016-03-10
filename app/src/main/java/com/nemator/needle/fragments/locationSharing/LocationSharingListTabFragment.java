@@ -1,7 +1,9 @@
 package com.nemator.needle.fragments.locationSharing;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
@@ -12,15 +14,17 @@ import android.view.ViewGroup;
 
 import com.nemator.needle.Needle;
 import com.nemator.needle.R;
+import com.nemator.needle.activities.HaystackActivity;
+import com.nemator.needle.activities.LocationSharingActivity;
 import com.nemator.needle.adapter.LocationSharingListCardAdapter;
-import com.nemator.needle.models.vo.LocationSharingVO;
-import com.nemator.needle.utils.AppState;
 import com.nemator.needle.fragments.haystacks.OnActivityStateChangeListener;
-import com.nemator.needle.fragments.locationSharing.LocationSharingListFragment.LocationSharingListFragmentInteractionListener;
+import com.nemator.needle.models.vo.LocationSharingVO;
+import com.nemator.needle.utils.AppConstants;
+import com.nemator.needle.utils.AppState;
 
 import java.util.ArrayList;
 
-public class LocationSharingListTabFragment extends Fragment{
+public class LocationSharingListTabFragment extends Fragment implements LocationSharingCardListener{
     private static final String TAG = "LocationSharingListTabFragment";
 
     //Views
@@ -33,10 +37,9 @@ public class LocationSharingListTabFragment extends Fragment{
     private Boolean isReceived;
 
     //Objects
-    private RecyclerView.Adapter mAdapter;
-    private RecyclerView.LayoutManager mLayoutManager;
+    private RecyclerView.Adapter listAdapter;
+    private RecyclerView.LayoutManager layoutManager;
     private OnActivityStateChangeListener stateChangeCallback;
-    private LocationSharingListFragmentInteractionListener interactionListener;
 
     @Override
     public void onCreate(Bundle savedInstanceState){
@@ -54,10 +57,9 @@ public class LocationSharingListTabFragment extends Fragment{
 
         try {
             stateChangeCallback = Needle.navigationController;
-            interactionListener = Needle.navigationController;
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString()
-                    + " must implement OnActivityStateChangeListener and LocationSharingListFragmentInteractionListener");
+                    + " must implement OnActivityStateChangeListener and LocationSharingCardListener");
         }
     }
 
@@ -69,11 +71,11 @@ public class LocationSharingListTabFragment extends Fragment{
         mRecyclerView = (RecyclerView) rootView.findViewById(R.id.location_sharing_list);
         mRecyclerView.setHasFixedSize(true);
 
-        mLayoutManager = new LinearLayoutManager(getActivity());
-        mRecyclerView.setLayoutManager(mLayoutManager);
+        layoutManager = new LinearLayoutManager(getActivity());
+        mRecyclerView.setLayoutManager(layoutManager);
 
-        mAdapter = new LocationSharingListCardAdapter(dataList, getActivity(), !isReceived, Needle.navigationController);
-        mRecyclerView.setAdapter(mAdapter);
+        listAdapter = new LocationSharingListCardAdapter(dataList, getActivity(), !isReceived, this);
+        mRecyclerView.setAdapter(listAdapter);
 
 
         //Swipe To Refresh
@@ -81,7 +83,7 @@ public class LocationSharingListTabFragment extends Fragment{
         swipeLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                interactionListener.onRefreshLocationSharingList();
+                onRefreshList();
             }
         });
         return rootView;
@@ -99,22 +101,28 @@ public class LocationSharingListTabFragment extends Fragment{
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        if(mAdapter != null){
-            mRecyclerView.setAdapter(mAdapter);
+        if(listAdapter != null){
+            mRecyclerView.setAdapter(listAdapter);
         }
     }
 
     public void updateLocationSharingList(ArrayList<LocationSharingVO> data){
         this.dataList = data;
-        mAdapter = new LocationSharingListCardAdapter(dataList, getActivity(), !isReceived, Needle.navigationController);
+        listAdapter = new LocationSharingListCardAdapter(dataList, getActivity(), !isReceived, this);
 
         if(mRecyclerView != null){
-            mRecyclerView.setAdapter(mAdapter);
+            mRecyclerView.setAdapter(listAdapter);
         }
     }
 
     //Getters/Setters
     public SwipeRefreshLayout getRefreshLayout() {
         return swipeLayout;
+    }
+
+    //Handlers
+    @Override
+    public void onRefreshList() {
+        Needle.navigationController.refreshLocationSharingList();
     }
 }

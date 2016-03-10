@@ -2,6 +2,7 @@ package com.nemator.needle.api;
 
 import android.util.Log;
 
+import com.nemator.needle.Needle;
 import com.nemator.needle.api.result.LocationSharingTaskResult;
 import com.nemator.needle.api.result.UserRegistrationResult;
 import com.nemator.needle.api.result.UserTaskResult;
@@ -140,8 +141,18 @@ public class ApiClient {
         call.enqueue(callBack);
     }
 
-    public void fetchLocationSharings(int userId, Callback<LocationSharingTaskResult> callBack) {
-        Call<LocationSharingTaskResult> call = client.getLocationSharings(String.valueOf(userId));
+    public void fetchLocationSharings(Callback<LocationSharingTaskResult> callBack) {
+        Call<LocationSharingTaskResult> call = client.getLocationSharings(Needle.userModel.getUserId());
+        call.enqueue(callBack);
+    }
+
+    public void shareLocationBack(LocationSharingVO vo, Callback<LocationSharingTaskResult> callBack){
+        Call<LocationSharingTaskResult> call = client.shareLocationBack(vo);
+        call.enqueue(callBack);
+    }
+
+    public void cancelLocationSharing(LocationSharingVO vo, Callback<LocationSharingTaskResult> callBack){
+        Call<LocationSharingTaskResult> call = client.cancelLocationSharing(vo);
         call.enqueue(callBack);
     }
 

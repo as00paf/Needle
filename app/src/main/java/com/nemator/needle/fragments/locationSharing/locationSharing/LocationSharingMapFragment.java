@@ -30,6 +30,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.nemator.needle.activities.HomeActivity;
 import com.nemator.needle.Needle;
 import com.nemator.needle.R;
+import com.nemator.needle.activities.LocationSharingActivity;
 import com.nemator.needle.broadcastReceiver.LocationServiceBroadcastReceiver;
 import com.nemator.needle.models.vo.LocationSharingVO;
 import com.nemator.needle.service.NeedleLocationService;
@@ -64,7 +65,6 @@ public class LocationSharingMapFragment extends SupportMapFragment
     private Boolean cameraUpdated = false;
 
     //Location Service
-    private NeedleLocationService locationService;
     private LocationServiceBroadcastReceiver locationServiceBroadcastReceiver;
     private Boolean mRequestingLocationUpdates = true;
 
@@ -85,8 +85,8 @@ public class LocationSharingMapFragment extends SupportMapFragment
         if(savedInstanceState != null){
             updateValuesFromBundle(savedInstanceState);
         }else{
-            locationSharing = ((LocationSharingFragment) getParentFragment()).getLocationSharing();
-            isSent = ((LocationSharingFragment) getParentFragment()).getIsSent();
+            locationSharing = ((LocationSharingActivity) getActivity()).getLocationSharing();
+            isSent = locationSharing.isSender();
         }
 
         //Map
@@ -97,7 +97,6 @@ public class LocationSharingMapFragment extends SupportMapFragment
 
         //Location Service
         Needle.serviceController.initServiceAndStartUpdates(getActivity());
-        locationService.startLocationUpdates();
 
         locationServiceBroadcastReceiver = new LocationServiceBroadcastReceiver(this);
 
@@ -138,7 +137,7 @@ public class LocationSharingMapFragment extends SupportMapFragment
     @Override
     public void onResume() {
         //Broadcast Receiver
-        locationSharing = ((LocationSharingFragment) getParentFragment()).getLocationSharing();
+        locationSharing = ((LocationSharingActivity) getActivity()).getLocationSharing();
         getActivity().registerReceiver(locationServiceBroadcastReceiver, new IntentFilter(AppConstants.LOCATION_UPDATED));
 
         super.onResume();
@@ -149,7 +148,7 @@ public class LocationSharingMapFragment extends SupportMapFragment
         super.onDetach();
 
         if(!isSent){
-            locationService.stopLocationUpdates();
+            Needle.serviceController.stopLocationUpdates();
         }
     }
 
@@ -199,7 +198,7 @@ public class LocationSharingMapFragment extends SupportMapFragment
     public void setUpMapIfNeeded() {
         if (mMap == null) {
             mMap = getMap();
-        }else if(locationService.isConnected()){
+        }else if(Needle.serviceController.isConnected()){
             resumeOperations();
         }
     }

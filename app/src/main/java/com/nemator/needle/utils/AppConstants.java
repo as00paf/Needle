@@ -28,6 +28,7 @@ public class AppConstants {
     public static final String TAG_HAYSTACK = "haystack";
     public static final String TAG_HAYSTACK_ID = "haystackId";
     public static final String TAG_IS_ACTIVE = "isActive";
+    public static final String TAG_LOCATION_SHARING = "locationSharing";
     public static final String TAG_LOCATION_SHARING_ID = "locationSharingId";
     public static final String TAG_USER_NAME = "userName";
     public static final String TAG_EMAIL = "email";

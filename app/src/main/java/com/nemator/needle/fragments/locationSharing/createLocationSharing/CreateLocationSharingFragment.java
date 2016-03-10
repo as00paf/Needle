@@ -2,7 +2,9 @@ package com.nemator.needle.fragments.locationSharing.createLocationSharing;
 
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
+import android.content.Intent;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -20,15 +22,13 @@ import android.widget.Toast;
 
 import com.nemator.needle.Needle;
 import com.nemator.needle.R;
+import com.nemator.needle.activities.LocationSharingActivity;
 import com.nemator.needle.api.ApiClient;
 import com.nemator.needle.api.result.LocationSharingTaskResult;
 import com.nemator.needle.api.result.UsersTaskResult;
 import com.nemator.needle.data.LocationServiceDBHelper;
 import com.nemator.needle.models.vo.LocationSharingVO;
 import com.nemator.needle.models.vo.UserVO;
-import com.nemator.needle.tasks.locationSharing.LocationSharingParams;
-import com.nemator.needle.tasks.locationSharing.LocationSharingResult;
-import com.nemator.needle.tasks.locationSharing.LocationSharingTask;
 import com.nemator.needle.utils.AppConstants;
 
 import java.text.SimpleDateFormat;
@@ -226,11 +226,14 @@ public class CreateLocationSharingFragment extends Fragment {
             LocationSharingTaskResult result = response.body();
 
             if(result.getSuccessCode() == 1){
-                Needle.serviceController.startLocationUpdates();
+                LocationSharingVO vo = result.getLocationSharing();
                 Needle.serviceController.getService().addPostLocationRequest(LocationServiceDBHelper.PostLocationRequest.POSTER_TYPE_LOCATION_SHARING,
-                        result.getLocationSharing().getTimeLimit(), result.getLocationSharing().getSenderId(), String.valueOf(result.getLocationSharing().getId()));
+                        vo.getTimeLimit(), vo.getSenderId(), String.valueOf(vo.getId()));
                 Toast.makeText(getActivity(), "Location shared with " + result.getLocationSharing().getReceiverName(), Toast.LENGTH_SHORT).show();
-                Needle.navigationController.showSection(AppConstants.SECTION_LOCATION_SHARING_LIST);
+
+                Intent locationSharingIntent = new Intent(getContext(), LocationSharingActivity.class);
+                locationSharingIntent.putExtra(AppConstants.TAG_LOCATION_SHARING, (Parcelable) result.getLocationSharing());
+                getContext().startActivity(locationSharingIntent);
             }else{
                 Log.e(TAG, "Location Sharing not created. Error : " + result.getMessage());
                 Toast.makeText(getActivity(), "Location Sharing not created !", Toast.LENGTH_SHORT).show();

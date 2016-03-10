@@ -225,7 +225,7 @@ public class HaystackListFragment extends Fragment implements SwipeRefreshLayout
                 publicTab.getRefreshLayout().setRefreshing(false);
                 privateTab.getRefreshLayout().setRefreshing(false);
 
-                Toast.makeText(getActivity(), R.string.fetch_haystack_error, Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), R.string.fetch_haystack_error, Toast.LENGTH_SHORT).show();
             }
         });
     }

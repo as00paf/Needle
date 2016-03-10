@@ -30,6 +30,7 @@ import com.nemator.needle.activities.CreateHaystackActivity;
 import com.nemator.needle.activities.HaystackActivity;
 import com.nemator.needle.activities.HomeActivity;
 import com.nemator.needle.api.ApiClient;
+import com.nemator.needle.data.LocationServiceDBHelper;
 import com.nemator.needle.data.LocationServiceDBHelper.PostLocationRequest;
 import com.nemator.needle.fragments.authentication.LoginFragment;
 import com.nemator.needle.fragments.authentication.LoginSplashFragment;
@@ -45,8 +46,6 @@ import com.nemator.needle.fragments.settings.SettingsFragment;
 import com.nemator.needle.models.vo.HaystackVO;
 import com.nemator.needle.models.vo.LocationSharingVO;
 import com.nemator.needle.tasks.TaskResult;
-import com.nemator.needle.api.result.HaystackTaskResult;
-import com.nemator.needle.tasks.locationSharing.LocationSharingResult;
 import com.nemator.needle.utils.AppConstants;
 import com.nemator.needle.utils.AppState;
 import com.nemator.needle.utils.CropCircleTransformation;
@@ -57,11 +56,9 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 import static com.nemator.needle.fragments.haystacks.HaystackListFragment.HaystackListFragmentInteractionListener;
-import static com.nemator.needle.fragments.locationSharing.LocationSharingListFragment.LocationSharingListFragmentInteractionListener;
-import static com.nemator.needle.tasks.locationSharing.LocationSharingTask.CreateLocationSharingResponseHandler;
 
 public class NavigationController implements HomeActivity.NavigationHandler, OnActivityStateChangeListener,
-        HaystackListFragmentInteractionListener, LocationSharingListFragmentInteractionListener {
+        HaystackListFragmentInteractionListener {
 
     private static final String TAG = "NavigationController";
 
@@ -453,47 +450,7 @@ public class NavigationController implements HomeActivity.NavigationHandler, OnA
         activity.startActivity(haystackIntent);
     }
 
-    //LocationSharingListFragmentInteractionListener
-    @Override
-    public void onClickLocationSharingCard(LocationSharingVO locationSharing, Boolean isSent) {
-        //Add/Remove Sections
-        locationSharingFragment = new LocationSharingFragment();
-        locationSharingFragment.setLocationSharing(locationSharing);
-        locationSharingFragment.setIsSent(isSent);
-        String name = isSent ? locationSharing.getReceiverName() : locationSharing.getSenderName();
-        //locationSharingSection = activity.newSection(name, R.drawable.ic_action_location_found, locationSharingFragment);
-        //activity.addSectionAt(locationSharingSection, 2);
-
-        showSection(AppConstants.SECTION_LOCATION_SHARING);
-    }
-
-    //TODO:localize
-    @Override
-    public void onLocationSharingUpdated(LocationSharingResult result) {
-        if(result.successCode == 1){
-            if(result.vo.getShareBack()){
-                Needle.serviceController.startLocationUpdates();
-                Needle.serviceController.getService().addPostLocationRequest(PostLocationRequest.POSTER_TYPE_LOCATION_SHARING_BACK,
-                        result.vo.getTimeLimit(), result.vo.getSenderId(),
-                        String.valueOf(result.vo.getId()));
-
-                Toast.makeText(activity, "Location shared with " + result.vo.getReceiverName(), Toast.LENGTH_SHORT).show();
-            }else{
-                Needle.serviceController.getService().removePostLocationRequest(PostLocationRequest.POSTER_TYPE_LOCATION_SHARING_BACK,
-                                                                        result.vo.getTimeLimit(), result.vo.getSenderId(),
-                                                                        String.valueOf(result.vo.getId()));
-
-                Toast.makeText(activity, "Location shared with " + result.vo.getReceiverName(), Toast.LENGTH_SHORT).show();
-            }
-
-        }else{
-            String msg = result.vo.getShareBack() ? "Location still shared !" : "Could not share location !";
-            Toast.makeText(activity, msg, Toast.LENGTH_SHORT).show();
-        }
-    }
-
-    @Override
-    public void onRefreshLocationSharingList() {
+    public void refreshLocationSharingList() {
         locationSharingListFragment.fetchLocationSharing();
     }
 
@@ -669,4 +626,29 @@ public class NavigationController implements HomeActivity.NavigationHandler, OnA
     public void setPreviousState(int previousState) {
         this.previousState = previousState;
     }
+/*
+    //TODO:localize
+    @Override
+    public void onLocationSharingUpdated(LocationSharingResult result) {
+        if(result.successCode == 1){
+            if(result.vo.getShareBack()){
+                Needle.serviceController.startLocationUpdates();
+                Needle.serviceController.getService().addPostLocationRequest(LocationServiceDBHelper.PostLocationRequest.POSTER_TYPE_LOCATION_SHARING_BACK,
+                        result.vo.getTimeLimit(), result.vo.getSenderId(),
+                        String.valueOf(result.vo.getId()));
+
+                Toast.makeText(activity, "Location shared with " + result.vo.getReceiverName(), Toast.LENGTH_SHORT).show();
+            }else{
+                Needle.serviceController.getService().removePostLocationRequest(LocationServiceDBHelper.PostLocationRequest.POSTER_TYPE_LOCATION_SHARING_BACK,
+                        result.vo.getTimeLimit(), result.vo.getSenderId(),
+                        String.valueOf(result.vo.getId()));
+
+                Toast.makeText(activity, "Location shared with " + result.vo.getReceiverName(), Toast.LENGTH_SHORT).show();
+            }
+
+        }else{
+            String msg = result.vo.getShareBack() ? "Location still shared !" : "Could not share location !";
+            Toast.makeText(activity, msg, Toast.LENGTH_SHORT).show();
+        }
+    }*/
 }

@@ -88,4 +88,8 @@ public class NeedleServiceController {
     public void startLocationUpdates() {
         locationService.startLocationUpdates();
     }
+
+    public void stopLocationUpdates() {
+        locationService.stopLocationUpdates();
+    }
 }

@@ -80,7 +80,7 @@ public class GCMController /*implements UserTask.UpdateGCMIDResponseHandler*/ {
     }
 
     /*@Override
-   public void onGCMIDUpdated(UserTaskResult result) {
+   public void onGCMIDUpdated(UserResult result) {
         if(result.successCode != 1){//Retry
             tryCount++;
             if(tryCount < 3){

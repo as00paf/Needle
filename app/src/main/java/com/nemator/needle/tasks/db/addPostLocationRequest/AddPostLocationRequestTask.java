@@ -6,7 +6,7 @@ import android.os.AsyncTask;
 
 import com.nemator.needle.broadcastReceiver.PostLocationRequestAlarm;
 import com.nemator.needle.data.LocationServiceDBHelper;
-import com.nemator.needle.tasks.TaskResult;
+import com.nemator.needle.api.result.TaskResult;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -75,7 +75,9 @@ public class AddPostLocationRequestTask extends AsyncTask<Void, Void, TaskResult
     }
 
     protected void onPostExecute(TaskResult result) {
-        delegate.onLocationRequestPosted(result);
+        if(delegate != null){
+            delegate.onLocationRequestPosted(result);
+        }
     }
 
     public interface AddPostLocationRequestHandler {

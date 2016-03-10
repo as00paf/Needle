@@ -12,9 +12,9 @@ import android.view.ViewGroup;
 import com.nemator.needle.Needle;
 import com.nemator.needle.R;
 import com.nemator.needle.activities.HaystackActivity;
-import com.nemator.needle.adapter.HaystackUserListCardAdapter;
+import com.nemator.needle.adapter.UserListCardAdapter;
 import com.nemator.needle.api.ApiClient;
-import com.nemator.needle.api.result.UsersTaskResult;
+import com.nemator.needle.api.result.UsersResult;
 import com.nemator.needle.models.vo.HaystackVO;
 
 import retrofit2.Call;
@@ -28,7 +28,7 @@ public class HaystackUsersTabFragment extends Fragment{
     private RecyclerView listView;
 
     private HaystackVO haystack;
-    private HaystackUserListCardAdapter userListAdapter;
+    private UserListCardAdapter userListAdapter;
     private GridLayoutManager layoutManager;
 
     public HaystackUsersTabFragment() {
@@ -45,7 +45,7 @@ public class HaystackUsersTabFragment extends Fragment{
         listView.setLayoutManager(layoutManager);
 
         haystack = ((HaystackActivity) getActivity()).getHaystack();
-        userListAdapter = new HaystackUserListCardAdapter(haystack.getUsers(), getActivity());
+        userListAdapter = new UserListCardAdapter(haystack.getUsers(), getActivity());
         listView.setAdapter(userListAdapter);
 
         fetchAllUsers();
@@ -57,11 +57,11 @@ public class HaystackUsersTabFragment extends Fragment{
         ApiClient.getInstance().fetchHaystackUsers(Needle.userModel.getUser(), haystack, usersFetchedCallback);
     }
 
-    private Callback<UsersTaskResult> usersFetchedCallback = new Callback<UsersTaskResult>(){
+    private Callback<UsersResult> usersFetchedCallback = new Callback<UsersResult>(){
 
         @Override
-        public void onResponse(Call<UsersTaskResult> call, Response<UsersTaskResult> response) {
-            UsersTaskResult result = response.body();
+        public void onResponse(Call<UsersResult> call, Response<UsersResult> response) {
+            UsersResult result = response.body();
             Log.d(TAG, result.getUsers().size() + " users fetched");
 
             haystack.setUsers(result.getUsers());
@@ -69,13 +69,13 @@ public class HaystackUsersTabFragment extends Fragment{
         }
 
         @Override
-        public void onFailure(Call<UsersTaskResult> call, Throwable t) {
+        public void onFailure(Call<UsersResult> call, Throwable t) {
 
         }
     };
 
     private void updateUserList(){
-        userListAdapter = new HaystackUserListCardAdapter(haystack.getUsers(), getActivity());
+        userListAdapter = new UserListCardAdapter(haystack.getUsers(), getActivity());
         listView.setAdapter(userListAdapter);
 
         userListAdapter.notifyDataSetChanged();

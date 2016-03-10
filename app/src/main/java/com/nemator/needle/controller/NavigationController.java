@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Parcelable;
+import android.support.annotation.IdRes;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -30,8 +31,6 @@ import com.nemator.needle.activities.CreateHaystackActivity;
 import com.nemator.needle.activities.HaystackActivity;
 import com.nemator.needle.activities.HomeActivity;
 import com.nemator.needle.api.ApiClient;
-import com.nemator.needle.data.LocationServiceDBHelper;
-import com.nemator.needle.data.LocationServiceDBHelper.PostLocationRequest;
 import com.nemator.needle.fragments.authentication.LoginFragment;
 import com.nemator.needle.fragments.authentication.LoginSplashFragment;
 import com.nemator.needle.fragments.authentication.RegisterFragment;
@@ -39,13 +38,13 @@ import com.nemator.needle.fragments.haystacks.HaystackListFragment;
 import com.nemator.needle.fragments.haystacks.OnActivityStateChangeListener;
 import com.nemator.needle.fragments.haystacks.createHaystack.CreateHaystackFragment;
 import com.nemator.needle.fragments.locationSharing.LocationSharingListFragment;
-import com.nemator.needle.fragments.locationSharing.createLocationSharing.CreateLocationSharingFragment;
+import com.nemator.needle.fragments.locationSharing.createLocationSharing.CreateLocationSharingExpirationFragment;
 import com.nemator.needle.fragments.locationSharing.locationSharing.LocationSharingFragment;
 import com.nemator.needle.fragments.people.PeopleFragment;
 import com.nemator.needle.fragments.settings.SettingsFragment;
 import com.nemator.needle.models.vo.HaystackVO;
 import com.nemator.needle.models.vo.LocationSharingVO;
-import com.nemator.needle.tasks.TaskResult;
+import com.nemator.needle.api.result.TaskResult;
 import com.nemator.needle.utils.AppConstants;
 import com.nemator.needle.utils.AppState;
 import com.nemator.needle.utils.CropCircleTransformation;
@@ -74,7 +73,7 @@ public class NavigationController implements HomeActivity.NavigationHandler, OnA
     private LocationSharingListFragment locationSharingListFragment;
     private CreateHaystackFragment createHaystackFragment;
     private SettingsFragment settingsFragment;
-    private CreateLocationSharingFragment createLocationSharingFragment;
+    private CreateLocationSharingExpirationFragment createLocationSharingExpirationFragment;
     private LocationSharingFragment locationSharingFragment;
     private PeopleFragment peopleFragment;
 
@@ -208,8 +207,8 @@ public class NavigationController implements HomeActivity.NavigationHandler, OnA
                 actionBar.setTitle(R.string.title_location_sharing);
                 break;
             case AppConstants.SECTION_CREATE_LOCATION_SHARING:
-                if(createLocationSharingFragment == null) createLocationSharingFragment = new CreateLocationSharingFragment();
-                newFragment = createLocationSharingFragment;
+                if(createLocationSharingExpirationFragment == null) createLocationSharingExpirationFragment = new CreateLocationSharingExpirationFragment();
+                newFragment = createLocationSharingExpirationFragment;
                 onStateChange(AppState.LOCATION_SHARING_RECEIVED_TAB);
                 break;
             case AppConstants.SECTION_SETTINGS:
@@ -521,13 +520,20 @@ public class NavigationController implements HomeActivity.NavigationHandler, OnA
 
     //Getters/Setters
     public void setHaystacksCount(int count) {
-        // if(count>0)
-        //  haystacksSection.setNotifications(count);
+        setMenuCounter(R.id.drawer_haystacks, count);
     }
 
     public void setLocationSharingCount(int count) {
-        //if(count>0)
-        //  locationSharingListSection.setNotifications(count);
+        setMenuCounter(R.id.drawer_location_sharing, count);
+    }
+
+    public void setNotificationsCount(int count) {
+        setMenuCounter(R.id.drawer_notifications, count);
+    }
+
+    private void setMenuCounter(@IdRes int itemId, int count) {
+        TextView view = (TextView) navigationView.getMenu().findItem(itemId).getActionView();
+        view.setText(count > 0 ? String.valueOf(count) : null);
     }
 
     public void onLogOutComplete() {

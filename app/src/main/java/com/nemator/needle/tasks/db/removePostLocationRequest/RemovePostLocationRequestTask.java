@@ -10,7 +10,7 @@ import android.util.Log;
 
 import com.nemator.needle.broadcastReceiver.PostLocationRequestAlarm;
 import com.nemator.needle.data.LocationServiceDBHelper;
-import com.nemator.needle.tasks.TaskResult;
+import com.nemator.needle.api.result.TaskResult;
 import com.nemator.needle.tasks.db.addPostLocationRequest.AddPostLocationRequestParams;
 
 public class RemovePostLocationRequestTask extends AsyncTask<Void, Void, TaskResult> {

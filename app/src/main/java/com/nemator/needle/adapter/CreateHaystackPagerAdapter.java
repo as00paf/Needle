@@ -10,10 +10,9 @@ import com.nemator.needle.R;
 import com.nemator.needle.fragments.haystacks.createHaystack.CreateHaystackGeneralInfosFragment;
 import com.nemator.needle.fragments.haystacks.createHaystack.CreateHaystackMapFragment;
 import com.nemator.needle.fragments.haystacks.createHaystack.CreateHaystackUsersFragment;
-
 import java.util.ArrayList;
 
-public class CreateHaystackPagerAdapter extends FragmentStatePagerAdapter {
+public class CreateHaystackPagerAdapter extends FragmentStatePagerAdapter implements IconPagerAdapter {
     public final int GENERAL_INFOS = 0;
     public final int MAP = 1;
     public final int USERS = 2;
@@ -64,7 +63,7 @@ public class CreateHaystackPagerAdapter extends FragmentStatePagerAdapter {
     }
 
     @Override
-    public CharSequence getPageTitle(int position) {
+    public String getPageTitle(int position) {
         String title;
         switch (position){
             case GENERAL_INFOS:

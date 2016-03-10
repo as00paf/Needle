@@ -20,7 +20,7 @@ import android.widget.TextView;
 import com.nemator.needle.R;
 import com.nemator.needle.activities.LocationSharingActivity;
 import com.nemator.needle.api.ApiClient;
-import com.nemator.needle.api.result.LocationSharingTaskResult;
+import com.nemator.needle.api.result.LocationSharingResult;
 import com.nemator.needle.fragments.locationSharing.LocationSharingCardListener;
 import com.nemator.needle.models.vo.LocationSharingVO;
 import com.nemator.needle.utils.AppConstants;
@@ -120,51 +120,17 @@ public class LocationSharingListCardAdapter extends RecyclerView.Adapter<Locatio
         }
     }
 
-    public void cancel(MenuItem item, LocationSharingCardViewHolder viewHolder){
-        ApiClient.getInstance().cancelLocationSharing(viewHolder.locationSharingData, cancelLocationSharingCallback);
-    }
-
-    private Callback<LocationSharingTaskResult> cancelLocationSharingCallback = new Callback<LocationSharingTaskResult>() {
-
-        @Override
-        public void onResponse(Call<LocationSharingTaskResult> call, Response<LocationSharingTaskResult> response) {
-            LocationSharingTaskResult result = response.body();
-            if(result.getSuccessCode() == 1){
-                //Remove from list
-                int index = -1;
-
-                for (LocationSharingVO vo : listData){
-                    if(vo.getId() == result.getLocationSharing().getId()){
-                        index = listData.indexOf(vo);
-                    }
-                }
-
-                if(index > -1){
-                    listData.remove(index);
-                    LocationSharingListCardAdapter.this.notifyDataSetChanged();
-                }
-            }else{
-
-            }
-        }
-
-        @Override
-        public void onFailure(Call<LocationSharingTaskResult> call, Throwable t) {
-
-        }
-    };
-
     //TODO : move from here ?
     public void shareLocationBack(MenuItem item, LocationSharingCardViewHolder viewHolder){
         LocationSharingVO vo = ((LocationSharingVO) getItem(viewHolder.getPosition())).clone();
         ApiClient.getInstance().shareLocationBack(vo, shareLocationBackCallback);
     }
 
-    private Callback<LocationSharingTaskResult> shareLocationBackCallback = new Callback<LocationSharingTaskResult>() {
+    private Callback<LocationSharingResult> shareLocationBackCallback = new Callback<LocationSharingResult>() {
         @Override
-        public void onResponse(Call<LocationSharingTaskResult> call, Response<LocationSharingTaskResult> response) {
+        public void onResponse(Call<LocationSharingResult> call, Response<LocationSharingResult> response) {
             //TODO : show share back icon on card
-            LocationSharingTaskResult result = response.body();
+            LocationSharingResult result = response.body();
             if(result.getSuccessCode() == 1){
                 Log.d(TAG, "Location shared back !");
             }else{
@@ -178,22 +144,23 @@ public class LocationSharingListCardAdapter extends RecyclerView.Adapter<Locatio
         }
 
         @Override
-        public void onFailure(Call<LocationSharingTaskResult> call, Throwable t) {
+        public void onFailure(Call<LocationSharingResult> call, Throwable t) {
             Log.d(TAG, "Failed to share location back !");
         }
     };
 
+    //TODO : own class
     public static class LocationSharingCardViewHolder extends RecyclerView.ViewHolder implements PopupMenu.OnMenuItemClickListener, View.OnClickListener
     {
         //Item
-        TextView titleView, active_until;
-        ImageView imageView, shareBackIndicator;
-        ImageButton menuButton;
+        private TextView titleView, active_until;
+        private ImageView imageView, shareBackIndicator;
+        private ImageButton menuButton;
 
         //Empty
-        TextView emptyText;
+        private TextView emptyText;
 
-        LocationSharingVO locationSharingData;
+        private LocationSharingVO locationSharingData;
 
         private LocationSharingCardListener mListener;
 
@@ -253,7 +220,7 @@ public class LocationSharingListCardAdapter extends RecyclerView.Adapter<Locatio
                             .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
-                                    adapter.cancel(item, me);
+                                    mListener.onCancelLocationSharing(me.locationSharingData);
                                 }
                             })
                             .setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
@@ -305,6 +272,15 @@ public class LocationSharingListCardAdapter extends RecyclerView.Adapter<Locatio
             setShareBack(!shareBack);
             return shareBack;
         }
+    }
+
+    //Getters/Setters
+    public ArrayList<LocationSharingVO> getListData() {
+        return listData;
+    }
+
+    public void setListData(ArrayList<LocationSharingVO> listData) {
+        this.listData = listData;
     }
 }
 

@@ -33,6 +33,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.nemator.needle.adapter.CreateHaystackPagerAdapter;
+import com.nemator.needle.adapter.IconPagerAdapter;
 
 /**
  * To be used with ViewPager to provide a tab indicator component which give constant feedback as to
@@ -214,7 +215,7 @@ public class SlidingTabLayout extends HorizontalScrollView {
     }
 
     private void populateTabStrip() {
-        final CreateHaystackPagerAdapter adapter = (CreateHaystackPagerAdapter) mViewPager.getAdapter();
+        final IconPagerAdapter adapter = (IconPagerAdapter) mViewPager.getAdapter();
         final View.OnClickListener tabClickListener = new TabClickListener();
 
         for (int i = 0; i < adapter.getCount(); i++) {
@@ -329,7 +330,7 @@ public class SlidingTabLayout extends HorizontalScrollView {
 
         @Override
         public void onPageSelected(int position) {
-            final CreateHaystackPagerAdapter adapter = (CreateHaystackPagerAdapter) mViewPager.getAdapter();
+            final IconPagerAdapter adapter = (IconPagerAdapter) mViewPager.getAdapter();
 
             //Clear old selection and make new
             for(int i = 0; i < mTabStrip.getChildCount(); i ++){

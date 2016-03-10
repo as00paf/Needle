@@ -1,16 +1,16 @@
 package com.nemator.needle.api;
 
-import com.nemator.needle.api.result.HaystackTaskResult;
-import com.nemator.needle.api.result.LocationSharingTaskResult;
-import com.nemator.needle.api.result.LoginTaskResult;
+import com.nemator.needle.api.result.HaystackResult;
+import com.nemator.needle.api.result.LocationSharingResult;
+import com.nemator.needle.api.result.LoginResult;
 import com.nemator.needle.api.result.UserRegistrationResult;
-import com.nemator.needle.api.result.UserTaskResult;
-import com.nemator.needle.api.result.UsersTaskResult;
+import com.nemator.needle.api.result.UserResult;
+import com.nemator.needle.api.result.UsersResult;
 import com.nemator.needle.models.vo.HaystackUserVO;
 import com.nemator.needle.models.vo.HaystackVO;
 import com.nemator.needle.models.vo.LocationSharingVO;
 import com.nemator.needle.models.vo.UserVO;
-import com.nemator.needle.tasks.TaskResult;
+import com.nemator.needle.api.result.TaskResult;
 
 import java.util.List;
 
@@ -45,12 +45,12 @@ public interface NeedleApiClient {
     //Authentication
     @FormUrlEncoded
     @POST("login.php")
-    Call<LoginTaskResult> logIn(@Field("type") int loginType, @Field("email") String email, @Field("username") String username,
+    Call<LoginResult> logIn(@Field("type") int loginType, @Field("email") String email, @Field("username") String username,
                                 @Field("regId") String gcmRegId, @Field("password") String password, @Field("socialNetworkUserId") String socialNetworkUserId);
 
     @FormUrlEncoded
     @POST("login.php")
-    Call<LoginTaskResult> socialLogIn(@Field("loginType") int loginType, @Field("email") String email,
+    Call<LoginResult> socialLogIn(@Field("loginType") int loginType, @Field("email") String email,
                                       @Field("gcmRegId") String gcmRegId, @Field("socialNetworkUserId")
                                       String socialNetworkUserId);
 
@@ -59,11 +59,11 @@ public interface NeedleApiClient {
 
     //Haystacks
     @GET("haystack.php")
-    Call<HaystackTaskResult> getHaystacks(@Query("userId") int userId);
+    Call<HaystackResult> getHaystacks(@Query("userId") int userId);
 
     @FormUrlEncoded
     @POST("haystack.php")
-    Call<HaystackTaskResult> createHaystack(@Field("name") String name, @Field("owner") int owner,
+    Call<HaystackResult> createHaystack(@Field("name") String name, @Field("owner") int owner,
                               @Field("isPublic") Boolean isPublic ,@Field("zoneRadius") int zoneRadius,
                               @Field("isCircle") Boolean isCircle,  @Field("lat") double lat,
                               @Field("lng") double lng, @Field("pictureURL")  String pictureURL,
@@ -72,14 +72,17 @@ public interface NeedleApiClient {
     //Users
     //TODO : replace by better use of user.php
     @GET("retrieveAllUsers.php")
-    Call<UsersTaskResult> fetchAllUsers(@Query("userId") String userId);
+    Call<UsersResult> fetchAllUsers(@Query("userId") String userId);
 
     //Location
     @PUT("location.php")
-    Call<UserTaskResult> updateLocation(@Body UserVO vo);
+    Call<UserResult> updateLocation(@Body UserVO vo);
 
     @GET("location.php")
-    Call<UsersTaskResult> retrieveHaystackLocations(@Query("haystackId") int haystackId);
+    Call<UsersResult> retrieveHaystackLocations(@Query("haystackId") int haystackId);
+
+    @GET("location.php")
+    Call<UserResult> retrieveUserLocation(@Query("locationSharingId") int locationSharingId, @Query("userId") int userId);
 
     //HaystackUser
     @PUT("haystackUser.php")
@@ -89,24 +92,24 @@ public interface NeedleApiClient {
     Call<TaskResult> leaveHaystack(@Body HaystackUserVO vo);
 
     @GET("haystackUser.php")
-    Call<UsersTaskResult> fetchHaystackUsers(@Query("userId") int userId, @Query("haystackId") int haystackId);
+    Call<UsersResult> fetchHaystackUsers(@Query("userId") int userId, @Query("haystackId") int haystackId);
 
     @POST("haystackUser.php")
-    Call<HaystackTaskResult> addUsersToHaystack(@Body HaystackVO haystack);
+    Call<HaystackResult> addUsersToHaystack(@Body HaystackVO haystack);
 
     @GET("fetchUsersNotInHaystack.php")
-    Call<UsersTaskResult> fetchUsersNotInHaystack(@Query("haystackId") int haystackId);
+    Call<UsersResult> fetchUsersNotInHaystack(@Query("haystackId") int haystackId);
 
     //LocationSharing
     @GET("locationSharing.php")
-    Call<LocationSharingTaskResult> getLocationSharings(@Query("userId") int userId);
+    Call<LocationSharingResult> getLocationSharings(@Query("userId") int userId);
 
     @POST("locationSharing.php")
-    Call<LocationSharingTaskResult> createLocationSharing(@Body LocationSharingVO locationSharingVO);
+    Call<LocationSharingResult> createLocationSharing(@Body LocationSharingVO locationSharingVO);
 
     @PUT("locationSharing.php")
-    Call<LocationSharingTaskResult> shareLocationBack(@Body LocationSharingVO vo);
+    Call<LocationSharingResult> shareLocationBack(@Body LocationSharingVO vo);
 
     @HTTP(method = "DELETE", path = "locationSharing.php", hasBody = true)
-    Call<LocationSharingTaskResult> cancelLocationSharing(@Body LocationSharingVO vo);
+    Call<LocationSharingResult> cancelLocationSharing(@Body LocationSharingVO vo);
 }

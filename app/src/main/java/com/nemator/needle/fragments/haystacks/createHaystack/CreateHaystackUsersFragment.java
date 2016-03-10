@@ -12,9 +12,9 @@ import android.view.ViewGroup;
 
 import com.nemator.needle.Needle;
 import com.nemator.needle.R;
-import com.nemator.needle.adapter.HaystackUserListCardAdapter;
+import com.nemator.needle.adapter.UserListCardAdapter;
 import com.nemator.needle.api.ApiClient;
-import com.nemator.needle.api.result.UsersTaskResult;
+import com.nemator.needle.api.result.UsersResult;
 import com.nemator.needle.models.vo.UserVO;
 
 import java.util.ArrayList;
@@ -29,7 +29,7 @@ public class CreateHaystackUsersFragment extends CreateHaystackBaseFragment impl
 
     //Children
     private RecyclerView mRecyclerView;
-    private HaystackUserListCardAdapter mAdapter;
+    private UserListCardAdapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
     private SwipeRefreshLayout swipeLayout;
 
@@ -163,16 +163,16 @@ public class CreateHaystackUsersFragment extends CreateHaystackBaseFragment impl
 
     //Actions
     private void fetchAllUsers(){
-        ApiClient.getInstance().fetchAllUsers(Needle.userModel.getUserId(), new Callback<UsersTaskResult>() {
+        ApiClient.getInstance().fetchAllUsers(Needle.userModel.getUserId(), new Callback<UsersResult>() {
             @Override
-            public void onResponse(Call<UsersTaskResult> call, Response<UsersTaskResult> response) {
-                UsersTaskResult result = response.body();
+            public void onResponse(Call<UsersResult> call, Response<UsersResult> response) {
+                UsersResult result = response.body();
                 usersList = result.getUsers();
                 updateUserList();
             }
 
             @Override
-            public void onFailure(Call<UsersTaskResult> call, Throwable t) {
+            public void onFailure(Call<UsersResult> call, Throwable t) {
                 Log.d(TAG, "Retrieving users failed ! Error : " + t.getMessage());
 
                 usersList = new ArrayList<UserVO>();
@@ -182,7 +182,7 @@ public class CreateHaystackUsersFragment extends CreateHaystackBaseFragment impl
     }
 
     private void updateUserList(){
-        mAdapter = new HaystackUserListCardAdapter(usersList, getActivity());
+        mAdapter = new UserListCardAdapter(usersList, getActivity());
         mRecyclerView.setAdapter(mAdapter);
 
         mAdapter.notifyDataSetChanged();

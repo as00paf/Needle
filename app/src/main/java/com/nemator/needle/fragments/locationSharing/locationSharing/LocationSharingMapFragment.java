@@ -27,21 +27,22 @@ import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.nemator.needle.activities.HomeActivity;
 import com.nemator.needle.Needle;
 import com.nemator.needle.R;
 import com.nemator.needle.activities.LocationSharingActivity;
+import com.nemator.needle.api.ApiClient;
+import com.nemator.needle.api.result.UserResult;
 import com.nemator.needle.broadcastReceiver.LocationServiceBroadcastReceiver;
 import com.nemator.needle.models.vo.LocationSharingVO;
-import com.nemator.needle.service.NeedleLocationService;
-import com.nemator.needle.tasks.trackUser.TrackUserParams;
-import com.nemator.needle.tasks.trackUser.TrackUserResult;
-import com.nemator.needle.tasks.trackUser.TrackUserTask;
 import com.nemator.needle.utils.AppConstants;
 import com.nemator.needle.utils.SphericalUtil;
 
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
 public class LocationSharingMapFragment extends SupportMapFragment
-        implements LocationServiceBroadcastReceiver.LocationServiceDelegate, TrackUserTask.TrackUserResponseHandler {
+        implements LocationServiceBroadcastReceiver.LocationServiceDelegate{
 
     public static final String TAG = "LocationSharingMap";
 
@@ -267,42 +268,46 @@ public class LocationSharingMapFragment extends SupportMapFragment
 
     //Actions
     private void trackUser(){
-        TrackUserParams params = new TrackUserParams(String.valueOf(locationSharing.getId()), String.valueOf(locationSharing.getSenderId()));
-        try{
-            TrackUserTask task = new TrackUserTask(params, this);
-            task.execute();
-        }catch (Exception e){
-            mReceivedPosition = null;
-        }
+        ApiClient.getInstance().retrieveUserLocation(locationSharing.getSenderId(), locationSharing, userLocationRetrievedCallback);
     }
 
-    @Override
-    public void onUserTracked(TrackUserResult result) {
-        if(result.successCode == 1){
-            mReceivedPosition = result.location;
-            updateMap();
-        }else if(result.successCode == 201 && mRequestingLocationUpdates){//LocationSharingCancelled or expired
-            mRequestingLocationUpdates = false;
-            new AlertDialog.Builder(getActivity())
-                    .setIcon(android.R.drawable.ic_dialog_alert)
-                    .setTitle(getString(R.string.location_sharing_ended))
-                    .setMessage(getString(R.string.log_out_confirmation_msg))
-                    .setNeutralButton(R.string.ok, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            dialog.dismiss();
-                            Needle.navigationController.onBackPressed();
-                        }
-                    })
-                    .setOnCancelListener(new DialogInterface.OnCancelListener() {
-                        @Override
-                        public void onCancel(DialogInterface dialog) {
-                            Needle.navigationController.onBackPressed();
-                        }
-                    })
-                    .show();
+    private Callback<UserResult> userLocationRetrievedCallback = new Callback<UserResult>() {
+        @Override
+        public void onResponse(Call<UserResult> call, Response<UserResult> response) {
+            UserResult result = response.body();
+            if(result.getSuccessCode() == 1){
+                mReceivedPosition = result.getUser().getLocation().getLatLng();
+                updateMap();
+            }else if(result.getSuccessCode() == 201 && mRequestingLocationUpdates){//LocationSharingCancelled or expired
+                mRequestingLocationUpdates = false;
+                new AlertDialog.Builder(getActivity())
+                        .setIcon(android.R.drawable.ic_dialog_alert)
+                        .setTitle(getString(R.string.location_sharing_ended))
+                        .setMessage(getString(R.string.log_out_confirmation_msg))
+                        .setNeutralButton(R.string.ok, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.dismiss();
+                                Needle.navigationController.onBackPressed();
+                            }
+                        })
+                        .setOnCancelListener(new DialogInterface.OnCancelListener() {
+                            @Override
+                            public void onCancel(DialogInterface dialog) {
+                                Needle.navigationController.onBackPressed();
+                            }
+                        })
+                        .show();
+            }else{
+                Log.e(TAG, "Failed to retrieve user's location. Error : " + result.getMessage());
+            }
         }
-    }
+
+        @Override
+        public void onFailure(Call<UserResult> call, Throwable t) {
+            Log.e(TAG, "Failed to retrieve user's location. Error : " + t.getMessage());
+        }
+    };
 
     //Map Stuff
     private void drawMarkerWithCircle(LatLng position, String label){

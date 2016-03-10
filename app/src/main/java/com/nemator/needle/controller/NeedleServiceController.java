@@ -10,6 +10,9 @@ import android.support.v4.app.FragmentActivity;
 
 import com.nemator.needle.Needle;
 import com.nemator.needle.service.NeedleLocationService;
+import com.nemator.needle.tasks.db.addPostLocationRequest.AddPostLocationRequestParams;
+import com.nemator.needle.tasks.db.addPostLocationRequest.AddPostLocationRequestTask;
+import com.nemator.needle.tasks.db.removePostLocationRequest.RemovePostLocationRequestTask;
 
 /**
  * Created by Alex on 20/02/2016.
@@ -85,11 +88,22 @@ public class NeedleServiceController {
         return locationService;
     }
 
+    //Actions
     public void startLocationUpdates() {
         locationService.startLocationUpdates();
     }
 
     public void stopLocationUpdates() {
         locationService.stopLocationUpdates();
+    }
+
+    public void addPostLocationRequest(Context context, int type, String expiration, int posterId, String itemId){
+        AddPostLocationRequestParams params = new AddPostLocationRequestParams(context, type, expiration, posterId, itemId);
+        new AddPostLocationRequestTask(params, null).execute();
+    }
+
+    public void removePostLocationRequest(Context context, int type, String expiration, int posterId, String itemId){
+        AddPostLocationRequestParams params = new AddPostLocationRequestParams(context, type, expiration, posterId, itemId);
+        new RemovePostLocationRequestTask(params).execute();
     }
 }

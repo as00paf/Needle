@@ -3,21 +3,20 @@ package com.nemator.needle.api;
 import android.util.Log;
 
 import com.nemator.needle.Needle;
-import com.nemator.needle.api.result.LocationSharingTaskResult;
+import com.nemator.needle.api.result.LocationSharingResult;
 import com.nemator.needle.api.result.UserRegistrationResult;
-import com.nemator.needle.api.result.UserTaskResult;
-import com.nemator.needle.api.result.UsersTaskResult;
+import com.nemator.needle.api.result.UserResult;
+import com.nemator.needle.api.result.UsersResult;
 import com.nemator.needle.models.vo.HaystackUserVO;
 import com.nemator.needle.models.vo.HaystackVO;
 import com.nemator.needle.models.vo.LocationSharingVO;
 import com.nemator.needle.models.vo.UserVO;
-import com.nemator.needle.tasks.TaskResult;
-import com.nemator.needle.api.result.HaystackTaskResult;
-import com.nemator.needle.api.result.LoginTaskResult;
+import com.nemator.needle.api.result.TaskResult;
+import com.nemator.needle.api.result.HaystackResult;
+import com.nemator.needle.api.result.LoginResult;
 import com.nemator.needle.utils.AppConstants;
 
 import java.io.IOException;
-import java.util.ArrayList;
 
 import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
@@ -75,8 +74,8 @@ public class ApiClient {
         call.enqueue(callBack);
     }
 
-    public void login(int loginType, String email, String username, String gcmRegId, String password, String socialNetworkUserId, Callback<LoginTaskResult> callBack){
-        Call<LoginTaskResult> call = client.logIn(loginType, email, username, gcmRegId, password, socialNetworkUserId);
+    public void login(int loginType, String email, String username, String gcmRegId, String password, String socialNetworkUserId, Callback<LoginResult> callBack){
+        Call<LoginResult> call = client.logIn(loginType, email, username, gcmRegId, password, socialNetworkUserId);
         call.enqueue(callBack);
     }
 
@@ -86,20 +85,20 @@ public class ApiClient {
     }
 
     //Haystacks
-    public void fetchHaystacks(int userId,  Callback<HaystackTaskResult> callBack) {
-        Call<HaystackTaskResult> call = client.getHaystacks(userId);
+    public void fetchHaystacks(int userId,  Callback<HaystackResult> callBack) {
+        Call<HaystackResult> call = client.getHaystacks(userId);
         call.enqueue(callBack);
     }
 
-    public void createHaystack(HaystackVO vo,  Callback<HaystackTaskResult> callBack){
-        Call<HaystackTaskResult> call = client.createHaystack(vo.getName(),
+    public void createHaystack(HaystackVO vo,  Callback<HaystackResult> callBack){
+        Call<HaystackResult> call = client.createHaystack(vo.getName(),
                 vo.getOwner(), vo.getIsPublic(), vo.getZoneRadius(), vo.getIsCircle(), vo.getPosition().getLongitude(),
                 vo.getPosition().getLatitude(), vo.getPictureURL(), vo.getTimeLimit(), vo.getUserIds());
         call.enqueue(callBack);
     }
 
-    public void retrieveHaystackUserLocations(int haystackId, Callback<UsersTaskResult> callBack){
-        Call<UsersTaskResult> call = client.retrieveHaystackLocations(haystackId);
+    public void retrieveHaystackUserLocations(int haystackId, Callback<UsersResult> callBack){
+        Call<UsersResult> call = client.retrieveHaystackLocations(haystackId);
         call.enqueue(callBack);
     }
 
@@ -120,51 +119,56 @@ public class ApiClient {
         call.enqueue(callBack);
     }
 
-    public void fetchHaystackUsers(UserVO user, HaystackVO haystack, Callback<UsersTaskResult> callBack){
-        Call<UsersTaskResult> call = client.fetchHaystackUsers(user.getId(), haystack.getId());
+    public void fetchHaystackUsers(UserVO user, HaystackVO haystack, Callback<UsersResult> callBack){
+        Call<UsersResult> call = client.fetchHaystackUsers(user.getId(), haystack.getId());
         call.enqueue(callBack);
     }
 
-    public void addUsersToHaystack(HaystackVO haystack, Callback<HaystackTaskResult> callback) {
-        Call<HaystackTaskResult> call = client.addUsersToHaystack(haystack);
+    public void addUsersToHaystack(HaystackVO haystack, Callback<HaystackResult> callback) {
+        Call<HaystackResult> call = client.addUsersToHaystack(haystack);
         call.enqueue(callback);
     }
 
-    public void fetchUsersNotInHaystack(int haystackId, Callback<UsersTaskResult> callback) {
-        Call<UsersTaskResult> call = client.fetchUsersNotInHaystack(haystackId);
+    public void fetchUsersNotInHaystack(int haystackId, Callback<UsersResult> callback) {
+        Call<UsersResult> call = client.fetchUsersNotInHaystack(haystackId);
         call.enqueue(callback);
     }
 
     //Location Sharing
-    public void createLocationSharing(LocationSharingVO locationSharingVO, Callback<LocationSharingTaskResult> callBack) {
-        Call<LocationSharingTaskResult> call = client.createLocationSharing(locationSharingVO);
+    public void createLocationSharing(LocationSharingVO locationSharingVO, Callback<LocationSharingResult> callBack) {
+        Call<LocationSharingResult> call = client.createLocationSharing(locationSharingVO);
         call.enqueue(callBack);
     }
 
-    public void fetchLocationSharings(Callback<LocationSharingTaskResult> callBack) {
-        Call<LocationSharingTaskResult> call = client.getLocationSharings(Needle.userModel.getUserId());
+    public void fetchLocationSharings(Callback<LocationSharingResult> callBack) {
+        Call<LocationSharingResult> call = client.getLocationSharings(Needle.userModel.getUserId());
         call.enqueue(callBack);
     }
 
-    public void shareLocationBack(LocationSharingVO vo, Callback<LocationSharingTaskResult> callBack){
-        Call<LocationSharingTaskResult> call = client.shareLocationBack(vo);
+    public void shareLocationBack(LocationSharingVO vo, Callback<LocationSharingResult> callBack){
+        Call<LocationSharingResult> call = client.shareLocationBack(vo);
         call.enqueue(callBack);
     }
 
-    public void cancelLocationSharing(LocationSharingVO vo, Callback<LocationSharingTaskResult> callBack){
-        Call<LocationSharingTaskResult> call = client.cancelLocationSharing(vo);
+    public void cancelLocationSharing(LocationSharingVO vo, Callback<LocationSharingResult> callBack){
+        Call<LocationSharingResult> call = client.cancelLocationSharing(vo);
         call.enqueue(callBack);
     }
 
     //Location
-    public void updateLocation(UserVO user, Callback<UserTaskResult> callBack) {
-        Call<UserTaskResult> call = client.updateLocation(user);
+    public void updateLocation(UserVO user, Callback<UserResult> callBack) {
+        Call<UserResult> call = client.updateLocation(user);
+        call.enqueue(callBack);
+    }
+
+    public void retrieveUserLocation(int userId, LocationSharingVO vo, Callback<UserResult> callBack) {
+        Call<UserResult> call = client.retrieveUserLocation(userId, vo.getId());
         call.enqueue(callBack);
     }
 
     //General
-    public void fetchAllUsers(int userId,  Callback<UsersTaskResult> callBack) {
-        Call<UsersTaskResult> call = client.fetchAllUsers(String.valueOf(userId));
+    public void fetchAllUsers(int userId,  Callback<UsersResult> callBack) {
+        Call<UsersResult> call = client.fetchAllUsers(String.valueOf(userId));
         call.enqueue(callBack);
     }
 

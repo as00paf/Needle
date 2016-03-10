@@ -22,7 +22,7 @@ import com.nemator.needle.Needle;
 import com.nemator.needle.R;
 import com.nemator.needle.adapter.SlidingPanelPagerAdapter;
 import com.nemator.needle.api.ApiClient;
-import com.nemator.needle.api.result.HaystackTaskResult;
+import com.nemator.needle.api.result.HaystackResult;
 import com.nemator.needle.fragments.haystack.HaystackUsersTabFragment;
 import com.nemator.needle.models.vo.HaystackVO;
 import com.nemator.needle.models.vo.UserVO;
@@ -191,11 +191,11 @@ public class HaystackActivity extends AppCompatActivity{
                     HaystackVO updatedHaystack = haystack.clone();
                     updatedHaystack.setUsers(newUserList);
 
-                    ApiClient.getInstance().addUsersToHaystack(updatedHaystack, new Callback<HaystackTaskResult>(){
+                    ApiClient.getInstance().addUsersToHaystack(updatedHaystack, new Callback<HaystackResult>(){
 
                         @Override
-                        public void onResponse(Call<HaystackTaskResult> call, Response<HaystackTaskResult> response) {
-                            HaystackTaskResult result = response.body();
+                        public void onResponse(Call<HaystackResult> call, Response<HaystackResult> response) {
+                            HaystackResult result = response.body();
                             if(result.getSuccessCode() == 1){
                                 haystack.addUsers(newUserList);
 
@@ -212,7 +212,7 @@ public class HaystackActivity extends AppCompatActivity{
                         }
 
                         @Override
-                        public void onFailure(Call<HaystackTaskResult> call, Throwable t) {
+                        public void onFailure(Call<HaystackResult> call, Throwable t) {
                             Toast.makeText(HaystackActivity.this, getString(R.string.error_adding_users), Toast.LENGTH_SHORT).show();
                         }
                     });

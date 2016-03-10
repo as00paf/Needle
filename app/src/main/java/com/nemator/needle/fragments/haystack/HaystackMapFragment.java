@@ -15,7 +15,6 @@ import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
-import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.Projection;
@@ -31,12 +30,12 @@ import com.nemator.needle.Needle;
 import com.nemator.needle.R;
 import com.nemator.needle.activities.HaystackActivity;
 import com.nemator.needle.api.ApiClient;
-import com.nemator.needle.api.result.UsersTaskResult;
+import com.nemator.needle.api.result.UsersResult;
 import com.nemator.needle.broadcastReceiver.LocationServiceBroadcastReceiver;
 import com.nemator.needle.data.LocationServiceDBHelper;
 import com.nemator.needle.models.vo.HaystackVO;
 import com.nemator.needle.models.vo.UserVO;
-import com.nemator.needle.tasks.TaskResult;
+import com.nemator.needle.api.result.TaskResult;
 import com.nemator.needle.utils.AppConstants;
 import com.nemator.needle.utils.PermissionManager;
 
@@ -360,10 +359,10 @@ public class HaystackMapFragment extends SupportMapFragment implements LocationS
 
     //Actions
     public void retrieveLocations(){
-        ApiClient.getInstance().retrieveHaystackUserLocations(haystack.getId(), new Callback<UsersTaskResult>() {
+        ApiClient.getInstance().retrieveHaystackUserLocations(haystack.getId(), new Callback<UsersResult>() {
             @Override
-            public void onResponse(Call<UsersTaskResult> call, Response<UsersTaskResult> response) {
-                UsersTaskResult result = response.body();
+            public void onResponse(Call<UsersResult> call, Response<UsersResult> response) {
+                UsersResult result = response.body();
 
                 if (result.getSuccessCode() == 1) {
                     //Log.d(TAG, "Retrieving locations success !");
@@ -377,7 +376,7 @@ public class HaystackMapFragment extends SupportMapFragment implements LocationS
             }
 
             @Override
-            public void onFailure(Call<UsersTaskResult> call, Throwable t) {
+            public void onFailure(Call<UsersResult> call, Throwable t) {
                 Log.d(TAG, "Retrieving locations failed ! Error : " + t.getMessage());
                 usersList = null;
             }

@@ -19,9 +19,9 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.model.LatLng;
 import com.nemator.needle.Needle;
 import com.nemator.needle.api.ApiClient;
-import com.nemator.needle.api.result.UserTaskResult;
+import com.nemator.needle.api.result.UserResult;
 import com.nemator.needle.models.vo.LocationVO;
-import com.nemator.needle.tasks.TaskResult;
+import com.nemator.needle.api.result.TaskResult;
 import com.nemator.needle.tasks.db.addPostLocationRequest.AddPostLocationRequestParams;
 import com.nemator.needle.tasks.db.addPostLocationRequest.AddPostLocationRequestTask;
 import com.nemator.needle.tasks.db.isPostLocationRequestDBEmpty.IsPostLocationRequestDBEmptyTask;
@@ -211,14 +211,14 @@ public class NeedleLocationService extends Service implements
 
         Needle.userModel.getUser().setLocation(new LocationVO(mCurrentPosition));
 
-        ApiClient.getInstance().updateLocation(Needle.userModel.getUser(), new Callback<UserTaskResult>() {
+        ApiClient.getInstance().updateLocation(Needle.userModel.getUser(), new Callback<UserResult>() {
             @Override
-            public void onResponse(Call<UserTaskResult> call, Response<UserTaskResult> response) {
+            public void onResponse(Call<UserResult> call, Response<UserResult> response) {
                 Log.d(TAG, "Location Updated");
             }
 
             @Override
-            public void onFailure(Call<UserTaskResult> call, Throwable t) {
+            public void onFailure(Call<UserResult> call, Throwable t) {
                 Log.d(TAG, "Location Update Failed");
             }
         });

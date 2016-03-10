@@ -13,10 +13,9 @@ import android.view.MenuItem;
 import android.widget.Toast;
 
 import com.nemator.needle.R;
-import com.nemator.needle.adapter.HaystackUserListCardAdapter;
+import com.nemator.needle.adapter.UserListCardAdapter;
 import com.nemator.needle.api.ApiClient;
-import com.nemator.needle.api.result.UserTaskResult;
-import com.nemator.needle.api.result.UsersTaskResult;
+import com.nemator.needle.api.result.UsersResult;
 import com.nemator.needle.models.vo.HaystackVO;
 import com.nemator.needle.utils.AppConstants;
 
@@ -32,7 +31,7 @@ public class UserSelectActivity extends AppCompatActivity{
     private RecyclerView listView;
     private SwipeRefreshLayout swipeLayout;
 
-    private HaystackUserListCardAdapter userListAdapter;
+    private UserListCardAdapter userListAdapter;
     private GridLayoutManager layoutManager;
     private HaystackVO haystack;
 
@@ -94,14 +93,14 @@ public class UserSelectActivity extends AppCompatActivity{
         ApiClient.getInstance().fetchUsersNotInHaystack(haystack.getId(), usersNotInHaystackFetchedCallback);
     }
 
-    private Callback<UsersTaskResult> usersNotInHaystackFetchedCallback = new Callback<UsersTaskResult>() {
+    private Callback<UsersResult> usersNotInHaystackFetchedCallback = new Callback<UsersResult>() {
         @Override
-        public void onResponse(Call<UsersTaskResult> call, Response<UsersTaskResult> response) {
+        public void onResponse(Call<UsersResult> call, Response<UsersResult> response) {
             swipeLayout.setRefreshing(false);
 
-            UsersTaskResult result = response.body();
+            UsersResult result = response.body();
             if(result.getSuccessCode() == 1){
-                userListAdapter = new HaystackUserListCardAdapter(result.getUsers(), UserSelectActivity.this);
+                userListAdapter = new UserListCardAdapter(result.getUsers(), UserSelectActivity.this);
                 listView.setAdapter(userListAdapter);
             }else{
                 Toast.makeText(UserSelectActivity.this, getString(R.string.fetching_users_failed), Toast.LENGTH_SHORT).show();
@@ -110,7 +109,7 @@ public class UserSelectActivity extends AppCompatActivity{
         }
 
         @Override
-        public void onFailure(Call<UsersTaskResult> call, Throwable t) {
+        public void onFailure(Call<UsersResult> call, Throwable t) {
             swipeLayout.setRefreshing(false);
 
             Toast.makeText(UserSelectActivity.this, getString(R.string.fetching_users_failed), Toast.LENGTH_SHORT).show();

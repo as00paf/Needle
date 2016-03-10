@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
+<menu
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
 
     <group
         android:checkableBehavior="single"
@@ -9,21 +11,24 @@
             android:id="@+id/drawer_haystacks"
             android:checked="true"
             android:icon="@drawable/ic_haystack"
-            android:title="@string/title_haystacks"/>
+            android:title="@string/title_haystacks"
+            app:actionLayout="@layout/menu_counter"/>
 
         <item
             android:id="@+id/drawer_location_sharing"
             android:icon="@drawable/ic_near_me_black_24dp"
-            android:title="@string/title_location_sharing"/>
+            android:title="@string/title_location_sharing"
+            app:actionLayout="@layout/menu_counter"/>
 
         <item
             android:id="@+id/drawer_notifications"
             android:icon="@drawable/ic_notifications_black_24dp"
-            android:title="@string/title_notifications"/>
+            android:title="@string/title_notifications"
+            app:actionLayout="@layout/menu_counter"/>
 
         <item
             android:id="@+id/drawer_people"
-            android:icon="@drawable/ic_action_person"
+            android:icon="@drawable/ic_person_black_24dp"
             android:title="@string/title_people"/>
 
     </group>

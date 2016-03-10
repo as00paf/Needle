@@ -17,12 +17,18 @@ import com.nemator.needle.R;
 import com.nemator.needle.activities.HaystackActivity;
 import com.nemator.needle.activities.LocationSharingActivity;
 import com.nemator.needle.adapter.LocationSharingListCardAdapter;
+import com.nemator.needle.api.ApiClient;
+import com.nemator.needle.api.result.LocationSharingResult;
 import com.nemator.needle.fragments.haystacks.OnActivityStateChangeListener;
 import com.nemator.needle.models.vo.LocationSharingVO;
 import com.nemator.needle.utils.AppConstants;
 import com.nemator.needle.utils.AppState;
 
 import java.util.ArrayList;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class LocationSharingListTabFragment extends Fragment implements LocationSharingCardListener{
     private static final String TAG = "LocationSharingListTabFragment";
@@ -37,7 +43,7 @@ public class LocationSharingListTabFragment extends Fragment implements Location
     private Boolean isReceived;
 
     //Objects
-    private RecyclerView.Adapter listAdapter;
+    private LocationSharingListCardAdapter listAdapter;
     private RecyclerView.LayoutManager layoutManager;
     private OnActivityStateChangeListener stateChangeCallback;
 
@@ -125,4 +131,40 @@ public class LocationSharingListTabFragment extends Fragment implements Location
     public void onRefreshList() {
         Needle.navigationController.refreshLocationSharingList();
     }
+
+    @Override
+    public void onCancelLocationSharing(LocationSharingVO vo) {
+        ApiClient.getInstance().cancelLocationSharing(vo, cancelLocationSharingCallback);
+    }
+
+    private Callback<LocationSharingResult> cancelLocationSharingCallback = new Callback<LocationSharingResult>() {
+
+        @Override
+        public void onResponse(Call<LocationSharingResult> call, Response<LocationSharingResult> response) {
+            LocationSharingResult result = response.body();
+            if(result.getSuccessCode() == 1){
+                //Remove from list
+                int index = -1;
+
+                for (LocationSharingVO vo : listAdapter.getListData()){
+                    if(vo.getId() == result.getLocationSharing().getId()){
+                        index = listAdapter.getListData().indexOf(vo);
+                    }
+                }
+
+                if(index > -1){
+                    listAdapter.getListData().remove(index);
+                    listAdapter.notifyDataSetChanged();
+                }
+            }else{
+
+            }
+        }
+
+        @Override
+        public void onFailure(Call<LocationSharingResult> call, Throwable t) {
+
+        }
+    };
+
 }

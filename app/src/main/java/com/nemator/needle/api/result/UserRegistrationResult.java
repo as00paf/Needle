@@ -1,7 +1,6 @@
 package com.nemator.needle.api.result;
 
 import com.google.gson.annotations.SerializedName;
-import com.nemator.needle.tasks.TaskResult;
 
 public class UserRegistrationResult extends TaskResult{
 

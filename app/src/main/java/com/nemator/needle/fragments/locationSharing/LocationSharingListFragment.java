@@ -1,6 +1,7 @@
 package com.nemator.needle.fragments.locationSharing;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
@@ -14,9 +15,10 @@ import android.widget.Toast;
 import com.appcompat.view.slidingTab.SlidingTabLayout;
 import com.nemator.needle.Needle;
 import com.nemator.needle.R;
+import com.nemator.needle.activities.CreateLocationSharingActivity;
 import com.nemator.needle.adapter.LocationSharingPagerAdapter;
 import com.nemator.needle.api.ApiClient;
-import com.nemator.needle.api.result.LocationSharingTaskResult;
+import com.nemator.needle.api.result.LocationSharingResult;
 import com.nemator.needle.fragments.haystacks.OnActivityStateChangeListener;
 import com.nemator.needle.models.vo.LocationSharingVO;
 import com.nemator.needle.utils.AppConstants;
@@ -97,7 +99,8 @@ public class LocationSharingListFragment extends Fragment {
             fab.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Needle.navigationController.showSection(AppConstants.SECTION_CREATE_LOCATION_SHARING);
+                    Intent intent = new Intent(getContext(), CreateLocationSharingActivity.class);
+                    startActivity(intent);
                 }
             });
 
@@ -155,10 +158,16 @@ public class LocationSharingListFragment extends Fragment {
         ApiClient.getInstance().fetchLocationSharings(locationSharingsFetchedCallback);
     }
 
-    private Callback<LocationSharingTaskResult> locationSharingsFetchedCallback = new Callback<LocationSharingTaskResult>() {
+    private Callback<LocationSharingResult> locationSharingsFetchedCallback = new Callback<LocationSharingResult>() {
         @Override
-        public void onResponse(Call<LocationSharingTaskResult> call, Response<LocationSharingTaskResult> response) {
-            LocationSharingTaskResult result = response.body();
+        public void onResponse(Call<LocationSharingResult> call, Response<LocationSharingResult> response) {
+            LocationSharingListTabFragment receivedTab = mLocationSharingPagerAdapter.getReceivedFragment();
+            LocationSharingListTabFragment sentTab = mLocationSharingPagerAdapter.getSentFragment();
+
+            receivedTab.getRefreshLayout().setRefreshing(false);
+            sentTab.getRefreshLayout().setRefreshing(false);
+
+            LocationSharingResult result = response.body();
             if(result.getSuccessCode() == 1){
                 receivedLocationsList = result.getReceivedLocationSharings();
                 sentLocationsList = result.getSentLocationSharings();
@@ -166,12 +175,6 @@ public class LocationSharingListFragment extends Fragment {
                 if(receivedLocationsList != null && getActivity() != null){
                     Needle.navigationController.setLocationSharingCount(receivedLocationsList.size());
                 }
-
-                LocationSharingListTabFragment receivedTab = mLocationSharingPagerAdapter.getReceivedFragment();
-                LocationSharingListTabFragment sentTab = mLocationSharingPagerAdapter.getSentFragment();
-
-                receivedTab.getRefreshLayout().setRefreshing(false);
-                sentTab.getRefreshLayout().setRefreshing(false);
 
                 receivedTab.updateLocationSharingList(receivedLocationsList);
                 sentTab.updateLocationSharingList(sentLocationsList);
@@ -182,7 +185,7 @@ public class LocationSharingListFragment extends Fragment {
         }
 
         @Override
-        public void onFailure(Call<LocationSharingTaskResult> call, Throwable t) {
+        public void onFailure(Call<LocationSharingResult> call, Throwable t) {
             Log.e(TAG, "Could not fetch location sharings. Error : " + t.getMessage());
             Toast.makeText(getActivity(), R.string.fetch_location_sharings_error, Toast.LENGTH_SHORT).show();
         }

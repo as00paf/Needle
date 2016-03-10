@@ -9,7 +9,7 @@
         app:actionLayout="@layout/search_bar" />
 
     <item
-        android:id="@+id/create_haystack_action_done"
+        android:id="@+id/action_done"
         android:icon="@drawable/ic_done_white_24dp"
         android:description="@string/done"
         app:showAsAction="always" />

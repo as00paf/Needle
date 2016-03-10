@@ -23,7 +23,6 @@ import com.facebook.GraphResponse;
 import com.facebook.Profile;
 import com.facebook.ProfileTracker;
 import com.facebook.login.LoginManager;
-import com.facebook.login.LoginResult;
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInResult;
@@ -41,7 +40,7 @@ import com.nemator.needle.api.ApiClient;
 import com.nemator.needle.api.result.UserRegistrationResult;
 import com.nemator.needle.models.vo.FacebookUserVO;
 import com.nemator.needle.models.vo.UserVO;
-import com.nemator.needle.api.result.LoginTaskResult;
+import com.nemator.needle.api.result.LoginResult;
 import com.nemator.needle.utils.AppConstants;
 import com.nemator.needle.utils.AppState;
 import com.twitter.sdk.android.Twitter;
@@ -103,10 +102,10 @@ public class AuthenticationController {
     }
 
     //Handlers
-    private Callback<LoginTaskResult> loginCallback = new Callback<LoginTaskResult>() {
+    private Callback<LoginResult> loginCallback = new Callback<LoginResult>() {
         @Override
-        public void onResponse(Call<LoginTaskResult> call, Response<LoginTaskResult> response) {
-            LoginTaskResult result = response.body();
+        public void onResponse(Call<LoginResult> call, Response<LoginResult> response) {
+            LoginResult result = response.body();
 
             Log.i("Needle loginCallbackk", "Needle loginCallback success : " +(result.getSuccessCode() == 1) );
 
@@ -141,7 +140,7 @@ public class AuthenticationController {
         }
 
         @Override
-        public void onFailure(Call<LoginTaskResult> call, Throwable t) {
+        public void onFailure(Call<LoginResult> call, Throwable t) {
             Log.d(TAG, "log in failed : " + t.getMessage());
         }
     };
@@ -366,9 +365,9 @@ public class AuthenticationController {
         LoginManager.getInstance().registerCallback(facebookCallbackManager, facebookLoginCallback);
     }
 
-    private FacebookCallback<LoginResult> facebookLoginCallback =  new FacebookCallback<LoginResult>() {
+    private FacebookCallback<com.facebook.login.LoginResult> facebookLoginCallback =  new FacebookCallback<com.facebook.login.LoginResult>() {
         @Override
-        public void onSuccess(LoginResult loginResult) {
+        public void onSuccess(com.facebook.login.LoginResult loginResult) {
             Log.d(TAG, "Facebook log in success");
 
             //Todo : own class

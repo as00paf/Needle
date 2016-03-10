@@ -19,7 +19,6 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Toast;
 
@@ -27,7 +26,7 @@ import com.nemator.needle.Needle;
 import com.nemator.needle.R;
 import com.nemator.needle.adapter.CreateHaystackPagerAdapter;
 import com.nemator.needle.api.ApiClient;
-import com.nemator.needle.api.result.HaystackTaskResult;
+import com.nemator.needle.api.result.HaystackResult;
 import com.nemator.needle.fragments.haystacks.OnActivityStateChangeListener;
 import com.nemator.needle.fragments.haystacks.createHaystack.CreateHaystackGeneralInfosFragment;
 import com.nemator.needle.fragments.haystacks.createHaystack.CreateHaystackMapFragment;
@@ -51,7 +50,7 @@ import retrofit2.Response;
 public class CreateHaystackActivity extends AppCompatActivity implements ImageUploaderTask.ImageUploadResponseHandler,
         CreateHaystackGeneralInfosFragment.OnPrivacySettingsUpdatedListener{
 
-    public static final String TAG = "CreateHaystackFragment";
+    public static final String TAG = "CreateHaystackActivity";
 
     //TODO : put this in constants
     //Activity Results
@@ -80,7 +79,7 @@ public class CreateHaystackActivity extends AppCompatActivity implements ImageUp
         stateChangeCallback = Needle.navigationController;
 
         //Toolbar
-        setContentView(R.layout.activity_create_haystack);
+        setContentView(R.layout.activity_create);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -88,7 +87,7 @@ public class CreateHaystackActivity extends AppCompatActivity implements ImageUp
 
         //ViewPager
         mCreateHaystackPagerAdapter = new CreateHaystackPagerAdapter(getSupportFragmentManager(), this);
-        createHaystackViewPager = (ViewPager) findViewById(R.id.create_haystack_view_pager);
+        createHaystackViewPager = (ViewPager) findViewById(R.id.view_pager);
         createHaystackViewPager.setAdapter(mCreateHaystackPagerAdapter);
         createHaystackViewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
@@ -121,28 +120,11 @@ public class CreateHaystackActivity extends AppCompatActivity implements ImageUp
             }
         });
 
-        createHaystackViewPager.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                Log.d(TAG, "here");
-
-                return false;
-            }
-        });
-
         //Tabs
         mSlidingTabLayout = (SlidingTabLayout) findViewById(R.id.sliding_tabs);
         mSlidingTabLayout.setCustomTabView(R.layout.layout_tab_title, R.id.tab_text);
         mSlidingTabLayout.setDistributeEvenly(true);
         mSlidingTabLayout.setViewPager(createHaystackViewPager, toolbar);
-        mSlidingTabLayout.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                Log.d(TAG, "here");
-
-                return false;
-            }
-        });
 
         mSlidingTabLayout.setCustomTabColorizer(new SlidingTabLayout.TabColorizer() {
 
@@ -179,7 +161,7 @@ public class CreateHaystackActivity extends AppCompatActivity implements ImageUp
        * */
 
         //FAB
-        fab = (FloatingActionButton) findViewById(R.id.new_haystack_photo_fab);
+        fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -279,7 +261,7 @@ public class CreateHaystackActivity extends AppCompatActivity implements ImageUp
         int id = item.getItemId();
 
         switch(id) {
-            case R.id.create_haystack_action_done:
+            case R.id.action_done:
                 createHaystack();
                 return true;
         }
@@ -343,10 +325,10 @@ public class CreateHaystackActivity extends AppCompatActivity implements ImageUp
         }
     }
 
-    private Callback<HaystackTaskResult> createHaystackHandler = new Callback<HaystackTaskResult>() {
+    private Callback<HaystackResult> createHaystackHandler = new Callback<HaystackResult>() {
         @Override
-        public void onResponse(Call<HaystackTaskResult> call, Response<HaystackTaskResult> response) {
-            HaystackTaskResult result = response.body();
+        public void onResponse(Call<HaystackResult> call, Response<HaystackResult> response) {
+            HaystackResult result = response.body();
             if(result.getSuccessCode() == 0){
                 Toast.makeText(CreateHaystackActivity.this, "An error occured while creating Haystack", Toast.LENGTH_SHORT).show();
             }else{
@@ -360,7 +342,7 @@ public class CreateHaystackActivity extends AppCompatActivity implements ImageUp
         }
 
         @Override
-        public void onFailure(Call<HaystackTaskResult> call, Throwable t) {
+        public void onFailure(Call<HaystackResult> call, Throwable t) {
             Log.d(TAG, "An error occured while creating Haystack : " + t.getMessage());
             Toast.makeText(CreateHaystackActivity.this, "An error occured while creating Haystack ", Toast.LENGTH_SHORT).show();
         }

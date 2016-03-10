@@ -39,7 +39,6 @@ import com.nemator.needle.fragments.SearchFragment;
 import com.nemator.needle.fragments.haystacks.OnActivityStateChangeListener;
 import com.nemator.needle.models.vo.HaystackVO;
 import com.nemator.needle.models.vo.UserVO;
-import com.nemator.needle.tasks.imageUploader.ImageUploaderTask;
 import com.nemator.needle.utils.AppConstants;
 import com.nemator.needle.utils.AppState;
 import com.nemator.needle.utils.CameraUtils;
@@ -132,7 +131,7 @@ public class CreateHaystackFragment extends CreateHaystackBaseFragment implement
 
         //ViewPager
         mCreateHaystackPagerAdapter = new CreateHaystackPagerAdapter(getActivity().getSupportFragmentManager(), getActivity());
-        createHaystackViewPager = (ViewPager) rootView.findViewById(R.id.create_haystack_view_pager);
+        createHaystackViewPager = (ViewPager) rootView.findViewById(R.id.view_pager);
         createHaystackViewPager.setAdapter(mCreateHaystackPagerAdapter);
 
         //ViewPagerIndicator
@@ -185,7 +184,7 @@ public class CreateHaystackFragment extends CreateHaystackBaseFragment implement
         });
 
         //FAB
-        fab = (FloatingActionButton) rootView.findViewById(R.id.new_haystack_photo_fab);
+        fab = (FloatingActionButton) rootView.findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

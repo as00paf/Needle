@@ -22,7 +22,7 @@ import com.nemator.needle.adapter.HaystackListPagerAdapter;
 import com.nemator.needle.api.ApiClient;
 import com.nemator.needle.controller.NavigationController;
 import com.nemator.needle.models.vo.HaystackVO;
-import com.nemator.needle.api.result.HaystackTaskResult;
+import com.nemator.needle.api.result.HaystackResult;
 import com.nemator.needle.utils.AppConstants;
 import com.nemator.needle.utils.AppState;
 
@@ -181,11 +181,11 @@ public class HaystackListFragment extends Fragment implements SwipeRefreshLayout
         }
 
         lastUpdate = now;
-        ApiClient.getInstance().fetchHaystacks(getUserId(), new Callback<HaystackTaskResult>() {
+        ApiClient.getInstance().fetchHaystacks(getUserId(), new Callback<HaystackResult>() {
 
             @Override
-            public void onResponse(Call<HaystackTaskResult> call, Response<HaystackTaskResult> response) {
-                HaystackTaskResult result = response.body();
+            public void onResponse(Call<HaystackResult> call, Response<HaystackResult> response) {
+                HaystackResult result = response.body();
 
                 Log.d(TAG, "haystacks fetched !");
 
@@ -214,7 +214,7 @@ public class HaystackListFragment extends Fragment implements SwipeRefreshLayout
             }
 
             @Override
-            public void onFailure(Call<HaystackTaskResult> call, Throwable t) {
+            public void onFailure(Call<HaystackResult> call, Throwable t) {
                 Log.d(TAG, "haystacks fetch failed !");
 
                 HaystackListTabFragment publicTab = mHaystackListPagerAdapter.getPublicHaystackListFragment();

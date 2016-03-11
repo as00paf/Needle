@@ -185,14 +185,10 @@ public class CreateLocationSharingActivity extends AppCompatActivity {
         locationSharingVO = new LocationSharingVO();
 
         //Sender
-        locationSharingVO.setSenderId(Needle.userModel.getUserId());
-        locationSharingVO.setSenderName(Needle.userModel.getUserName());
-        locationSharingVO.setSenderRegId(Needle.userModel.getGcmRegId());
+        locationSharingVO.setSender(Needle.userModel.getUser());
 
         //Receiver
-        locationSharingVO.setReceiverId(selectedUser.getId());
-        locationSharingVO.setReceiverName(selectedUser.getUserName());
-        locationSharingVO.setReceiverRegId(selectedUser.getGcmRegId());
+        locationSharingVO.setReceiver(selectedUser);
 
         //Options
         String dateLimit = pagerAdapter.getDateLimit();
@@ -213,11 +209,11 @@ public class CreateLocationSharingActivity extends AppCompatActivity {
 
                 //Add Post Location Request to the DB
                 AddPostLocationRequestParams params = new AddPostLocationRequestParams(CreateLocationSharingActivity.this, LocationServiceDBHelper.PostLocationRequest.POSTER_TYPE_LOCATION_SHARING,
-                        vo.getTimeLimit(), vo.getSenderId(), String.valueOf(vo.getId()));
+                        vo.getTimeLimit(), vo.getSender().getId(), String.valueOf(vo.getId()));
                 new AddPostLocationRequestTask(params, null).execute();
 
                 //Feedback
-                Toast.makeText(CreateLocationSharingActivity.this, "Location shared with " + result.getLocationSharing().getReceiverName(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(CreateLocationSharingActivity.this, "Location shared with " + result.getLocationSharing().getReceiver().getReadableUserName(), Toast.LENGTH_SHORT).show();
 
                 //Launch Activity
                 Intent locationSharingIntent = new Intent(CreateLocationSharingActivity.this, LocationSharingActivity.class);
@@ -225,7 +221,7 @@ public class CreateLocationSharingActivity extends AppCompatActivity {
                 startActivity(locationSharingIntent);
             }else{
                 Log.e(TAG, "Location Sharing not created. Error : " + result.getMessage());
-                Toast.makeText(CreateLocationSharingActivity.this, "Location Sharing not created !", Toast.LENGTH_SHORT).show();
+                Toast.makeText(CreateLocationSharingActivity.this, result.getMessage(), Toast.LENGTH_SHORT).show();
             }
         }
 

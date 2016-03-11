@@ -86,8 +86,10 @@ public class LocationSharingMapFragment extends SupportMapFragment
         if(savedInstanceState != null){
             updateValuesFromBundle(savedInstanceState);
         }else{
-            locationSharing = ((LocationSharingActivity) getActivity()).getLocationSharing();
-            isSent = locationSharing.isSender();
+            locationSharing = (LocationSharingVO) ((LocationSharingActivity) getActivity()).getIntent().getExtras().get(AppConstants.TAG_LOCATION_SHARING);
+            if(locationSharing != null){
+                isSent = locationSharing.isSender();
+            }
         }
 
         //Map
@@ -222,7 +224,7 @@ public class LocationSharingMapFragment extends SupportMapFragment
                 if(mReceivedMarker == null && mReceivedCircle == null){
                     MarkerOptions markerOptions = new MarkerOptions();
                     markerOptions.position(mReceivedPosition);
-                    drawReceivedMarkerWithCircle(mReceivedPosition, locationSharing.getSenderName() + "'s Position");
+                    drawReceivedMarkerWithCircle(mReceivedPosition, locationSharing.getSender().getReadableUserName()+ "'s Position");
                 }else{
                     updateReceivedMarkerWithCircle(mReceivedPosition);
                 }
@@ -248,7 +250,7 @@ public class LocationSharingMapFragment extends SupportMapFragment
             MarkerOptions receivedMarkerOptions = new MarkerOptions();
             if(mReceivedMarker == null){
                 receivedMarkerOptions.position(mReceivedPosition);
-                drawReceivedMarkerWithCircle(mReceivedPosition, locationSharing.getSenderName() + "'s Position");
+                drawReceivedMarkerWithCircle(mReceivedPosition, locationSharing.getSender().getReadableUserName() + "'s Position");
             }else{
                 updateReceivedMarkerWithCircle(mReceivedPosition);
             }
@@ -268,7 +270,7 @@ public class LocationSharingMapFragment extends SupportMapFragment
 
     //Actions
     private void trackUser(){
-        ApiClient.getInstance().retrieveUserLocation(locationSharing.getSenderId(), locationSharing, userLocationRetrievedCallback);
+        ApiClient.getInstance().retrieveUserLocation(locationSharing.getSender().getId(), locationSharing, userLocationRetrievedCallback);
     }
 
     private Callback<UserResult> userLocationRetrievedCallback = new Callback<UserResult>() {

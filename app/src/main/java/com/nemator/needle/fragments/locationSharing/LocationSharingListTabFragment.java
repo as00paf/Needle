@@ -1,27 +1,24 @@
 package com.nemator.needle.fragments.locationSharing;
 
 import android.app.Activity;
-import android.content.Intent;
 import android.os.Bundle;
-import android.os.Parcelable;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.nemator.needle.Needle;
 import com.nemator.needle.R;
-import com.nemator.needle.activities.HaystackActivity;
-import com.nemator.needle.activities.LocationSharingActivity;
 import com.nemator.needle.adapter.LocationSharingListCardAdapter;
 import com.nemator.needle.api.ApiClient;
 import com.nemator.needle.api.result.LocationSharingResult;
 import com.nemator.needle.fragments.haystacks.OnActivityStateChangeListener;
 import com.nemator.needle.models.vo.LocationSharingVO;
-import com.nemator.needle.utils.AppConstants;
 import com.nemator.needle.utils.AppState;
 
 import java.util.ArrayList;
@@ -31,7 +28,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public class LocationSharingListTabFragment extends Fragment implements LocationSharingCardListener{
-    private static final String TAG = "LocationSharingListTabFragment";
+    private static final String TAG = "ListTabFragment";
 
     //Views
     private View rootView;
@@ -44,7 +41,7 @@ public class LocationSharingListTabFragment extends Fragment implements Location
 
     //Objects
     private LocationSharingListCardAdapter listAdapter;
-    private RecyclerView.LayoutManager layoutManager;
+    private GridLayoutManager layoutManager;
     private OnActivityStateChangeListener stateChangeCallback;
 
     @Override
@@ -77,7 +74,13 @@ public class LocationSharingListTabFragment extends Fragment implements Location
         mRecyclerView = (RecyclerView) rootView.findViewById(R.id.location_sharing_list);
         mRecyclerView.setHasFixedSize(true);
 
-        layoutManager = new LinearLayoutManager(getActivity());
+        layoutManager = new GridLayoutManager(getActivity(), 2);
+        layoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
+            @Override
+            public int getSpanSize(int position) {
+                return listAdapter.getItemViewType(position) == 0 ? 1 : 2;
+            }
+        });
         mRecyclerView.setLayoutManager(layoutManager);
 
         listAdapter = new LocationSharingListCardAdapter(dataList, getActivity(), !isReceived, this);
@@ -156,15 +159,19 @@ public class LocationSharingListTabFragment extends Fragment implements Location
                     listAdapter.getListData().remove(index);
                     listAdapter.notifyDataSetChanged();
                 }
-            }else{
 
+                //TODO : Localize
+                Toast.makeText(getContext(), "Location Sharing was cancelled", Toast.LENGTH_SHORT).show();
+            }else{
+                Log.e(TAG, "Could not cancel location sharing! Error : " + result.getMessage());
+                Toast.makeText(getContext(), "Could not cancel location sharing!", Toast.LENGTH_SHORT).show();
             }
         }
 
         @Override
         public void onFailure(Call<LocationSharingResult> call, Throwable t) {
-
+            Log.e(TAG, "Could not cancel location sharing! Error : " + t.getMessage());
+            Toast.makeText(getContext(), "Could not cancel location sharing!", Toast.LENGTH_SHORT).show();
         }
     };
-
 }

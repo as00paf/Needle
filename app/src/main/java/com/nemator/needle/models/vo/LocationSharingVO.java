@@ -1,62 +1,35 @@
 package com.nemator.needle.models.vo;
 
-
 import android.os.Parcel;
 import android.os.Parcelable;
 
 import com.google.gson.annotations.SerializedName;
-import com.nemator.needle.Needle;
 
 import java.io.Serializable;
-
 
 public class LocationSharingVO implements Serializable, Parcelable {
     @SerializedName("id")
     private int id;
 
-    @SerializedName("senderName")
-    private String senderName;
+    @SerializedName("sender")
+    private UserVO sender;
 
-    @SerializedName("senderId")
-    private int senderId;
-
-    @SerializedName("senderRegId")
-    private String senderRegId;
-
-    @SerializedName("receiverName")
-    private String receiverName;
-
-    @SerializedName("receiverId")
-    private int receiverId;
-
-    @SerializedName("receiverRegId")
-    private String receiverRegId;
+    @SerializedName("receiver")
+    private UserVO receiver;
 
     @SerializedName("timeLimit")
     private String timeLimit;
 
     @SerializedName("shareBack")
     private Boolean shareBack;
-    private boolean sender;
+    private boolean isSender;
 
     public LocationSharingVO(){
 
     }
 
-    public LocationSharingVO(int id, String senderName, int senderId, String senderRegId, String receiverRegId, String timeLimit, Boolean shareBack){
+    public LocationSharingVO(int id, String timeLimit, Boolean shareBack){
         this.id = id;
-        this.senderName = senderName;
-        this.senderId = senderId;
-        this.senderRegId = senderRegId;
-        this.receiverRegId = receiverRegId;
-        this.timeLimit = timeLimit;
-        this.shareBack = shareBack;
-    }
-
-    public LocationSharingVO(int id, String senderName, int senderId, String timeLimit, Boolean shareBack){
-        this.id = id;
-        this.senderName = senderName;
-        this.senderId = senderId;
         this.timeLimit = timeLimit;
         this.shareBack = shareBack;
     }
@@ -80,38 +53,28 @@ public class LocationSharingVO implements Serializable, Parcelable {
 
     public LocationSharingVO(Parcel in){
         this.id = in.readInt();
-        this.senderName = in.readString();
-        this.senderId = in.readInt();
-        this.senderRegId = in.readString();
-        this.receiverName = in.readString();
-        this.receiverId = in.readInt();
-        this.receiverRegId = in.readString();
         this.timeLimit = in.readString();
         this.shareBack = in.readByte() != 0;
+        this.sender = (UserVO) in.readParcelable(UserVO.class.getClassLoader());
+        this.receiver = (UserVO) in.readParcelable(UserVO.class.getClassLoader());
     }
 
     @Override
     public void writeToParcel(Parcel parcel, int i) {
         parcel.writeInt(id);
-        parcel.writeString(senderName);
-        parcel.writeInt(senderId);
-        parcel.writeString(senderRegId);
-        parcel.writeString(receiverName);
-        parcel.writeInt(receiverId);
-        parcel.writeString(receiverRegId);
         parcel.writeString(timeLimit);
         parcel.writeByte((byte) (shareBack ? 1 : 0));
+        parcel.writeParcelable(sender, i);
+        parcel.writeParcelable(receiver, i);
     }
 
     public LocationSharingVO clone(){
         LocationSharingVO vo = new LocationSharingVO();
         vo.id = this.id;
-        vo.senderId = this.senderId;
-        vo.senderName = this.senderName;
-        vo.receiverId = this.receiverId;
-        vo.receiverName = this.receiverName;
         vo.timeLimit = this.timeLimit;
         vo.shareBack = this.shareBack;
+        vo.sender = this.sender;
+        vo.receiver = this.receiver;
         return vo;
     }
 
@@ -124,36 +87,20 @@ public class LocationSharingVO implements Serializable, Parcelable {
         this.id = id;
     }
 
-    public String getSenderName() {
-        return senderName;
+    public UserVO getSender() {
+        return sender;
     }
 
-    public void setSenderName(String senderName) {
-        this.senderName = senderName;
+    public void setSender(UserVO sender) {
+        this.sender = sender;
     }
 
-    public int getSenderId() {
-        return senderId;
+    public UserVO getReceiver() {
+        return receiver;
     }
 
-    public void setSenderId(int senderId) {
-        this.senderId = senderId;
-    }
-
-    public String getReceiverName() {
-        return receiverName;
-    }
-
-    public void setReceiverName(String receiverName) {
-        this.receiverName = receiverName;
-    }
-
-    public int getReceiverId() {
-        return receiverId;
-    }
-
-    public void setReceiverId(int receiverId) {
-        this.receiverId = receiverId;
+    public void setReceiver(UserVO receiver) {
+        this.receiver = receiver;
     }
 
     public String getTimeLimit() {
@@ -172,23 +119,11 @@ public class LocationSharingVO implements Serializable, Parcelable {
         this.shareBack = shareBack;
     }
 
-    public String getSenderRegId() {
-        return senderRegId;
-    }
-
-    public void setSenderRegId(String senderRegId) {
-        this.senderRegId = senderRegId;
-    }
-
-    public String getReceiverRegId() {
-        return receiverRegId;
-    }
-
-    public void setReceiverRegId(String receiverRegId) {
-        this.receiverRegId = receiverRegId;
-    }
-
     public boolean isSender() {
-        return Needle.userModel.getUserId() == senderId;
+        return isSender;
+    }
+
+    public void setIsSender(boolean isSender) {
+        this.isSender = isSender;
     }
 }

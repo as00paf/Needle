@@ -186,6 +186,12 @@ public class LocationSharingListFragment extends Fragment {
 
         @Override
         public void onFailure(Call<LocationSharingResult> call, Throwable t) {
+            LocationSharingListTabFragment receivedTab = mLocationSharingPagerAdapter.getReceivedFragment();
+            LocationSharingListTabFragment sentTab = mLocationSharingPagerAdapter.getSentFragment();
+
+            receivedTab.getRefreshLayout().setRefreshing(false);
+            sentTab.getRefreshLayout().setRefreshing(false);
+
             Log.e(TAG, "Could not fetch location sharings. Error : " + t.getMessage());
             Toast.makeText(getActivity(), R.string.fetch_location_sharings_error, Toast.LENGTH_SHORT).show();
         }

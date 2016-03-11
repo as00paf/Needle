@@ -151,27 +151,10 @@ public class HomeActivity extends AppCompatActivity {
             if(action != null && type != null){
                 if(action.equals("Notification")){
                     if(type.equals("LocationSharing")){
-                        String timeLimit = extras.getString(AppConstants.TAG_TIME_LIMIT);
-                        String senderName = extras.getString(AppConstants.TAG_SENDER_NAME);
-                        int senderId = Integer.parseInt(extras.getString(AppConstants.TAG_SENDER_ID, "-1"));
-                        Boolean shareBack = extras.getBoolean(AppConstants.TAG_SHARE_BACK);
-
-                        LocationSharingVO vo = new LocationSharingVO(id, senderName, senderId, timeLimit, shareBack);
+                        LocationSharingVO vo = extras.getParcelable(AppConstants.LOCATION_SHARING_DATA_KEY);
                         Needle.navigationController.showReceivedLocationSharing(vo);
                     }else if(type.equals("Haystack")){
-                        int owner = Integer.parseInt(extras.getString(AppConstants.TAG_IS_OWNER, "-1"));
-                        String name = extras.getString(AppConstants.TAG_HAYSTACK_NAME);
-                        String timeLimit = extras.getString(AppConstants.TAG_TIME_LIMIT);
-                        int zoneRadius = Integer.parseInt(extras.getString(AppConstants.TAG_ZONE_RADIUS, "-1"));
-                        Boolean isCircle = extras.getBoolean(AppConstants.TAG_IS_CIRCLE);
-                        Boolean isPublic = extras.getBoolean(AppConstants.TAG_IS_PUBLIC);
-                        double latitude = extras.getDouble(AppConstants.TAG_LATITUDE);
-                        double longitude = extras.getDouble(AppConstants.TAG_LONGITUDE);
-                        LocationVO position = new LocationVO(latitude, longitude);
-                        String pictureURL = extras.getString(AppConstants.TAG_PICTURE_URL);
-
-
-                        HaystackVO vo = new HaystackVO(id, owner, name, isPublic, timeLimit, zoneRadius, isCircle, position, pictureURL, null, null);
+                        HaystackVO vo = extras.getParcelable(AppConstants.HAYSTACK_DATA_KEY);
 
                         Intent haystackIntent = new Intent(this, HaystackActivity.class);
                         haystackIntent.putExtra(AppConstants.TAG_HAYSTACK, (Parcelable) vo);

@@ -35,7 +35,7 @@ public class LocationSharingActivity extends AppCompatActivity {
         setContentView(R.layout.activity_location_sharing);
 
         toolbar = (Toolbar) findViewById(R.id.toolbar);
-        String name = locationSharing.isSender() ? locationSharing.getReceiverName() : locationSharing.getSenderName();
+        String name = locationSharing.isSender() ? locationSharing.getReceiver().getReadableUserName() : locationSharing.getSender().getReadableUserName();
         String title = getString(R.string.location_of) + name;
         toolbar.setTitle(title);
         setSupportActionBar(toolbar);

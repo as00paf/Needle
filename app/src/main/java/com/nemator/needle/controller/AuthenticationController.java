@@ -11,6 +11,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.LocalBroadcastManager;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -74,7 +75,7 @@ public class AuthenticationController {
     public static final int RC_GOOGLE_SIGN_IN = 9001;
     public static final int RC_GOOGLE_REGISTRATION_SIGN_IN = 9002;
 
-    private HomeActivity activity;
+    private AppCompatActivity activity;
 
     //Facebook
     private CallbackManager facebookCallbackManager;
@@ -97,7 +98,7 @@ public class AuthenticationController {
         return instance;
     }
 
-    public void init(HomeActivity activity){
+    public void init(AppCompatActivity activity){
         this.activity = activity;
     }
 
@@ -107,7 +108,7 @@ public class AuthenticationController {
         public void onResponse(Call<LoginResult> call, Response<LoginResult> response) {
             LoginResult result = response.body();
 
-            Log.i("Needle loginCallbackk", "Needle loginCallback success : " +(result.getSuccessCode() == 1) );
+            Log.i("Needle loginCallback", "Needle loginCallback success : " +(result.getSuccessCode() == 1) );
 
             if (result.getSuccessCode() == 1) {
                 Needle.userModel.setLoggedIn(true);
@@ -120,10 +121,12 @@ public class AuthenticationController {
                 Needle.userModel.getUser().setCoverPictureURL(result.getUser().getCoverPictureURL());
                 Needle.userModel.saveUser();
 
-                Needle.navigationController.onPostLogin();
+                //TODO : this is a test, might need to fix
+                Needle.googleApiController.stopAutoManage();
 
-                Needle.navigationController.setHaystacksCount(result.getHaystackCount());
-                Needle.navigationController.setLocationSharingCount(result.getLocationSharingCount());
+                Intent intent = new Intent(activity, HomeActivity.class);
+                intent.putExtra("loginResult", result);//TODO : use constant
+                activity.startActivity(intent);
             }
             else if(result.getSuccessCode() == 404){
                 int loginType = Needle.userModel.getUser().getLoginType();
@@ -241,6 +244,7 @@ public class AuthenticationController {
                 }
             }, new IntentFilter(AppConstants.GOOGLE_API_CONNECTED));
 
+            //TODO : check if necessary
             Needle.googleApiController.init(activity);
         }
     }

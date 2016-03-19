@@ -1,6 +1,7 @@
 package com.nemator.needle.adapter;
 
 import android.app.Activity;
+import android.os.AsyncTask;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -19,11 +20,14 @@ import com.google.android.gms.location.places.AutocompletePrediction;
 import com.google.android.gms.location.places.AutocompletePredictionBuffer;
 import com.google.android.gms.location.places.Places;
 import com.google.android.gms.maps.model.LatLngBounds;
+import com.nemator.needle.Needle;
 import com.nemator.needle.R;
+import com.nemator.needle.api.NeedleApiClient;
 import com.nemator.needle.models.vo.CustomPlace;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -50,10 +54,9 @@ public class PlacesRecyclerAdapter extends RecyclerView.Adapter<PlacesRecyclerAd
     private int mode = DEFAULT_MODE;
 
     private LatLngBounds bounds;
-    private GoogleApiClient mGoogleApiClient;
     private final AutocompleteFilter placeFilter;
 
-    public PlacesRecyclerAdapter(Activity activity,  ArrayList<CustomPlace> nearbyLocations, ArrayList<CustomPlace> searchHistory, NearbyPlaceCardClickListener listener, AutocompleteFilter filter, GoogleApiClient googleApiClient) {
+    public PlacesRecyclerAdapter(Activity activity,  ArrayList<CustomPlace> nearbyLocations, ArrayList<CustomPlace> searchHistory, NearbyPlaceCardClickListener listener, AutocompleteFilter filter) {
         super();
 
         this.activity = activity;
@@ -61,7 +64,6 @@ public class PlacesRecyclerAdapter extends RecyclerView.Adapter<PlacesRecyclerAd
         this.nearbyLocations = nearbyLocations;
         this.listener = listener;
         this.placeFilter = filter;
-        mGoogleApiClient = googleApiClient;
     }
 
     @Override
@@ -152,7 +154,9 @@ public class PlacesRecyclerAdapter extends RecyclerView.Adapter<PlacesRecyclerAd
         if(mode == DEFAULT_MODE){
             int nearbyLocationsCount = (nearbyLocations != null) ? nearbyLocations.size() : 0;
 
-            count = nearbyLocationsCount + searchHistory.size() + (searchHistory.size() > 0 ? 2 : 1);
+            if(searchHistory != null){
+                count = nearbyLocationsCount + searchHistory.size() + (searchHistory.size() > 0 ? 2 : 1);
+            }
         }else if(searchResults != null){
             count = searchResults.size() + 1;
         }
@@ -220,17 +224,51 @@ public class PlacesRecyclerAdapter extends RecyclerView.Adapter<PlacesRecyclerAd
         }
     }
 
+    @Override
+    public Filter getFilter() {
+        return new Filter() {
+            @Override
+            protected FilterResults performFiltering(CharSequence constraint) {
+                FilterResults results = new FilterResults();
+                if (constraint != null) {
+                    // Query the autocomplete API for the entered constraint
+                    //searchResults =  Needle.googleApiController.getPredictions(constraint, PlacesRecyclerAdapter.this, bounds, placeFilter);
+                    searchResults = getPredictions(constraint);
+
+                    if (searchResults != null) {
+                        // Results
+                        results.values = searchResults;
+                        results.count = searchResults.size();
+                    }
+                }
+                return results;
+            }
+
+            @Override
+            protected void publishResults(CharSequence constraint, FilterResults results) {
+                if (results != null && results.count > 0) {
+                    // The API returned at least one result, update the data.
+                    notifyDataSetChanged();
+                } else {
+                    // The API did not return any results, invalidate the data set.
+                    notifyDataSetChanged();
+                }
+            }
+        };
+    }
+
     private ArrayList<CustomPlace> getPredictions(CharSequence constraint) {
-        if (mGoogleApiClient != null) {
-            if(!mGoogleApiClient.isConnected()){
+        if (Needle.googleApiController.getGoogleApiClient() != null) {
+            if(!Needle.googleApiController.isConnected()){
                 Log.e(TAG, "Google API client is not connected.");
                 return null;
             }
 
+
             Log.i(TAG, "Executing autocomplete query for: " + constraint);
             PendingResult<AutocompletePredictionBuffer> results =
                     Places.GeoDataApi
-                            .getAutocompletePredictions(mGoogleApiClient, constraint.toString(),
+                            .getAutocompletePredictions(Needle.googleApiController.getGoogleApiClient(), constraint.toString(),
                                     bounds, placeFilter);
             // Wait for predictions, set the timeout.
             AutocompletePredictionBuffer autocompletePredictions = results
@@ -252,8 +290,8 @@ public class PlacesRecyclerAdapter extends RecyclerView.Adapter<PlacesRecyclerAd
             ArrayList resultList = new ArrayList<>(autocompletePredictions.getCount());
             while (iterator.hasNext()) {
                 AutocompletePrediction prediction = iterator.next();
-                CustomPlace place = new CustomPlace(prediction.getPlaceId(), prediction.getDescription(),
-                        prediction.getDescription(), null);
+                CustomPlace place = new CustomPlace(prediction.getPlaceId(), prediction.getPrimaryText(null).toString(),
+                        prediction.getSecondaryText(null).toString(), null);
 
                 resultList.add(place);
             }
@@ -271,37 +309,6 @@ public class PlacesRecyclerAdapter extends RecyclerView.Adapter<PlacesRecyclerAd
         }
         Log.e(TAG, "Google API client is not set.");
         return null;
-    }
-
-    @Override
-    public Filter getFilter() {
-        return new Filter() {
-            @Override
-            protected FilterResults performFiltering(CharSequence constraint) {
-                FilterResults results = new FilterResults();
-                if (constraint != null) {
-                    // Query the autocomplete API for the entered constraint
-                    searchResults = getPredictions(constraint);
-                    if (searchResults != null) {
-                        // Results
-                        results.values = searchResults;
-                        results.count = searchResults.size();
-                    }
-                }
-                return results;
-            }
-
-            @Override
-            protected void publishResults(CharSequence constraint, FilterResults results) {
-                if (results != null && results.count > 0) {
-                    // The API returned at least one result, update the data.
-                    notifyDataSetChanged();
-                } else {
-                    // The API did not return any results, invalidate the data set.
-                    notifyDataSetChanged();
-                }
-            }
-        };
     }
 
     public void setBounds(LatLngBounds bounds) {

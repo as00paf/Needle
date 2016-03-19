@@ -4,12 +4,15 @@ import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
 
+import com.google.android.gms.location.FusedLocationProviderApi;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
+import com.nemator.needle.Needle;
 import com.nemator.needle.utils.PermissionManager;
 
 public class GoogleMapController {
@@ -51,6 +54,8 @@ public class GoogleMapController {
                     //Permission & Location
                     if(PermissionManager.getInstance(context).isPermissionGranted(Manifest.permission.ACCESS_FINE_LOCATION)){
                         googleMap.setMyLocationEnabled(true);
+
+                        cameraController.zoom(Needle.googleApiController.getLastKnownLocation());
                     }else{
                         PermissionManager.getInstance(context).requestPermission((Activity) context, Manifest.permission.ACCESS_FINE_LOCATION);
                     }

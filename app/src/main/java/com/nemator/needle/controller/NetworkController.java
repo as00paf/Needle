@@ -6,26 +6,24 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.ConnectivityManager;
 import android.support.v4.content.LocalBroadcastManager;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 
 import com.nemator.needle.activities.HomeActivity;
 
-/**
- * Created by Alex on 14/09/2015.
- */
 public class NetworkController extends BroadcastReceiver {
 
     private static final String TAG = "NetworkController";
     private static NetworkController instance;
 
-    private HomeActivity activity;
+    private AppCompatActivity activity;
     private LocalBroadcastManager localBroadcastManager;
     private Boolean isNetworkConnected;
 
     public NetworkController(){
     }
 
-    public void init(HomeActivity activity){
+    public void init(AppCompatActivity activity){
         this.activity = activity;
         this.localBroadcastManager = LocalBroadcastManager.getInstance(activity);
 

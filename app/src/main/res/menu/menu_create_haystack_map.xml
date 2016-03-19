@@ -21,16 +21,4 @@
         android:icon="@drawable/ic_vpn_lock_white_24dp"
         app:showAsAction="always"/>
 
-    <item
-        android:id="@+id/action_settings"
-        android:title="@string/action_settings"
-        android:icon="@drawable/ic_action_settings"
-        app:showAsAction="never" />
-
-    <item
-        android:id="@+id/menu_option_help"
-        android:title="@string/title_helpAndSupport"
-        app:showAsAction="never"
-        android:icon="@drawable/ic_action_help"/>
-
 </menu>

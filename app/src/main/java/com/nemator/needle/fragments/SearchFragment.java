@@ -2,13 +2,17 @@ package com.nemator.needle.fragments;
 
 import android.Manifest;
 import android.animation.Animator;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.Point;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.LocalBroadcastManager;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
@@ -23,6 +27,7 @@ import android.view.animation.DecelerateInterpolator;
 
 import com.google.android.gms.common.api.PendingResult;
 import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.common.data.DataBufferUtils;
 import com.google.android.gms.location.places.PlaceBuffer;
 import com.google.android.gms.location.places.PlaceLikelihood;
 import com.google.android.gms.location.places.PlaceLikelihoodBuffer;
@@ -34,13 +39,11 @@ import com.nemator.needle.R;
 import com.nemator.needle.adapter.PlacesRecyclerAdapter;
 import com.nemator.needle.data.NeedleDBHelper;
 import com.nemator.needle.models.vo.CustomPlace;
+import com.nemator.needle.utils.AppConstants;
 import com.nemator.needle.utils.PermissionManager;
 
 import java.util.ArrayList;
 
-/**
- * Created by Alex on 26/11/2015.
- */
 public class SearchFragment extends Fragment implements PlacesRecyclerAdapter.NearbyPlaceCardClickListener {
 
     private static final String TAG = "SearchFragment";
@@ -87,12 +90,26 @@ public class SearchFragment extends Fragment implements PlacesRecyclerAdapter.Ne
 
         rootView.setY(posY);
 
+        initNearbyPlaces();
+        initSearchHistory();
+
         return rootView;
     }
+    private BroadcastReceiver apiConnectedReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Log.d(TAG, "Received API connected Intent");
+
+            LocalBroadcastManager localBroadcastManager = LocalBroadcastManager.getInstance(getActivity());
+            localBroadcastManager.unregisterReceiver(this);
+
+            initNearbyPlaces();
+        }
+    };
 
     public void initNearbyPlaces() {
         if(PermissionManager.getInstance(getActivity()).isPermissionGranted(Manifest.permission.ACCESS_FINE_LOCATION)){
-            Needle.googleApiController.getCurrentPlace(nearbyPlacesCallback);
+            Needle.googleApiController.getCurrentPlace(nearbyPlacesCallback, getActivity());
         }
     }
 
@@ -126,7 +143,8 @@ public class SearchFragment extends Fragment implements PlacesRecyclerAdapter.Ne
                     break;
                 }
             }
-            likelyPlaces.release();
+
+            DataBufferUtils.freezeAndClose(likelyPlaces);
 
             isNearbyLoaded = true;
             showSuggestions();
@@ -134,33 +152,16 @@ public class SearchFragment extends Fragment implements PlacesRecyclerAdapter.Ne
     };
 
     private void showSuggestions() {
-        if(isNearbyLoaded || isHistoryLoaded){
-            recyclerAdapter = new PlacesRecyclerAdapter(getActivity(), nearbyPlaces, searchHistory, this, null, Needle.googleApiController.getGoogleApiClient());
+        if(isNearbyLoaded && isHistoryLoaded){
+            recyclerAdapter = new PlacesRecyclerAdapter(getActivity(), nearbyPlaces, searchHistory, this, null);
             recyclerView.setAdapter(recyclerAdapter);
         }else{
             Log.d(TAG, "Suggestions won't be shown");
         }
     }
 
-    private void initSearchItems(){
-        Handler handler = new Handler();
-        handler.post(new Runnable() {
-            @Override
-            public void run() {
-                initNearbyPlaces();
-            }
-        });
-
-        handler.post(new Runnable() {
-            @Override
-            public void run() {
-                initSearchHistory();
-            }
-        });
-    }
-
     public void show(Animator.AnimatorListener listener){
-        initSearchItems();
+        showSuggestions();
 
         rootView.animate()
                 .y(0)

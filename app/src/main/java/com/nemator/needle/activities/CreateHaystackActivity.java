@@ -8,6 +8,7 @@ import android.content.pm.ActivityInfo;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.Matrix;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.provider.MediaStore;
@@ -71,7 +72,6 @@ public class CreateHaystackActivity extends AppCompatActivity implements ImageUp
     private Boolean isPublic = false;
     private OnActivityStateChangeListener stateChangeCallback;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -89,6 +89,7 @@ public class CreateHaystackActivity extends AppCompatActivity implements ImageUp
         mCreateHaystackPagerAdapter = new CreateHaystackPagerAdapter(getSupportFragmentManager(), this);
         createHaystackViewPager = (ViewPager) findViewById(R.id.view_pager);
         createHaystackViewPager.setAdapter(mCreateHaystackPagerAdapter);
+        createHaystackViewPager.setOffscreenPageLimit(2);
         createHaystackViewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
@@ -135,31 +136,6 @@ public class CreateHaystackActivity extends AppCompatActivity implements ImageUp
 
         });
 
-       /*
-       * public void onPageSelected(int position) {
-                //Back/Next Button
-                backButton.setEnabled((position == 1 || position == 2));
-                nextButton.setEnabled((position == 0 || (position == 1 && isPublic == false)));
-
-                //FAB & Back-Stack
-                switch (position){
-                    case 0:
-                        fab.setImageDrawable(getResources().getDrawable( R.drawable.ic_photo_camera_black_24dp));
-                        stateChangeCallback.onStateChange(AppState.CREATE_HAYSTACK_GENERAL_INFOS);
-                        break;
-                    case 1:
-                        fab.setImageDrawable(getResources().getDrawable( R.drawable.ic_action_location_found));
-                        stateChangeCallback.onStateChange(AppState.CREATE_HAYSTACK_MAP);
-                        break;
-                    case 2:
-                        fab.setImageDrawable(getResources().getDrawable( R.drawable.ic_action_add_person));
-                        stateChangeCallback.onStateChange(AppState.CREATE_HAYSTACK_USERS);
-                        break;
-                }
-            }
-       *
-       * */
-
         //FAB
         fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -195,6 +171,7 @@ public class CreateHaystackActivity extends AppCompatActivity implements ImageUp
     private BroadcastReceiver apiConnectedReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
+            Log.d(TAG, "Received API connected Intent");
             LocalBroadcastManager localBroadcastManager = LocalBroadcastManager.getInstance(CreateHaystackActivity.this);
             localBroadcastManager.unregisterReceiver(this);
 
@@ -223,6 +200,13 @@ public class CreateHaystackActivity extends AppCompatActivity implements ImageUp
             CreateHaystackGeneralInfosFragment fragment = (CreateHaystackGeneralInfosFragment) mCreateHaystackPagerAdapter.getFragmentAt(0);
             fragment.updatePhoto(bitmap);
         }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        Needle.networkController.unregister();
     }
 
     private void initializeBroadcastListener() {

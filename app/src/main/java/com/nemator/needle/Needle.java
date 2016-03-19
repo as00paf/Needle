@@ -16,9 +16,6 @@ import com.twitter.sdk.android.core.TwitterAuthConfig;
 
 import io.fabric.sdk.android.Fabric;
 
-/**
- * Created by Alex on 20/09/2015.
- */
 public class Needle extends MultiDexApplication {
 
     // Note: Your consumer key and secret should be obfuscated in your source code before shipping.
@@ -42,6 +39,7 @@ public class Needle extends MultiDexApplication {
     public void onCreate(Bundle arguments) {
         MultiDex.install(getApplicationContext());
         super.onCreate();
+
         TwitterAuthConfig authConfig = new TwitterAuthConfig(TWITTER_KEY, TWITTER_SECRET);
         Fabric.with(this, new Twitter(authConfig));
 

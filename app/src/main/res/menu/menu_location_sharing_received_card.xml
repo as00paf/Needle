@@ -1,7 +1,9 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <item android:id="@+id/menu_option_share_back" android:description="@string/share_location_back"
+    <item android:id="@+id/menu_option_share_back"
+        android:description="@string/share_location_back"
+        android:title="@string/share_location_back"
         app:showAsAction="always" android:icon="@drawable/ic_action_location_found"/>
 
 </menu>

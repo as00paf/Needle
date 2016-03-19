@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.ActionBar;
@@ -33,6 +34,7 @@ import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.location.places.PlaceLikelihoodBuffer;
 import com.google.android.gms.location.places.Places;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.Circle;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
@@ -40,6 +42,7 @@ import com.google.android.gms.maps.model.Polygon;
 import com.nemator.needle.Needle;
 import com.nemator.needle.R;
 import com.nemator.needle.activities.CreateHaystackActivity;
+import com.nemator.needle.controller.GoogleMapCameraController;
 import com.nemator.needle.controller.GoogleMapCameraControllerConfig;
 import com.nemator.needle.controller.GoogleMapController;
 import com.nemator.needle.fragments.SearchFragment;
@@ -47,6 +50,7 @@ import com.nemator.needle.tasks.getAutoCompleteResults.GetAutoCompleteResultsTas
 import com.nemator.needle.utils.AppConstants;
 import com.nemator.needle.utils.GoogleMapDrawingUtils;
 import com.nemator.needle.utils.PermissionManager;
+import com.nemator.needle.utils.SphericalUtil;
 
 public class CreateHaystackMapFragment extends CreateHaystackBaseFragment implements GoogleMapController.GoogleMapCallback {
     public static String TAG = "CreateHaystackMapFragment";
@@ -66,7 +70,6 @@ public class CreateHaystackMapFragment extends CreateHaystackBaseFragment implem
     //Objects
     private ScaleGestureDetector mScaleDetector;
     private GetAutoCompleteResultsTask autoCompleteTask;
-    private GoogleApiClient mGoogleApiClient;
 
     //Search
     private SearchView searchView;
@@ -85,30 +88,16 @@ public class CreateHaystackMapFragment extends CreateHaystackBaseFragment implem
     public CreateHaystackMapFragment() {
     }
 
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-        mGoogleApiClient = Needle.googleApiController.getGoogleApiClient();
-        if(mGoogleApiClient == null){
-            LocalBroadcastManager localBroadcastManager = LocalBroadcastManager.getInstance(getActivity());
-            localBroadcastManager.registerReceiver(apiConnectedReceiver, new IntentFilter(AppConstants.GOOGLE_API_CONNECTED));
-        }else{
-            if(PermissionManager.getInstance(getActivity()).isPermissionGranted(Manifest.permission.ACCESS_FINE_LOCATION)){
-                addPlaceSuggestion();
-            }else{
-                PermissionManager.getInstance(getActivity()).requestPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION);
-            }
-        }
-    }
-
     private BroadcastReceiver apiConnectedReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
+            Log.d(TAG, "Received API connected Intent");
+
             LocalBroadcastManager localBroadcastManager = LocalBroadcastManager.getInstance(getActivity());
             localBroadcastManager.unregisterReceiver(this);
 
             addPlaceSuggestion();
+            mapController.focusOnMyPosition();
         }
     };
 
@@ -145,23 +134,27 @@ public class CreateHaystackMapFragment extends CreateHaystackBaseFragment implem
         mRadiusLabel.setText(String.valueOf(getZoneRadius()) + "m");
         initBroadcastListeners();
 
+        if (!PermissionManager.getInstance(getActivity()).isPermissionGranted(Manifest.permission.ACCESS_FINE_LOCATION)) {
+            PermissionManager.getInstance(getActivity()).requestPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION);
+        }
+
         return rootView;
     }
 
     private void updateMap() {
         //Update user's marker and polygon
         LatLng position = mapController.getCurrentCameraTarget();
-        if(position != null){
-            if(mIsPolygonCircle){
-                if(mCircle == null){
+        if (position != null) {
+            if (mIsPolygonCircle) {
+                if (mCircle == null) {
                     mCircle = GoogleMapDrawingUtils.drawCircle(mapController.getGoogleMap(), position, mScaleFactor, getResources(), mCircle);
-                }else{
+                } else {
                     mCircle = GoogleMapDrawingUtils.updateCircle(mCircle, position, mScaleFactor);
                 }
-            }else{
-                if(mPolygon == null){
+            } else {
+                if (mPolygon == null) {
                     mPolygon = GoogleMapDrawingUtils.drawPolygon(mapController.getGoogleMap(), position, mScaleFactor, getResources(), mPolygon);
-                }else{
+                } else {
                     mPolygon = GoogleMapDrawingUtils.updatePolygon(mPolygon, position, mScaleFactor);
                 }
             }
@@ -179,7 +172,7 @@ public class CreateHaystackMapFragment extends CreateHaystackBaseFragment implem
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
 
-        switch(id) {
+        switch (id) {
             case R.id.action_search:
                 handleMenuSearch();
                 break;
@@ -196,7 +189,7 @@ public class CreateHaystackMapFragment extends CreateHaystackBaseFragment implem
                 break;
             case R.id.action_polygon:
                 if (mIsPolygonCircle != true) {
-                    if(mPolygon!=null){
+                    if (mPolygon != null) {
                         mPolygon.remove();
                         mPolygon = null;
                     }
@@ -204,7 +197,7 @@ public class CreateHaystackMapFragment extends CreateHaystackBaseFragment implem
                     mIsPolygonCircle = true;
                     item.setIcon(getResources().getDrawable(R.drawable.square24));
                 } else {
-                    if(mCircle!=null){
+                    if (mCircle != null) {
                         mCircle.remove();
                         mCircle = null;
                     }
@@ -216,7 +209,7 @@ public class CreateHaystackMapFragment extends CreateHaystackBaseFragment implem
                 updateMap();
                 break;
             case android.R.id.home:
-                if(isSearchOpened) {
+                if (isSearchOpened) {
                     handleMenuSearch();
                 }
                 return true;
@@ -227,7 +220,7 @@ public class CreateHaystackMapFragment extends CreateHaystackBaseFragment implem
 
     private void handleMenuSearch() {
         int flag;
-        if(isSearchOpened){
+        if (isSearchOpened) {
             closeSearchMenu();
 
             flag = MenuItem.SHOW_AS_ACTION_ALWAYS;
@@ -330,15 +323,15 @@ public class CreateHaystackMapFragment extends CreateHaystackBaseFragment implem
         @Override
         public void onReceive(Context context, Intent intent) {
             LatLng location = intent.getParcelableExtra(getString(R.string.location));
-            if(location != null){
+            if (location != null) {
                 closeSearchMenu();
 
-                //mMapFragment.moveCameraTo(location);
+                mapController.cameraController.zoom(location);
             }
         }
     };
 
-    private void openSearchMenu(){
+    private void openSearchMenu() {
         ActionBar action = ((AppCompatActivity) getActivity()).getSupportActionBar();
         action.setCustomView(R.layout.search_bar);
 
@@ -392,12 +385,15 @@ public class CreateHaystackMapFragment extends CreateHaystackBaseFragment implem
     }
 
     private void doSearch(String query) {
-        Log.d(TAG, "doSearch::query : " + query);
+        if(!query.isEmpty()){
+            Log.d(TAG, "doSearch::query : " + query);
 
-        searchFragment.guessLocation(query, getCameraTargetBounds());
+            LatLngBounds bounds = SphericalUtil.toBounds(getCameraTarget(), 50000);//Guessing average city size at 50 km2
+            searchFragment.guessLocation(query, bounds);
+        }
     }
 
-    private void closeSearchMenu(){
+    private void closeSearchMenu() {
         //Hide keyboard
         InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(getActivity().INPUT_METHOD_SERVICE);
         imm.hideSoftInputFromWindow(searchView.getWindowToken(), 0);
@@ -418,20 +414,29 @@ public class CreateHaystackMapFragment extends CreateHaystackBaseFragment implem
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
 
-        if(permissions[0] == Manifest.permission.ACCESS_FINE_LOCATION && grantResults[0] == PackageManager.PERMISSION_GRANTED){
+        if (permissions[0] == Manifest.permission.ACCESS_FINE_LOCATION && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
             mapController.setLocationUpdates(true);
             addPlaceSuggestion();
         }
     }
 
-    private void addPlaceSuggestion(){
-        if(mGoogleApiClient != null){
+    private void addPlaceSuggestion() {
+        if (Needle.googleApiController.getGoogleApiClient() != null) {
+
+            if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                // TODO: Consider calling
+                //    ActivityCompat#requestPermissions
+                return;
+            }
+
             PendingResult<PlaceLikelihoodBuffer> result = Places.PlaceDetectionApi
-                    .getCurrentPlace(mGoogleApiClient, null);
+                    .getCurrentPlace(Needle.googleApiController.getGoogleApiClient(), null);
 
             result.setResultCallback(new ResultCallback<PlaceLikelihoodBuffer>() {
                 @Override
                 public void onResult(PlaceLikelihoodBuffer likelyPlaces) {
+
+
                 /*searchBox.clearSearchable();
                 for (PlaceLikelihood placeLikelihood : likelyPlaces) {
                     searchBox.addSearchable(new SearchResult(placeLikelihood.getPlace().getName().toString(), getResources().getDrawable(R.drawable.ic_action_place)));
@@ -439,8 +444,8 @@ public class CreateHaystackMapFragment extends CreateHaystackBaseFragment implem
                     Log.i(TAG, String.format("Place '%s' has likelihood: %g",
                             placeLikelihood.getPlace().getName(),
                             placeLikelihood.getLikelihood()));
-                }*/
-
+                }
+*/
                     likelyPlaces.release();
                 }
             });
@@ -461,13 +466,22 @@ public class CreateHaystackMapFragment extends CreateHaystackBaseFragment implem
         return mIsPolygonCircle;
     }
 
+    public LatLng getCameraTarget() {
+        return mapController.getCurrentCameraTarget();
+    }
+
     public LatLngBounds getCameraTargetBounds() {
         return mapController.getCurrentCameraTargetBounds();
     }
 
     @Override
     public void onMapInitialized() {
-        updateMap();
+        mapController.cameraController.setCameraChangedListener(new GoogleMapCameraController.CameraChangedListener() {
+            @Override
+            public void onCameraChanged(CameraPosition cameraPosition) {
+                updateMap();
+            }
+        });
     }
 
     public GoogleMapController getMapController() {

@@ -3,7 +3,9 @@ package com.nemator.needle.api.result;
 import com.google.gson.annotations.SerializedName;
 import com.nemator.needle.models.vo.UserVO;
 
-public class AuthenticationResult extends TaskResult{
+import java.io.Serializable;
+
+public class AuthenticationResult extends TaskResult implements Serializable{
     @SerializedName("user")
     private UserVO user;
 

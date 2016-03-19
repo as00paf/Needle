@@ -85,28 +85,14 @@ public class CreateLocationSharingActivity extends AppCompatActivity {
         pagerAdapter = new CreateLocationSharingPagerAdapter(getSupportFragmentManager(), this);
         viewPager = (ViewPager) findViewById(R.id.view_pager);
         viewPager.setAdapter(pagerAdapter);
-        viewPager.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                Log.d(TAG, "here");
 
-                return false;
-            }
-        });
+        getSupportActionBar().setTitle(pagerAdapter.getPageTitle(0));
 
         //Tabs
         tabs = (SlidingTabLayout) findViewById(R.id.sliding_tabs);
         tabs.setCustomTabView(R.layout.layout_tab_title, R.id.tab_text);
         tabs.setDistributeEvenly(true);
         tabs.setViewPager(viewPager, toolbar);
-        tabs.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                Log.d(TAG, "here");
-
-                return false;
-            }
-        });
 
         tabs.setCustomTabColorizer(new SlidingTabLayout.TabColorizer() {
 
@@ -231,4 +217,10 @@ public class CreateLocationSharingActivity extends AppCompatActivity {
             Toast.makeText(CreateLocationSharingActivity.this, "Location Sharing not created !", Toast.LENGTH_SHORT).show();
         }
     };
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        Needle.networkController.unregister();    }
 }

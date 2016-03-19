@@ -3,6 +3,7 @@ package com.nemator.needle.controller;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Handler;
+import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.util.Log;
 import android.widget.Toast;
@@ -28,7 +29,7 @@ public class GCMController /*implements UserTask.UpdateGCMIDResponseHandler*/ {
     public static final int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
     private static GCMController instance;
 
-    private HomeActivity activity;
+    private AppCompatActivity activity;
 
     GoogleCloudMessaging gcm;
     int tryCount = 0;
@@ -45,7 +46,7 @@ public class GCMController /*implements UserTask.UpdateGCMIDResponseHandler*/ {
         return instance;
     }
 
-    public void init(HomeActivity activity){
+    public void init(AppCompatActivity activity){
         this.activity = activity;
         Needle.userModel.init(activity);
 

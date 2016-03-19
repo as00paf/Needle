@@ -21,6 +21,8 @@ import com.google.android.gms.maps.model.LatLng;
 import java.util.List;
 
 import static java.lang.Math.*;
+
+import com.google.android.gms.maps.model.LatLngBounds;
 import com.nemator.needle.utils.MathUtil;
 
 public class SphericalUtil {
@@ -163,7 +165,7 @@ public class SphericalUtil {
      */
     static double computeAngleBetween(LatLng from, LatLng to) {
         return distanceRadians(toRadians(from.latitude), toRadians(from.longitude),
-                               toRadians(to.latitude), toRadians(to.longitude));
+                toRadians(to.latitude), toRadians(to.longitude));
     }
 
     /**
@@ -249,5 +251,11 @@ public class SphericalUtil {
         double deltaLng = lng1 - lng2;
         double t = tan1 * tan2;
         return 2 * atan2(t * sin(deltaLng), 1 + t * cos(deltaLng));
+    }
+
+    public static LatLngBounds toBounds(LatLng center, double radius) {//radius is in meters
+        LatLng southwest = SphericalUtil.computeOffset(center, radius * Math.sqrt(2.0), 225);
+        LatLng northeast = SphericalUtil.computeOffset(center, radius * Math.sqrt(2.0), 45);
+        return new LatLngBounds(southwest, northeast);
     }
 }

@@ -3,7 +3,9 @@ package com.nemator.needle.api.result;
 import com.google.gson.annotations.SerializedName;
 import com.nemator.needle.models.vo.UserVO;
 
-public class LoginResult extends AuthenticationResult{
+import java.io.Serializable;
+
+public class LoginResult extends AuthenticationResult implements Serializable{
     @SerializedName("haystackCount")
     private int haystackCount = 0;
 

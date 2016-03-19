@@ -87,7 +87,6 @@ public class NavigationController implements HomeActivity.NavigationHandler, OnA
     private ProgressDialog pd;
     private android.support.v4.widget.DrawerLayout drawerLayout;
     private FragmentManager manager;
-    private NavigationView navigationView;
 
     private NavigationView.OnNavigationItemSelectedListener navigationItemListener = new NavigationView.OnNavigationItemSelectedListener() {
         @Override
@@ -185,10 +184,7 @@ public class NavigationController implements HomeActivity.NavigationHandler, OnA
                 if(haystacksListFragment == null){haystacksListFragment = new HaystackListFragment();}
                 newFragment = haystacksListFragment;
 
-                if(getCurrentState() < AppState.PUBLIC_HAYSTACK_TAB){
-                    actionBar.show();
-                }
-                actionBar.setTitle(R.string.title_haystacks);
+               // actionBar.setTitle(R.string.title_haystacks);
                 onStateChange(AppState.PUBLIC_HAYSTACK_TAB);
 
                 if(previousState == AppState.SETTINGS){
@@ -459,83 +455,6 @@ public class NavigationController implements HomeActivity.NavigationHandler, OnA
         locationSharingFragment.setIsSent(false);
     }
 
-    public void setAccount(){
-        //ActionBar
-        activity.getSupportActionBar().setDisplayHomeAsUpEnabled(false);
-        activity.getSupportActionBar().setDisplayShowHomeEnabled(false);
-
-        activity.getDrawerToggle().setDrawerIndicatorEnabled(true);
-        activity.getDrawerToggle().syncState();
-
-        navigationView = (NavigationView) activity.findViewById(R.id.navigation_view);
-        View headerView = navigationView.getHeaderView(0);
-
-        //Profile Image
-        ImageView avatarImageView = (ImageView) headerView.findViewById(R.id.avatar);
-        String pictureURL = Needle.userModel.getUser().getPictureURL().replace("_normal", "");
-        if(!TextUtils.isEmpty(pictureURL)){
-            Picasso.with(activity.getApplicationContext()).load(pictureURL)
-                    .transform(new CropCircleTransformation(activity, 2, Color.WHITE))
-                    .into(avatarImageView);
-        }else {
-            Log.e(TAG, "Can't fetch avatar picture for user " + Needle.userModel.getUserName());
-        }
-
-        //Cover Image
-        String coverUrl = Needle.userModel.getUser().getCoverPictureURL();
-        if(!TextUtils.isEmpty(coverUrl)){
-            final ImageView cover = (ImageView) headerView.findViewById(R.id.cover);
-
-            Picasso.with(activity.getApplicationContext())
-                    .load(coverUrl)
-                    .fit()
-                    .into(cover);
-        } else {
-            Log.e(TAG, "Can't fetch cover for login type " + Needle.userModel.getUser().getLoginType());
-        }
-
-        //Username
-        TextView username = (TextView) headerView.findViewById(R.id.username);
-        username.setText(Needle.userModel.getUserName());
-
-        //Logged in with ...
-        TextView accountType = (TextView) headerView.findViewById(R.id.account_type);
-        String type = activity.getString(R.string.logged_in_with_needle_account);
-
-        switch (Needle.userModel.getUser().getLoginType()){
-            case AuthenticationController.LOGIN_TYPE_GOOGLE:
-                type = activity.getString(R.string.logged_in_with_google_account);
-                break;
-            case AuthenticationController.LOGIN_TYPE_FACEBOOK:
-                type = activity.getString(R.string.logged_in_with_facebook_account);
-                break;
-            case AuthenticationController.LOGIN_TYPE_TWITTER:
-                type = activity.getString(R.string.logged_in_with_twitter_account);
-                type = activity.getString(R.string.logged_in_with_twitter_account);
-                break;
-        }
-
-        accountType.setText(type);
-    }
-
-    //Getters/Setters
-    public void setHaystacksCount(int count) {
-        setMenuCounter(R.id.drawer_haystacks, count);
-    }
-
-    public void setLocationSharingCount(int count) {
-        setMenuCounter(R.id.drawer_location_sharing, count);
-    }
-
-    public void setNotificationsCount(int count) {
-        setMenuCounter(R.id.drawer_notifications, count);
-    }
-
-    private void setMenuCounter(@IdRes int itemId, int count) {
-        TextView view = (TextView) navigationView.getMenu().findItem(itemId).getActionView();
-        view.setText(count > 0 ? String.valueOf(count) : null);
-    }
-
     public void onLogOutComplete() {
         Log.i(TAG, "Log out complete");
 
@@ -610,27 +529,16 @@ public class NavigationController implements HomeActivity.NavigationHandler, OnA
         return null;
     }
 
-    public void onPostLogin() {
-        showSection(AppConstants.SECTION_HAYSTACKS);
-
-        navigationView = (NavigationView) activity.findViewById(R.id.navigation_view);
-        navigationView.setNavigationItemSelectedListener(navigationItemListener);
-
-        navigationView.getMenu().findItem(R.id.drawer_log_out).setChecked(false);
-        navigationView.getMenu().findItem(R.id.drawer_haystacks).setChecked(true);
-        //setAccount();
-    }
-
-    public NavigationView.OnNavigationItemSelectedListener getDrawerListener() {
-        return navigationItemListener;
-    }
-
     public void setActionBarTitle(String title){
         actionBar.setTitle(title);
     }
 
     public void setPreviousState(int previousState) {
         this.previousState = previousState;
+    }
+
+    public NavigationView.OnNavigationItemSelectedListener getNavigationItemListener() {
+        return navigationItemListener;
     }
 /*
     //TODO:localize

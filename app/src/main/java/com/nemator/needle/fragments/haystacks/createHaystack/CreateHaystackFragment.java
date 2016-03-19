@@ -31,6 +31,7 @@ import android.widget.Button;
 
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
 import com.nemator.needle.Needle;
 import com.nemator.needle.R;
 import com.nemator.needle.activities.HomeActivity;
@@ -42,6 +43,7 @@ import com.nemator.needle.models.vo.UserVO;
 import com.nemator.needle.utils.AppConstants;
 import com.nemator.needle.utils.AppState;
 import com.nemator.needle.utils.CameraUtils;
+import com.nemator.needle.utils.SphericalUtil;
 import com.viewpagerindicator.CirclePageIndicator;
 
 import java.util.ArrayList;
@@ -472,7 +474,8 @@ public class CreateHaystackFragment extends CreateHaystackBaseFragment implement
     private void doSearch(String query) {
         Log.d(TAG, "doSearch::query : " + query);
 
-        searchFragment.guessLocation(query, mCreateHaystackMapFragment.getCameraTargetBounds());
+        LatLngBounds bounds = SphericalUtil.toBounds(mCreateHaystackMapFragment.getCameraTarget(), 50000);//Guessing average city size at 50 km2
+        searchFragment.guessLocation(query, bounds);
     }
 
     @Override

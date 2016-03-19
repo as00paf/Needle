@@ -3,16 +3,20 @@ package com.nemator.needle.fragments.haystacks;
 import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.SharedElementCallback;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.appcompat.view.slidingTab.SlidingTabLayout;
@@ -20,11 +24,14 @@ import com.nemator.needle.Needle;
 import com.nemator.needle.R;
 import com.nemator.needle.adapter.HaystackListPagerAdapter;
 import com.nemator.needle.api.ApiClient;
+import com.nemator.needle.controller.AuthenticationController;
 import com.nemator.needle.controller.NavigationController;
 import com.nemator.needle.models.vo.HaystackVO;
 import com.nemator.needle.api.result.HaystackResult;
 import com.nemator.needle.utils.AppConstants;
 import com.nemator.needle.utils.AppState;
+import com.nemator.needle.utils.CropCircleTransformation;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -234,8 +241,6 @@ public class HaystackListFragment extends Fragment implements SwipeRefreshLayout
     public void onResume(){
         super.onResume();
         fetchHaystacks(false);
-
-        Needle.navigationController.setAccount();
     }
 
     @Override public void onRefresh() {

@@ -16,6 +16,7 @@ import com.appcompat.view.slidingTab.SlidingTabLayout;
 import com.nemator.needle.Needle;
 import com.nemator.needle.R;
 import com.nemator.needle.activities.CreateLocationSharingActivity;
+import com.nemator.needle.activities.HomeActivity;
 import com.nemator.needle.adapter.LocationSharingPagerAdapter;
 import com.nemator.needle.api.ApiClient;
 import com.nemator.needle.api.result.LocationSharingResult;
@@ -173,7 +174,7 @@ public class LocationSharingListFragment extends Fragment {
                 sentLocationsList = result.getSentLocationSharings();
 
                 if(receivedLocationsList != null && getActivity() != null){
-                    Needle.navigationController.setLocationSharingCount(receivedLocationsList.size());
+                    ((HomeActivity) getActivity()).setLocationSharingCount(receivedLocationsList.size());
                 }
 
                 receivedTab.updateLocationSharingList(receivedLocationsList);

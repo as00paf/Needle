@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.widget.CardView
+    xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/card_view"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:foreground="?android:attr/selectableItemBackground"
+    android:layout_margin="8dp"
+    app:cardElevation="2dp"
+    android:clickable="true">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <ImageView
+            android:id="@+id/thumbImage"
+            android:layout_width="match_parent"
+            android:layout_height="300dp"
+            android:scaleType="centerCrop"
+            android:src="@drawable/haystack_picture_placeholder"/>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="72dp"
+            android:background="#CCFFFFFF"
+            android:layout_alignParentBottom="true">
+
+            <TextView
+                android:id="@+id/description"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:lineSpacingExtra="3dp"
+                android:paddingLeft="8dp"
+                android:paddingTop="8dp"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:text="Haystack Name"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/active_users"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentBottom="true"
+                android:layout_below="@id/description"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:drawableLeft="@drawable/person_placeholder_24"
+                android:paddingTop="8dp"
+                android:drawablePadding="8dp"
+                android:gravity="center_vertical"
+                android:paddingLeft="5dp"
+                android:text="3 Active Users"
+                android:textStyle="bold"
+                android:textSize="12sp" />
+
+            <TextView
+                android:id="@+id/active_until"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/description"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentBottom="true"
+                android:paddingTop="8dp"
+                android:drawablePadding="8dp"
+                android:gravity="center_vertical"
+                android:drawableRight="@drawable/ic_timer_black_24dp"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:paddingRight="5dp"
+                android:textStyle="bold"
+                android:paddingBottom="5dp"
+                android:text="2015-05-07 22:55"
+                android:textSize="12sp" />
+        </RelativeLayout>
+    </RelativeLayout>
+</android.support.v7.widget.CardView>

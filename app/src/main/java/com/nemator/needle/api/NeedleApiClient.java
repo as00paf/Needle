@@ -82,7 +82,7 @@ public interface NeedleApiClient {
     Call<UsersResult> retrieveHaystackLocations(@Query("haystackId") int haystackId);
 
     @GET("location.php")
-    Call<UserResult> retrieveUserLocation(@Query("locationSharingId") int locationSharingId, @Query("userId") int userId);
+    Call<UserResult> retrieveUserLocation(@Query("locationSharingId") int locationSharingId, @Query("userId") int userId, @Query("who") String who);
 
     //HaystackUser
     @PUT("haystackUser.php")

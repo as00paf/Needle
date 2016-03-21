@@ -2,7 +2,6 @@ package com.nemator.needle.adapter;
 
 import android.app.Activity;
 import android.content.Context;
-import android.graphics.Color;
 import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -10,13 +9,13 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 
 import com.nemator.needle.R;
 import com.nemator.needle.api.ApiClient;
 import com.nemator.needle.api.result.LocationSharingResult;
 import com.nemator.needle.fragments.locationSharing.LocationSharingCardListener;
 import com.nemator.needle.models.vo.LocationSharingVO;
-import com.nemator.needle.utils.CropCircleTransformation;
 import com.nemator.needle.viewHolders.LocationSharingCardHolder;
 import com.squareup.picasso.Picasso;
 
@@ -93,19 +92,21 @@ public class LocationSharingListCardAdapter extends RecyclerView.Adapter<Locatio
                     ((Activity) mContext).getWindowManager().getDefaultDisplay().getMetrics(dm);
                     int width = dm.widthPixels / 2 - padding;
 
-                    holder.itemView.getLayoutParams().height  = width;
+                    holder.imageView.getLayoutParams().height  = width;
 
                     //Image
-                    if(locationSharing.getSender().getPictureURL() != null && !locationSharing.getSender().getPictureURL().isEmpty()){
-                        Picasso.with(mContext)
-                                .load(locationSharing.getSender().getPictureURL())
+                    String pictureURL = isSent ? locationSharing.getReceiver().getPictureURL() : locationSharing.getSender().getPictureURL();
+                    if(pictureURL != null && !pictureURL.isEmpty()){
+                        Picasso.with(holder.imageView.getContext()).cancelRequest(holder.imageView);
+
+                        Picasso.with(holder.imageView.getContext())
+                                .load(pictureURL)
                                 .resize(width,width)
                                 .into(holder.imageView);
                     }else{
-                        Log.d(TAG, "Cant get picture URL for user " + locationSharing.getSender().getUserName());
+                        holder.imageView.setImageDrawable(mContext.getResources().getDrawable(R.drawable.person_placeholder));
+                        Log.d(TAG, "Cant get picture URL for user " + locationSharing.getReceiver().getUserName());
                     }
-
-                    holder.imageView.setImageDrawable(mContext.getResources().getDrawable(R.drawable.person_placeholder));
                 }
 
                 holder.setData(locationSharing);
@@ -151,7 +152,7 @@ public class LocationSharingListCardAdapter extends RecyclerView.Adapter<Locatio
             }
 
             //LocationSharingCardViewHolder viewHolder = result.viewHolderRef.get();
-            //viewHolder.setShareBack(result.getLocationSharing().getShareBack());
+            //viewHolder.setShareBack(result.getLocationSharing().isSharedBack());
 
             //mListener.onLocationSharingUpdated(result);
         }

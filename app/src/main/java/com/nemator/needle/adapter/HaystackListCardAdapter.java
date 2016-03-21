@@ -49,7 +49,7 @@ public class HaystackListCardAdapter extends RecyclerView.Adapter<HaystackListCa
         View haystackCard;
 
         if(viewType == TYPE_ITEM){
-            haystackCard = LayoutInflater.from(parent.getContext()).inflate(R.layout.haystack_card_layout, parent, false);
+            haystackCard = LayoutInflater.from(parent.getContext()).inflate(R.layout.card_haystack, parent, false);
             viewHolder = new HaystackCardViewHolder(haystackCard, true, mListener);
         }else{
             haystackCard = LayoutInflater.from(parent.getContext()).inflate(R.layout.haystack_empty_card_layout, parent, false);

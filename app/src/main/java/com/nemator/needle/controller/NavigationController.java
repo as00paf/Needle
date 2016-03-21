@@ -4,10 +4,8 @@ import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Parcelable;
-import android.support.annotation.IdRes;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -15,12 +13,10 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
-import android.text.TextUtils;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -31,24 +27,19 @@ import com.nemator.needle.activities.CreateHaystackActivity;
 import com.nemator.needle.activities.HaystackActivity;
 import com.nemator.needle.activities.HomeActivity;
 import com.nemator.needle.api.ApiClient;
+import com.nemator.needle.api.result.TaskResult;
 import com.nemator.needle.fragments.authentication.LoginFragment;
 import com.nemator.needle.fragments.authentication.LoginSplashFragment;
 import com.nemator.needle.fragments.authentication.RegisterFragment;
 import com.nemator.needle.fragments.haystacks.HaystackListFragment;
 import com.nemator.needle.fragments.haystacks.OnActivityStateChangeListener;
-import com.nemator.needle.fragments.haystacks.createHaystack.CreateHaystackFragment;
 import com.nemator.needle.fragments.locationSharing.LocationSharingListFragment;
 import com.nemator.needle.fragments.locationSharing.createLocationSharing.CreateLocationSharingExpirationFragment;
-import com.nemator.needle.fragments.locationSharing.locationSharing.LocationSharingFragment;
 import com.nemator.needle.fragments.people.PeopleFragment;
 import com.nemator.needle.fragments.settings.SettingsFragment;
 import com.nemator.needle.models.vo.HaystackVO;
-import com.nemator.needle.models.vo.LocationSharingVO;
-import com.nemator.needle.api.result.TaskResult;
 import com.nemator.needle.utils.AppConstants;
 import com.nemator.needle.utils.AppState;
-import com.nemator.needle.utils.CropCircleTransformation;
-import com.squareup.picasso.Picasso;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -71,10 +62,8 @@ public class NavigationController implements HomeActivity.NavigationHandler, OnA
     private RegisterFragment registerFragment;
     private HaystackListFragment haystacksListFragment;
     private LocationSharingListFragment locationSharingListFragment;
-    private CreateHaystackFragment createHaystackFragment;
     private SettingsFragment settingsFragment;
     private CreateLocationSharingExpirationFragment createLocationSharingExpirationFragment;
-    private LocationSharingFragment locationSharingFragment;
     private PeopleFragment peopleFragment;
 
     private Menu menu;
@@ -184,7 +173,7 @@ public class NavigationController implements HomeActivity.NavigationHandler, OnA
                 if(haystacksListFragment == null){haystacksListFragment = new HaystackListFragment();}
                 newFragment = haystacksListFragment;
 
-               // actionBar.setTitle(R.string.title_haystacks);
+                if(actionBar != null) actionBar.setTitle(R.string.title_haystacks);
                 onStateChange(AppState.PUBLIC_HAYSTACK_TAB);
 
                 if(previousState == AppState.SETTINGS){
@@ -268,26 +257,6 @@ public class NavigationController implements HomeActivity.NavigationHandler, OnA
             case AppState.CREATE_HAYSTACK_GENERAL_INFOS:
                 showSection(AppConstants.SECTION_HAYSTACKS);
                 //removeSection(AppConstants.SECTION_CREATE_HAYSTACK);
-                break;
-            case AppState.CREATE_HAYSTACK_MAP:
-                //Goto General Infos
-                createHaystackFragment.goToPage(0);
-                onStateChange(AppState.CREATE_HAYSTACK_GENERAL_INFOS);
-                break;
-            case AppState.CREATE_HAYSTACK_USERS:
-                //Goto Map
-                createHaystackFragment.goToPage(1);
-                onStateChange(AppState.CREATE_HAYSTACK_MAP);
-                break;
-            case AppState.CREATE_HAYSTACK_MAP_SEARCH_OPEN:
-                //Close Search
-                createHaystackFragment.mCreateHaystackMapFragment.closeSearchResults();
-                onStateChange(AppState.CREATE_HAYSTACK_MAP);
-                break;
-            case AppState.CREATE_HAYSTACK_USERS_SEARCH_OPEN:
-                //Close Search
-                createHaystackFragment.mCreateHaystackUsersFragment.closeSearchResults();
-                onStateChange(AppState.CREATE_HAYSTACK_USERS);
                 break;
             case AppState.LOCATION_SHARING_RECEIVED_TAB:
                 showSection(AppConstants.SECTION_HAYSTACKS);
@@ -449,17 +418,10 @@ public class NavigationController implements HomeActivity.NavigationHandler, OnA
         locationSharingListFragment.fetchLocationSharing();
     }
 
-    public void showReceivedLocationSharing(LocationSharingVO vo){
-        showSection(AppConstants.SECTION_LOCATION_SHARING);
-        locationSharingFragment.setLocationSharing(vo);
-        locationSharingFragment.setIsSent(false);
-    }
-
     public void onLogOutComplete() {
         Log.i(TAG, "Log out complete");
 
         Needle.userModel.setLoggedIn(false);
-        Needle.userModel.setAutoLogin(false);
 
         activity.getDrawerToggle().setDrawerIndicatorEnabled(false);
         activity.getDrawerToggle().setHomeAsUpIndicator(R.drawable.ic_logo_24dp);
@@ -518,12 +480,6 @@ public class NavigationController implements HomeActivity.NavigationHandler, OnA
                 return haystacksListFragment;
             case AppState.SETTINGS:
                 return settingsFragment;
-            case AppState.CREATE_HAYSTACK_GENERAL_INFOS:
-            case AppState.CREATE_HAYSTACK_MAP:
-            case AppState.CREATE_HAYSTACK_MAP_SEARCH_OPEN:
-            case AppState.CREATE_HAYSTACK_USERS:
-            case AppState.CREATE_HAYSTACK_USERS_SEARCH_OPEN:
-                return createHaystackFragment;
         }
 
         return null;
@@ -545,7 +501,7 @@ public class NavigationController implements HomeActivity.NavigationHandler, OnA
     @Override
     public void onLocationSharingUpdated(LocationSharingResult result) {
         if(result.successCode == 1){
-            if(result.vo.getShareBack()){
+            if(result.vo.isSharedBack()){
                 Needle.serviceController.startLocationUpdates();
                 Needle.serviceController.getService().addPostLocationRequest(LocationServiceDBHelper.PostLocationRequest.POSTER_TYPE_LOCATION_SHARING_BACK,
                         result.vo.getTimeLimit(), result.vo.getSenderId(),
@@ -561,7 +517,7 @@ public class NavigationController implements HomeActivity.NavigationHandler, OnA
             }
 
         }else{
-            String msg = result.vo.getShareBack() ? "Location still shared !" : "Could not share location !";
+            String msg = result.vo.isSharedBack() ? "Location still shared !" : "Could not share location !";
             Toast.makeText(activity, msg, Toast.LENGTH_SHORT).show();
         }
     }*/

@@ -128,6 +128,7 @@
 
     <string name="fetch_haystack_error">Could Not Fetch Haystacks</string>
     <string name="share_location_back">Share Location Back</string>
+    <string name="location_shared_back">Location Shared Back!</string>
     <string name="stop_sharing_location">Stop Sharing Location</string>
     <string name="share_location_back_confirmation">Are you sure you want to share you location back ?</string>
 

@@ -3,30 +3,21 @@ package com.nemator.needle.fragments.locationSharing.locationSharing;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.IntentFilter;
-import android.graphics.Point;
 import android.location.Location;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.SystemClock;
 import android.util.Log;
 import android.view.MenuItem;
-import android.view.animation.Interpolator;
-import android.view.animation.LinearInterpolator;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.Projection;
 import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.BitmapDescriptor;
-import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.Circle;
 import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
-import com.google.android.gms.maps.model.MarkerOptions;
 import com.nemator.needle.Needle;
 import com.nemator.needle.R;
 import com.nemator.needle.activities.LocationSharingActivity;
@@ -34,8 +25,13 @@ import com.nemator.needle.api.ApiClient;
 import com.nemator.needle.api.result.UserResult;
 import com.nemator.needle.broadcastReceiver.LocationServiceBroadcastReceiver;
 import com.nemator.needle.models.vo.LocationSharingVO;
+import com.nemator.needle.models.vo.UserVO;
 import com.nemator.needle.utils.AppConstants;
+import com.nemator.needle.utils.MarkerUtils;
 import com.nemator.needle.utils.SphericalUtil;
+import com.nemator.needle.views.UserMarker;
+
+import java.util.ArrayList;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -48,21 +44,17 @@ public class LocationSharingMapFragment extends SupportMapFragment
 
     //Locations
     private Location mCurrentLocation;
-    private LatLng mCurrentPosition;
+    private LatLng myPosition;
 
     private LatLng mReceivedPosition;
 
     //Map
     private GoogleMap mMap;
-    private Marker mMarker;
-    private Circle mCircle;
-
-    private Marker mReceivedMarker;
-    private Circle mReceivedCircle;
+    private UserMarker myMarker, otherUsersMarker;
+    private final ArrayList<UserMarker> markers = new ArrayList<>();
 
     //Map data
     private LocationSharingVO locationSharing;
-    private Boolean isSent;
     private Boolean cameraUpdated = false;
 
     //Location Service
@@ -87,9 +79,6 @@ public class LocationSharingMapFragment extends SupportMapFragment
             updateValuesFromBundle(savedInstanceState);
         }else{
             locationSharing = (LocationSharingVO) ((LocationSharingActivity) getActivity()).getIntent().getExtras().get(AppConstants.TAG_LOCATION_SHARING);
-            if(locationSharing != null){
-                isSent = locationSharing.isSender();
-            }
         }
 
         //Map
@@ -117,11 +106,8 @@ public class LocationSharingMapFragment extends SupportMapFragment
                 mCurrentLocation = savedInstanceState.getParcelable(AppConstants.LOCATION_KEY);
                 Double lat = mCurrentLocation.getLatitude();
                 Double lng = mCurrentLocation.getLongitude();
-                mCurrentPosition = new LatLng(lat, lng);
+                myPosition = new LatLng(lat, lng);
             }
-
-            locationSharing = ((LocationSharingFragment) getParentFragment()).getLocationSharing();
-            isSent = ((LocationSharingFragment) getParentFragment()).getIsSent();
         }
     }
 
@@ -150,9 +136,7 @@ public class LocationSharingMapFragment extends SupportMapFragment
     public void onDetach() {
         super.onDetach();
 
-        if(!isSent){
-            Needle.serviceController.stopLocationUpdates();
-        }
+        Needle.serviceController.stopLocationUpdates();
     }
 
     @Override
@@ -180,20 +164,20 @@ public class LocationSharingMapFragment extends SupportMapFragment
 
     public void onLocationUpdated(Location location) {
         mCurrentLocation = location;
-        mCurrentPosition = new LatLng(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude());
+        myPosition = new LatLng(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude());
 
         updateMap();
 
         if(!cameraUpdated)
             moveCamera();
 
-        if(!isSent && mRequestingLocationUpdates)
+        if(mRequestingLocationUpdates)
             trackUser();
 
         //Update distance to user
-        if(!isSent && mCurrentPosition != null && mReceivedPosition !=null){
-            double distance = SphericalUtil.computeDistanceBetween(mCurrentPosition, mReceivedPosition);
-            ((LocationSharingFragment) getParentFragment()).updateDistance(String.valueOf(Math.round(distance)) + "m");
+        if(myPosition != null && mReceivedPosition != null){
+            double distance = SphericalUtil.computeDistanceBetween(myPosition, mReceivedPosition);
+            ((LocationSharingActivity) getActivity()).updateDistance(String.valueOf(Math.round(distance)) + "m");
         }
     }
 
@@ -208,26 +192,22 @@ public class LocationSharingMapFragment extends SupportMapFragment
 
     public void updateMap() {
         //Update user's marker
-        if(mCurrentLocation != null){
-            if(mMarker == null && mCircle == null){
-                MarkerOptions markerOptions = new MarkerOptions();
-                markerOptions.position(mCurrentPosition);
-                drawMarkerWithCircle(mCurrentPosition, "Your Position");
+        if(myPosition != null){
+            if(myMarker == null){
+                myMarker = drawUserMarker(Needle.userModel.getUser(), myPosition);
             }else{
-                updateMarkerWithCircle(mCurrentPosition);
+                myMarker.updateLocation(mMap, myPosition);
             }
         }
 
         //Update received user's marker
-        if(!isSent){
-            if(mReceivedPosition != null){
-                if(mReceivedMarker == null && mReceivedCircle == null){
-                    MarkerOptions markerOptions = new MarkerOptions();
-                    markerOptions.position(mReceivedPosition);
-                    drawReceivedMarkerWithCircle(mReceivedPosition, locationSharing.getSender().getReadableUserName()+ "'s Position");
-                }else{
-                    updateReceivedMarkerWithCircle(mReceivedPosition);
-                }
+        if(mReceivedPosition != null){
+            if(otherUsersMarker == null){
+                UserVO user = Needle.userModel.getUserId() == locationSharing.getSender().getId() ?
+                        locationSharing.getReceiver() : locationSharing.getSender();
+                otherUsersMarker = drawUserMarker(user, mReceivedPosition);
+            }else{
+                otherUsersMarker.updateLocation(mMap, mReceivedPosition);
             }
         }
     }
@@ -236,41 +216,27 @@ public class LocationSharingMapFragment extends SupportMapFragment
         if(mMap==null)
             mMap = getMap();
 
-        //Add user's marker back
-        MarkerOptions markerOptions = new MarkerOptions();
-        if(mMarker == null){
-            markerOptions.position(mCurrentPosition);
-            drawMarkerWithCircle(mCurrentPosition, "Your Position");
-        }else{
-            updateMarkerWithCircle(mCurrentPosition);
-        }
-
-        if(!isSent){
-            //Add received user's marker back
-            MarkerOptions receivedMarkerOptions = new MarkerOptions();
-            if(mReceivedMarker == null){
-                receivedMarkerOptions.position(mReceivedPosition);
-                drawReceivedMarkerWithCircle(mReceivedPosition, locationSharing.getSender().getReadableUserName() + "'s Position");
-            }else{
-                updateReceivedMarkerWithCircle(mReceivedPosition);
-            }
-        }
-
         updateMap();
         moveCamera();
 
-        if(!isSent && mRequestingLocationUpdates)
+        if(mRequestingLocationUpdates)
             trackUser();
     }
 
     public void moveCamera(){
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(mCurrentPosition, 19.0f));
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(myPosition, 19.0f));
         cameraUpdated = true;
     }
 
     //Actions
     private void trackUser(){
-        ApiClient.getInstance().retrieveUserLocation(locationSharing.getSender().getId(), locationSharing, userLocationRetrievedCallback);
+        if(Needle.userModel.getUserId() == locationSharing.getReceiver().getId()){
+            ApiClient.getInstance().retrieveSenderLocation(locationSharing.getSender().getId(), locationSharing, userLocationRetrievedCallback);
+        }else if(locationSharing.isSharedBack()){
+            ApiClient.getInstance().retrieveReceiverLocation(locationSharing.getReceiver().getId(), locationSharing, userLocationRetrievedCallback);
+        }else{
+            Log.e(TAG, "Location is not shared back. Will only be showing your location");
+        }
     }
 
     private Callback<UserResult> userLocationRetrievedCallback = new Callback<UserResult>() {
@@ -290,13 +256,13 @@ public class LocationSharingMapFragment extends SupportMapFragment
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 dialog.dismiss();
-                                Needle.navigationController.onBackPressed();
+                                getActivity().finish();
                             }
                         })
                         .setOnCancelListener(new DialogInterface.OnCancelListener() {
                             @Override
                             public void onCancel(DialogInterface dialog) {
-                                Needle.navigationController.onBackPressed();
+                                getActivity().finish();
                             }
                         })
                         .show();
@@ -312,97 +278,20 @@ public class LocationSharingMapFragment extends SupportMapFragment
     };
 
     //Map Stuff
-    private void drawMarkerWithCircle(LatLng position, String label){
+    private UserMarker drawUserMarker(UserVO user, LatLng position){
         double radiusInMeters = 10.0;
         int strokeColor = getResources().getColor(R.color.primary);
         int shadeColor = getResources().getColor(R.color.circleColor);
 
         CircleOptions circleOptions = new CircleOptions().center(position).radius(radiusInMeters).fillColor(shadeColor).strokeColor(strokeColor).strokeWidth(8);
-        mCircle = mMap.addCircle(circleOptions);
+        Circle circle = mMap.addCircle(circleOptions);
+        Marker marker = MarkerUtils.createUserMarker(getActivity(), mMap, user, position).getMarker();
 
-        MarkerOptions markerOptions = new MarkerOptions().position(position);
-        mMarker = mMap.addMarker(markerOptions);
+        String label = Needle.userModel.getUserId() == user.getId() ? "Your Location" : user.getReadableUserName() + "' Location";
+        marker.setTitle(label);
 
-        mMarker.setTitle(label);
-    }
-
-    private void updateMarkerWithCircle(LatLng position) {
-        if(!mCircle.getCenter().equals(position)){
-            mCircle.setCenter(position);
-        }
-
-        if(!mMarker.getPosition().equals(position)){
-            animateMarker(mMap, mMarker, position, false);
-        }
-    }
-
-    private void drawReceivedMarkerWithCircle(LatLng position, String label){
-        double radiusInMeters = 10.0;
-        int strokeColor = getResources().getColor(R.color.primary);
-        int shadeColor = getResources().getColor(R.color.circleColor);
-
-        CircleOptions circleOptions = new CircleOptions().center(position).radius(radiusInMeters).fillColor(shadeColor).strokeColor(strokeColor).strokeWidth(8);
-        mReceivedCircle = mMap.addCircle(circleOptions);
-
-        MarkerOptions markerOptions = new MarkerOptions().position(position);
-        BitmapDescriptor icon = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_VIOLET);
-        markerOptions.icon(icon);
-        mReceivedMarker = mMap.addMarker(markerOptions);
-
-        mReceivedMarker.setTitle(label);
-    }
-
-    private void updateReceivedMarkerWithCircle(LatLng position) {
-        if(!mReceivedCircle.getCenter().equals(position)){
-            mReceivedCircle.setCenter(position);
-        }
-
-        if(!mReceivedMarker.getPosition().equals(position)){
-            animateMarker(mMap, mReceivedMarker, position, false);
-        }
-    }
-
-    private void animateMarker(final GoogleMap map, final Marker marker, final LatLng toPosition, final boolean hideMarker) {
-        final Handler handler = new Handler();
-        final long start = SystemClock.uptimeMillis();
-        Projection proj = map.getProjection();
-        Point startPoint = proj.toScreenLocation(marker.getPosition());
-        final LatLng startLatLng = proj.fromScreenLocation(startPoint);
-        final long duration = 500;
-        final Interpolator interpolator = new LinearInterpolator();
-
-        Location startLocation = new Location("");
-        startLocation.setLatitude(startLatLng.latitude);
-        startLocation.setLongitude(startLatLng.longitude);
-
-        Location endLocation = new Location("");
-        endLocation.setLatitude(toPosition.latitude);
-        endLocation.setLongitude(toPosition.longitude);
-
-        float distance = startLocation.distanceTo(endLocation);
-
-        if(distance > 1){
-            handler.post(new Runnable() {
-                @Override
-                public void run() {
-                    long elapsed = SystemClock.uptimeMillis() - start;
-                    float t = interpolator.getInterpolation((float) elapsed / duration);
-                    double lng = t * toPosition.longitude + (1 - t) * startLatLng.longitude;
-                    double lat = t * toPosition.latitude + (1 - t) * startLatLng.latitude;
-                    marker.setPosition(new LatLng(lat, lng));
-
-                    if (t < 1.0) {
-                        // Post again 16ms later.
-                        handler.postDelayed(this, 16);
-                    } else {
-                        if (hideMarker) {
-                            marker.setVisible(false);
-                        } else {
-                            marker.setVisible(true);
-                        }
-                    }
-                }
-            });
-        }
+        UserMarker userMarker = new UserMarker(user, marker, circle, position);
+        markers.add(userMarker);
+        return userMarker;
     }
 }

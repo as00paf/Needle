@@ -22,7 +22,6 @@ public class LocationSharingVO implements Serializable, Parcelable {
 
     @SerializedName("shareBack")
     private Boolean shareBack;
-    private boolean isSender;
 
     public LocationSharingVO(){
 
@@ -111,19 +110,11 @@ public class LocationSharingVO implements Serializable, Parcelable {
         this.timeLimit = timeLimit;
     }
 
-    public Boolean getShareBack() {
+    public Boolean isSharedBack() {
         return shareBack;
     }
 
     public void setShareBack(Boolean shareBack) {
         this.shareBack = shareBack;
-    }
-
-    public boolean isSender() {
-        return isSender;
-    }
-
-    public void setIsSender(boolean isSender) {
-        this.isSender = isSender;
     }
 }

@@ -96,20 +96,6 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
         Needle.authenticationController.googleSilentSignIn();
     }
 
-    @Override
-    public void onResume(){
-        boolean rememberMe = getContext().getSharedPreferences("com.nemator.needle", Context.MODE_PRIVATE).getBoolean("rememberMe", false);
-        boolean autoLogin =Needle.userModel.isAutoLogin();
-        boolean willLogin = rememberMe && autoLogin && ! Needle.userModel.isLoggedIn();
-
-        if(!usernameText.getText().toString().isEmpty() && !passwordText.getText().toString().isEmpty() && willLogin){
-            //TODO : fix
-            //login();
-        }
-
-        super.onResume();
-    }
-
     private void login(){
         passwordText.clearFocus();
         usernameText.clearFocus();

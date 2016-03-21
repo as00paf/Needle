@@ -5,6 +5,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -66,8 +67,8 @@ public class HomeActivity extends AppCompatActivity {
             initUser(savedInstanceState);
         }
 
-        setupDrawerLayout();
         initToolbar();
+        setupDrawerLayout();
 
         initView();
         setAccount();
@@ -88,7 +89,6 @@ public class HomeActivity extends AppCompatActivity {
         //Saved Instance State
         if(savedInstanceState != null){
             //TODO : Use constants
-            Needle.userModel.setAutoLogin(savedInstanceState.getBoolean("autoLogin", true));
             Needle.userModel.setLoggedIn(savedInstanceState.getBoolean("loggedIn", false));
             Needle.navigationController.setCurrentState(savedInstanceState.getInt(AppConstants.APP_STATE, Needle.navigationController.getCurrentState()));
             Needle.navigationController.setPreviousState(savedInstanceState.getInt(AppConstants.APP_PREVIOUS_STATE, Needle.navigationController.getCurrentState()));
@@ -97,14 +97,6 @@ public class HomeActivity extends AppCompatActivity {
 
     private void initView() {
         Log.d(TAG, "initView");
-
-        UserVO user = UserVO.retrieve(getSharedPreferences("com.nemator.needle", Context.MODE_PRIVATE));
-
-        if(!Needle.userModel.isLoggedIn()){
-            Needle.navigationController.showSection(AppConstants.SECTION_LOGIN);
-        }else {
-            Needle.userModel.setUser(user);
-        }
 
         Needle.navigationController.showSection(AppConstants.SECTION_HAYSTACKS);
     }
@@ -212,6 +204,29 @@ public class HomeActivity extends AppCompatActivity {
                 //TODO : notification count
             }
         }
+
+        showNavigationDrawerIfFirstTime();
+    }
+
+    private void showNavigationDrawerIfFirstTime() {
+        Thread t = new Thread(new Runnable() {
+
+            @Override
+            public void run() {
+
+                SharedPreferences preferences = getSharedPreferences("com.nemator.needle", Context.MODE_PRIVATE);
+                boolean isFirstStart = preferences.getBoolean(AppConstants.IS_FIRST_START, true);
+
+                if(isFirstStart) {
+                    drawerLayout.openDrawer(findViewById(R.id.navigation_drawer_container));
+                    SharedPreferences.Editor e = preferences.edit();
+                    e.putBoolean(AppConstants.IS_FIRST_START, false);
+                    e.commit();
+                }
+            }
+        });
+
+        t.start();
     }
 
     @Override
@@ -224,15 +239,22 @@ public class HomeActivity extends AppCompatActivity {
 
             if(action != null && type != null){
                 if(action.equals("Notification")){
+                    Intent newIntent = null;
                     if(type.equals("LocationSharing")){
                         LocationSharingVO vo = extras.getParcelable(AppConstants.LOCATION_SHARING_DATA_KEY);
-                        Needle.navigationController.showReceivedLocationSharing(vo);
+                        Log.d(TAG, "starting location sharing activity with data : " + vo.toString());
+                        newIntent = new Intent(this, LocationSharingActivity.class);
+                        newIntent.putExtra(AppConstants.TAG_LOCATION_SHARING, (Parcelable) vo);
+
                     }else if(type.equals("Haystack")){
                         HaystackVO vo = extras.getParcelable(AppConstants.HAYSTACK_DATA_KEY);
 
-                        Intent haystackIntent = new Intent(this, HaystackActivity.class);
-                        haystackIntent.putExtra(AppConstants.TAG_HAYSTACK, (Parcelable) vo);
-                        startActivity(haystackIntent);
+                        newIntent = new Intent(this, HaystackActivity.class);
+                        newIntent.putExtra(AppConstants.TAG_HAYSTACK, (Parcelable) vo);
+                    }
+
+                    if(newIntent != null){
+                        startActivity(newIntent);
                     }
                 }
             }
@@ -247,7 +269,6 @@ public class HomeActivity extends AppCompatActivity {
     public void onSaveInstanceState(Bundle savedInstanceState){
         savedInstanceState.putInt(AppConstants.APP_STATE, Needle.navigationController.getCurrentState());
         savedInstanceState.putInt(AppConstants.APP_PREVIOUS_STATE, Needle.navigationController.getPreviousState());
-        savedInstanceState.putBoolean("autoLogin", Needle.userModel.isAutoLogin());
         savedInstanceState.putBoolean("loggedIn", Needle.userModel.isLoggedIn());
 
         super.onSaveInstanceState(savedInstanceState);

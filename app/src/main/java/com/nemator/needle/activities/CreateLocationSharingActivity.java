@@ -202,9 +202,11 @@ public class CreateLocationSharingActivity extends AppCompatActivity {
                 Toast.makeText(CreateLocationSharingActivity.this, "Location shared with " + result.getLocationSharing().getReceiver().getReadableUserName(), Toast.LENGTH_SHORT).show();
 
                 //Launch Activity
-                Intent locationSharingIntent = new Intent(CreateLocationSharingActivity.this, LocationSharingActivity.class);
+               /* Intent locationSharingIntent = new Intent(CreateLocationSharingActivity.this, LocationSharingActivity.class);
                 locationSharingIntent.putExtra(AppConstants.TAG_LOCATION_SHARING, (Parcelable) result.getLocationSharing());
-                startActivity(locationSharingIntent);
+                startActivity(locationSharingIntent);*/
+
+                finish();
             }else{
                 Log.e(TAG, "Location Sharing not created. Error : " + result.getMessage());
                 Toast.makeText(CreateLocationSharingActivity.this, result.getMessage(), Toast.LENGTH_SHORT).show();

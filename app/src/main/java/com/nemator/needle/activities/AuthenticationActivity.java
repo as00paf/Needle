@@ -37,14 +37,6 @@ public class AuthenticationActivity extends AppCompatActivity {
     }
 
     public void initUser(Bundle  savedInstanceState) {
-        if(savedInstanceState != null){
-            //TODO : Use constants
-            Needle.userModel.setAutoLogin(savedInstanceState.getBoolean("autoLogin", true));
-            Needle.userModel.setLoggedIn(savedInstanceState.getBoolean("loggedIn", false));
-            Needle.navigationController.setCurrentState(savedInstanceState.getInt(AppConstants.APP_STATE, Needle.navigationController.getCurrentState()));
-            Needle.navigationController.setPreviousState(savedInstanceState.getInt(AppConstants.APP_PREVIOUS_STATE, Needle.navigationController.getCurrentState()));
-        }
-
         if(Needle.userModel.isLoggedIn()){
             //TODO : manage ?
             Needle.googleApiController.stopAutoManage();
@@ -53,10 +45,8 @@ public class AuthenticationActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onDestroy() {
-        super.onDestroy();
-
+    protected void onStop() {
         Needle.networkController.unregister();
-        Needle.serviceController.unbindService();
+        super.onStop();
     }
 }

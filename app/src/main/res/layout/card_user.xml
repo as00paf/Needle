@@ -15,7 +15,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
         <ImageView
-            android:id="@+id/create_haystack_user_card_image"
+            android:id="@+id/user_profile_picture"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:scaleType="fitXY"
@@ -23,7 +23,7 @@
             android:layout_alignParentTop="true"/>
 
         <TextView
-            android:id="@+id/create_haystack_user_card_name_label"
+            android:id="@+id/username_label"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:padding="8dp"

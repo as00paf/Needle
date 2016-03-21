@@ -39,10 +39,10 @@ public class LocationSharingCardHolder extends RecyclerView.ViewHolder implement
         super(view);
         mListener = listener;
         this.isSent = isSent;
-        titleView =  (TextView) view.findViewById(R.id.location_sharing_name_label);
-        active_until = (TextView)  view.findViewById(R.id.location_sharing_time_limit_label);
+        titleView =  (TextView) view.findViewById(R.id.username_label);
+        active_until = (TextView)  view.findViewById(R.id.time_limit_label);
         emptyText = (TextView) view.findViewById(R.id.emptyText);
-        imageView = (ImageView) view.findViewById(R.id.thumbImage);
+        imageView = (ImageView) view.findViewById(R.id.location_sharing_card_image);
         menuButton = (ImageButton) view.findViewById(R.id.location_sharing_card_menu_button);
         shareBackIndicator = (ImageView) view.findViewById(R.id.location_sharing_share_back_indicator);
         this.adapter = adapter;
@@ -50,10 +50,10 @@ public class LocationSharingCardHolder extends RecyclerView.ViewHolder implement
 
     public LocationSharingCardHolder(View view) {
         super(view);
-        titleView =  (TextView) view.findViewById(R.id.location_sharing_name_label);
-        active_until = (TextView)  view.findViewById(R.id.location_sharing_time_limit_label);
+        titleView =  (TextView) view.findViewById(R.id.username_label);
+        active_until = (TextView)  view.findViewById(R.id.time_limit_label);
         emptyText = (TextView) view.findViewById(R.id.emptyText);
-        imageView = (ImageView) view.findViewById(R.id.thumbImage);
+        imageView = (ImageView) view.findViewById(R.id.location_sharing_card_image);
     }
 
     public void setData(LocationSharingVO locationSharing){
@@ -68,7 +68,7 @@ public class LocationSharingCardHolder extends RecyclerView.ViewHolder implement
         });
 
         menuButton.setOnClickListener(this);
-        setShareBack(locationSharing.getShareBack());
+        setShareBack(locationSharing.isSharedBack());
     }
 
     @Override

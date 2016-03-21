@@ -112,8 +112,8 @@ public class UserListCardAdapter extends RecyclerView.Adapter<UserListCardAdapte
 
         public UserCardViewHolder(View view) {
             super(view);
-            userNameView =  (TextView) view.findViewById(R.id.create_haystack_user_card_name_label);
-            imageView = (ImageView) view.findViewById(R.id.create_haystack_user_card_image);
+            userNameView =  (TextView) view.findViewById(R.id.username_label);
+            imageView = (ImageView) view.findViewById(R.id.user_profile_picture);
 
             view.setClickable(true);
         }
@@ -126,11 +126,11 @@ public class UserListCardAdapter extends RecyclerView.Adapter<UserListCardAdapte
                     view.setSelected(!view.isSelected());
 
                     if(view.isSelected()){
-                        view.findViewById(R.id.create_haystack_user_card_name_label).setBackgroundColor(view.getContext().getResources().getColor(R.color.primary));
+                        view.findViewById(R.id.username_label).setBackgroundColor(view.getContext().getResources().getColor(R.color.primary));
                         selectedItems.add(userData);
                         selectedItem = userData;
                     }else{
-                        view.findViewById(R.id.create_haystack_user_card_name_label).setBackgroundColor(view.getContext().getResources().getColor(android.R.color.transparent));
+                        view.findViewById(R.id.username_label).setBackgroundColor(view.getContext().getResources().getColor(android.R.color.transparent));
                         selectedItems.remove(userData);
                         selectedItem = null;
                     }

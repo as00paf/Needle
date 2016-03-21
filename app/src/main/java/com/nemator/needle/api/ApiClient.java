@@ -161,8 +161,13 @@ public class ApiClient {
         call.enqueue(callBack);
     }
 
-    public void retrieveUserLocation(int userId, LocationSharingVO vo, Callback<UserResult> callBack) {
-        Call<UserResult> call = client.retrieveUserLocation(userId, vo.getId());
+    public void retrieveSenderLocation(int userId, LocationSharingVO vo, Callback<UserResult> callBack) {
+        Call<UserResult> call = client.retrieveUserLocation(vo.getId(), userId, "sender");
+        call.enqueue(callBack);
+    }
+
+    public void retrieveReceiverLocation(int userId, LocationSharingVO vo, Callback<UserResult> callBack) {
+        Call<UserResult> call = client.retrieveUserLocation(vo.getId(), userId, "receiver");
         call.enqueue(callBack);
     }
 

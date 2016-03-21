@@ -82,6 +82,7 @@ public class AppConstants {
     public static final String LAST_UPDATED_TIME_STRING_KEY = "lastUpdatedTime";
     public static final String APP_STATE = "appState";
     public static final String APP_PREVIOUS_STATE = "appPrevState";
+    public static final String IS_FIRST_START = "isFirstStart";
 
     //App Sections
     public static final int SECTION_SPLASH_LOGIN = 0;

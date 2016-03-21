@@ -24,6 +24,10 @@ public class NetworkController extends BroadcastReceiver {
     }
 
     public void init(AppCompatActivity activity){
+        if(this.activity != null){
+            unregister();
+        }
+
         this.activity = activity;
         this.localBroadcastManager = LocalBroadcastManager.getInstance(activity);
 
@@ -50,6 +54,7 @@ public class NetworkController extends BroadcastReceiver {
         if(activity != null){
             try{
                 activity.unregisterReceiver(this);
+                activity = null;
             }catch (Exception e){
                 e.printStackTrace();
             }

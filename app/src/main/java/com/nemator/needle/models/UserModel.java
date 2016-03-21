@@ -14,7 +14,6 @@ public class UserModel {
     private static UserModel instance;
 
     private boolean loggedIn = false;
-    private boolean autoLogin = true;
 
     private UserVO user;
     private SharedPreferences sharedPreferences;
@@ -33,7 +32,7 @@ public class UserModel {
     public void init(Context context){
         sharedPreferences = context.getSharedPreferences("com.nemator.needle", Context.MODE_PRIVATE);
         user = UserVO.retrieve(sharedPreferences);
-        loggedIn =  sharedPreferences.getBoolean(AppConstants.TAG_LOGGED_IN, false);
+        loggedIn = sharedPreferences.getBoolean(AppConstants.TAG_LOGGED_IN, false);
     }
 
     //Getters/Setters
@@ -89,14 +88,6 @@ public class UserModel {
     public void setLoggedIn(boolean loggedIn) {
         this.loggedIn = loggedIn;
         sharedPreferences.edit().putBoolean(AppConstants.TAG_LOGGED_IN, loggedIn).apply();
-    }
-
-    public boolean isAutoLogin() {
-        return autoLogin;
-    }
-
-    public void setAutoLogin(boolean autoLogin) {
-        this.autoLogin = autoLogin;
     }
 
     public void saveUser(){

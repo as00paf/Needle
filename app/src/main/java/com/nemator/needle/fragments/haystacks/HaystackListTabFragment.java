@@ -12,7 +12,7 @@ import android.view.ViewGroup;
 
 import com.nemator.needle.Needle;
 import com.nemator.needle.R;
-import com.nemator.needle.adapter.HaystackListCardAdapter;
+import com.nemator.needle.adapter.HaystackCardAdapter;
 import com.nemator.needle.models.vo.HaystackVO;
 
 import java.util.ArrayList;
@@ -60,16 +60,16 @@ public class HaystackListTabFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        rootView = inflater.inflate(R.layout.fragment_haystack_list_tab, container, false);
+        rootView = inflater.inflate(R.layout.fragment_list_tab, container, false);
 
         //Recycler View
-        mRecyclerView = (RecyclerView) rootView.findViewById(R.id.haystack_list);
+        mRecyclerView = (RecyclerView) rootView.findViewById(R.id.list);
         mRecyclerView.setHasFixedSize(true);
 
         mLayoutManager = new LinearLayoutManager(getActivity());
         mRecyclerView.setLayoutManager(mLayoutManager);
 
-        mAdapter = new HaystackListCardAdapter(this.dataList, getActivity(), interactionListener);
+        mAdapter = new HaystackCardAdapter(this.dataList, getActivity(), interactionListener);
         mRecyclerView.setAdapter(mAdapter);
 
         //Swipe To Refresh
@@ -87,7 +87,7 @@ public class HaystackListTabFragment extends Fragment {
     public void updateHaystackList(ArrayList<HaystackVO> data){
         this.dataList = data;
 
-        mAdapter = new HaystackListCardAdapter(this.dataList, getActivity(), interactionListener);
+        mAdapter = new HaystackCardAdapter(this.dataList, getActivity(), interactionListener);
 
         if(mRecyclerView != null){
             mRecyclerView.setAdapter(mAdapter);

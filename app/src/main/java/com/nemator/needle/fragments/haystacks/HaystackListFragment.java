@@ -3,35 +3,28 @@ package com.nemator.needle.fragments.haystacks;
 import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.SharedElementCallback;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.SwipeRefreshLayout;
-import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.appcompat.view.slidingTab.SlidingTabLayout;
 import com.nemator.needle.Needle;
 import com.nemator.needle.R;
-import com.nemator.needle.adapter.HaystackListPagerAdapter;
+import com.nemator.needle.adapter.HaystackPagerAdapter;
 import com.nemator.needle.api.ApiClient;
-import com.nemator.needle.controller.AuthenticationController;
 import com.nemator.needle.controller.NavigationController;
 import com.nemator.needle.models.vo.HaystackVO;
 import com.nemator.needle.api.result.HaystackResult;
 import com.nemator.needle.utils.AppConstants;
 import com.nemator.needle.utils.AppState;
-import com.nemator.needle.utils.CropCircleTransformation;
-import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -52,7 +45,7 @@ public class HaystackListFragment extends Fragment implements SwipeRefreshLayout
     private SwipeRefreshLayout refreshLayout;
 
     //Objects
-    private HaystackListPagerAdapter mHaystackListPagerAdapter;
+    private HaystackPagerAdapter mHaystackPagerAdapter;
     private OnActivityStateChangeListener stateChangeCallback;
     private HaystackListFragmentInteractionListener fragmentListener;
 
@@ -103,7 +96,7 @@ public class HaystackListFragment extends Fragment implements SwipeRefreshLayout
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        if(rootView == null){
+        //if(rootView == null){
             rootView = inflater.inflate(R.layout.fragment_haystack_list, container, false);
 
             setEnterSharedElementCallback(new SharedElementCallback() {
@@ -135,9 +128,9 @@ public class HaystackListFragment extends Fragment implements SwipeRefreshLayout
             });
 
             //View pager
-            mHaystackListPagerAdapter = new HaystackListPagerAdapter(getActivity().getSupportFragmentManager(), this);
+            mHaystackPagerAdapter = new HaystackPagerAdapter(getActivity().getSupportFragmentManager(), this);
             haystackListViewPager = (ViewPager) rootView.findViewById(R.id.haystackListViewPager);
-            haystackListViewPager.setAdapter(mHaystackListPagerAdapter);
+            haystackListViewPager.setAdapter(mHaystackPagerAdapter);
 
             //Tabs
             mSlidingTabLayout = (SlidingTabLayout) rootView.findViewById(R.id.haystack_list_sliding_tabs);
@@ -173,7 +166,7 @@ public class HaystackListFragment extends Fragment implements SwipeRefreshLayout
 
                 }
             });
-        }
+        //}
 
         return rootView;
     }
@@ -196,8 +189,8 @@ public class HaystackListFragment extends Fragment implements SwipeRefreshLayout
 
                 Log.d(TAG, "haystacks fetched !");
 
-                HaystackListTabFragment publicTab = mHaystackListPagerAdapter.getPublicHaystackListFragment();
-                HaystackListTabFragment privateTab = mHaystackListPagerAdapter.getPrivateHaystackListFragment();
+                HaystackListTabFragment publicTab = mHaystackPagerAdapter.getPublicHaystackListFragment();
+                HaystackListTabFragment privateTab = mHaystackPagerAdapter.getPrivateHaystackListFragment();
 /*
             //Show how many haystacks are available in the Nav Drawer
             int count = publicHaystacks.size() + privateHaystacks.size();
@@ -224,8 +217,8 @@ public class HaystackListFragment extends Fragment implements SwipeRefreshLayout
             public void onFailure(Call<HaystackResult> call, Throwable t) {
                 Log.d(TAG, "haystacks fetch failed !");
 
-                HaystackListTabFragment publicTab = mHaystackListPagerAdapter.getPublicHaystackListFragment();
-                HaystackListTabFragment privateTab = mHaystackListPagerAdapter.getPrivateHaystackListFragment();
+                HaystackListTabFragment publicTab = mHaystackPagerAdapter.getPublicHaystackListFragment();
+                HaystackListTabFragment privateTab = mHaystackPagerAdapter.getPrivateHaystackListFragment();
 
                 if(publicTab == null && privateTab == null) return;
 

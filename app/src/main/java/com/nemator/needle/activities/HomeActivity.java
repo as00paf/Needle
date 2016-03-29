@@ -43,6 +43,7 @@ import com.nemator.needle.utils.CropCircleTransformation;
 import com.nemator.needle.utils.PermissionManager;
 import com.squareup.picasso.Picasso;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
 public class HomeActivity extends AppCompatActivity {
@@ -70,7 +71,6 @@ public class HomeActivity extends AppCompatActivity {
         initToolbar();
         setupDrawerLayout();
 
-        initView();
         setAccount();
         requestPermission();
 
@@ -93,12 +93,6 @@ public class HomeActivity extends AppCompatActivity {
             Needle.navigationController.setCurrentState(savedInstanceState.getInt(AppConstants.APP_STATE, Needle.navigationController.getCurrentState()));
             Needle.navigationController.setPreviousState(savedInstanceState.getInt(AppConstants.APP_PREVIOUS_STATE, Needle.navigationController.getCurrentState()));
         }
-    }
-
-    private void initView() {
-        Log.d(TAG, "initView");
-
-        Needle.navigationController.showSection(AppConstants.SECTION_HAYSTACKS);
     }
 
     protected void initToolbar() {
@@ -205,6 +199,7 @@ public class HomeActivity extends AppCompatActivity {
             }
         }
 
+        Needle.navigationController.showSection(AppConstants.SECTION_HAYSTACKS);
         showNavigationDrawerIfFirstTime();
     }
 
@@ -244,7 +239,7 @@ public class HomeActivity extends AppCompatActivity {
                         LocationSharingVO vo = extras.getParcelable(AppConstants.LOCATION_SHARING_DATA_KEY);
                         Log.d(TAG, "starting location sharing activity with data : " + vo.toString());
                         newIntent = new Intent(this, LocationSharingActivity.class);
-                        newIntent.putExtra(AppConstants.TAG_LOCATION_SHARING, (Parcelable) vo);
+                        newIntent.putExtra(AppConstants.TAG_LOCATION_SHARING, (Serializable) vo);
 
                     }else if(type.equals("Haystack")){
                         HaystackVO vo = extras.getParcelable(AppConstants.HAYSTACK_DATA_KEY);
@@ -316,6 +311,7 @@ public class HomeActivity extends AppCompatActivity {
 
         Needle.networkController.unregister();
         Needle.serviceController.unbindService();
+        Needle.googleApiController.disconnect();
     }
 
     //TODO : move to authentication controller

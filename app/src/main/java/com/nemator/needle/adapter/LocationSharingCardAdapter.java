@@ -25,8 +25,8 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class LocationSharingListCardAdapter extends RecyclerView.Adapter<LocationSharingCardHolder>{
-    public static String TAG = "LocationSharingListCardAdapter";
+public class LocationSharingCardAdapter extends RecyclerView.Adapter<LocationSharingCardHolder>{
+    public static String TAG = "LocationSharingCardAdapter";
 
     private static final int TYPE_ITEM = 0;
     private static final int TYPE_EMPTY = 1;
@@ -37,7 +37,7 @@ public class LocationSharingListCardAdapter extends RecyclerView.Adapter<Locatio
 
     private LocationSharingCardListener mListener;
 
-    public LocationSharingListCardAdapter(ArrayList<LocationSharingVO> data, Context context, Boolean isSent, LocationSharingCardListener listener) {
+    public LocationSharingCardAdapter(ArrayList<LocationSharingVO> data, Context context, Boolean isSent, LocationSharingCardListener listener) {
         mListener = listener;
         listData = data;
         mContext = context;

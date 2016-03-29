@@ -1,6 +1,5 @@
 package com.nemator.needle.fragments.locationSharing.createLocationSharing;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.GridLayoutManager;
@@ -12,7 +11,7 @@ import android.view.ViewGroup;
 
 import com.nemator.needle.Needle;
 import com.nemator.needle.R;
-import com.nemator.needle.adapter.UserListCardAdapter;
+import com.nemator.needle.adapter.UserCardAdapter;
 import com.nemator.needle.api.ApiClient;
 import com.nemator.needle.api.result.UsersResult;
 import com.nemator.needle.fragments.haystacks.createHaystack.CreateHaystackBaseFragment;
@@ -30,7 +29,7 @@ public class CreateLocationSharingUsersFragment extends CreateHaystackBaseFragme
 
     //Children
     private RecyclerView mRecyclerView;
-    private UserListCardAdapter mAdapter;
+    private UserCardAdapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
     private SwipeRefreshLayout swipeLayout;
 
@@ -101,7 +100,7 @@ public class CreateLocationSharingUsersFragment extends CreateHaystackBaseFragme
     }
 
     private void updateUserList(){
-        mAdapter = new UserListCardAdapter(usersList, getActivity());
+        mAdapter = new UserCardAdapter(usersList, getActivity());
         mRecyclerView.setAdapter(mAdapter);
 
         mAdapter.notifyDataSetChanged();

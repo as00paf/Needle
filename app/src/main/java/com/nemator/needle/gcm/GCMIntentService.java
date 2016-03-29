@@ -11,11 +11,14 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.NotificationCompat;
 
+import com.google.gson.Gson;
 import com.nemator.needle.activities.HomeActivity;
 import com.nemator.needle.Needle;
 import com.nemator.needle.R;
+import com.nemator.needle.models.vo.LocationSharingVO;
 import com.nemator.needle.utils.AppConstants;
 
+import java.io.Serializable;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class GCMIntentService extends IntentService {
@@ -90,7 +93,10 @@ public class GCMIntentService extends IntentService {
         intent.putExtra(AppConstants.TAG_ID, data.getString("id"));
 
         if(notificationType.equals("LocationSharing")){
-            intent.putExtra(AppConstants.LOCATION_SHARING_DATA_KEY, data.getParcelable("locationSharing"));
+            Gson gson = new Gson();
+            LocationSharingVO vo = gson.fromJson(data.getString("locationSharing"), LocationSharingVO.class);
+
+            intent.putExtra(AppConstants.LOCATION_SHARING_DATA_KEY, (Serializable) vo );
         }else if(notificationType.equals("Haystack")){
             intent.putExtra(AppConstants.HAYSTACK_DATA_KEY, data.getParcelable("haystack"));
         }else{

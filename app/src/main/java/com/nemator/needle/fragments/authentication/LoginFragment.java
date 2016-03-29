@@ -89,13 +89,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
 
         return layout;
     }
-
-    @Override
-    public void onStart() {
-        super.onStart();
-        Needle.authenticationController.googleSilentSignIn();
-    }
-
+    
     private void login(){
         passwordText.clearFocus();
         usernameText.clearFocus();

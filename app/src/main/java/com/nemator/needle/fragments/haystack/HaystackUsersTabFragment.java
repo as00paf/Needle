@@ -12,7 +12,7 @@ import android.view.ViewGroup;
 import com.nemator.needle.Needle;
 import com.nemator.needle.R;
 import com.nemator.needle.activities.HaystackActivity;
-import com.nemator.needle.adapter.UserListCardAdapter;
+import com.nemator.needle.adapter.UserCardAdapter;
 import com.nemator.needle.api.ApiClient;
 import com.nemator.needle.api.result.UsersResult;
 import com.nemator.needle.models.vo.HaystackVO;
@@ -28,7 +28,7 @@ public class HaystackUsersTabFragment extends Fragment{
     private RecyclerView listView;
 
     private HaystackVO haystack;
-    private UserListCardAdapter userListAdapter;
+    private UserCardAdapter userListAdapter;
     private GridLayoutManager layoutManager;
 
     public HaystackUsersTabFragment() {
@@ -45,7 +45,7 @@ public class HaystackUsersTabFragment extends Fragment{
         listView.setLayoutManager(layoutManager);
 
         haystack = ((HaystackActivity) getActivity()).getHaystack();
-        userListAdapter = new UserListCardAdapter(haystack.getUsers(), getActivity());
+        userListAdapter = new UserCardAdapter(haystack.getUsers(), getActivity());
         listView.setAdapter(userListAdapter);
 
         fetchAllUsers();
@@ -75,7 +75,7 @@ public class HaystackUsersTabFragment extends Fragment{
     };
 
     private void updateUserList(){
-        userListAdapter = new UserListCardAdapter(haystack.getUsers(), getActivity());
+        userListAdapter = new UserCardAdapter(haystack.getUsers(), getActivity());
         listView.setAdapter(userListAdapter);
 
         userListAdapter.notifyDataSetChanged();

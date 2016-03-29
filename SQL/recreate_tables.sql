@@ -92,5 +92,7 @@ CREATE TABLE notification
 	dataId INT, 
 	text TEXT,
 	sentAt datetime,
-	seen BOOLEAN
+	seen BOOLEAN,
+	senderId INT,
+	senderPictureURL TEXT
 );

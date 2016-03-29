@@ -17,7 +17,7 @@ import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 
-public class UserListCardAdapter extends RecyclerView.Adapter<UserListCardAdapter.UserCardViewHolder> {
+public class UserCardAdapter extends RecyclerView.Adapter<UserCardAdapter.UserCardViewHolder> {
     public static final String TAG = "UserListAdapter";
 
     private ArrayList<UserVO> listData;
@@ -26,7 +26,7 @@ public class UserListCardAdapter extends RecyclerView.Adapter<UserListCardAdapte
     private UserVO selectedItem;
     private Context mContext;
 
-    public UserListCardAdapter(ArrayList<UserVO> data, Context context) {
+    public UserCardAdapter(ArrayList<UserVO> data, Context context) {
         listData = data;
         filteredListData = data;
         mContext = context;

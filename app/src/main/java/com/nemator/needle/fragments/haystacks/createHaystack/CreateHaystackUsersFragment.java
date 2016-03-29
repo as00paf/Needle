@@ -12,7 +12,7 @@ import android.view.ViewGroup;
 
 import com.nemator.needle.Needle;
 import com.nemator.needle.R;
-import com.nemator.needle.adapter.UserListCardAdapter;
+import com.nemator.needle.adapter.UserCardAdapter;
 import com.nemator.needle.api.ApiClient;
 import com.nemator.needle.api.result.UsersResult;
 import com.nemator.needle.models.vo.UserVO;
@@ -29,7 +29,7 @@ public class CreateHaystackUsersFragment extends CreateHaystackBaseFragment impl
 
     //Children
     private RecyclerView mRecyclerView;
-    private UserListCardAdapter mAdapter;
+    private UserCardAdapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
     private SwipeRefreshLayout swipeLayout;
 
@@ -182,7 +182,7 @@ public class CreateHaystackUsersFragment extends CreateHaystackBaseFragment impl
     }
 
     private void updateUserList(){
-        mAdapter = new UserListCardAdapter(usersList, getActivity());
+        mAdapter = new UserCardAdapter(usersList, getActivity());
         mRecyclerView.setAdapter(mAdapter);
 
         mAdapter.notifyDataSetChanged();

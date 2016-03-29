@@ -3,6 +3,7 @@ package com.nemator.needle.api;
 import com.nemator.needle.api.result.HaystackResult;
 import com.nemator.needle.api.result.LocationSharingResult;
 import com.nemator.needle.api.result.LoginResult;
+import com.nemator.needle.api.result.NotificationResult;
 import com.nemator.needle.api.result.UserRegistrationResult;
 import com.nemator.needle.api.result.UserResult;
 import com.nemator.needle.api.result.UsersResult;
@@ -112,4 +113,8 @@ public interface NeedleApiClient {
 
     @HTTP(method = "DELETE", path = "locationSharing.php", hasBody = true)
     Call<LocationSharingResult> cancelLocationSharing(@Body LocationSharingVO vo);
+
+    //Notifications
+    @GET("notification.php")
+    Call<NotificationResult> fetchNotifications(@Query("userId") int userId);
 }

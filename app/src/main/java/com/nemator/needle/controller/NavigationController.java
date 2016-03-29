@@ -35,6 +35,7 @@ import com.nemator.needle.fragments.haystacks.HaystackListFragment;
 import com.nemator.needle.fragments.haystacks.OnActivityStateChangeListener;
 import com.nemator.needle.fragments.locationSharing.LocationSharingListFragment;
 import com.nemator.needle.fragments.locationSharing.createLocationSharing.CreateLocationSharingExpirationFragment;
+import com.nemator.needle.fragments.notifications.NotificationFragment;
 import com.nemator.needle.fragments.people.PeopleFragment;
 import com.nemator.needle.fragments.settings.SettingsFragment;
 import com.nemator.needle.models.vo.HaystackVO;
@@ -57,14 +58,12 @@ public class NavigationController implements HomeActivity.NavigationHandler, OnA
     private HomeActivity activity;
 
     //Fragments
-    private LoginFragment loginFragment;
-    private LoginSplashFragment splashLoginFragment;
-    private RegisterFragment registerFragment;
     private HaystackListFragment haystacksListFragment;
     private LocationSharingListFragment locationSharingListFragment;
     private SettingsFragment settingsFragment;
     private CreateLocationSharingExpirationFragment createLocationSharingExpirationFragment;
     private PeopleFragment peopleFragment;
+    private NotificationFragment notificationFragment;
 
     private Menu menu;
     private ActionBar actionBar;
@@ -135,40 +134,12 @@ public class NavigationController implements HomeActivity.NavigationHandler, OnA
 
     public void showSection(int type, Bundle bundle){
         int containerViewId = (getCurrentFragment() != null) ? getCurrentFragment().getId() : content.getId();
-        Boolean add = false;
+        Boolean add = containerViewId == 0;
         Fragment newFragment = null;
         int enterAnimation = 0;
         int exitAnimation = 0;
 
         switch(type) {
-            case AppConstants.SECTION_SPLASH_LOGIN:
-                splashLoginFragment = new LoginSplashFragment();
-                add = true;
-                newFragment = splashLoginFragment;
-                onStateChange(AppState.SPLASH_LOGIN);
-                break;
-            case AppConstants.SECTION_LOGIN:
-                if(loginFragment == null){loginFragment = new LoginFragment();}
-                newFragment = loginFragment;
-                if(previousState == -1){
-                    enterAnimation = R.anim.enter_from_bottom;
-                }else if(previousState != AppState.SPLASH_LOGIN ){
-                    enterAnimation = R.anim.enter_from_left;
-                    exitAnimation = R.anim.exit_to_right;
-                }
-                onStateChange(AppState.LOGIN);
-                break;
-            case AppConstants.SECTION_LOGIN_PICTURE:
-                enterAnimation = R.anim.enter_from_right;
-                exitAnimation = R.anim.exit_to_left;
-                break;
-            case AppConstants.SECTION_REGISTER:
-                if(registerFragment == null){registerFragment = new RegisterFragment();}
-                enterAnimation = R.anim.enter_from_right;
-                exitAnimation = R.anim.exit_to_left;
-                newFragment = registerFragment;
-                onStateChange(AppState.REGISTER);
-                break;
             case AppConstants.SECTION_HAYSTACKS:
                 if(haystacksListFragment == null){haystacksListFragment = new HaystackListFragment();}
                 newFragment = haystacksListFragment;
@@ -208,6 +179,12 @@ public class NavigationController implements HomeActivity.NavigationHandler, OnA
                 if(peopleFragment == null) peopleFragment = new PeopleFragment();
                 newFragment = peopleFragment;
                 onStateChange(AppState.SETTINGS);
+                break;
+            case AppConstants.SECTION_NOTIFICATIONS:
+                if(notificationFragment == null) notificationFragment = NotificationFragment.newInstance();
+                newFragment = notificationFragment;
+                onStateChange(AppState.NOTIFICATIONS);
+                if(actionBar != null) actionBar.setTitle(R.string.title_notifications);
                 break;
         }
 
@@ -427,13 +404,9 @@ public class NavigationController implements HomeActivity.NavigationHandler, OnA
         activity.getDrawerToggle().setHomeAsUpIndicator(R.drawable.ic_logo_24dp);
         activity.getDrawerToggle().syncState();
 
-        actionBar.hide();
+        setCurrentState(AppState.LOGIN);
 
-        showSection(AppConstants.SECTION_LOGIN);
-    }
-
-    public LoginFragment getLoginFragment() {
-        return loginFragment;
+        activity.finish();
     }
 
     public void showProgress(String message, Boolean cancelable) {
@@ -469,17 +442,13 @@ public class NavigationController implements HomeActivity.NavigationHandler, OnA
 
     public Fragment getCurrentFragment() {
         switch (getCurrentState()){
-            case AppState.SPLASH_LOGIN:
-                return splashLoginFragment;
-            case AppState.LOGIN:
-                return loginFragment;
-            case AppState.REGISTER:
-                return registerFragment;
             case AppState.PUBLIC_HAYSTACK_TAB:
             case AppState.PRIVATE_HAYSTACK_TAB:
                 return haystacksListFragment;
             case AppState.SETTINGS:
                 return settingsFragment;
+            case AppState.NOTIFICATIONS:
+                return notificationFragment;
         }
 
         return null;
@@ -496,29 +465,4 @@ public class NavigationController implements HomeActivity.NavigationHandler, OnA
     public NavigationView.OnNavigationItemSelectedListener getNavigationItemListener() {
         return navigationItemListener;
     }
-/*
-    //TODO:localize
-    @Override
-    public void onLocationSharingUpdated(LocationSharingResult result) {
-        if(result.successCode == 1){
-            if(result.vo.isSharedBack()){
-                Needle.serviceController.startLocationUpdates();
-                Needle.serviceController.getService().addPostLocationRequest(LocationServiceDBHelper.PostLocationRequest.POSTER_TYPE_LOCATION_SHARING_BACK,
-                        result.vo.getTimeLimit(), result.vo.getSenderId(),
-                        String.valueOf(result.vo.getId()));
-
-                Toast.makeText(activity, "Location shared with " + result.vo.getReceiverName(), Toast.LENGTH_SHORT).show();
-            }else{
-                Needle.serviceController.getService().removePostLocationRequest(LocationServiceDBHelper.PostLocationRequest.POSTER_TYPE_LOCATION_SHARING_BACK,
-                        result.vo.getTimeLimit(), result.vo.getSenderId(),
-                        String.valueOf(result.vo.getId()));
-
-                Toast.makeText(activity, "Location shared with " + result.vo.getReceiverName(), Toast.LENGTH_SHORT).show();
-            }
-
-        }else{
-            String msg = result.vo.isSharedBack() ? "Location still shared !" : "Could not share location !";
-            Toast.makeText(activity, msg, Toast.LENGTH_SHORT).show();
-        }
-    }*/
 }

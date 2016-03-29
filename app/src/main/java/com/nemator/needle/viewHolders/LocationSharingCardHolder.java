@@ -15,7 +15,7 @@ import android.widget.TextView;
 
 import com.nemator.needle.R;
 import com.nemator.needle.activities.LocationSharingActivity;
-import com.nemator.needle.adapter.LocationSharingListCardAdapter;
+import com.nemator.needle.adapter.LocationSharingCardAdapter;
 import com.nemator.needle.fragments.locationSharing.LocationSharingCardListener;
 import com.nemator.needle.models.vo.LocationSharingVO;
 import com.nemator.needle.utils.AppConstants;
@@ -31,17 +31,17 @@ public class LocationSharingCardHolder extends RecyclerView.ViewHolder implement
     private LocationSharingCardListener mListener;
 
     private Boolean isSent;
-    private LocationSharingListCardAdapter adapter;
+    private LocationSharingCardAdapter adapter;
 
     private Boolean shareBack = false;
 
-    public LocationSharingCardHolder(LocationSharingListCardAdapter adapter, View view, LocationSharingCardListener listener, Boolean isSent) {
+    public LocationSharingCardHolder(LocationSharingCardAdapter adapter, View view, LocationSharingCardListener listener, Boolean isSent) {
         super(view);
         mListener = listener;
         this.isSent = isSent;
         titleView =  (TextView) view.findViewById(R.id.username_label);
         active_until = (TextView)  view.findViewById(R.id.time_limit_label);
-        emptyText = (TextView) view.findViewById(R.id.emptyText);
+        emptyText = (TextView) view.findViewById(R.id.title);
         imageView = (ImageView) view.findViewById(R.id.location_sharing_card_image);
         menuButton = (ImageButton) view.findViewById(R.id.location_sharing_card_menu_button);
         shareBackIndicator = (ImageView) view.findViewById(R.id.location_sharing_share_back_indicator);
@@ -52,7 +52,7 @@ public class LocationSharingCardHolder extends RecyclerView.ViewHolder implement
         super(view);
         titleView =  (TextView) view.findViewById(R.id.username_label);
         active_until = (TextView)  view.findViewById(R.id.time_limit_label);
-        emptyText = (TextView) view.findViewById(R.id.emptyText);
+        emptyText = (TextView) view.findViewById(R.id.title);
         imageView = (ImageView) view.findViewById(R.id.location_sharing_card_image);
     }
 

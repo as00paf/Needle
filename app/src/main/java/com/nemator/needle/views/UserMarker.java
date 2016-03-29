@@ -7,7 +7,7 @@ import com.google.android.gms.maps.model.Marker;
 import com.nemator.needle.models.vo.UserVO;
 import com.nemator.needle.utils.MarkerUtils;
 
-public final class UserMarker extends MarkerTarget{
+public class UserMarker extends MarkerTarget{
 
     private UserVO user;
     private LatLng location;

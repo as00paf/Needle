@@ -8,13 +8,13 @@ import android.support.v4.app.FragmentStatePagerAdapter;
 import com.nemator.needle.R;
 import com.nemator.needle.fragments.haystacks.HaystackListTabFragment;
 
-public class HaystackListPagerAdapter extends FragmentStatePagerAdapter {
+public class HaystackPagerAdapter extends FragmentStatePagerAdapter {
     private HaystackListTabFragment publicHaystackListFragment;
     private HaystackListTabFragment privateHaystackListFragment;
 
     private Fragment fragment;
 
-    public HaystackListPagerAdapter(FragmentManager fm, Fragment frag) {
+    public HaystackPagerAdapter(FragmentManager fm, Fragment frag) {
         super(fm);
         fragment = frag;
     }

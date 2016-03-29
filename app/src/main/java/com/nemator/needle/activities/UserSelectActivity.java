@@ -13,7 +13,7 @@ import android.view.MenuItem;
 import android.widget.Toast;
 
 import com.nemator.needle.R;
-import com.nemator.needle.adapter.UserListCardAdapter;
+import com.nemator.needle.adapter.UserCardAdapter;
 import com.nemator.needle.api.ApiClient;
 import com.nemator.needle.api.result.UsersResult;
 import com.nemator.needle.models.vo.HaystackVO;
@@ -31,7 +31,7 @@ public class UserSelectActivity extends AppCompatActivity{
     private RecyclerView listView;
     private SwipeRefreshLayout swipeLayout;
 
-    private UserListCardAdapter userListAdapter;
+    private UserCardAdapter userListAdapter;
     private GridLayoutManager layoutManager;
     private HaystackVO haystack;
 
@@ -100,7 +100,7 @@ public class UserSelectActivity extends AppCompatActivity{
 
             UsersResult result = response.body();
             if(result.getSuccessCode() == 1){
-                userListAdapter = new UserListCardAdapter(result.getUsers(), UserSelectActivity.this);
+                userListAdapter = new UserCardAdapter(result.getUsers(), UserSelectActivity.this);
                 listView.setAdapter(userListAdapter);
             }else{
                 Toast.makeText(UserSelectActivity.this, getString(R.string.fetching_users_failed), Toast.LENGTH_SHORT).show();

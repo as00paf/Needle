@@ -1,9 +1,11 @@
 package com.nemator.needle.api;
 
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.Log;
 
 import com.nemator.needle.Needle;
 import com.nemator.needle.api.result.LocationSharingResult;
+import com.nemator.needle.api.result.NotificationResult;
 import com.nemator.needle.api.result.UserRegistrationResult;
 import com.nemator.needle.api.result.UserResult;
 import com.nemator.needle.api.result.UsersResult;
@@ -174,6 +176,12 @@ public class ApiClient {
     //General
     public void fetchAllUsers(int userId,  Callback<UsersResult> callBack) {
         Call<UsersResult> call = client.fetchAllUsers(String.valueOf(userId));
+        call.enqueue(callBack);
+    }
+
+    //Notifications
+    public void fetchNotifications(int userId,  Callback<NotificationResult> callBack) {
+        Call<NotificationResult> call = client.fetchNotifications(userId);
         call.enqueue(callBack);
     }
 

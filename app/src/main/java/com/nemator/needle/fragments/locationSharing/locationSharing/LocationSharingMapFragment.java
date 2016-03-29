@@ -51,7 +51,7 @@ public class LocationSharingMapFragment extends SupportMapFragment
     //Map
     private GoogleMap mMap;
     private UserMarker myMarker, otherUsersMarker;
-    private final ArrayList<UserMarker> markers = new ArrayList<>();
+    private final ArrayList<Marker> markers = new ArrayList<>();
 
     //Map data
     private LocationSharingVO locationSharing;
@@ -285,13 +285,13 @@ public class LocationSharingMapFragment extends SupportMapFragment
 
         CircleOptions circleOptions = new CircleOptions().center(position).radius(radiusInMeters).fillColor(shadeColor).strokeColor(strokeColor).strokeWidth(8);
         Circle circle = mMap.addCircle(circleOptions);
-        Marker marker = MarkerUtils.createUserMarker(getActivity(), mMap, user, position).getMarker();
+        final Marker marker = MarkerUtils.createUserMarker(getActivity(), mMap, user, position).getMarker();
 
         String label = Needle.userModel.getUserId() == user.getId() ? "Your Location" : user.getReadableUserName() + "' Location";
         marker.setTitle(label);
 
-        UserMarker userMarker = new UserMarker(user, marker, circle, position);
-        markers.add(userMarker);
+        final UserMarker userMarker = new UserMarker(user, marker, circle, position);
+        markers.add(marker);
         return userMarker;
     }
 }

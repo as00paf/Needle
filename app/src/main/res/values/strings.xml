@@ -135,6 +135,9 @@
     <!-- Location Sharing -->
     <string name="fetch_location_sharings_error">Could Not Fetch Location Sharings</string>
 
+    <!-- Notifications -->
+    <string name="no_notifications_yet">No notifications yet</string>
+
     <!-- GCM -->
     <string name="gcm_send_message">Token retrieved and sent to server! You can now use gcmsender to send downstream messages to this app.</string>
     <string name="registering_message">Generating InstanceID token...</string>

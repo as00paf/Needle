@@ -86,6 +86,7 @@ public class AuthenticationController {
 
     private ProgressDialog mProgressDialog;
 
+
     public AuthenticationController(){
 
     }
@@ -230,24 +231,30 @@ public class AuthenticationController {
         Log.d(TAG, "Google Login");
         if(Needle.googleApiController.isConnected()){
             Log.d(TAG, "Google Api is Connected");
-            Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(Needle.googleApiController.getGoogleApiClient());
+            Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(Needle.googleApiController.getGoogleApiClient());//Todo add method in api controller
             activity.startActivityForResult(signInIntent, RC_GOOGLE_SIGN_IN);
         }else{
             Log.d(TAG, "Google Api is not Connected");
             LocalBroadcastManager localBroadcastManager = LocalBroadcastManager.getInstance(activity);
-            localBroadcastManager.registerReceiver(new BroadcastReceiver() {
-                @Override
-                public void onReceive(Context context, Intent intent) {
-                    Log.d(TAG, "Google Sign In");
-                    Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(Needle.googleApiController.getGoogleApiClient());
-                    activity.startActivityForResult(signInIntent, RC_GOOGLE_SIGN_IN);
-                }
-            }, new IntentFilter(AppConstants.GOOGLE_API_CONNECTED));
+            localBroadcastManager.registerReceiver(apiReconnectReceiver, new IntentFilter(AppConstants.GOOGLE_API_CONNECTED));
 
             //TODO : check if necessary
             Needle.googleApiController.init(activity);
         }
     }
+
+    private final BroadcastReceiver apiReconnectReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Log.d(TAG, "Google Sign In");
+
+            LocalBroadcastManager localBroadcastManager = LocalBroadcastManager.getInstance(activity);
+            localBroadcastManager.unregisterReceiver(this);
+
+            Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(Needle.googleApiController.getGoogleApiClient());
+            activity.startActivityForResult(signInIntent, RC_GOOGLE_SIGN_IN);
+        }
+    };
 
     public void onGoogleActivityResult(int requestCode, int resultCode, Intent data) {
         // Result returned from launching the Intent from GoogleSignInApi.getSignInIntent(...);
@@ -442,35 +449,37 @@ public class AuthenticationController {
 
     public void twitterSignIn() {
         initTwitterSDK();
-        twitterAuthClient.authorize(activity, new com.twitter.sdk.android.core.Callback<TwitterSession>() {
-            @Override
-            public void success(Result<TwitterSession> result) {
-                Twitter.getInstance().getApiClient().getAccountService().verifyCredentials(false, false, new com.twitter.sdk.android.core.Callback<User>() {
-                    @Override
-                    public void success(Result<User> result) {
-                        Needle.userModel.getUser()
-                                .setPictureURL(result.data.profileImageUrl.replace("_normal", ""))
-                                .setCoverPictureURL(result.data.profileBannerUrl)
-                                .setSocialNetworkUserId(String.valueOf(result.data.id))
-                                .setLoginType(LOGIN_TYPE_TWITTER)
-                                .setUserName(result.data.screenName);
-
-                        login();
-                    }
-
-                    @Override
-                    public void failure(TwitterException e) {
-                        Log.d(TAG, "Twitter log in error : " + e.getMessage());
-                    }
-                });
-            }
-
-            @Override
-            public void failure(TwitterException e) {
-
-            }
-        });
+        twitterAuthClient.authorize(activity, twitterSessionCallback);
     }
+
+    private com.twitter.sdk.android.core.Callback<TwitterSession> twitterSessionCallback = new com.twitter.sdk.android.core.Callback<TwitterSession>() {
+        @Override
+        public void success(Result<TwitterSession> result) {
+            Twitter.getInstance().getApiClient().getAccountService().verifyCredentials(false, false, new com.twitter.sdk.android.core.Callback<User>() {
+                @Override
+                public void success(Result<User> result) {
+                    Needle.userModel.getUser()
+                            .setPictureURL(result.data.profileImageUrl.replace("_normal", ""))
+                            .setCoverPictureURL(result.data.profileBannerUrl)
+                            .setSocialNetworkUserId(String.valueOf(result.data.id))
+                            .setLoginType(LOGIN_TYPE_TWITTER)
+                            .setUserName(result.data.screenName);
+
+                    login();
+                }
+
+                @Override
+                public void failure(TwitterException e) {
+                    Log.d(TAG, "Twitter log in error : " + e.getMessage());
+                }
+            });
+        }
+
+        @Override
+        public void failure(TwitterException e) {
+            Log.d(TAG, "Twitter log in error : " + e.getMessage());
+        }
+    };
 
     public void onTwitterActivityResult(int requestCode, int responseCode, Intent intent){
         if(twitterAuthClient != null){

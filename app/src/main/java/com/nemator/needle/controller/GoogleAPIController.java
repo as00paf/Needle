@@ -71,6 +71,7 @@ public class GoogleAPIController implements GoogleApiClient.ConnectionCallbacks,
     }
 
     public void init(AppCompatActivity activity) {
+        disconnect();
         this.activity = activity;
 
         connect();
@@ -89,7 +90,6 @@ public class GoogleAPIController implements GoogleApiClient.ConnectionCallbacks,
     public void disconnect() {
         Log.w(TAG, "disconnect()");
         if (mGoogleApiClient != null && mGoogleApiClient.isConnected()) {
-            stopAutoManage();
             mGoogleApiClient.disconnect();
         }
 
@@ -100,7 +100,10 @@ public class GoogleAPIController implements GoogleApiClient.ConnectionCallbacks,
     public void stopAutoManage() {
         Log.w(TAG, "stopAutoManage()");
         if (mGoogleApiClient != null) {
-            mGoogleApiClient.stopAutoManage(activity);
+            if(activity != null){
+                mGoogleApiClient.stopAutoManage(activity);
+            }
+            disconnect();
         }
     }
 

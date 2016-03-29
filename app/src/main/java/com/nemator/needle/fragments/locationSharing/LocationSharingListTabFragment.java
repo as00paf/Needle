@@ -14,7 +14,7 @@ import android.widget.Toast;
 
 import com.nemator.needle.Needle;
 import com.nemator.needle.R;
-import com.nemator.needle.adapter.LocationSharingListCardAdapter;
+import com.nemator.needle.adapter.LocationSharingCardAdapter;
 import com.nemator.needle.api.ApiClient;
 import com.nemator.needle.api.result.LocationSharingResult;
 import com.nemator.needle.fragments.haystacks.OnActivityStateChangeListener;
@@ -40,7 +40,7 @@ public class LocationSharingListTabFragment extends Fragment implements Location
     private Boolean isReceived;
 
     //Objects
-    private LocationSharingListCardAdapter listAdapter;
+    private LocationSharingCardAdapter listAdapter;
     private GridLayoutManager layoutManager;
     private OnActivityStateChangeListener stateChangeCallback;
 
@@ -83,7 +83,7 @@ public class LocationSharingListTabFragment extends Fragment implements Location
         });
         mRecyclerView.setLayoutManager(layoutManager);
 
-        listAdapter = new LocationSharingListCardAdapter(dataList, getActivity(), !isReceived, this);
+        listAdapter = new LocationSharingCardAdapter(dataList, getActivity(), !isReceived, this);
         mRecyclerView.setAdapter(listAdapter);
 
 
@@ -117,7 +117,7 @@ public class LocationSharingListTabFragment extends Fragment implements Location
 
     public void updateLocationSharingList(ArrayList<LocationSharingVO> data){
         this.dataList = data;
-        listAdapter = new LocationSharingListCardAdapter(dataList, getActivity(), !isReceived, this);
+        listAdapter = new LocationSharingCardAdapter(dataList, getActivity(), !isReceived, this);
 
         if(mRecyclerView != null){
             mRecyclerView.setAdapter(listAdapter);

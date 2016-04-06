@@ -53,7 +53,7 @@ if (!empty($_POST)) {
 	<h1>Retrieve All Users</h1> 
 	<form action="retrieveAllUsers.php" method="post"> 
 	    Haystack Id:<br /> 
-	    <input type="text" name="haystackId" value="" /> 
+	    <input type="description" name="haystackId" value="" />
 	    <br /><br /> 
 	    <input type="submit" value="Register New User" /> 
 	</form>

@@ -11,6 +11,7 @@ import com.nemator.needle.fragments.haystacks.HaystackListTabFragment;
 public class HaystackPagerAdapter extends FragmentStatePagerAdapter {
     private HaystackListTabFragment publicHaystackListFragment;
     private HaystackListTabFragment privateHaystackListFragment;
+    private HaystackListTabFragment ownedHaystackListFragment;
 
     private Fragment fragment;
 
@@ -24,13 +25,19 @@ public class HaystackPagerAdapter extends FragmentStatePagerAdapter {
         HaystackListTabFragment fragment  = new HaystackListTabFragment();
 
         Bundle args = new Bundle();
-        Boolean isPublic = (position == 0);
-        if(isPublic){
-            publicHaystackListFragment = fragment;
-        }else{
-            privateHaystackListFragment = fragment;
+        switch(position){
+            case 0:
+                publicHaystackListFragment = fragment;
+                break;
+            case 1:
+                privateHaystackListFragment = fragment;
+                break;
+            case 2:
+                ownedHaystackListFragment = fragment;
+                break;
         }
-        args.putBoolean("isPublic", isPublic);
+
+        args.putInt("type", position);
         fragment.setArguments(args);
 
         return fragment;
@@ -46,7 +53,7 @@ public class HaystackPagerAdapter extends FragmentStatePagerAdapter {
 
     @Override
     public int getCount() {
-        return 2;
+        return 3;
     }
 
     @Override
@@ -59,11 +66,18 @@ public class HaystackPagerAdapter extends FragmentStatePagerAdapter {
             case 1:
                 title = fragment.getString(R.string.privateHeader);
                 break;
+            case 2:
+                title = fragment.getString(R.string.ownedHeader);
+                break;
             default:
                 title = "tab " + String.valueOf(position);
                 break;
         }
 
         return title;
+    }
+
+    public HaystackListTabFragment getOwnedHaystackListFragment() {
+        return ownedHaystackListFragment;
     }
 }

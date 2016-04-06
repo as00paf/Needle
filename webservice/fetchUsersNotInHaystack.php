@@ -60,7 +60,7 @@ if (!empty($_POST)) {
 		<h1>Fetch Users Not In Haystack</h1> 
 		<form action="fetchUsersNotInHaystack.php" method="post"> 
 		    HaystackId:<br /> 
-		    <input type="text" name="haystackId" placeholder="" /> 
+		    <input type="description" name="haystackId" placeholder="" />
 		    <br />
 			
 		    <input type="submit" value="Fetch Active Users" /> 

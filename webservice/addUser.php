@@ -66,12 +66,12 @@ if (!empty($_POST)) {
 		<h1>Add User</h1> 
 		<form action="addUser.php" method="post"> 
 		    UserId:<br /> 
-		    <input type="text" name="id" placeholder="" />
+		    <input type="description" name="id" placeholder="" />
 			
 		    <br /><br /> 
 			
 		    HaystackId:<br /> 
-		    <input type="text" name="haystackId" placeholder="" /> 
+		    <input type="description" name="haystackId" placeholder="" />
 		    <br />
 			
 		    <input type="submit" value="Add User" /> 

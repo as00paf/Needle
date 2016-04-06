@@ -62,7 +62,7 @@ if (!empty($_POST)) {
 		<h1>Retrieve Locations</h1> 
 		<form action="retrieveLocations.php" method="post"> 
 		    Haystack Id:<br /> 
-		    <input type="text" name="haystackId" placeholder="0" /> 
+		    <input type="description" name="haystackId" placeholder="0" />
 		    <br /><br />
 			
 		    <input type="submit" value="Retrieve Locations" /> 

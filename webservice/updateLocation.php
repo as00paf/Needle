@@ -80,13 +80,13 @@ if (!empty($_POST)) {
 		<h1>Update Location</h1> 
 		<form action="updateLocation.php" method="post"> 
 		    User Id:<br /> 
-		    <input type="text" name="id" placeholder="" />
+		    <input type="description" name="id" placeholder="" />
 		    <br /><br /> 
 		    Lattitude:<br /> 
-		    <input type="text" name="lat" placeholder="" /> 
+		    <input type="description" name="lat" placeholder="" />
 		    <br /><br />
 			Longitude:<br /> 
-		    <input type="text" name="lng" placeholder="" /> 
+		    <input type="description" name="lng" placeholder="" />
 		    <br /><br />
 		    <input type="submit" value="Update Location" /> 
 		</form> 

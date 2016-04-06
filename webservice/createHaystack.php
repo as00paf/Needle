@@ -108,31 +108,31 @@ if (!empty($_POST)) {
 	<h1>Create Haystack</h1> 
 	<form action="createHaystack.php" method="post"> 
 		    Name:<br /> 
-		    <input type="text" name="name" placeholder="" /> 
+		    <input type="description" name="name" placeholder="" />
 		    <br /><br /> 
 			
 		    Time Limit:<br /> 
-		    <input type="text" name="timeLimit" placeholder="" /> 
+		    <input type="description" name="timeLimit" placeholder="" />
 		    <br /><br /> 
 			
 			Owner :<br /> 
-		    <input type="text" name="owner" placeholder="" /> 
+		    <input type="description" name="owner" placeholder="" />
 		    <br /><br /> 
 			
 			Zone :<br /> 
-		    <input type="text" name="zone" placeholder="" /> 
+		    <input type="description" name="zone" placeholder="" />
 		    <br /><br /> 
 			
 			Picture URL :<br /> 
-		    <input type="text" name="picture" placeholder="" />
+		    <input type="description" name="picture" placeholder="" />
 		    <br /><br />
 
 			Haystack Users :<br /> 
-		    <input type="text" name="haystack_user" placeholder="" /> 
+		    <input type="description" name="haystack_user" placeholder="" />
 		    <br /><br /> 
 			
 			Haystack Active Users :<br /> 
-		    <input type="text" name="haystack_active_user" placeholder="" /> 
+		    <input type="description" name="haystack_active_user" placeholder="" />
 		    <br /><br /> 
 			
 		    <input type="submit" value="Create Haystack" /> 

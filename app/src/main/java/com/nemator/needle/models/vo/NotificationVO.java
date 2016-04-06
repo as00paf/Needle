@@ -21,8 +21,11 @@ public class NotificationVO implements Serializable, Parcelable {
     @SerializedName("dataId")
     private int dataId;
 
-    @SerializedName("text")
-    private String text;
+    @SerializedName("title")
+    private String title;
+
+    @SerializedName("description")
+    private String description;
 
     @SerializedName("sentAt")
     private String sentAt;
@@ -40,12 +43,13 @@ public class NotificationVO implements Serializable, Parcelable {
 
     }
 
-    public NotificationVO(int id, int type, int userId, int dataId, String text, String sentAt, Boolean seen, int senderId, String senderPictureURL ){
+    public NotificationVO(int id, int type, int userId, int dataId, String title, String description, String sentAt, Boolean seen, int senderId, String senderPictureURL){
         this.id = id;
         this.type = type;
         this.userId = userId;
         this.dataId = dataId;
-        this.text = text;
+        this.title = title;
+        this.description = description;
         this.sentAt = sentAt;
         this.seen = seen;
         this.senderId = senderId;
@@ -62,7 +66,8 @@ public class NotificationVO implements Serializable, Parcelable {
         this.type = in.readInt();
         this.userId = in.readInt();
         this.dataId = in.readInt();
-        this.text = in.readString();
+        this.title = in.readString();
+        this.description = in.readString();
         this.sentAt = in.readString();
         this.seen = (Boolean) in.readValue(Boolean.class.getClassLoader());
         this.senderId = in.readInt();
@@ -75,7 +80,8 @@ public class NotificationVO implements Serializable, Parcelable {
         parcel.writeInt(type);
         parcel.writeInt(userId);
         parcel.writeInt(dataId);
-        parcel.writeString(text);
+        parcel.writeString(title);
+        parcel.writeString(description);
         parcel.writeString(sentAt);
         parcel.writeValue(seen);
         parcel.writeInt(senderId);
@@ -128,12 +134,12 @@ public class NotificationVO implements Serializable, Parcelable {
         this.dataId = dataId;
     }
 
-    public String getText() {
-        return text;
+    public String getDescription() {
+        return description;
     }
 
-    public void setText(String text) {
-        this.text = text;
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     public String getSentAt() {
@@ -166,5 +172,13 @@ public class NotificationVO implements Serializable, Parcelable {
 
     public void setSenderPictureURL(String senderPictureURL) {
         this.senderPictureURL = senderPictureURL;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
     }
 }

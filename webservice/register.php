@@ -60,7 +60,7 @@ if (!empty($_POST)) {
 	<h1>Register</h1> 
 	<form action="register.php" method="post"> 
 	    Username:<br /> 
-	    <input type="text" name="username" value="" /> 
+	    <input type="description" name="username" value="" />
 	    <br /><br /> 
 	    Password:<br /> 
 	    <input type="password" name="password" value="" /> 

@@ -47,6 +47,7 @@
     <!-- Haystack List Fragment -->
     <string name="publicHeader">Public Haystacks</string>
     <string name="privateHeader">Private Haystacks</string>
+    <string name="ownedHeader">My Haystacks</string>
     <string name="noHaystackAvailable">No Haystacks Available</string>
     <string name="activeUntil">Active Until</string>
     <string name="activeUsers"> Active Users</string>

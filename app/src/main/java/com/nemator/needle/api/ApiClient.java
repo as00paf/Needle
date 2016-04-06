@@ -12,6 +12,7 @@ import com.nemator.needle.api.result.UsersResult;
 import com.nemator.needle.models.vo.HaystackUserVO;
 import com.nemator.needle.models.vo.HaystackVO;
 import com.nemator.needle.models.vo.LocationSharingVO;
+import com.nemator.needle.models.vo.NotificationVO;
 import com.nemator.needle.models.vo.UserVO;
 import com.nemator.needle.api.result.TaskResult;
 import com.nemator.needle.api.result.HaystackResult;
@@ -19,6 +20,8 @@ import com.nemator.needle.api.result.LoginResult;
 import com.nemator.needle.utils.AppConstants;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Iterator;
 
 import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
@@ -76,8 +79,8 @@ public class ApiClient {
         call.enqueue(callBack);
     }
 
-    public void login(int loginType, String email, String username, String gcmRegId, String password, String socialNetworkUserId, Callback<LoginResult> callBack){
-        Call<LoginResult> call = client.logIn(loginType, email, username, gcmRegId, password, socialNetworkUserId);
+    public void login(UserVO user, Callback<LoginResult> callBack){
+        Call<LoginResult> call = client.logIn(user);
         call.enqueue(callBack);
     }
 
@@ -93,9 +96,7 @@ public class ApiClient {
     }
 
     public void createHaystack(HaystackVO vo,  Callback<HaystackResult> callBack){
-        Call<HaystackResult> call = client.createHaystack(vo.getName(),
-                vo.getOwner(), vo.getIsPublic(), vo.getZoneRadius(), vo.getIsCircle(), vo.getPosition().getLongitude(),
-                vo.getPosition().getLatitude(), vo.getPictureURL(), vo.getTimeLimit(), vo.getUserIds());
+        Call<HaystackResult> call = client.createHaystack(vo);
         call.enqueue(callBack);
     }
 
@@ -175,13 +176,18 @@ public class ApiClient {
 
     //General
     public void fetchAllUsers(int userId,  Callback<UsersResult> callBack) {
-        Call<UsersResult> call = client.fetchAllUsers(String.valueOf(userId));
+        Call<UsersResult> call = client.fetchAllUsers(userId);
         call.enqueue(callBack);
     }
 
     //Notifications
-    public void fetchNotifications(int userId,  Callback<NotificationResult> callBack) {
+    public void fetchNotifications(int userId, Callback<NotificationResult> callBack) {
         Call<NotificationResult> call = client.fetchNotifications(userId);
+        call.enqueue(callBack);
+    }
+
+    public void seenNotifications(ArrayList<NotificationVO> notifications, Callback<NotificationResult> callBack) {
+        Call<NotificationResult> call = client.seenNotifications(notifications);
         call.enqueue(callBack);
     }
 

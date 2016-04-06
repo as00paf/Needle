@@ -12,6 +12,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import com.google.android.gms.common.api.Api;
 import com.nemator.needle.Needle;
 import com.nemator.needle.R;
 import com.nemator.needle.adapter.NotificationCardAdapter;
@@ -21,6 +22,7 @@ import com.nemator.needle.models.vo.NotificationVO;
 import com.nemator.needle.viewHolders.NotificationCardHolder;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -128,6 +130,34 @@ public class NotificationFragment  extends Fragment {
         if(mRecyclerView != null){
             mRecyclerView.setAdapter(mAdapter);
             mAdapter.notifyDataSetChanged();
+        }
+
+        Iterator<NotificationVO> notifications = data.iterator();
+        ArrayList<NotificationVO> unseenNotifications = new ArrayList<NotificationVO>();
+        while(notifications.hasNext()){
+            NotificationVO notif = notifications.next();
+            if(!notif.getSeen()){
+                unseenNotifications.add(notif);
+            }
+        }
+
+        if(unseenNotifications.size() > 0){
+            ApiClient.getInstance().seenNotifications(unseenNotifications, new Callback<NotificationResult>() {
+                @Override
+                public void onResponse(Call<NotificationResult> call, Response<NotificationResult> response) {
+                    NotificationResult result = response.body();
+                    if(result.getSuccessCode() == 1){
+                        Log.d(TAG, "Notifications successfuly updated");
+                    }else{
+                        Log.d(TAG, "Notifications failed to update. Error : " + result.getMessage());
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<NotificationResult> call, Throwable t) {
+                    Log.d(TAG, "Notifications failed to update. Error : " + t.getMessage());
+                }
+            });
         }
     }
 }

@@ -162,17 +162,6 @@ public class HaystackVO implements Serializable, Parcelable {
         return users;
     }
 
-    public ArrayList<Integer> getUserIds() {
-        ArrayList<Integer> result = new ArrayList<Integer>();
-
-        Iterator<UserVO> iterator = users.iterator();
-        while(iterator.hasNext()){
-            result.add(iterator.next().getId());
-        }
-
-        return result;
-    }
-
     public void setUsers(ArrayList<UserVO> value) {
         this.users = value;
     }

@@ -54,7 +54,7 @@ if (!empty($_POST)) {
 		<h1>Login</h1> 
 		<form action="login.php" method="post"> 
 		    Username:<br /> 
-		    <input type="text" name="username" placeholder="username" /> 
+		    <input type="description" name="username" placeholder="username" />
 		    <br /><br /> 
 		    Password:<br /> 
 		    <input type="password" name="password" placeholder="password" value="" /> 

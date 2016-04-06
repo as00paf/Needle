@@ -43,7 +43,7 @@ public class NotificationCardHolder extends RecyclerView.ViewHolder {
             }
         });
 
-        titleView.setText(notification.getText());
+        titleView.setText(notification.getDescription());
         sentAt.setText(notification.getSentAt());
 
         Picasso.with(imageView.getContext()).cancelRequest(imageView);

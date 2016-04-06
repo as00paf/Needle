@@ -1,26 +1,19 @@
 package com.nemator.needle.fragments.settings;
 
 
-import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.PreferenceCategory;
+import android.support.v4.preference.PreferenceFragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.support.v4.preference.PreferenceFragment;
 import android.widget.Button;
 import android.widget.FrameLayout;
 
-import com.google.android.gms.common.SignInButton;
-import com.google.android.gms.common.api.ResultCallback;
-import com.google.android.gms.common.api.Status;
 import com.nemator.needle.Needle;
 import com.nemator.needle.R;
-import com.nemator.needle.activities.HomeActivity;
 import com.nemator.needle.controller.AuthenticationController;
-import com.nemator.needle.controller.GoogleAPIController;
 
 public class SettingsFragment extends PreferenceFragment {
 

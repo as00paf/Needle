@@ -114,6 +114,10 @@ public class CreateLocationSharingUsersFragment extends CreateHaystackBaseFragme
     }
 
     public UserVO getSelectedUser(){
-        return mAdapter.getSelectedItems().get(0);
+        if(mAdapter.getSelectedItems() != null){
+            return mAdapter.getSelectedItems().get(0);
+        }
+
+        return null;
     }
 }

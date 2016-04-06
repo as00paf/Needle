@@ -60,12 +60,12 @@ if (!empty($_POST)) {
 		<h1>Fetch Active Users</h1> 
 		<form action="fetchHaystackActiveUsers.php" method="post"> 
 		    UserId:<br /> 
-		    <input type="text" name="id" placeholder="" />
+		    <input type="description" name="id" placeholder="" />
 			
 		    <br /><br /> 
 			
 		    HaystackId:<br /> 
-		    <input type="text" name="haystackId" placeholder="" /> 
+		    <input type="description" name="haystackId" placeholder="" />
 		    <br />
 			
 		    <input type="submit" value="Fetch Active Users" /> 

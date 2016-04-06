@@ -86,7 +86,7 @@ public class NotificationCardAdapter extends RecyclerView.Adapter<NotificationCa
 
     @Override
     public int getItemViewType(int position) {
-        if(getItem(position) instanceof HaystackVO){
+        if(getItem(position) instanceof NotificationVO){
             return TYPE_ITEM;
         }else{
             return TYPE_EMPTY;

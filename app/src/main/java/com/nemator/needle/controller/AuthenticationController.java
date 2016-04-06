@@ -223,8 +223,7 @@ public class AuthenticationController {
         Log.d(TAG, "Needle Application Login");
         UserVO user = Needle.userModel.getUser();
         ApiClient.getInstance()
-                .login(user.getLoginType(), user.getEmail(), user.getUserName(), user.getGcmRegId(),
-                        user.getPassword(), user.getSocialNetworkUserId(), loginCallback);
+                .login(user, loginCallback);
     }
 
     public void googleSignIn() {

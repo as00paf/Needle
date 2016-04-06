@@ -141,7 +141,7 @@ public class NavigationController implements HomeActivity.NavigationHandler, OnA
 
         switch(type) {
             case AppConstants.SECTION_HAYSTACKS:
-                if(haystacksListFragment == null){haystacksListFragment = new HaystackListFragment();}
+                if(haystacksListFragment == null){haystacksListFragment = HaystackListFragment.newInstance();}
                 newFragment = haystacksListFragment;
 
                 if(actionBar != null) actionBar.setTitle(R.string.title_haystacks);

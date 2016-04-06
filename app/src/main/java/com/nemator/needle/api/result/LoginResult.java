@@ -12,14 +12,18 @@ public class LoginResult extends AuthenticationResult implements Serializable{
     @SerializedName("locationSharingCount")
     private int locationSharingCount = 0;
 
+    @SerializedName("notificationCount")
+    private int notificationCount = 0;
+
     @SerializedName("type")
     private int type = 0;
 
-    public LoginResult(int successCode, String message, UserVO user, int haystackCount, int locationSharingCount){
+    public LoginResult(int successCode, String message, UserVO user, int haystackCount, int locationSharingCount, int notificationCount){
         super(successCode, message, user);
 
         this.haystackCount = haystackCount;
         this.locationSharingCount = locationSharingCount;
+        this.notificationCount = notificationCount;
     }
 
     public LoginResult(){
@@ -48,5 +52,13 @@ public class LoginResult extends AuthenticationResult implements Serializable{
 
     public void setType(int type) {
         this.type = type;
+    }
+
+    public int getNotificationCount() {
+        return notificationCount;
+    }
+
+    public void setNotificationCount(int notificationCount) {
+        this.notificationCount = notificationCount;
     }
 }

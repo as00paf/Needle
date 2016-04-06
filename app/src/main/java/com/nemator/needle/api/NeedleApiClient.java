@@ -10,9 +10,12 @@ import com.nemator.needle.api.result.UsersResult;
 import com.nemator.needle.models.vo.HaystackUserVO;
 import com.nemator.needle.models.vo.HaystackVO;
 import com.nemator.needle.models.vo.LocationSharingVO;
+import com.nemator.needle.models.vo.NotificationVO;
 import com.nemator.needle.models.vo.UserVO;
 import com.nemator.needle.api.result.TaskResult;
 
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import retrofit2.Call;
@@ -37,7 +40,10 @@ public interface NeedleApiClient {
                               @Field("coverPictureURL") String coverPictureURL, @Field("socialNetworkUserId") String socialNetworkUserId);
 
     @GET("user.php")
-    Call<UserVO> getUser(@Path("userId") int userId);
+    Call<UserVO> getUser(@Path("id") int userId);
+
+    @GET("user.php")
+    Call<UsersResult> fetchAllUsers(@Query("except") int userId);
 
     @FormUrlEncoded
     @PUT("user.php")
@@ -46,14 +52,7 @@ public interface NeedleApiClient {
     //Authentication
     @FormUrlEncoded
     @POST("login.php")
-    Call<LoginResult> logIn(@Field("type") int loginType, @Field("email") String email, @Field("username") String username,
-                                @Field("regId") String gcmRegId, @Field("password") String password, @Field("socialNetworkUserId") String socialNetworkUserId);
-
-    @FormUrlEncoded
-    @POST("login.php")
-    Call<LoginResult> socialLogIn(@Field("loginType") int loginType, @Field("email") String email,
-                                      @Field("gcmRegId") String gcmRegId, @Field("socialNetworkUserId")
-                                      String socialNetworkUserId);
+    Call<LoginResult> logIn(@Body UserVO user);
 
     @GET("logout.php")
     Call<TaskResult> logOut();
@@ -62,18 +61,8 @@ public interface NeedleApiClient {
     @GET("haystack.php")
     Call<HaystackResult> getHaystacks(@Query("userId") int userId);
 
-    @FormUrlEncoded
     @POST("haystack.php")
-    Call<HaystackResult> createHaystack(@Field("name") String name, @Field("owner") int owner,
-                              @Field("isPublic") Boolean isPublic ,@Field("zoneRadius") int zoneRadius,
-                              @Field("isCircle") Boolean isCircle,  @Field("lat") double lat,
-                              @Field("lng") double lng, @Field("pictureURL")  String pictureURL,
-                              @Field("timeLimit") String timeLimit, @Field("haystack_user[]") List<Integer> haystackUsers);
-
-    //Users
-    //TODO : replace by better use of user.php
-    @GET("retrieveAllUsers.php")
-    Call<UsersResult> fetchAllUsers(@Query("userId") String userId);
+    Call<HaystackResult> createHaystack(@Body HaystackVO haystack);
 
     //Location
     @PUT("location.php")
@@ -117,4 +106,7 @@ public interface NeedleApiClient {
     //Notifications
     @GET("notification.php")
     Call<NotificationResult> fetchNotifications(@Query("userId") int userId);
+
+    @PUT("notification.php")
+    Call<NotificationResult> seenNotifications(@Body ArrayList<NotificationVO> notifications);
 }

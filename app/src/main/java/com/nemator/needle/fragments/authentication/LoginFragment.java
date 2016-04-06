@@ -21,6 +21,7 @@ import android.widget.Toast;
 
 import com.nemator.needle.Needle;
 import com.nemator.needle.R;
+import com.nemator.needle.activities.AuthenticationActivity;
 import com.nemator.needle.controller.AuthenticationController;
 import com.nemator.needle.utils.AppConstants;
 
@@ -136,7 +137,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
                 Needle.authenticationController.facebookLogin(this);
                 break;
             case R.id.fab_register:
-                Needle.navigationController.showSection(AppConstants.SECTION_REGISTER);
+                ((AuthenticationActivity) getActivity()).goToRegister();
                 break;
             default:
                 break;

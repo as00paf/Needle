@@ -195,6 +195,7 @@ public class HomeActivity extends AppCompatActivity {
             if(result != null){
                 setHaystacksCount(result.getHaystackCount());
                 setLocationSharingCount(result.getLocationSharingCount());
+                setNotificationsCount(result.getNotificationCount());
                 //TODO : notification count
             }
         }
@@ -279,7 +280,7 @@ public class HomeActivity extends AppCompatActivity {
         return Needle.navigationController.onOptionsItemSelected(item);
     }
 
-    @Override
+    /*@Override
     public void onBackPressed() {
         int state = Needle.navigationController.getCurrentState();
         if(state != AppState.LOGIN && state != AppState.SPLASH_LOGIN ){
@@ -287,7 +288,7 @@ public class HomeActivity extends AppCompatActivity {
         }else{
             super.onBackPressed();
         }
-    }
+    }*/
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {

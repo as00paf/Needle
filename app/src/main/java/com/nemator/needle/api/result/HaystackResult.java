@@ -19,15 +19,19 @@ public class HaystackResult extends TaskResult {
     @SerializedName("private_haystacks")
     private ArrayList<HaystackVO> privateHaystacks = null;
 
+    @SerializedName("owned_haystacks")
+    private ArrayList<HaystackVO> ownedHaystacks = null;
+
     public HaystackResult() {
     }
 
-    public HaystackResult(int successCode, String message, HaystackVO haystack, ArrayList<Object> haystacks, ArrayList<HaystackVO> publicHaystacks, ArrayList<HaystackVO> privateHaystacks) {
+    public HaystackResult(int successCode, String message, HaystackVO haystack, ArrayList<Object> haystacks, ArrayList<HaystackVO> publicHaystacks, ArrayList<HaystackVO> privateHaystacks, ArrayList<HaystackVO> ownedHaystacks) {
         super(successCode, message);
         this.haystack = haystack;
         this.haystacks = haystacks;
         this.publicHaystacks = publicHaystacks;
         this.privateHaystacks = privateHaystacks;
+        this.ownedHaystacks = ownedHaystacks;
     }
 
     public HaystackVO getHaystack() {
@@ -60,5 +64,13 @@ public class HaystackResult extends TaskResult {
 
     public void setPrivateHaystacks(ArrayList<HaystackVO> privateHaystacks) {
         this.privateHaystacks = privateHaystacks;
+    }
+
+    public ArrayList<HaystackVO> getOwnedHaystacks() {
+        return ownedHaystacks;
+    }
+
+    public void setOwnedHaystacks(ArrayList<HaystackVO> ownedHaystacks) {
+        this.ownedHaystacks = ownedHaystacks;
     }
 }

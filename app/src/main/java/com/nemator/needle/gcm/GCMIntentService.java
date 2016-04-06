@@ -8,17 +8,15 @@ import android.content.Intent;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.support.v4.app.NotificationCompat;
 
 import com.google.gson.Gson;
 import com.nemator.needle.activities.HomeActivity;
 import com.nemator.needle.Needle;
 import com.nemator.needle.R;
-import com.nemator.needle.models.vo.LocationSharingVO;
+import com.nemator.needle.models.vo.NotificationVO;
 import com.nemator.needle.utils.AppConstants;
 
-import java.io.Serializable;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class GCMIntentService extends IntentService {
@@ -39,10 +37,9 @@ public class GCMIntentService extends IntentService {
         if (!extras.isEmpty()) {
 
             // read extras as sent from server
-            String message = extras.getString("message");
-            String type = extras.getString("notificationType");
-            if(message != null && !message.isEmpty()){
-                sendNotification( message, type, extras);
+            String notification = extras.getString("notification");
+            if(notification != null && !notification.isEmpty()){
+                sendNotification(extras);
             }else{
                 String registrationId = extras.getString("registration_id");
 
@@ -63,18 +60,21 @@ public class GCMIntentService extends IntentService {
         GCMBroadcastReceiver.completeWakefulIntent(intent);
     }
 
-    private void sendNotification(String msg, String type, Bundle data) {
+    private void sendNotification(Bundle data) {
         mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
-        Intent intent = createIntent(type, data);
+        Gson gson = new Gson();
+        NotificationVO notification = gson.fromJson(data.getString("notification"), NotificationVO.class);
+
+        Intent intent = createIntent(notification);
         PendingIntent contentIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
         Uri defaultSoundUri= RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
         NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(
                 this).setSmallIcon(R.drawable.ic_app_white)
                 .setContentTitle(getResources().getString(R.string.app_name))
-                .setStyle(new NotificationCompat.BigTextStyle().bigText(msg))
-                .setContentText(msg)
+                .setStyle(new NotificationCompat.BigTextStyle().bigText(notification.getTitle()))
+                .setContentText(notification.getDescription())
                 .setColor(getResources().getColor(R.color.primary))
                 .setLights(getResources().getColor(R.color.primary), 1500, 2000)
                 .setDefaults(NotificationCompat.DEFAULT_VIBRATE)
@@ -86,21 +86,16 @@ public class GCMIntentService extends IntentService {
         mNotificationManager.notify(id, mBuilder.build());
     }
 
-    private Intent createIntent(String notificationType, Bundle data){
+    private Intent createIntent(NotificationVO notification){
         Intent intent = new Intent(this, HomeActivity.class);
-        intent.putExtra(AppConstants.TAG_TYPE, notificationType);
+        intent.putExtra(AppConstants.TAG_TYPE, notification.getType());
         intent.putExtra(AppConstants.TAG_ACTION, "Notification");
-        intent.putExtra(AppConstants.TAG_ID, data.getString("id"));
+        intent.putExtra(AppConstants.TAG_ID, notification.getDataId());
 
-        if(notificationType.equals("LocationSharing")){
-            Gson gson = new Gson();
-            LocationSharingVO vo = gson.fromJson(data.getString("locationSharing"), LocationSharingVO.class);
-
-            intent.putExtra(AppConstants.LOCATION_SHARING_DATA_KEY, (Serializable) vo );
-        }else if(notificationType.equals("Haystack")){
-            intent.putExtra(AppConstants.HAYSTACK_DATA_KEY, data.getParcelable("haystack"));
-        }else{
-
+        if(notification.getType() == 0){
+            //intent.putExtra(AppConstants.LOCATION_SHARING_DATA_KEY, (Serializable) vo );
+        }else if(notification.getType() == 1){
+            //intent.putExtra(AppConstants.HAYSTACK_DATA_KEY, data.getParcelable("haystack"));
         }
 
         intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);

@@ -86,7 +86,6 @@ public class LocationSharingListTabFragment extends Fragment implements Location
         listAdapter = new LocationSharingCardAdapter(dataList, getActivity(), !isReceived, this);
         mRecyclerView.setAdapter(listAdapter);
 
-
         //Swipe To Refresh
         swipeLayout = (SwipeRefreshLayout) rootView.findViewById(R.id.swipe_container);
         swipeLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {

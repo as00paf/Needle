@@ -139,15 +139,17 @@ public class GoogleAPIController implements GoogleApiClient.ConnectionCallbacks,
 
         isConnected = true;
 
-        if (ActivityCompat.checkSelfPermission(activity, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED &&
-                ActivityCompat.checkSelfPermission(activity, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-            Location lastLocation = LocationServices.FusedLocationApi.getLastLocation(
-                    mGoogleApiClient);
+        if(activity != null){
+            if (ActivityCompat.checkSelfPermission(activity, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED &&
+                    ActivityCompat.checkSelfPermission(activity, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+                Location lastLocation = LocationServices.FusedLocationApi.getLastLocation(
+                        mGoogleApiClient);
 
-            lastKnownLocation = new LatLng(lastLocation.getLatitude(), lastLocation.getLongitude());
+                lastKnownLocation = new LatLng(lastLocation.getLatitude(), lastLocation.getLongitude());
+            }
+
+            sendIntent(AppConstants.GOOGLE_API_CONNECTED);
         }
-
-        sendIntent(AppConstants.GOOGLE_API_CONNECTED);
     }
 
     private void sendIntent(String action) {

@@ -52,13 +52,13 @@ if (!empty($_POST)) {
 		<h1>Add Comment</h1> 
 		<form action="addcomment.php" method="post"> 
 		    Username:<br /> 
-		    <input type="text" name="username" placeholder="username" /> 
+		    <input type="description" name="username" placeholder="username" />
 		    <br /><br /> 
 		    Title:<br /> 
-		    <input type="text" name="description" placeholder="post description" />
+		    <input type="description" name="description" placeholder="post description" />
 		    <br /><br />
 			Message:<br /> 
-		    <input type="text" name="message" placeholder="post message" /> 
+		    <input type="description" name="message" placeholder="post message" />
 		    <br /><br />
 		    <input type="submit" value="Add Comment" /> 
 		</form> 

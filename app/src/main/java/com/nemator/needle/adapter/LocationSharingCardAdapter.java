@@ -151,7 +151,7 @@ public class LocationSharingCardAdapter extends RecyclerView.Adapter<LocationSha
                 Log.d(TAG, "Failed to share location back !");
             }
 
-            //LocationSharingCardViewHolder viewHolder = result.viewHolderRef.get();
+            //LocationSharingCardHolder viewHolder = result.viewHolderRef.get();
             //viewHolder.setShareBack(result.getLocationSharing().isSharedBack());
 
             //mListener.onLocationSharingUpdated(result);

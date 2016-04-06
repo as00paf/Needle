@@ -66,8 +66,21 @@ public class AuthenticationActivity extends AppCompatActivity {
     }
 
     @Override
+    public void onBackPressed() {
+        if(viewPager.getCurrentItem() != 0){
+            viewPager.setCurrentItem(0, true);
+        }else{
+            super.onBackPressed();
+        }
+    }
+
+    @Override
     protected void onStop() {
         Needle.networkController.unregister();
         super.onStop();
+    }
+
+    public void goToRegister() {
+        viewPager.setCurrentItem(1, true);
     }
 }

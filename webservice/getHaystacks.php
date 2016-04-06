@@ -237,7 +237,7 @@ if (!empty($_POST)) {
 		<h1>GetHaystacks</h1> 
 		<form action="getHaystacks.php" method="post"> 
 		    HaystackId:<br /> 
-		    <input type="text" name="id" placeholder="" />
+		    <input type="description" name="id" placeholder="" />
 		    <br />
 			
 		    <input type="submit" value="Get Haystacks" /> 

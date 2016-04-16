@@ -68,50 +68,38 @@ public class LocationSharingListTabFragment extends Fragment implements Location
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        rootView = inflater.inflate(R.layout.fragment_location_sharing_tab, container, false);
+        if(rootView == null){
+            rootView = inflater.inflate(R.layout.fragment_location_sharing_tab, container, false);
 
-        //Recycler View
-        mRecyclerView = (RecyclerView) rootView.findViewById(R.id.location_sharing_list);
-        mRecyclerView.setHasFixedSize(true);
+            //Recycler View
+            mRecyclerView = (RecyclerView) rootView.findViewById(R.id.location_sharing_list);
+            mRecyclerView.setHasFixedSize(true);
 
-        layoutManager = new GridLayoutManager(getActivity(), 2);
-        layoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
-            @Override
-            public int getSpanSize(int position) {
-                return listAdapter.getItemViewType(position) == 0 ? 1 : 2;
-            }
-        });
-        mRecyclerView.setLayoutManager(layoutManager);
+            layoutManager = new GridLayoutManager(getActivity(), 2);
+            layoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
+                @Override
+                public int getSpanSize(int position) {
+                    return listAdapter.getItemViewType(position) == 0 ? 1 : 2;
+                }
+            });
+            mRecyclerView.setLayoutManager(layoutManager);
 
-        listAdapter = new LocationSharingCardAdapter(dataList, getActivity(), !isReceived, this);
-        mRecyclerView.setAdapter(listAdapter);
-
-        //Swipe To Refresh
-        swipeLayout = (SwipeRefreshLayout) rootView.findViewById(R.id.swipe_container);
-        swipeLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                onRefreshList();
-            }
-        });
-        return rootView;
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-
-        int state = isReceived ? AppState.LOCATION_SHARING_RECEIVED_TAB : AppState.LOCATION_SHARING_SENT_TAB;
-        if(stateChangeCallback!=null) stateChangeCallback.onStateChange(state);
-    }
-
-    @Override
-    public void onViewCreated(View view, Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-
-        if(listAdapter != null){
+            listAdapter = new LocationSharingCardAdapter(dataList, getActivity(), !isReceived, this);
             mRecyclerView.setAdapter(listAdapter);
+
+            //Swipe To Refresh
+            swipeLayout = (SwipeRefreshLayout) rootView.findViewById(R.id.swipe_container);
+            swipeLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+                @Override
+                public void onRefresh() {
+                    onRefreshList();
+                }
+            });
+
+            setRetainInstance(true);
         }
+
+        return rootView;
     }
 
     public void updateLocationSharingList(ArrayList<LocationSharingVO> data){
@@ -120,12 +108,17 @@ public class LocationSharingListTabFragment extends Fragment implements Location
 
         if(mRecyclerView != null){
             mRecyclerView.setAdapter(listAdapter);
+            listAdapter.notifyDataSetChanged();
         }
     }
 
     //Getters/Setters
     public SwipeRefreshLayout getRefreshLayout() {
         return swipeLayout;
+    }
+
+    public void setRefreshing(boolean value){
+        if(swipeLayout!=null) swipeLayout.setRefreshing(value);
     }
 
     //Handlers

@@ -43,6 +43,9 @@ public interface NeedleApiClient {
     Call<UserVO> getUser(@Path("id") int userId);
 
     @GET("user.php")
+    Call<UserResult> getUserById(@Path("callerId") int callerId, @Path("userId") int userId);
+
+    @GET("user.php")
     Call<UsersResult> fetchAllUsers(@Query("except") int userId);
 
     @FormUrlEncoded
@@ -50,7 +53,6 @@ public interface NeedleApiClient {
     Call<TaskResult> updateGCMRegId(@Field("userId") int userId, @Field("gcmRegId") String gcmRegId);
 
     //Authentication
-    @FormUrlEncoded
     @POST("login.php")
     Call<LoginResult> logIn(@Body UserVO user);
 
@@ -109,4 +111,5 @@ public interface NeedleApiClient {
 
     @PUT("notification.php")
     Call<NotificationResult> seenNotifications(@Body ArrayList<NotificationVO> notifications);
+
 }

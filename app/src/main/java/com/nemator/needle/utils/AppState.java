@@ -18,4 +18,5 @@ public class AppState {
     public static final int LOCATION_SHARING = 14;
     public static final int SETTINGS = 15;
     public static final int NOTIFICATIONS = 16;
+    public static final int PEOPLE = 17;
 }

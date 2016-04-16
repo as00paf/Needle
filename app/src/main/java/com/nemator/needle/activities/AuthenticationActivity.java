@@ -6,6 +6,7 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 
+import com.facebook.FacebookSdk;
 import com.nemator.needle.Needle;
 import com.nemator.needle.R;
 import com.nemator.needle.adapter.AuthenticationPagerAdapter;
@@ -49,7 +50,10 @@ public class AuthenticationActivity extends AppCompatActivity {
             //TODO : manage ?
             Needle.googleApiController.stopAutoManage();
             finish();
-            startActivity(new Intent(this, HomeActivity.class));
+
+            Intent intent = new Intent(this, HomeActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_TASK_ON_HOME);
+            startActivity(intent);
         }
     }
 
@@ -58,6 +62,8 @@ public class AuthenticationActivity extends AppCompatActivity {
         Log.d(TAG, "onActivityResult");
         if (requestCode == AuthenticationController.RC_GOOGLE_SIGN_IN) {
             Needle.authenticationController.onGoogleActivityResult(requestCode, resultCode, data);
+        }else if (FacebookSdk.isFacebookRequestCode(requestCode)) {
+            Needle.authenticationController.getFacebookCallbackManager().onActivityResult(requestCode, resultCode, data);
         }else{
             Needle.authenticationController.onTwitterActivityResult(requestCode, resultCode, data);
         }

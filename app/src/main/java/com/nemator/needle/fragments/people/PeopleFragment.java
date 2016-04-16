@@ -21,7 +21,7 @@ public class PeopleFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        rootView = inflater.inflate(R.layout.fragment_people, container);
+        rootView = inflater.inflate(R.layout.fragment_people, container, false);
 
         return rootView;
     }

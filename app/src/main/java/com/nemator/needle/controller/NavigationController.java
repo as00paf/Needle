@@ -23,14 +23,12 @@ import android.widget.Toast;
 
 import com.nemator.needle.Needle;
 import com.nemator.needle.R;
+import com.nemator.needle.activities.AuthenticationActivity;
 import com.nemator.needle.activities.CreateHaystackActivity;
 import com.nemator.needle.activities.HaystackActivity;
 import com.nemator.needle.activities.HomeActivity;
 import com.nemator.needle.api.ApiClient;
 import com.nemator.needle.api.result.TaskResult;
-import com.nemator.needle.fragments.authentication.LoginFragment;
-import com.nemator.needle.fragments.authentication.LoginSplashFragment;
-import com.nemator.needle.fragments.authentication.RegisterFragment;
 import com.nemator.needle.fragments.haystacks.HaystackListFragment;
 import com.nemator.needle.fragments.haystacks.OnActivityStateChangeListener;
 import com.nemator.needle.fragments.locationSharing.LocationSharingListFragment;
@@ -133,7 +131,8 @@ public class NavigationController implements HomeActivity.NavigationHandler, OnA
     }
 
     public void showSection(int type, Bundle bundle){
-        int containerViewId = (getCurrentFragment() != null) ? getCurrentFragment().getId() : content.getId();
+        //int containerViewId = (getCurrentFragment() != null) ? getCurrentFragment().getId() : content.getId();
+        int containerViewId = content.getId();
         Boolean add = containerViewId == 0;
         Fragment newFragment = null;
         int enterAnimation = 0;
@@ -141,7 +140,8 @@ public class NavigationController implements HomeActivity.NavigationHandler, OnA
 
         switch(type) {
             case AppConstants.SECTION_HAYSTACKS:
-                if(haystacksListFragment == null){haystacksListFragment = HaystackListFragment.newInstance();}
+                //if(haystacksListFragment == null){haystacksListFragment = HaystackListFragment.newInstance();}
+                haystacksListFragment = HaystackListFragment.newInstance();
                 newFragment = haystacksListFragment;
 
                 if(actionBar != null) actionBar.setTitle(R.string.title_haystacks);
@@ -178,7 +178,8 @@ public class NavigationController implements HomeActivity.NavigationHandler, OnA
             case AppConstants.SECTION_PEOPLE:
                 if(peopleFragment == null) peopleFragment = new PeopleFragment();
                 newFragment = peopleFragment;
-                onStateChange(AppState.SETTINGS);
+                onStateChange(AppState.PEOPLE);
+                actionBar.setTitle(R.string.title_people);
                 break;
             case AppConstants.SECTION_NOTIFICATIONS:
                 if(notificationFragment == null) notificationFragment = NotificationFragment.newInstance();
@@ -197,11 +198,12 @@ public class NavigationController implements HomeActivity.NavigationHandler, OnA
                 manager.beginTransaction()
                         .setCustomAnimations(enterAnimation, exitAnimation)
                         .replace(containerViewId, newFragment)
-                        .commitAllowingStateLoss();
+                        .commit();
+                        //.commitAllowingStateLoss();
             }
         }
 
-        System.gc();
+        //System.gc();
     }
 
     private void removeFragment(Fragment fragment){
@@ -392,7 +394,7 @@ public class NavigationController implements HomeActivity.NavigationHandler, OnA
     }
 
     public void refreshLocationSharingList() {
-        locationSharingListFragment.fetchLocationSharing();
+        locationSharingListFragment.fetchLocationSharing(true);
     }
 
     public void onLogOutComplete() {
@@ -407,6 +409,7 @@ public class NavigationController implements HomeActivity.NavigationHandler, OnA
         setCurrentState(AppState.LOGIN);
 
         activity.finish();
+        activity.startActivity(new Intent(activity.getBaseContext(), AuthenticationActivity.class));
     }
 
     public void showProgress(String message, Boolean cancelable) {

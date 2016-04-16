@@ -89,6 +89,11 @@ public class ApiClient {
         call.enqueue(callBack);
     }
 
+    public void getUserById(int callerId, int userId,  Callback<UserResult> callBack) {
+        Call<UserResult> call = client.getUserById(callerId, userId);
+        call.enqueue(callBack);
+    }
+
     //Haystacks
     public void fetchHaystacks(int userId,  Callback<HaystackResult> callBack) {
         Call<HaystackResult> call = client.getHaystacks(userId);
@@ -192,5 +197,8 @@ public class ApiClient {
     }
 
     //Friends
-
+    public void getFriendById(int callerId, int userId,  Callback<UsersResult> callBack) {
+       /* Call<UsersResult> call = client.getUser(userId);
+        call.enqueue(callBack);*/
+    }
 }

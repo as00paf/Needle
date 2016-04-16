@@ -51,6 +51,10 @@ public class HaystackPagerAdapter extends FragmentStatePagerAdapter {
         return privateHaystackListFragment;
     }
 
+    public HaystackListTabFragment getOwnedHaystackListFragment(){
+        return ownedHaystackListFragment;
+    }
+
     @Override
     public int getCount() {
         return 3;
@@ -77,7 +81,5 @@ public class HaystackPagerAdapter extends FragmentStatePagerAdapter {
         return title;
     }
 
-    public HaystackListTabFragment getOwnedHaystackListFragment() {
-        return ownedHaystackListFragment;
-    }
+
 }

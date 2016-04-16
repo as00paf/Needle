@@ -134,7 +134,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
                 Needle.authenticationController.googleSignIn();
                 break;
             case R.id.fab_fb:
-                Needle.authenticationController.facebookLogin(this);
+                Needle.authenticationController.facebookLogin();
                 break;
             case R.id.fab_register:
                 ((AuthenticationActivity) getActivity()).goToRegister();
@@ -148,7 +148,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
 
     }
 
-    @Override
+   /* @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         Log.d(TAG, "onActivityResult");
 
@@ -158,5 +158,5 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
         }else{
             super.onActivityResult(requestCode, resultCode, data);
         }
-    }
+    }*/
 }

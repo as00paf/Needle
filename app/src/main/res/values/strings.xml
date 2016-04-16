@@ -177,5 +177,11 @@
     <string name="error_adding_users">Error adding users to the Haystack</string>
     <string name="select_users_to_add">Select users to add</string>
     <string name="fetching_users_failed">Fetching users failed</string>
+    <string name="user" translatable="false">user</string>
+    <string name="delete_account">Delete Account</string>
+    <string name="delete_account_info">This will delete your account permanently</string>
+    <string name="facebook_account">Facebook Account</string>
+    <string name="twitter_account">Twitter Account</string>
+    <string name="google_account_title">Google Account</string>
 
 </resources>

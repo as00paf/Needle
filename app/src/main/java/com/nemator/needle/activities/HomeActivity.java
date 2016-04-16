@@ -120,6 +120,13 @@ public class HomeActivity extends AppCompatActivity {
             Log.e(TAG, "Can't fetch avatar picture for user " + Needle.userModel.getUserName());
         }
 
+        avatarImageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(HomeActivity.this, UserProfileActivity.class));
+            }
+        });
+
         //Cover Image
         String coverUrl = Needle.userModel.getUser().getCoverPictureURL();
         if(!TextUtils.isEmpty(coverUrl)){

@@ -1,7 +1,6 @@
 package com.nemator.needle.adapter;
 
 import android.app.Activity;
-import android.os.AsyncTask;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -12,7 +11,6 @@ import android.widget.Filterable;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.PendingResult;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.places.AutocompleteFilter;
@@ -22,12 +20,10 @@ import com.google.android.gms.location.places.Places;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.nemator.needle.Needle;
 import com.nemator.needle.R;
-import com.nemator.needle.api.NeedleApiClient;
 import com.nemator.needle.models.vo.CustomPlace;
 
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -93,7 +89,7 @@ public class PlacesRecyclerAdapter extends RecyclerView.Adapter<PlacesRecyclerAd
             case TYPE_NEARBY_HEADER:
             case TYPE_HISTORY_HEADER:
             case TYPE_RESULTS_HEADER:
-                v = LayoutInflater.from(activity).inflate(R.layout.place_list_header, parent, false);
+                v = LayoutInflater.from(activity).inflate(R.layout.list_header, parent, false);
                 viewHolder = new HeaderDataHolder(v, viewType);
                 break;
             case TYPE_PLACE_ITEM:
@@ -205,7 +201,7 @@ public class PlacesRecyclerAdapter extends RecyclerView.Adapter<PlacesRecyclerAd
         public HeaderDataHolder(View itemView, int viewType) {
             super(itemView, viewType);
 
-            title = (TextView) itemView.findViewById(R.id.header_label);
+            title = (TextView) itemView.findViewById(R.id.title);
         }
     }
 

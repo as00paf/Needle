@@ -23,6 +23,7 @@ import com.facebook.GraphRequest;
 import com.facebook.GraphResponse;
 import com.facebook.Profile;
 import com.facebook.ProfileTracker;
+import com.facebook.appevents.AppEventsLogger;
 import com.facebook.login.LoginManager;
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
@@ -78,7 +79,7 @@ public class AuthenticationController {
     private AppCompatActivity activity;
 
     //Facebook
-    private CallbackManager facebookCallbackManager;
+    private final CallbackManager facebookCallbackManager = CallbackManager.Factory.create();
     private ProfileTracker profileTracker;
 
     //Twitter
@@ -126,6 +127,7 @@ public class AuthenticationController {
                 Needle.googleApiController.stopAutoManage();
 
                 Intent intent = new Intent(activity, HomeActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_TASK_ON_HOME);
                 intent.putExtra("loginResult", result);//TODO : use constant
                 activity.startActivity(intent);
             }
@@ -146,6 +148,7 @@ public class AuthenticationController {
         @Override
         public void onFailure(Call<LoginResult> call, Throwable t) {
             Log.d(TAG, "log in failed : " + t.getMessage());
+            Toast.makeText(activity, "A server error Occured", Toast.LENGTH_SHORT).show();
         }
     };
 
@@ -298,10 +301,11 @@ public class AuthenticationController {
             //hideProgressDialog();
 
             GoogleSignInAccount acct = result.getSignInAccount();
+            String photoURL = (acct.getPhotoUrl() != null) ? acct.getPhotoUrl().toString() : "";
             Needle.userModel.getUser()
                     .setLoginType(AuthenticationController.LOGIN_TYPE_GOOGLE)
                     .setUserName(acct.getDisplayName())
-                    .setPictureURL(acct.getPhotoUrl().toString())
+                    .setPictureURL(photoURL)
                     .setEmail(acct.getEmail())
                     .setSocialNetworkUserId(acct.getId());
 
@@ -311,7 +315,7 @@ public class AuthenticationController {
                     if(loadPeopleResult.getPersonBuffer() != null){
                         Person person = loadPeopleResult.getPersonBuffer().get(0);
 
-                        String coverURL = person.getCover().getCoverPhoto().getUrl();
+                        String coverURL = (person.getCover() != null) ? person.getCover().getCoverPhoto().getUrl() : "";
                         Needle.userModel.getUser().setCoverPictureURL(coverURL);
                         AuthenticationController.getInstance().login();
                     }else{
@@ -360,22 +364,36 @@ public class AuthenticationController {
 
     //Facebook
     private void initFacebook(){
-        FacebookSdk.sdkInitialize(activity.getApplicationContext());
-        facebookCallbackManager = CallbackManager.Factory.create();
-
-        profileTracker = new ProfileTracker() {
-            @Override
-            protected void onCurrentProfileChanged( Profile oldProfile, Profile currentProfile) {
-                Log.d(TAG, "onCurrentProfileChanged");
-            }
-        };
-
-        profileTracker.startTracking();
-
-        LoginManager.getInstance().registerCallback(facebookCallbackManager, facebookLoginCallback);
+        Log.d(TAG, "initFacebook");
+        AppEventsLogger.activateApp(activity);
+        FacebookSdk.sdkInitialize(activity.getApplicationContext(), facebookInitializedCallback);
     }
 
-    private FacebookCallback<com.facebook.login.LoginResult> facebookLoginCallback =  new FacebookCallback<com.facebook.login.LoginResult>() {
+    private final FacebookSdk.InitializeCallback facebookInitializedCallback = new FacebookSdk.InitializeCallback() {
+        @Override
+        public void onInitialized() {
+            Log.d(TAG, "facebook sdk initialized");
+
+            FacebookSdk.setIsDebugEnabled(true);
+            FacebookSdk.setApplicationName(activity.getResources().getString(R.string.app_name));
+            FacebookSdk.setApplicationId(activity.getResources().getString(R.string.facebook_app_id));
+
+            profileTracker = new ProfileTracker() {
+                @Override
+                protected void onCurrentProfileChanged(Profile oldProfile, Profile currentProfile) {
+                    Log.d(TAG, "onCurrentProfileChanged");
+                }
+            };
+
+            profileTracker.startTracking();
+
+            LoginManager.getInstance().registerCallback(facebookCallbackManager, facebookLoginCallback);
+
+            LoginManager.getInstance().logInWithReadPermissions(activity, Arrays.asList("public_profile", "user_friends", "email"));
+        }
+    };
+
+    private final FacebookCallback<com.facebook.login.LoginResult> facebookLoginCallback =  new FacebookCallback<com.facebook.login.LoginResult>() {
         @Override
         public void onSuccess(com.facebook.login.LoginResult loginResult) {
             Log.d(TAG, "Facebook log in success");
@@ -421,14 +439,8 @@ public class AuthenticationController {
         }
     };
 
-    public void facebookLogin(Activity activity) {
+    public void facebookLogin() {
         initFacebook();
-        LoginManager.getInstance().logInWithReadPermissions(activity, Arrays.asList("public_profile", "user_friends", "email"));
-    }
-
-    public void facebookLogin(Fragment fragment) {
-        initFacebook();
-        LoginManager.getInstance().logInWithReadPermissions(fragment, Arrays.asList("public_profile", "user_friends", "email"));
     }
 
 

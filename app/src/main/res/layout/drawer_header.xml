@@ -4,6 +4,7 @@
     android:id="@+id/drawer_header"
     android:layout_width="match_parent"
     android:layout_height="172dp"
+    android:background="@android:color/white"
     android:theme="@style/ThemeOverlay.AppCompat.Dark">
 
     <ImageView

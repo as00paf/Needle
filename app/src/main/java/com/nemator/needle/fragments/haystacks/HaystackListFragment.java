@@ -18,6 +18,7 @@ import android.widget.Toast;
 import com.appcompat.view.slidingTab.SlidingTabLayout;
 import com.nemator.needle.Needle;
 import com.nemator.needle.R;
+import com.nemator.needle.activities.HomeActivity;
 import com.nemator.needle.adapter.HaystackPagerAdapter;
 import com.nemator.needle.api.ApiClient;
 import com.nemator.needle.controller.NavigationController;
@@ -76,6 +77,7 @@ public class HaystackListFragment extends Fragment implements SwipeRefreshLayout
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
+        //TODO : use constants
         outState.putParcelableArrayList("publicHaystacks", publicHaystacks);
         outState.putParcelableArrayList("privateHaystacks", privateHaystacks);
         outState.putParcelableArrayList("ownedHaystacks", ownedHaystacks);
@@ -99,78 +101,66 @@ public class HaystackListFragment extends Fragment implements SwipeRefreshLayout
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        if(rootView == null){
-            rootView = inflater.inflate(R.layout.fragment_haystack_list, container, false);
+        rootView = inflater.inflate(R.layout.fragment_haystack_list, container, false);
 
-            setEnterSharedElementCallback(new SharedElementCallback() {
-                @Override
-                public void onSharedElementEnd(List<String> sharedElementNames, List<View> sharedElements, List<View> sharedElementSnapshots) {
-                    super.onSharedElementEnd(sharedElementNames, sharedElements, sharedElementSnapshots);
-                    Needle.navigationController.hideProgress();
-                }
-            });
+        //Navigation Drawer
+        Boolean firstNavDrawerLearned = getContext().getSharedPreferences("com.nemator.needle", Context.MODE_PRIVATE).getBoolean("firstNavDrawerLearned", false);
 
-            //Navigation Drawer
-            Boolean firstNavDrawerLearned = getContext().getSharedPreferences("com.nemator.needle", Context.MODE_PRIVATE).getBoolean("firstNavDrawerLearned", false);
+        if(!firstNavDrawerLearned){
+            SharedPreferences.Editor edit = getContext().getSharedPreferences("com.nemator.needle", Context.MODE_PRIVATE).edit();
+            edit.putBoolean("firstNavDrawerLearned", true);
+            edit.commit();
+        }
 
-            if(!firstNavDrawerLearned){
-                //TODO: Open Nav Drawer
+        //FAB
+        fab = (FloatingActionButton) rootView.findViewById(R.id.fab);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                NavigationController.getInstance().showSection(AppConstants.SECTION_CREATE_HAYSTACK);
+            }
+        });
 
-                SharedPreferences.Editor edit = getContext().getSharedPreferences("com.nemator.needle", Context.MODE_PRIVATE).edit();
-                edit.putBoolean("firstNavDrawerLearned", true);
-                edit.commit();
+        //View pager
+        haystackListViewPager = (ViewPager) rootView.findViewById(R.id.haystackListViewPager);
+        mHaystackPagerAdapter = new HaystackPagerAdapter(getActivity().getSupportFragmentManager(), this);
+        haystackListViewPager.setOffscreenPageLimit(3);
+        haystackListViewPager.setAdapter(mHaystackPagerAdapter);
+
+        //Tabs
+        mSlidingTabLayout = (SlidingTabLayout) rootView.findViewById(R.id.haystack_list_sliding_tabs);
+        mSlidingTabLayout.setDistributeEvenly(true);
+        mSlidingTabLayout.setCustomTabColorizer(new SlidingTabLayout.TabColorizer() {
+            @Override
+            public int getIndicatorColor(int position) {
+                return getResources().getColor(R.color.tabsScrollColor);
+            }
+        });
+
+        mSlidingTabLayout.setViewPager(haystackListViewPager);
+        mSlidingTabLayout.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
             }
 
-            //FAB
-            fab = (FloatingActionButton) rootView.findViewById(R.id.fab);
-            fab.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    NavigationController.getInstance().showSection(AppConstants.SECTION_CREATE_HAYSTACK);
+            @Override
+            public void onPageSelected(int position) {
+                switch(position){
+                    case 0:
+                        stateChangeCallback.onStateChange(AppState.PUBLIC_HAYSTACK_TAB);
+                        break;
+                    case 1:
+                        stateChangeCallback.onStateChange(AppState.PRIVATE_HAYSTACK_TAB);
+                        break;
                 }
-            });
+            }
 
-            //View pager
-            mHaystackPagerAdapter = new HaystackPagerAdapter(getActivity().getSupportFragmentManager(), this);
-            haystackListViewPager = (ViewPager) rootView.findViewById(R.id.haystackListViewPager);
-            haystackListViewPager.setOffscreenPageLimit(3);
-            haystackListViewPager.setAdapter(mHaystackPagerAdapter);
+            @Override
+            public void onPageScrollStateChanged(int state) {
 
-            //Tabs
-            mSlidingTabLayout = (SlidingTabLayout) rootView.findViewById(R.id.haystack_list_sliding_tabs);
-            mSlidingTabLayout.setDistributeEvenly(true);
-            mSlidingTabLayout.setCustomTabColorizer(new SlidingTabLayout.TabColorizer() {
-                @Override
-                public int getIndicatorColor(int position) {
-                    return getResources().getColor(R.color.tabsScrollColor);
-                }
-            });
-
-            mSlidingTabLayout.setViewPager(haystackListViewPager);
-            mSlidingTabLayout.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
-                @Override
-                public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-
-                }
-
-                @Override
-                public void onPageSelected(int position) {
-                    switch(position){
-                        case 0:
-                            stateChangeCallback.onStateChange(AppState.PUBLIC_HAYSTACK_TAB);
-                            break;
-                        case 1:
-                            stateChangeCallback.onStateChange(AppState.PRIVATE_HAYSTACK_TAB);
-                            break;
-                    }
-                }
-
-                @Override
-                public void onPageScrollStateChanged(int state) {
-
-                }
-            });
-        }
+            }
+        });
 
         return rootView;
     }
@@ -197,19 +187,24 @@ public class HaystackListFragment extends Fragment implements SwipeRefreshLayout
                 HaystackListTabFragment privateTab = mHaystackPagerAdapter.getPrivateHaystackListFragment();
                 HaystackListTabFragment ownedTab = mHaystackPagerAdapter.getOwnedHaystackListFragment();
 
-                if(publicTab != null) publicTab.getRefreshLayout().setRefreshing(false);
-                if(privateTab != null) privateTab.getRefreshLayout().setRefreshing(false);
-                if(ownedTab != null) ownedTab.getRefreshLayout().setRefreshing(false);
+                if (publicTab != null) publicTab.getRefreshLayout().setRefreshing(false);
+                if (privateTab != null) privateTab.getRefreshLayout().setRefreshing(false);
+                if (ownedTab != null) ownedTab.getRefreshLayout().setRefreshing(false);
 
-                if(result.getSuccessCode() == 1){
+                if (result.getSuccessCode() == 1) {
                     publicHaystacks = result.getPublicHaystacks();
                     privateHaystacks = result.getPrivateHaystacks();
                     ownedHaystacks = result.getOwnedHaystacks();
 
-                    if(publicTab != null) publicTab.updateHaystackList(publicHaystacks);
-                    if(privateTab != null)  privateTab.updateHaystackList(privateHaystacks);
-                    if(ownedTab != null) ownedTab.updateHaystackList(ownedHaystacks);
-                }else if(getActivity() != null){
+                    if (publicTab != null) publicTab.updateHaystackList(publicHaystacks);
+                    if (privateTab != null) privateTab.updateHaystackList(privateHaystacks);
+                    if (ownedTab != null) ownedTab.updateHaystackList(ownedHaystacks);
+
+                    if (privateHaystacks != null && publicHaystacks != null && getActivity() != null) {
+                        ((HomeActivity) getActivity()).setHaystacksCount(privateHaystacks.size() + publicHaystacks.size());
+                    }
+
+                } else if (getActivity() != null) {
                     Toast.makeText(getActivity(), R.string.fetch_haystack_error, Toast.LENGTH_SHORT).show();
                 }
             }
@@ -243,10 +238,6 @@ public class HaystackListFragment extends Fragment implements SwipeRefreshLayout
 
     private int getUserId(){
         return Needle.userModel.getUserId();
-    }
-
-    private String getUserName(){
-        return Needle.userModel.getUserName();
     }
 
     public void goToTab(int tab){

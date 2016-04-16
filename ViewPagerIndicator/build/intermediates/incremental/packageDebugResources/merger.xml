@@ -48,7 +48,7 @@
         <attr format="boolean" name="selectedBold"/>
         <!-- Color of regular titles. -->
         <attr name="android:textColor"/>
-        <!-- Size of description text. -->
+        <!-- Size of description description. -->
         <attr name="android:textSize"/>
         <!-- Padding between titles when bumping into each other. -->
         <attr format="dimension" name="titlePadding"/>

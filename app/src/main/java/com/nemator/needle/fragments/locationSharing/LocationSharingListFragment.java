@@ -22,10 +22,10 @@ import com.nemator.needle.api.ApiClient;
 import com.nemator.needle.api.result.LocationSharingResult;
 import com.nemator.needle.fragments.haystacks.OnActivityStateChangeListener;
 import com.nemator.needle.models.vo.LocationSharingVO;
-import com.nemator.needle.utils.AppConstants;
 import com.nemator.needle.utils.AppState;
 
 import java.util.ArrayList;
+import java.util.Date;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -48,11 +48,10 @@ public class LocationSharingListFragment extends Fragment {
     public ArrayList<LocationSharingVO> receivedLocationsList = new ArrayList<>();
     public ArrayList<LocationSharingVO> sentLocationsList = new ArrayList<>();
     private OnActivityStateChangeListener stateChangeCallback;
+    private long lastUpdate;
 
     public static LocationSharingListFragment newInstance() {
         LocationSharingListFragment fragment = new LocationSharingListFragment();
-        Bundle args = new Bundle();
-        fragment.setArguments(args);
         return fragment;
     }
 
@@ -65,8 +64,18 @@ public class LocationSharingListFragment extends Fragment {
         super.onCreate(savedInstanceState);
 
         if(savedInstanceState != null){
+            LocationSharingListTabFragment receivedTab = mLocationSharingPagerAdapter.getReceivedFragment();
+            LocationSharingListTabFragment sentTab = mLocationSharingPagerAdapter.getSentFragment();
+
             receivedLocationsList = savedInstanceState.getParcelableArrayList("receivedLocationsList");
             sentLocationsList = savedInstanceState.getParcelableArrayList("sentLocationsList");
+
+            if(receivedLocationsList != null && getActivity() != null){
+                ((HomeActivity) getActivity()).setLocationSharingCount(receivedLocationsList.size());
+            }
+
+            if(receivedTab != null) receivedTab.updateLocationSharingList(receivedLocationsList);
+            if(sentTab != null) sentTab.updateLocationSharingList(sentLocationsList);
         }
     }
 
@@ -78,6 +87,7 @@ public class LocationSharingListFragment extends Fragment {
         super.onSaveInstanceState(outState);
     }
 
+    //TODO : remove this
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
@@ -108,6 +118,7 @@ public class LocationSharingListFragment extends Fragment {
             //View pager
             mLocationSharingPagerAdapter = new LocationSharingPagerAdapter(getActivity().getSupportFragmentManager(), this);
             locationSharingViewPager = (ViewPager) rootView.findViewById(R.id.location_sharing_view_pager);
+            locationSharingViewPager.setOffscreenPageLimit(2);
             locationSharingViewPager.setAdapter(mLocationSharingPagerAdapter);
 
             //Tabs
@@ -144,59 +155,71 @@ public class LocationSharingListFragment extends Fragment {
 
                 }
             });
+
+            setRetainInstance(true);
         }
 
         return rootView;
     }
 
-    @Override
-    public void onResume(){
-        super.onResume();
-        fetchLocationSharing();
-    }
+    public void fetchLocationSharing(Boolean force){
+        long now = new Date().getTime();
 
-    public void fetchLocationSharing(){
-        ApiClient.getInstance().fetchLocationSharings(locationSharingsFetchedCallback);
-    }
-
-    private Callback<LocationSharingResult> locationSharingsFetchedCallback = new Callback<LocationSharingResult>() {
-        @Override
-        public void onResponse(Call<LocationSharingResult> call, Response<LocationSharingResult> response) {
-            LocationSharingListTabFragment receivedTab = mLocationSharingPagerAdapter.getReceivedFragment();
-            LocationSharingListTabFragment sentTab = mLocationSharingPagerAdapter.getSentFragment();
-
-            receivedTab.getRefreshLayout().setRefreshing(false);
-            sentTab.getRefreshLayout().setRefreshing(false);
-
-            LocationSharingResult result = response.body();
-            if(result.getSuccessCode() == 1){
-                receivedLocationsList = result.getReceivedLocationSharings();
-                sentLocationsList = result.getSentLocationSharings();
-
-                if(receivedLocationsList != null && getActivity() != null){
-                    ((HomeActivity) getActivity()).setLocationSharingCount(receivedLocationsList.size());
-                }
-
-                receivedTab.updateLocationSharingList(receivedLocationsList);
-                sentTab.updateLocationSharingList(sentLocationsList);
-            }else{
-                Log.e(TAG, "Could not fetch location sharings. Error : " + result.getMessage());
-                Toast.makeText(getActivity(), R.string.fetch_location_sharings_error, Toast.LENGTH_SHORT).show();
+        if(!force){
+            if(now < lastUpdate + 5000){
+                return;
             }
         }
 
-        @Override
-        public void onFailure(Call<LocationSharingResult> call, Throwable t) {
-            LocationSharingListTabFragment receivedTab = mLocationSharingPagerAdapter.getReceivedFragment();
-            LocationSharingListTabFragment sentTab = mLocationSharingPagerAdapter.getSentFragment();
+        lastUpdate = now;
 
-            receivedTab.getRefreshLayout().setRefreshing(false);
-            sentTab.getRefreshLayout().setRefreshing(false);
+        ApiClient.getInstance().fetchLocationSharings(new Callback<LocationSharingResult>() {
+            @Override
+            public void onResponse(Call<LocationSharingResult> call, Response<LocationSharingResult> response) {
+                LocationSharingListTabFragment receivedTab = mLocationSharingPagerAdapter.getReceivedFragment();
+                LocationSharingListTabFragment sentTab = mLocationSharingPagerAdapter.getSentFragment();
 
-            Log.e(TAG, "Could not fetch location sharings. Error : " + t.getMessage());
-            Toast.makeText(getActivity(), R.string.fetch_location_sharings_error, Toast.LENGTH_SHORT).show();
-        }
-    };
+                Log.d(TAG, "location sharing fetched !");
+
+                if(receivedTab != null) receivedTab.setRefreshing(false);
+                if(sentTab != null) sentTab.setRefreshing(false);
+
+                LocationSharingResult result = response.body();
+                if(result.getSuccessCode() == 1){
+                    receivedLocationsList = result.getReceivedLocationSharings();
+                    sentLocationsList = result.getSentLocationSharings();
+
+                    if(receivedLocationsList != null && getActivity() != null){
+                        ((HomeActivity) getActivity()).setLocationSharingCount(receivedLocationsList.size());
+                    }
+
+                    if(receivedTab != null) receivedTab.updateLocationSharingList(receivedLocationsList);
+                    if(sentTab != null) sentTab.updateLocationSharingList(sentLocationsList);
+                }else{
+                    Log.e(TAG, "Could not fetch location sharings. Error : " + result.getMessage());
+                    Toast.makeText(getActivity(), R.string.fetch_location_sharings_error, Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<LocationSharingResult> call, Throwable t) {
+                LocationSharingListTabFragment receivedTab = mLocationSharingPagerAdapter.getReceivedFragment();
+                LocationSharingListTabFragment sentTab = mLocationSharingPagerAdapter.getSentFragment();
+
+                receivedTab.getRefreshLayout().setRefreshing(false);
+                sentTab.getRefreshLayout().setRefreshing(false);
+
+                Log.e(TAG, "Could not fetch location sharings. Error : " + t.getMessage());
+                Toast.makeText(getActivity(), R.string.fetch_location_sharings_error, Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    @Override
+    public void onResume(){
+        super.onResume();
+        fetchLocationSharing(true);
+    }
 
     private int getUserId() {
         return Needle.userModel.getUserId();

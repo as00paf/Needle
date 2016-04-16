@@ -21,17 +21,17 @@ public class LocationSharingPagerAdapter extends FragmentStatePagerAdapter {
 
     @Override
     public Fragment getItem(int position) {
-        LocationSharingListTabFragment fragment;
-
-        fragment = new LocationSharingListTabFragment();
+        LocationSharingListTabFragment fragment = new LocationSharingListTabFragment();
 
         Bundle args = new Bundle();
         Boolean isReceived = (position == 0);
 
         if(isReceived){
-            receivedFragment = fragment;
+            if(receivedFragment == null) receivedFragment = new LocationSharingListTabFragment();
+            fragment = receivedFragment;
         }else{
-            sentFragment = fragment;
+            if(sentFragment == null) sentFragment = new LocationSharingListTabFragment();
+            fragment = sentFragment;
         }
 
         args.putBoolean("isReceived", isReceived);

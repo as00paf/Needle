@@ -11,15 +11,17 @@ import android.support.v4.app.NotificationCompat;
 
 import com.google.gson.Gson;
 import com.nemator.needle.R;
+import com.nemator.needle.activities.HaystackActivity;
 import com.nemator.needle.activities.HomeActivity;
+import com.nemator.needle.activities.LocationSharingActivity;
+import com.nemator.needle.models.vo.HaystackVO;
+import com.nemator.needle.models.vo.LocationSharingVO;
 import com.nemator.needle.models.vo.NotificationVO;
 import com.nemator.needle.utils.AppConstants;
 
+import java.io.Serializable;
 import java.util.concurrent.atomic.AtomicInteger;
 
-/**
- * Created by Alex on 16/04/2016.
- */
 public class NotificationController {
 
     public static final String TAG = "NotificationController";
@@ -29,10 +31,37 @@ public class NotificationController {
     public static void sendNotification(Context context, Bundle data) {
         NotificationManager mNotificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
 
+        //Notification
         Gson gson = new Gson();
-        NotificationVO notification = gson.fromJson(data.getString("notification"), NotificationVO.class);
+        NotificationVO notification = gson.fromJson(data.getString(AppConstants.TAG_NOTIFICATION), NotificationVO.class);
 
-        Intent intent = createIntent(context, notification);
+        //Intent
+        Intent intent;
+        if(notification.getType() == AppConstants.HAYSTACK_INVITATION || notification.getType() == AppConstants.USER_JOINED_HAYSTACK
+                || notification.getType() == AppConstants.USER_LEFT_HAYSTACK){
+            intent = new Intent(context, HaystackActivity.class);
+            HaystackVO haystack = gson.fromJson(data.getString("data"), HaystackVO.class);
+            intent.putExtra(AppConstants.TAG_HAYSTACK, (Serializable) haystack);
+            intent.putExtra(AppConstants.TAG_ACTION, AppConstants.TAG_NOTIFICATION);
+        }else if(notification.getType() == AppConstants.USER_LOCATION_SHARING || notification.getType() == AppConstants.USER_SHARING_LOCATION_BACK){
+            intent = new Intent(context, LocationSharingActivity.class);
+            LocationSharingVO locationSharing = gson.fromJson(data.getString("data"), LocationSharingVO.class);
+            intent.putExtra(AppConstants.TAG_LOCATION_SHARING, (Serializable) locationSharing );
+            intent.putExtra(AppConstants.TAG_ACTION, AppConstants.TAG_NOTIFICATION);
+        }else if(notification.getType() == AppConstants.USER_CANCELLED_LOCATION_SHARING || notification.getType() == AppConstants.USER_STOPPED_SHARING_LOCATION){
+            intent = new Intent(context, HomeActivity.class);
+            intent.putExtra(AppConstants.TAG_SECTION, AppConstants.SECTION_LOCATION_SHARING_LIST);
+            intent.putExtra(AppConstants.TAG_ACTION, AppConstants.TAG_NOTIFICATION);
+        }else{
+            intent = new Intent(context, HomeActivity.class);
+            intent.putExtra(AppConstants.TAG_ACTION, AppConstants.TAG_SECTION);
+        }
+
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_TASK_ON_HOME);
+        intent.putExtra(AppConstants.TAG_TYPE, notification.getType());
+        intent.putExtra(AppConstants.TAG_ID, notification.getDataId());
+
+        //Send actual notification
         PendingIntent contentIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
         Uri defaultSoundUri= RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
@@ -50,23 +79,5 @@ public class NotificationController {
 
         int id = new AtomicInteger(NOTIFICATION_ID).incrementAndGet();
         mNotificationManager.notify(id, mBuilder.build());
-    }
-
-    private static Intent createIntent(Context context, NotificationVO notification){
-        Intent intent = new Intent(context, HomeActivity.class);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_TASK_ON_HOME);
-        intent.putExtra(AppConstants.TAG_TYPE, notification.getType());
-        intent.putExtra(AppConstants.TAG_ACTION, "Notification");
-        intent.putExtra(AppConstants.TAG_ID, notification.getDataId());
-
-        if(notification.getType() == 0){
-            //intent.putExtra(AppConstants.LOCATION_SHARING_DATA_KEY, (Serializable) vo );
-        }else if(notification.getType() == 1){
-            //intent.putExtra(AppConstants.HAYSTACK_DATA_KEY, data.getParcelable("haystack"));
-        }
-
-        ;
-
-        return intent;
     }
 }

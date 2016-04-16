@@ -21,7 +21,7 @@ public class LocationSharingVO implements Serializable, Parcelable {
     private String timeLimit;
 
     @SerializedName("shareBack")
-    private Boolean shareBack;
+    private Boolean shareBack = false;
 
     public LocationSharingVO(){
 

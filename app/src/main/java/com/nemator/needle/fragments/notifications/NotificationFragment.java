@@ -103,9 +103,11 @@ public class NotificationFragment  extends Fragment {
 
         @Override
         public void onFailure(Call<NotificationResult> call, Throwable t) {
-            Toast.makeText(getContext(), "Could not fetch notifications", Toast.LENGTH_SHORT).show();
-            Log.d(TAG, "Could not fetch notifications. Error : " + t.getMessage());
-            swipeLayout.setRefreshing(false);
+            if(getActivity() != null && swipeLayout != null){
+                Toast.makeText(getActivity(), "Could not fetch notifications", Toast.LENGTH_SHORT).show();
+                Log.d(TAG, "Could not fetch notifications. Error : " + t.getMessage());
+                swipeLayout.setRefreshing(false);
+            }
         }
     };
 

@@ -237,29 +237,10 @@ public class HomeActivity extends AppCompatActivity {
         Bundle extras = intent.getExtras();
         if(extras != null){
             String action = extras.getString(AppConstants.TAG_ACTION);
-            String type = extras.getString(AppConstants.TAG_TYPE);
-            int id = Integer.parseInt(extras.getString(AppConstants.TAG_ID, "-1"));
 
-            if(action != null && type != null){
-                if(action.equals("Notification")){
-                    Intent newIntent = null;
-                    if(type.equals("LocationSharing")){
-                        LocationSharingVO vo = extras.getParcelable(AppConstants.LOCATION_SHARING_DATA_KEY);
-                        Log.d(TAG, "starting location sharing activity with data : " + vo.toString());
-                        newIntent = new Intent(this, LocationSharingActivity.class);
-                        newIntent.putExtra(AppConstants.TAG_LOCATION_SHARING, (Serializable) vo);
-
-                    }else if(type.equals("Haystack")){
-                        HaystackVO vo = extras.getParcelable(AppConstants.HAYSTACK_DATA_KEY);
-
-                        newIntent = new Intent(this, HaystackActivity.class);
-                        newIntent.putExtra(AppConstants.TAG_HAYSTACK, (Parcelable) vo);
-                    }
-
-                    if(newIntent != null){
-                        startActivity(newIntent);
-                    }
-                }
+            if(action.equals(AppConstants.TAG_SECTION)){
+                int section =  extras.getInt(AppConstants.TAG_SECTION);
+                Needle.navigationController.showSection(section);
             }
 
             Log.i(TAG, "here");

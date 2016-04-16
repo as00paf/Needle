@@ -86,6 +86,12 @@ public class AuthenticationActivity extends AppCompatActivity {
         super.onStop();
     }
 
+    @Override
+    protected void onDestroy() {
+        Needle.networkController.unregister();
+        super.onDestroy();
+    }
+
     public void goToRegister() {
         viewPager.setCurrentItem(1, true);
     }

@@ -60,13 +60,13 @@ public class LocationSharingActivity extends AppCompatActivity {
 
     @Override
     public void onSaveInstanceState(Bundle savedInstanceState) {
-        savedInstanceState.putParcelable(AppConstants.LOCATION_SHARING_DATA_KEY, locationSharing);
+        savedInstanceState.putParcelable(AppConstants.TAG_LOCATION_SHARING, locationSharing);
     }
 
     private void updateValuesFromBundle(Bundle savedInstanceState) {
         if (savedInstanceState != null) {
-            if (savedInstanceState.keySet().contains(AppConstants.LOCATION_SHARING_DATA_KEY)) {
-                locationSharing = savedInstanceState.getParcelable(AppConstants.LOCATION_SHARING_DATA_KEY);
+            if (savedInstanceState.keySet().contains(AppConstants.TAG_LOCATION_SHARING)) {
+                locationSharing = savedInstanceState.getParcelable(AppConstants.TAG_LOCATION_SHARING);
             }
         }
     }

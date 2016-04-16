@@ -65,7 +65,7 @@ public class UserSelectActivity extends AppCompatActivity{
         swipeLayout.setRefreshing(true);
 
         Bundle bundle = getIntent().getExtras();
-        haystack = bundle.getParcelable(AppConstants.HAYSTACK_DATA_KEY);
+        haystack = bundle.getParcelable(AppConstants.TAG_HAYSTACK);
         if(haystack != null){
             fetchUsersNotInHaystack();
         }

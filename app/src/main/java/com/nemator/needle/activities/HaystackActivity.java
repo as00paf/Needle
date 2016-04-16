@@ -59,8 +59,8 @@ public class HaystackActivity extends AppCompatActivity{
         setContentView(R.layout.activity_haystack);
 
         if(savedInstanceState != null){
-            if (savedInstanceState.keySet().contains(AppConstants.HAYSTACK_DATA_KEY)) {
-                haystack = savedInstanceState.getParcelable(AppConstants.HAYSTACK_DATA_KEY);
+            if (savedInstanceState.keySet().contains(AppConstants.TAG_HAYSTACK)) {
+                haystack = savedInstanceState.getParcelable(AppConstants.TAG_HAYSTACK);
             }
 
             if (savedInstanceState.keySet().contains(AppConstants.TAG_IS_OWNER)) {
@@ -147,7 +147,7 @@ public class HaystackActivity extends AppCompatActivity{
                 @Override
                 public void onClick(View v) {
                     Intent intent = new Intent(HaystackActivity.this, UserSelectActivity.class);
-                    intent.putExtra(AppConstants.HAYSTACK_DATA_KEY, (Parcelable) haystack);
+                    intent.putExtra(AppConstants.TAG_HAYSTACK, (Parcelable) haystack);
                     startActivityForResult(intent, AppConstants.SELECT_NEW_HAYSTACK_USERS);
                 }
             });
@@ -169,7 +169,7 @@ public class HaystackActivity extends AppCompatActivity{
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
-        outState.putParcelable(AppConstants.HAYSTACK_DATA_KEY, haystack);
+        outState.putParcelable(AppConstants.TAG_HAYSTACK, haystack);
         super.onSaveInstanceState(outState);
     }
 

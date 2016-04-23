@@ -7,8 +7,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.nemator.needle.Needle;
 import com.nemator.needle.R;
 import com.nemator.needle.fragments.haystacks.HaystackListFragment;
+import com.nemator.needle.fragments.haystacks.HaystackListTabFragment;
 import com.nemator.needle.models.vo.HaystackVO;
 import com.nemator.needle.utils.AppConstants;
 import com.nemator.needle.viewHolders.HaystackCardHolder;
@@ -23,9 +25,9 @@ public class HaystackCardAdapter extends RecyclerView.Adapter<HaystackCardHolder
 
     private ArrayList<HaystackVO> listData;
     private Context mContext;
-    private HaystackListFragment.HaystackListFragmentInteractionListener mListener;
+    private HaystackListTabFragment.HaystackListFragmentInteractionListener mListener;
 
-    public HaystackCardAdapter(ArrayList<HaystackVO> data, Context context, HaystackListFragment.HaystackListFragmentInteractionListener listener) {
+    public HaystackCardAdapter(ArrayList<HaystackVO> data, Context context, HaystackListTabFragment.HaystackListFragmentInteractionListener listener) {
         listData = data;
         mContext = context;
         mListener = listener;
@@ -49,10 +51,10 @@ public class HaystackCardAdapter extends RecyclerView.Adapter<HaystackCardHolder
 
         if(viewType == TYPE_ITEM){
             haystackCard = LayoutInflater.from(parent.getContext()).inflate(R.layout.card_haystack, parent, false);
-            viewHolder = new HaystackCardHolder(haystackCard, true, mListener);
+            viewHolder = new HaystackCardHolder(haystackCard, mListener);
         }else{
             haystackCard = LayoutInflater.from(parent.getContext()).inflate(R.layout.haystack_empty_card_layout, parent, false);
-            viewHolder = new HaystackCardHolder(haystackCard, false, mListener);
+            viewHolder = new HaystackCardHolder(haystackCard, mListener);
         }
 
         return viewHolder;

@@ -5,9 +5,15 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 import com.google.android.gms.maps.model.LatLng;
+import com.google.gson.Gson;
+import com.google.gson.JsonDeserializationContext;
+import com.google.gson.JsonDeserializer;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParseException;
 import com.google.gson.annotations.SerializedName;
 
 import java.io.Serializable;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Iterator;
 
@@ -31,7 +37,7 @@ public class HaystackVO implements Serializable, Parcelable {
     private int zoneRadius;
 
     @SerializedName("isCircle")
-    private Boolean isCircle;
+    private Boolean isCircle = true;
 
     @SerializedName("location")
     private LocationVO position;
@@ -104,6 +110,7 @@ public class HaystackVO implements Serializable, Parcelable {
         parcel.writeString(timeLimit);
         parcel.writeInt(zoneRadius);
         parcel.writeValue(isCircle);
+        parcel.writeValue(pictureURL);
         parcel.writeDouble(position.getLatitude());
         parcel.writeDouble(position.getLongitude());
         parcel.writeString(pictureURL);
@@ -125,6 +132,9 @@ public class HaystackVO implements Serializable, Parcelable {
     }
 
     public String getName() {
+        if(name.isEmpty()){
+           return null;
+        }
         StringBuffer res = new StringBuffer();
         String[] strArr = name.split(" ");
         for (String str : strArr) {
@@ -265,4 +275,19 @@ public class HaystackVO implements Serializable, Parcelable {
     public void addUsers(ArrayList<UserVO> newUserList) {
         users.addAll(newUserList);
     }
+
+    /*public static class Deserializer implements JsonDeserializer<LocationVO>
+    {
+        @Override
+        public LocationVO deserialize(JsonElement je, Type type, JsonDeserializationContext jdc)
+                throws JsonParseException{
+            // Get the "location" element from the parsed JSON
+            JsonElement content = je.getAsJsonObject().get("location");
+
+            // Deserialize it. You use a new instance of Gson to avoid infinite recursion
+            // to this deserializer
+            return new Gson().fromJson(content, LocationVO.class);
+
+        }
+    }*/
 }

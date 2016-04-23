@@ -2,8 +2,10 @@ package com.nemator.needle.fragments.haystacks;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.SharedElementCallback;
@@ -18,9 +20,11 @@ import android.widget.Toast;
 import com.appcompat.view.slidingTab.SlidingTabLayout;
 import com.nemator.needle.Needle;
 import com.nemator.needle.R;
+import com.nemator.needle.activities.HaystackActivity;
 import com.nemator.needle.activities.HomeActivity;
 import com.nemator.needle.adapter.HaystackPagerAdapter;
 import com.nemator.needle.api.ApiClient;
+import com.nemator.needle.api.result.TaskResult;
 import com.nemator.needle.controller.NavigationController;
 import com.nemator.needle.models.vo.HaystackVO;
 import com.nemator.needle.api.result.HaystackResult;
@@ -35,7 +39,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class HaystackListFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener {
+public class HaystackListFragment extends Fragment implements HaystackListTabFragment.HaystackListFragmentInteractionListener {
     private static final String TAG = "HaystackListFragment";
 
     //Views
@@ -43,12 +47,10 @@ public class HaystackListFragment extends Fragment implements SwipeRefreshLayout
     private FloatingActionButton fab;
     private ViewPager haystackListViewPager;
     private SlidingTabLayout mSlidingTabLayout;
-    private SwipeRefreshLayout refreshLayout;
 
     //Objects
     private HaystackPagerAdapter mHaystackPagerAdapter;
     private OnActivityStateChangeListener stateChangeCallback;
-    private HaystackListFragmentInteractionListener fragmentListener;
 
     //Data
     public ArrayList<HaystackVO> publicHaystacks = null;
@@ -92,7 +94,6 @@ public class HaystackListFragment extends Fragment implements SwipeRefreshLayout
 
         try {
             stateChangeCallback = ((OnActivityStateChangeListener) Needle.navigationController);
-            fragmentListener = ((HaystackListFragmentInteractionListener) Needle.navigationController);
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString()
                     + " must implement OnActivityStateChangeListener");
@@ -123,7 +124,7 @@ public class HaystackListFragment extends Fragment implements SwipeRefreshLayout
 
         //View pager
         haystackListViewPager = (ViewPager) rootView.findViewById(R.id.haystackListViewPager);
-        mHaystackPagerAdapter = new HaystackPagerAdapter(getActivity().getSupportFragmentManager(), this);
+        mHaystackPagerAdapter = new HaystackPagerAdapter(getActivity().getSupportFragmentManager(), getContext(), this);
         haystackListViewPager.setOffscreenPageLimit(3);
         haystackListViewPager.setAdapter(mHaystackPagerAdapter);
 
@@ -232,10 +233,6 @@ public class HaystackListFragment extends Fragment implements SwipeRefreshLayout
         fetchHaystacks(true);
     }
 
-    @Override public void onRefresh() {
-        fetchHaystacks(true);
-    }
-
     private int getUserId(){
         return Needle.userModel.getUserId();
     }
@@ -244,8 +241,65 @@ public class HaystackListFragment extends Fragment implements SwipeRefreshLayout
         haystackListViewPager.setCurrentItem(tab);
     }
 
-    public interface HaystackListFragmentInteractionListener {
-        void onRefreshHaystackList();
-        void onClickHaystackCard(HaystackVO haystack);
+    @Override
+    public void onRefreshHaystackList() {
+        fetchHaystacks(true);
     }
+
+    @Override
+    public void onClickHaystackCard(HaystackVO haystack) {
+        Intent haystackIntent = new Intent(getActivity(), HaystackActivity.class);
+        haystackIntent.putExtra(AppConstants.TAG_HAYSTACK, (Parcelable) haystack);
+        startActivity(haystackIntent);
+    }
+
+    @Override
+    public void onCancelHaystack(HaystackVO haystack) {
+        ApiClient.getInstance().cancelHaystack(Needle.userModel.getUser(), haystack, haystackCancelledCallback);
+    }
+
+    private Callback<TaskResult> haystackCancelledCallback = new Callback<TaskResult>() {
+        @Override
+        public void onResponse(Call<TaskResult> call, Response<TaskResult> response) {
+            TaskResult result = response.body();
+            if(result.getSuccessCode() == 1){
+                Log.i(TAG, "Haystack Cancelled !");
+                Toast.makeText(getContext(), "Haystack Cancelled", Toast.LENGTH_SHORT).show();
+                onRefreshHaystackList();
+            }else{
+                Log.i(TAG, "Could not cancel Haystack. Error : " + result.getMessage());
+                Toast.makeText(getContext(), "Could not cancel Haystack", Toast.LENGTH_SHORT).show();
+            }
+        }
+
+        @Override
+        public void onFailure(Call<TaskResult> call, Throwable t) {
+            Log.i(TAG, "Could not cancel Haystack. Error : " + t.getMessage());
+        }
+    };
+
+    @Override
+    public void onLeaveHaystack(HaystackVO haystack) {
+        ApiClient.getInstance().leaveHaystack(Needle.userModel.getUser(), haystack, haystackLeftCallback);
+    }
+
+    private Callback<TaskResult> haystackLeftCallback = new Callback<TaskResult>() {
+        @Override
+        public void onResponse(Call<TaskResult> call, Response<TaskResult> response) {
+            TaskResult result = response.body();
+            if(result.getSuccessCode() == 1){
+                Log.i(TAG, "Haystack Left !");
+                Toast.makeText(getContext(), "Haystack Left", Toast.LENGTH_SHORT).show();
+                onRefreshHaystackList();
+            }else{
+                Log.i(TAG, "Could not leave Haystack. Error : " + result.getMessage());
+                Toast.makeText(getContext(), "Could not leave Haystack", Toast.LENGTH_SHORT).show();
+            }
+        }
+
+        @Override
+        public void onFailure(Call<TaskResult> call, Throwable t) {
+
+        }
+    };
 }

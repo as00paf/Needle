@@ -17,6 +17,7 @@ public class UserModel {
 
     private UserVO user;
     private SharedPreferences sharedPreferences;
+    private SharedPreferences.Editor editor;
 
     public UserModel(){
     }
@@ -31,6 +32,7 @@ public class UserModel {
 
     public void init(Context context){
         sharedPreferences = context.getSharedPreferences("com.nemator.needle", Context.MODE_PRIVATE);
+        editor = sharedPreferences.edit();
         user = UserVO.retrieve(sharedPreferences);
         loggedIn = sharedPreferences.getBoolean(AppConstants.TAG_LOGGED_IN, false);
     }
@@ -56,7 +58,7 @@ public class UserModel {
 
     public void setUserId(int userId){
         user.setId(userId);
-        sharedPreferences.edit().putInt(AppConstants.TAG_USER_ID, userId).commit();
+        editor.putInt(AppConstants.TAG_USER_ID, userId).commit();
     }
 
     public String getUserName(){
@@ -66,7 +68,7 @@ public class UserModel {
     public void setUserName(String username){
         user.setUserName(username);
 
-        sharedPreferences.edit().putString(AppConstants.TAG_USER_NAME, username).commit();
+        editor.putString(AppConstants.TAG_USER_NAME, username).commit();
     }
 
     public String getGcmRegId() {
@@ -76,7 +78,7 @@ public class UserModel {
     public Boolean setGcmRegId(String gcmRegId) {
         Boolean wereTheSame = user.getGcmRegId() != null && !user.getGcmRegId().equals(gcmRegId);
         user.setGcmRegId(gcmRegId);
-        sharedPreferences.edit().putString(AppConstants.TAG_GCM_REG_ID, gcmRegId).apply();
+        editor.putString(AppConstants.TAG_GCM_REG_ID, gcmRegId).apply();
 
         return wereTheSame;
     }
@@ -87,7 +89,7 @@ public class UserModel {
 
     public void setLoggedIn(boolean loggedIn) {
         this.loggedIn = loggedIn;
-        sharedPreferences.edit().putBoolean(AppConstants.TAG_LOGGED_IN, loggedIn).apply();
+        editor.putBoolean(AppConstants.TAG_LOGGED_IN, loggedIn).apply();
     }
 
     public void saveUser(){

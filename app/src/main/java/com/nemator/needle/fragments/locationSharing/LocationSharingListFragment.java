@@ -189,6 +189,14 @@ public class LocationSharingListFragment extends Fragment {
                     receivedLocationsList = result.getReceivedLocationSharings();
                     sentLocationsList = result.getSentLocationSharings();
 
+                    for (LocationSharingVO vo : receivedLocationsList ) {
+                        vo.setReceiver(Needle.userModel.getUser());
+                    }
+
+                    for (LocationSharingVO vo : sentLocationsList ) {
+                        vo.setSender(Needle.userModel.getUser());
+                    }
+
                     if(receivedLocationsList != null && getActivity() != null){
                         ((HomeActivity) getActivity()).setLocationSharingCount(receivedLocationsList.size());
                     }

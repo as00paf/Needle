@@ -84,4 +84,5 @@ public class AppConstants {
     public static final int USER_CANCELLED_LOCATION_SHARING = 4;
     public static final int USER_SHARING_LOCATION_BACK = 5;
     public static final int USER_STOPPED_SHARING_LOCATION = 6;
+    public static final int HAYSTACK_CANCELLED = 7;
 }

@@ -2,9 +2,11 @@ package com.nemator.needle.activities;
 
 import android.Manifest;
 import android.app.AlertDialog;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.graphics.Color;
@@ -12,6 +14,7 @@ import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.annotation.IdRes;
 import android.support.design.widget.NavigationView;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -33,6 +36,7 @@ import com.nemator.needle.Needle;
 import com.nemator.needle.R;
 import com.nemator.needle.api.result.LoginResult;
 import com.nemator.needle.controller.AuthenticationController;
+import com.nemator.needle.controller.NavigationController;
 import com.nemator.needle.models.vo.CustomPlace;
 import com.nemator.needle.models.vo.HaystackVO;
 import com.nemator.needle.models.vo.LocationSharingVO;
@@ -77,6 +81,8 @@ public class HomeActivity extends AppCompatActivity {
         if(!Needle.googleApiController.isConnected()){
             Needle.googleApiController.init(this);
         }
+
+        initNotificationListener();
     }
 
    private void requestPermission() {
@@ -89,6 +95,7 @@ public class HomeActivity extends AppCompatActivity {
         //Saved Instance State
         if(savedInstanceState != null){
             //TODO : Use constants
+            Needle.userModel.init(this);
             Needle.userModel.setLoggedIn(savedInstanceState.getBoolean("loggedIn", false));
             Needle.navigationController.setCurrentState(savedInstanceState.getInt(AppConstants.APP_STATE, Needle.navigationController.getCurrentState()));
             Needle.navigationController.setPreviousState(savedInstanceState.getInt(AppConstants.APP_PREVIOUS_STATE, Needle.navigationController.getCurrentState()));
@@ -162,6 +169,21 @@ public class HomeActivity extends AppCompatActivity {
 
         accountType.setText(type);
     }
+
+    private void initNotificationListener(){
+        LocalBroadcastManager localBroadcastManager = LocalBroadcastManager.getInstance(this);
+
+        localBroadcastManager.registerReceiver(notificationReceiver,
+                new IntentFilter(AppConstants.TAG_NOTIFICATION));
+    }
+
+    private BroadcastReceiver notificationReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Needle.navigationController.refreshLocationSharingList();
+            Needle.navigationController.refreshHaystackList();
+        }
+    };
 
     @Override
     protected void onPostCreate(Bundle savedInstanceState) {

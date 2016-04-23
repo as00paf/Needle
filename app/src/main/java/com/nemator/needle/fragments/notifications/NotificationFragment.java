@@ -117,11 +117,6 @@ public class NotificationFragment  extends Fragment {
         public void onClick(View view, NotificationVO vo) {
             Log.d(TAG, "click");
         }
-
-        @Override
-        public void onClickUser(NotificationVO vo) {
-            Log.d(TAG, "click user");
-        }
     };
 
     public void updateNotficationList(ArrayList<NotificationVO> data){

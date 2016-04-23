@@ -8,8 +8,10 @@ import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.NotificationCompat;
+import android.support.v4.content.LocalBroadcastManager;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.nemator.needle.R;
 import com.nemator.needle.activities.HaystackActivity;
 import com.nemator.needle.activities.HomeActivity;
@@ -32,7 +34,7 @@ public class NotificationController {
         NotificationManager mNotificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
 
         //Notification
-        Gson gson = new Gson();
+        Gson gson = new GsonBuilder()/*.registerTypeAdapter(HaystackVO.class, new HaystackVO.Deserializer())*/.create();
         NotificationVO notification = gson.fromJson(data.getString(AppConstants.TAG_NOTIFICATION), NotificationVO.class);
 
         //Intent
@@ -42,6 +44,10 @@ public class NotificationController {
             intent = new Intent(context, HaystackActivity.class);
             HaystackVO haystack = gson.fromJson(data.getString("data"), HaystackVO.class);
             intent.putExtra(AppConstants.TAG_HAYSTACK, (Serializable) haystack);
+            intent.putExtra(AppConstants.TAG_ACTION, AppConstants.TAG_NOTIFICATION);
+        }else if(notification.getType() == AppConstants.HAYSTACK_CANCELLED){
+            intent = new Intent(context, HomeActivity.class);
+            intent.putExtra(AppConstants.TAG_SECTION, AppConstants.SECTION_HAYSTACKS);
             intent.putExtra(AppConstants.TAG_ACTION, AppConstants.TAG_NOTIFICATION);
         }else if(notification.getType() == AppConstants.USER_LOCATION_SHARING || notification.getType() == AppConstants.USER_SHARING_LOCATION_BACK){
             intent = new Intent(context, LocationSharingActivity.class);
@@ -57,9 +63,15 @@ public class NotificationController {
             intent.putExtra(AppConstants.TAG_ACTION, AppConstants.TAG_SECTION);
         }
 
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_TASK_ON_HOME);
         intent.putExtra(AppConstants.TAG_TYPE, notification.getType());
         intent.putExtra(AppConstants.TAG_ID, notification.getDataId());
+        intent.setAction(AppConstants.TAG_NOTIFICATION);
+
+        //Dispatch intent for other Activities
+        LocalBroadcastManager localBroadcastManager = LocalBroadcastManager.getInstance(context);
+        localBroadcastManager.sendBroadcast(intent);
+
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_TASK_ON_HOME);
 
         //Send actual notification
         PendingIntent contentIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
@@ -68,7 +80,7 @@ public class NotificationController {
         NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(context)
                 .setSmallIcon(R.drawable.ic_app_white)
                 .setContentTitle(context.getResources().getString(R.string.app_name))
-                .setStyle(new NotificationCompat.BigTextStyle().bigText(notification.getTitle()))
+                .setStyle(new NotificationCompat.BigTextStyle().bigText(notification.getDescription()))
                 .setContentText(notification.getDescription())
                 .setColor(context.getResources().getColor(R.color.primary))
                 .setLights(context.getResources().getColor(R.color.primary), 1500, 2000)

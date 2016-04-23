@@ -6,6 +6,7 @@ import android.graphics.Point;
 import android.location.Location;
 import android.os.Handler;
 import android.os.SystemClock;
+import android.support.v4.content.ContextCompat;
 import android.view.animation.Interpolator;
 import android.view.animation.LinearInterpolator;
 
@@ -13,6 +14,7 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.Projection;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.Circle;
+import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -24,11 +26,19 @@ import com.squareup.picasso.Transformation;
 
 public class MarkerUtils {
 
-    public static UserMarker createUserMarker(Context context, GoogleMap map, UserVO user, LatLng location){
+    public static UserMarker createUserMarker(Context context, GoogleMap map, UserVO user, LatLng location, String snippet){
         //Create map marker with options
         MarkerOptions myMarkerOptions = new MarkerOptions().position(location);
         myMarkerOptions.flat(true);
         myMarkerOptions.anchor(0.5f, 0.75f);
+
+        //Circle
+        double radiusInMeters = 10.0;
+        int strokeColor = ContextCompat.getColor(context, android.R.color.black);
+        int shadeColor = ContextCompat.getColor(context, R.color.transparent_grey);
+
+        CircleOptions circleOptions = new CircleOptions().center(location).radius(radiusInMeters).fillColor(shadeColor).strokeColor(strokeColor).strokeWidth(8);
+        Circle circle = map.addCircle(circleOptions);
 
         //Set Background
         Bitmap pinBitmap = BitmapUtils.drawableToBitmap(context.getResources().getDrawable(R.drawable.ic_place_black_24dp));
@@ -36,9 +46,11 @@ public class MarkerUtils {
 
         Marker marker = map.addMarker(myMarkerOptions);
         marker.setIcon(BitmapDescriptorFactory.fromBitmap(scaledBitmap));
+        marker.setSnippet(snippet);
 
         //Create marker target
         UserMarker userMarker = new UserMarker(user, marker);
+        userMarker.setCircle(circle);
         String pictureURL = user.getPictureURL();
 
         MarkerImageTransform transform = new MarkerImageTransform(context);

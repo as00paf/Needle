@@ -1,11 +1,13 @@
 package com.nemator.needle.utils;
 
 import android.animation.ValueAnimator;
+import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Point;
 import android.location.Location;
 import android.os.Handler;
 import android.os.SystemClock;
+import android.support.v4.content.ContextCompat;
 import android.view.animation.Interpolator;
 import android.view.animation.LinearInterpolator;
 
@@ -19,6 +21,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polygon;
 import com.google.android.gms.maps.model.PolygonOptions;
 import com.nemator.needle.R;
+import com.nemator.needle.models.vo.HaystackVO;
 
 import java.util.ArrayList;
 
@@ -26,7 +29,7 @@ import java.util.ArrayList;
  * Created by Alex on 09/12/2015.
  */
 public class GoogleMapDrawingUtils {
-
+    //TODO : move everything at the same place
     public static void animateMarker(GoogleMap map, final Marker marker, final LatLng toPosition, final boolean hideMarker) {
         final Handler handler = new Handler();
         final long start = SystemClock.uptimeMillis();
@@ -223,6 +226,34 @@ public class GoogleMapDrawingUtils {
         vertices.add(1, SphericalUtil.computeOffset(position, scale, 90));
         vertices.add(2, SphericalUtil.computeOffset(position, scale, 180));
         vertices.add(3, SphericalUtil.computeOffset(position, scale, 270));
+
+        polygon.setPoints(vertices);
+
+        return polygon;
+    }
+
+    public static Polygon drawHaystackPolygon(Context context, GoogleMap mMap, HaystackVO haystack) {
+        int strokeColor = ContextCompat.getColor(context, R.color.primary_dark);
+        int shadeColor = ContextCompat.getColor(context, R.color.circleColor);
+
+        ArrayList<LatLng> vertices = new ArrayList<>(4);
+        vertices.add(0, SphericalUtil.computeOffset(haystack.getPositionLatLng(), haystack.getZoneRadius(), 0));
+        vertices.add(1, SphericalUtil.computeOffset(haystack.getPositionLatLng(), haystack.getZoneRadius(), 90));
+        vertices.add(2, SphericalUtil.computeOffset(haystack.getPositionLatLng(), haystack.getZoneRadius(), 180));
+        vertices.add(3, SphericalUtil.computeOffset(haystack.getPositionLatLng(), haystack.getZoneRadius(), 270));
+
+        PolygonOptions polygonOptions = new PolygonOptions().fillColor(shadeColor).strokeColor(strokeColor).strokeWidth(8).addAll(vertices);
+        Polygon polygon = mMap.addPolygon(polygonOptions);
+
+        return polygon;
+    }
+
+    public static Polygon updateHaystackPolygon(Polygon polygon, HaystackVO haystackVO) {
+        ArrayList<LatLng> vertices = new ArrayList<>(4);
+        vertices.add(0, SphericalUtil.computeOffset(haystackVO.getPositionLatLng(), haystackVO.getZoneRadius(), 0));
+        vertices.add(1, SphericalUtil.computeOffset(haystackVO.getPositionLatLng(), haystackVO.getZoneRadius(), 90));
+        vertices.add(2, SphericalUtil.computeOffset(haystackVO.getPositionLatLng(), haystackVO.getZoneRadius(), 180));
+        vertices.add(3, SphericalUtil.computeOffset(haystackVO.getPositionLatLng(), haystackVO.getZoneRadius(), 270));
 
         polygon.setPoints(vertices);
 

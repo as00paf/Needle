@@ -43,7 +43,7 @@ public interface NeedleApiClient {
     Call<UserVO> getUser(@Path("id") int userId);
 
     @GET("user.php")
-    Call<UserResult> getUserById(@Path("callerId") int callerId, @Path("userId") int userId);
+    Call<UserResult> getUserById(@Query("callerId") int callerId, @Query("id") int userId);
 
     @GET("user.php")
     Call<UsersResult> fetchAllUsers(@Query("except") int userId);
@@ -65,6 +65,9 @@ public interface NeedleApiClient {
 
     @POST("haystack.php")
     Call<HaystackResult> createHaystack(@Body HaystackVO haystack);
+
+    @HTTP(method = "DELETE", path = "haystack.php", hasBody = true)
+    Call<TaskResult> cancelHaystack(@Body HaystackUserVO vo);
 
     //Location
     @PUT("location.php")

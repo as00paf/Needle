@@ -1,6 +1,5 @@
 package com.nemator.needle.api;
 
-import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.Log;
 
 import com.nemator.needle.Needle;
@@ -21,7 +20,6 @@ import com.nemator.needle.utils.AppConstants;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Iterator;
 
 import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
@@ -121,6 +119,13 @@ public class ApiClient {
         call.enqueue(callBack);
     }
 
+
+    public void cancelHaystack(UserVO user, HaystackVO haystack, Callback<TaskResult> callBack) {
+        HaystackUserVO vo = new HaystackUserVO(haystack, user);
+        Call<TaskResult> call = client.cancelHaystack(vo);
+        call.enqueue(callBack);
+    }
+
     public void leaveHaystack(UserVO user, HaystackVO haystack, Callback<TaskResult> callBack){
         HaystackUserVO vo = new HaystackUserVO(haystack, user);
         Call<TaskResult> call = client.leaveHaystack(vo);
@@ -201,4 +206,5 @@ public class ApiClient {
        /* Call<UsersResult> call = client.getUser(userId);
         call.enqueue(callBack);*/
     }
+
 }

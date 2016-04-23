@@ -137,7 +137,11 @@ public class UserVO implements Serializable, Parcelable{
     }
 
     public String getPictureURL() {
-        return pictureURL;
+        if(pictureURL != null){
+            return pictureURL;
+        }else{
+            return "";
+        }
     }
 
     public UserVO setPictureURL(String pictureURL) {
@@ -182,7 +186,11 @@ public class UserVO implements Serializable, Parcelable{
     }
 
     public String getCoverPictureURL() {
-        return coverPictureURL;
+        if(coverPictureURL != null){
+            return coverPictureURL;
+        }else{
+            return "";
+        }
     }
 
     public UserVO setCoverPictureURL(String coverPictureURL) {

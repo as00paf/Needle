@@ -1,0 +1,9 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item android:id="@+id/menu_option_leave"
+        android:description="@string/leave_haystack"
+        android:title="@string/leave_haystack"
+        app:showAsAction="always" android:icon="@drawable/ic_action_exit"/>
+
+</menu>

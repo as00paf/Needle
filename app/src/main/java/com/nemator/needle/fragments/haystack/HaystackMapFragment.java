@@ -1,23 +1,20 @@
 package com.nemator.needle.fragments.haystack;
 
 import android.Manifest;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.IntentFilter;
-import android.graphics.Point;
 import android.location.Location;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.SystemClock;
+import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.MenuItem;
-import android.view.animation.Interpolator;
-import android.view.animation.LinearInterpolator;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.Projection;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
@@ -26,18 +23,22 @@ import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.Polygon;
 import com.nemator.needle.Needle;
 import com.nemator.needle.R;
 import com.nemator.needle.activities.HaystackActivity;
 import com.nemator.needle.api.ApiClient;
+import com.nemator.needle.api.result.TaskResult;
 import com.nemator.needle.api.result.UsersResult;
 import com.nemator.needle.broadcastReceiver.LocationServiceBroadcastReceiver;
 import com.nemator.needle.data.LocationServiceDBHelper;
 import com.nemator.needle.models.vo.HaystackVO;
 import com.nemator.needle.models.vo.UserVO;
-import com.nemator.needle.api.result.TaskResult;
 import com.nemator.needle.utils.AppConstants;
+import com.nemator.needle.utils.GoogleMapDrawingUtils;
+import com.nemator.needle.utils.MarkerUtils;
 import com.nemator.needle.utils.PermissionManager;
+import com.nemator.needle.views.UserMarker;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -58,11 +59,12 @@ public class HaystackMapFragment extends SupportMapFragment implements LocationS
 
     //Map
     private GoogleMap mMap;
-    private Marker mMarker;
-    private Circle mCircle;
+    private UserMarker userMarker;
+    private Circle haystackBoundsCircle;
+    private Polygon haystackBoundsPolygon;
 
     //Map data
-    private HashMap<Integer, Marker> mMarkers;
+    private HashMap<Integer, UserMarker> mMarkers;
     private HaystackVO haystack;
     private Boolean cameraUpdated = false;
 
@@ -181,6 +183,9 @@ public class HaystackMapFragment extends SupportMapFragment implements LocationS
             case R.id.menu_option_leave:
                 leaveHaystack();
                 return true;
+            case R.id.menu_option_cancel:
+                cancelHaystack();
+                return true;
         }
 
         return super.onOptionsItemSelected(item);
@@ -209,14 +214,35 @@ public class HaystackMapFragment extends SupportMapFragment implements LocationS
     }
 
     public void updateMap() {
+        //Show Bounds
+        if(haystack != null){
+            if(haystack.getIsCircle()){
+                if(haystackBoundsCircle == null){
+                    CircleOptions circleOptions = new CircleOptions()
+                            .center(haystack.getPositionLatLng())
+                            .radius(haystack.getZoneRadius())
+                            .fillColor(ContextCompat.getColor(getContext(), R.color.circleColor))
+                            .strokeColor(ContextCompat.getColor(getContext(), R.color.primary_dark))
+                            .strokeWidth(8);
+                    haystackBoundsCircle = mMap.addCircle(circleOptions);
+                }else{
+                    haystackBoundsCircle.setCenter(haystack.getPositionLatLng());
+                }
+            }else{
+                if(haystackBoundsPolygon == null){
+                    haystackBoundsPolygon = GoogleMapDrawingUtils.drawHaystackPolygon(getContext(), mMap, haystack);
+                }else{
+                    haystackBoundsPolygon =  GoogleMapDrawingUtils.updateHaystackPolygon(haystackBoundsPolygon, haystack);
+                }
+            }
+        }
+
         //Update user's marker
         if(mCurrentLocation != null){
-            if(mMarker == null && mCircle == null){
-                MarkerOptions markerOptions = new MarkerOptions();
-                markerOptions.position(mCurrentPosition);
-                drawMarkerWithCircle(mCurrentPosition, "Your Position");
+            if(userMarker == null){
+                userMarker = MarkerUtils.createUserMarker(getContext(), mMap, Needle.userModel.getUser(), mCurrentPosition, "Your Position");
             }else{
-                updateMarkerWithCircle(mCurrentPosition);
+                userMarker.setLocation(mCurrentPosition);
             }
         }
 
@@ -230,17 +256,17 @@ public class HaystackMapFragment extends SupportMapFragment implements LocationS
                 Double lng = user.getLocation().getLongitude();
 
                 if(id != Needle.userModel.getUserId()){
-                    Marker marker;
+                    UserMarker marker;
                     LatLng position = new LatLng(lat, lng);
 
                     if(mMarkers == null){
-                        mMarkers = new HashMap<Integer, Marker>();
+                        mMarkers = new HashMap<Integer, UserMarker>();
                     }
 
                     if(mMarkers.containsKey(id)){
                         marker = mMarkers.get(id);
-                        if(!marker.getPosition().equals(position)){
-                            animateMarker(mMap, marker, position, false);
+                        if(!marker.getLocation().equals(position)){
+                            marker.setLocation(position);
 
                             Location loc = new Location("");
                             loc.setLatitude(lat);
@@ -253,14 +279,7 @@ public class HaystackMapFragment extends SupportMapFragment implements LocationS
 
                         //marker.showInfoWindow();
                     }else{
-                        MarkerOptions markerOptions = new MarkerOptions();
-                        markerOptions.position(position);
-
-                        BitmapDescriptor icon = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_VIOLET);
-                        markerOptions.icon(icon);
-
-                        marker = mMap.addMarker(markerOptions);
-                        marker.setPosition(position);
+                        marker = MarkerUtils.createUserMarker(getContext(), mMap, user, position, user.getReadableUserName() + "'s Position");
 
                         Log.i(TAG,"Adding marker with id : "+id+" to map.");
 
@@ -279,7 +298,7 @@ public class HaystackMapFragment extends SupportMapFragment implements LocationS
             Iterator markerIterator = mMarkers.keySet().iterator();
             while(markerIterator.hasNext()) {
                 int markerId = (int) markerIterator.next();
-                Marker marker = (Marker) mMarkers.get(markerId);
+                UserMarker marker = (UserMarker) mMarkers.get(markerId);
 
                 Boolean isActive = false;
 
@@ -308,11 +327,10 @@ public class HaystackMapFragment extends SupportMapFragment implements LocationS
 
         //Add user's marker back
         MarkerOptions markerOptions = new MarkerOptions();
-        if(mMarker == null && mCircle == null){
-            markerOptions.position(mCurrentPosition);
-            drawMarkerWithCircle(mCurrentPosition, "Your Position");
+        if(userMarker == null){
+            userMarker = MarkerUtils.createUserMarker(getContext(), mMap, Needle.userModel.getUser(), mCurrentPosition, "Your Position");
         }else{
-            updateMarkerWithCircle(mCurrentPosition);
+            userMarker.setLocation(mCurrentPosition);
         }
 
         //Add other user's markers back
@@ -480,6 +498,47 @@ public class HaystackMapFragment extends SupportMapFragment implements LocationS
         }
     };
 
+    private void cancelHaystack(){
+        new AlertDialog.Builder(getContext())
+                .setIcon(android.R.drawable.ic_dialog_alert)
+                .setTitle(getContext().getString(R.string.cancel))
+                .setMessage(getContext().getString(R.string.cancel_haystack_confirmation))
+                .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        ApiClient.getInstance().cancelHaystack(Needle.userModel.getUser(), haystack, haystackCancelledCallback);
+                    }
+                })
+                .setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                })
+                .show();
+    }
+
+    //TODO : own class
+    private Callback<TaskResult> haystackCancelledCallback = new Callback<TaskResult>(){
+        @Override
+        public void onResponse(Call<TaskResult> call, Response<TaskResult> response) {
+            TaskResult result = response.body();
+            if(result.getSuccessCode() == 1){
+                Log.d(TAG, "Haystack sucessfully cancelled !");//TODO : use constants
+                Toast.makeText(getContext(), "Haystack sucessfully cancelled", Toast.LENGTH_SHORT).show();
+                getActivity().finish();
+            }else{
+                Toast.makeText(getContext(), "Haystack cancellation failed", Toast.LENGTH_SHORT).show();
+            }
+        }
+
+        @Override
+        public void onFailure(Call<TaskResult> call, Throwable t) {
+            Toast.makeText(getContext(), "Haystack cancellation failed", Toast.LENGTH_SHORT).show();
+            Log.d(TAG, "Haystack cancellation failed. Error : " + t.getMessage() );//TODO : use constants
+        }
+    };
+
     public void shareLocation(){
         mPostingLocationUpdates = true;
         activateUser();
@@ -502,76 +561,6 @@ public class HaystackMapFragment extends SupportMapFragment implements LocationS
             stopSharingLocation();
         }else{
             shareLocation();
-        }
-    }
-
-    //Map Stuff
-    private void drawMarkerWithCircle(LatLng position, String label){
-        double radiusInMeters = 10.0;
-        int strokeColor = getResources().getColor(R.color.primary);
-        int shadeColor = getResources().getColor(R.color.circleColor);
-
-        CircleOptions circleOptions = new CircleOptions().center(position).radius(radiusInMeters).fillColor(shadeColor).strokeColor(strokeColor).strokeWidth(8);
-        mCircle = mMap.addCircle(circleOptions);
-
-        MarkerOptions markerOptions = new MarkerOptions().position(position);
-        mMarker = mMap.addMarker(markerOptions);
-
-        mMarker.setTitle(label);
-    }
-
-    private void updateMarkerWithCircle(LatLng position) {
-        if(!mCircle.getCenter().equals(position)){
-            mCircle.setCenter(position);
-        }
-
-        if(!mMarker.getPosition().equals(position)){
-            animateMarker(mMap, mMarker, position, false);
-        }
-    }
-
-    private void animateMarker(final GoogleMap map, final Marker marker, final LatLng toPosition, final boolean hideMarker) {
-        final Handler handler = new Handler();
-        final long start = SystemClock.uptimeMillis();
-        Projection proj = map.getProjection();
-        Point startPoint = proj.toScreenLocation(marker.getPosition());
-        final LatLng startLatLng = proj.fromScreenLocation(startPoint);
-        final long duration = 500;
-        final Interpolator interpolator = new LinearInterpolator();
-
-        Location startLocation = new Location("");
-        startLocation.setLatitude(startLatLng.latitude);
-        startLocation.setLongitude(startLatLng.longitude);
-
-        Location endLocation = new Location("");
-        endLocation.setLatitude(toPosition.latitude);
-        endLocation.setLongitude(toPosition.longitude);
-
-        float distance = startLocation.distanceTo(endLocation);
-
-        if(distance > 1){
-            handler.post(new Runnable() {
-                @Override
-                public void run() {
-                    long elapsed = SystemClock.uptimeMillis() - start;
-                    float t = interpolator.getInterpolation((float) elapsed / duration);
-                    double lng = t * toPosition.longitude + (1 - t) * startLatLng.longitude;
-                    double lat = t * toPosition.latitude + (1 - t) * startLatLng.latitude;
-                    marker.setPosition(new LatLng(lat, lng));
-
-                    if (t < 1.0) {
-                        // Post again 16ms later.
-                        handler.postDelayed(this, 16);
-                    } else {
-                        if (hideMarker) {
-                            marker.setVisible(false);
-                        } else {
-                            marker.setVisible(true);
-                        }
-                    }
-
-                }
-            });
         }
     }
 

@@ -48,14 +48,6 @@ public class LocationSharingCardHolder extends RecyclerView.ViewHolder implement
         this.adapter = adapter;
     }
 
-    public LocationSharingCardHolder(View view) {
-        super(view);
-        titleView =  (TextView) view.findViewById(R.id.username_label);
-        active_until = (TextView)  view.findViewById(R.id.time_limit_label);
-        emptyText = (TextView) view.findViewById(R.id.title);
-        imageView = (ImageView) view.findViewById(R.id.location_sharing_card_image);
-    }
-
     public void setData(LocationSharingVO locationSharing){
         locationSharingData = locationSharing;
         itemView.setOnClickListener(new View.OnClickListener() {

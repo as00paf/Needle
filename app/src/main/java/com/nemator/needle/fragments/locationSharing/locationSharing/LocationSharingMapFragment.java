@@ -285,7 +285,7 @@ public class LocationSharingMapFragment extends SupportMapFragment
 
         CircleOptions circleOptions = new CircleOptions().center(position).radius(radiusInMeters).fillColor(shadeColor).strokeColor(strokeColor).strokeWidth(8);
         Circle circle = mMap.addCircle(circleOptions);
-        final Marker marker = MarkerUtils.createUserMarker(getActivity(), mMap, user, position).getMarker();
+        final Marker marker = MarkerUtils.createUserMarker(getActivity(), mMap, user, position, user.getReadableUserName() + "'s Position").getMarker();
 
         String label = Needle.userModel.getUserId() == user.getId() ? "Your Location" : user.getReadableUserName() + "' Location";
         marker.setTitle(label);

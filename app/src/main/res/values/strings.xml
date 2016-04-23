@@ -126,6 +126,9 @@
     <string name="cancel">Cancel</string>
     <string name="cancel_location_sharing_confirmation">Are you sure you want to cancel this Location Sharing ?</string>
     <string name="ok">Okay</string>
+    <string name="cancel_haystack">Cancel Haystack</string>
+    <string name="cancel_haystack_confirmation">Are you sure you want to cancel this Haystack ?</string>
+    <string name="cancel_haystack_leave_confirmation">Are you sure you want to leave this Haystack ?</string>
 
     <string name="fetch_haystack_error">Could Not Fetch Haystacks</string>
     <string name="share_location_back">Share Location Back</string>

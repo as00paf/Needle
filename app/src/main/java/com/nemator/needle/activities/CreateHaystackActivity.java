@@ -180,9 +180,7 @@ public class CreateHaystackActivity extends AppCompatActivity implements ImageUp
     };
 
     private void initPermissionsAndServices() {
-        if(Needle.gcmController.checkPlayServices()){
-            Needle.googleApiController.checkLocationSettings();
-        }
+        Needle.googleApiController.checkLocationSettings();
     }
 
     @Override

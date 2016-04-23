@@ -1,0 +1,9 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item android:id="@+id/menu_option_cancel"
+        android:description="@string/cancel_haystack"
+        android:title="@string/cancel_haystack"
+        app:showAsAction="always" android:icon="@drawable/ic_action_exit"/>
+
+</menu>

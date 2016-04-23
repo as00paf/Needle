@@ -1,5 +1,6 @@
 package com.nemator.needle.adapter;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -9,20 +10,24 @@ import com.nemator.needle.R;
 import com.nemator.needle.fragments.haystacks.HaystackListTabFragment;
 
 public class HaystackPagerAdapter extends FragmentStatePagerAdapter {
+
+    //Tabs
     private HaystackListTabFragment publicHaystackListFragment;
     private HaystackListTabFragment privateHaystackListFragment;
     private HaystackListTabFragment ownedHaystackListFragment;
 
-    private Fragment fragment;
+    private HaystackListTabFragment.HaystackListFragmentInteractionListener listener;
+    private Context context;
 
-    public HaystackPagerAdapter(FragmentManager fm, Fragment frag) {
+    public HaystackPagerAdapter(FragmentManager fm, Context context, HaystackListTabFragment.HaystackListFragmentInteractionListener listener) {
         super(fm);
-        fragment = frag;
+        this.context = context;
+        this.listener = listener;
     }
 
     @Override
     public Fragment getItem(int position) {
-        HaystackListTabFragment fragment  = new HaystackListTabFragment();
+        HaystackListTabFragment fragment  = HaystackListTabFragment.newInstance(listener);
 
         Bundle args = new Bundle();
         switch(position){
@@ -65,13 +70,13 @@ public class HaystackPagerAdapter extends FragmentStatePagerAdapter {
         String title;
         switch (position){
             case 0:
-                title = fragment.getString(R.string.publicHeader);
+                title = context.getString(R.string.publicHeader);
                 break;
             case 1:
-                title = fragment.getString(R.string.privateHeader);
+                title = context.getString(R.string.privateHeader);
                 break;
             case 2:
-                title = fragment.getString(R.string.ownedHeader);
+                title = context.getString(R.string.ownedHeader);
                 break;
             default:
                 title = "tab " + String.valueOf(position);

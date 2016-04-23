@@ -37,6 +37,14 @@ public class UserMarker extends MarkerTarget{
         }
     }
 
+    public void showInfoWindow() {
+        marker.showInfoWindow();
+    }
+
+    public void remove() {
+        marker.remove();
+    }
+
     //Getters/Setters
     public UserVO getUser() {
         return user;
@@ -61,5 +69,14 @@ public class UserMarker extends MarkerTarget{
     public void setCircle(Circle circle) {
         this.circle = circle;
     }
+
+    public void setSnippet(String snippet){
+        marker.setSnippet(snippet);
+    }
+
+    public void setTitle(String title) {
+        marker.setTitle(title);
+    }
+
 }
 

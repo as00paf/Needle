@@ -44,10 +44,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-import static com.nemator.needle.fragments.haystacks.HaystackListFragment.HaystackListFragmentInteractionListener;
-
-public class NavigationController implements HomeActivity.NavigationHandler, OnActivityStateChangeListener,
-        HaystackListFragmentInteractionListener {
+public class NavigationController implements HomeActivity.NavigationHandler, OnActivityStateChangeListener{
 
     private static final String TAG = "NavigationController";
 
@@ -380,21 +377,16 @@ public class NavigationController implements HomeActivity.NavigationHandler, OnA
         showSection(previousState);
     }
 
-    //HaystackListFragmentInteractionListener
-    @Override
-    public void onRefreshHaystackList() {
-        haystacksListFragment.fetchHaystacks(true);
-    }
-
-    @Override
-    public void onClickHaystackCard(HaystackVO haystack) {
-        Intent haystackIntent = new Intent(activity, HaystackActivity.class);
-        haystackIntent.putExtra(AppConstants.TAG_HAYSTACK, (Parcelable) haystack);
-        activity.startActivity(haystackIntent);
-    }
-
     public void refreshLocationSharingList() {
-        locationSharingListFragment.fetchLocationSharing(true);
+        if(locationSharingListFragment != null){
+            locationSharingListFragment.fetchLocationSharing(true);
+        }
+    }
+
+    public void refreshHaystackList() {
+        if(haystacksListFragment != null){
+            haystacksListFragment.fetchHaystacks(true);
+        }
     }
 
     public void onLogOutComplete() {

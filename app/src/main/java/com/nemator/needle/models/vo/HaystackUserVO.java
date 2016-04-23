@@ -15,10 +15,14 @@ public class HaystackUserVO {
     @SerializedName("user")
     private UserVO user;
 
+    @SerializedName("haystackId")
+    private int haystackId;
+
     public HaystackUserVO(HaystackVO haystack, UserVO user) {
         super();
         this.haystack = haystack;
         this.user = user;
+        this.haystackId = haystack.getId();
     }
 
     public UserVO getUser() {
@@ -35,5 +39,13 @@ public class HaystackUserVO {
 
     public void setHaystack(HaystackVO haystack) {
         this.haystack = haystack;
+    }
+
+    public int getHaystackId() {
+        return haystackId;
+    }
+
+    public void setHaystackId(int haystackId) {
+        this.haystackId = haystackId;
     }
 }

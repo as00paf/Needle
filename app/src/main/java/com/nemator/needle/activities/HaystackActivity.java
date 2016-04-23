@@ -176,8 +176,14 @@ public class HaystackActivity extends AppCompatActivity{
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         this.menu = menu;
-        getMenuInflater().inflate(R.menu.haystack, menu);
+        int menuRes = mIsOwner ? R.menu.haystack_owner : R.menu.haystack;
+        getMenuInflater().inflate(menuRes, menu);
         return true;
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
     }
 
     @Override

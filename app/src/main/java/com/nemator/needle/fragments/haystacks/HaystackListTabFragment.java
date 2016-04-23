@@ -1,21 +1,33 @@
 package com.nemator.needle.fragments.haystacks;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.nemator.needle.Needle;
 import com.nemator.needle.R;
+import com.nemator.needle.activities.HaystackActivity;
 import com.nemator.needle.adapter.HaystackCardAdapter;
+import com.nemator.needle.api.ApiClient;
+import com.nemator.needle.api.result.TaskResult;
 import com.nemator.needle.models.vo.HaystackVO;
+import com.nemator.needle.utils.AppConstants;
 
 import java.util.ArrayList;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class HaystackListTabFragment extends Fragment {
     private static final String TAG = "HaystackListTabFragment";
@@ -29,11 +41,17 @@ public class HaystackListTabFragment extends Fragment {
     private OnActivityStateChangeListener stateChangeCallback;
     private RecyclerView.Adapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
-    private HaystackListFragment.HaystackListFragmentInteractionListener interactionListener;
 
     //Data
     private ArrayList<HaystackVO> dataList;
     private Boolean isPublic;
+    private HaystackListFragmentInteractionListener listener;
+
+    public static HaystackListTabFragment newInstance(HaystackListTabFragment.HaystackListFragmentInteractionListener listener){
+        HaystackListTabFragment fragment = new HaystackListTabFragment();
+        fragment.listener = listener;
+        return fragment;
+    }
 
     @Override
     public void onCreate(Bundle savedInstanceState){
@@ -51,7 +69,6 @@ public class HaystackListTabFragment extends Fragment {
 
         try {
             stateChangeCallback = Needle.navigationController;
-            interactionListener = Needle.navigationController;
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString()
                     + " must implement OnActivityStateChangeListener");
@@ -69,7 +86,7 @@ public class HaystackListTabFragment extends Fragment {
         mLayoutManager = new LinearLayoutManager(getActivity());
         mRecyclerView.setLayoutManager(mLayoutManager);
 
-        mAdapter = new HaystackCardAdapter(this.dataList, getActivity(), interactionListener);
+        mAdapter = new HaystackCardAdapter(this.dataList, getActivity(), (HaystackListTabFragment.HaystackListFragmentInteractionListener) getParentFragment());
         mRecyclerView.setAdapter(mAdapter);
 
         //Swipe To Refresh
@@ -77,7 +94,7 @@ public class HaystackListTabFragment extends Fragment {
         swipeLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                interactionListener.onRefreshHaystackList();
+                listener.onRefreshHaystackList();
             }
         });
 
@@ -87,7 +104,7 @@ public class HaystackListTabFragment extends Fragment {
     public void updateHaystackList(ArrayList<HaystackVO> data){
         this.dataList = data;
 
-        mAdapter = new HaystackCardAdapter(this.dataList, getActivity(), interactionListener);
+        mAdapter = new HaystackCardAdapter(this.dataList, getActivity(), listener);
 
         if(mRecyclerView != null){
             mRecyclerView.setAdapter(mAdapter);
@@ -99,4 +116,12 @@ public class HaystackListTabFragment extends Fragment {
     public SwipeRefreshLayout getRefreshLayout() {
         return swipeLayout;
     }
+
+    public static interface HaystackListFragmentInteractionListener {
+        void onRefreshHaystackList();
+        void onClickHaystackCard(HaystackVO haystack);
+        void onCancelHaystack(HaystackVO haystack);
+        void onLeaveHaystack(HaystackVO haystack);
+    }
+
 }

@@ -9,35 +9,53 @@
     android:foreground="?android:attr/selectableItemBackground"
     android:layout_margin="8dp"
     app:cardElevation="2dp"
+    card_view:cardUseCompatPadding="true"
     android:clickable="true">
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="wrap_content"
+        android:padding="4dp"
+        android:paddingBottom="8dp">
 
         <ImageView
             android:id="@+id/imageView"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
+            android:layout_width="72dp"
+            android:layout_height="72dp"
             android:scaleType="centerCrop"
-            android:layout_margin="16dp"
+            android:layout_margin="8dp"
             android:layout_alignParentLeft="true"
-            android:layout_centerVertical="true"/>
+            android:layout_alignParentTop="true"
+            android:background="@color/bg_grey"/>
 
         <TextView
             android:id="@+id/title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_alignParentTop="true"
-            android:layout_margin="8dp"
-            android:layout_toRightOf="@id/imageView"/>
+            android:maxHeight="72dp"
+            android:maxLines="3"
+            android:paddingLeft="8dp"
+            android:layout_marginRight="8dp"
+            android:layout_alignTop="@id/imageView"
+            android:layout_toRightOf="@id/imageView"
+            android:textAppearance="@style/TextAppearance.AppCompat.Body2"
+            android:clickable="true"
+            android:text="Gnex Shared his Location Sharing\nxfsdfjksdsadsadsadhasbjdgas"
+            android:linksClickable="true"/>
 
         <TextView
             android:id="@+id/sent_at"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_margin="8dp"
-            android:layout_toRightOf="@id/imageView"
-            android:layout_below="@id/title"/>
+            android:gravity="bottom|right"
+            android:layout_marginRight="8dp"
+            android:layout_alignParentRight="true"
+            android:layout_alignBottom="@id/imageView"
+            android:layout_below="@id/title"
+            android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+            android:textColorLink="@color/primary"
+            android:linksClickable="true"
+            android:text="2016-04-16 15:25:31"/>
+
     </RelativeLayout>
 </android.support.v7.widget.CardView>

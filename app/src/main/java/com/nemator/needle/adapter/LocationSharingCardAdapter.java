@@ -16,6 +16,7 @@ import com.nemator.needle.api.ApiClient;
 import com.nemator.needle.api.result.LocationSharingResult;
 import com.nemator.needle.fragments.locationSharing.LocationSharingCardListener;
 import com.nemator.needle.models.vo.LocationSharingVO;
+import com.nemator.needle.utils.AppUtils;
 import com.nemator.needle.viewHolders.LocationSharingCardHolder;
 import com.squareup.picasso.Picasso;
 
@@ -83,21 +84,7 @@ public class LocationSharingCardAdapter extends RecyclerView.Adapter<LocationSha
                 holder.titleView.setText(isSent ? locationSharing.getReceiver().getReadableUserName() :
                                                     locationSharing.getSender().getReadableUserName());
 
-                String activeUntil = locationSharing.getTimeLimit();
-                activeUntil = activeUntil.replace("00:00:00", "");
-                activeUntil = activeUntil.replace(":00", "");
-
-                /*SimpleDateFormat srcDf = new SimpleDateFormat("dd-MM-yyyy-hh-mm-ss");
-
-                try {
-                    Date date = srcDf.parse(activeUntil);
-                    SimpleDateFormat destDf = new SimpleDateFormat("MM/dd/yyyy");
-                    activeUntil = destDf.format(date);
-                } catch (ParseException e) {
-                    e.printStackTrace();
-                }
-                */
-                holder.active_until.setText(activeUntil);
+                holder.active_until.setText(AppUtils.formatDateUntil(mContext, locationSharing.getTimeLimit()));
 
                 if (holder.imageView != null) {
 

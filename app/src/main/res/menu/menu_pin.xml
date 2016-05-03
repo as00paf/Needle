@@ -1,0 +1,19 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item android:id="@+id/menu_option_move_pin"
+        android:description="@string/move_pin"
+        android:title="@string/move_pin"
+        app:showAsAction="always" android:icon="@drawable/ic_action_location_searching"/>
+
+    <item android:id="@+id/menu_option_edit_pin"
+        android:description="@string/edit_pin"
+        android:title="@string/edit_pin"
+        app:showAsAction="always" android:icon="@drawable/ic_action_place"/>
+
+    <item android:id="@+id/menu_option_delete_pin"
+        android:description="@string/delete_pin"
+        android:title="@string/delete_pin"
+        app:showAsAction="always" android:icon="@drawable/ic_action_location_off"/>
+
+</menu>

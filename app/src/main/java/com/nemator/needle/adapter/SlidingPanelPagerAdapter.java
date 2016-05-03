@@ -12,6 +12,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.nemator.needle.R;
+import com.nemator.needle.fragments.haystack.HaystackPinsTabFragment;
 import com.nemator.needle.fragments.haystack.HaystackUsersTabFragment;
 
 import java.util.ArrayList;
@@ -27,36 +28,27 @@ public class SlidingPanelPagerAdapter extends FragmentStatePagerAdapter {
 
     @Override
     public Fragment getItem(int position) {
-        Fragment fragment;
+        Fragment fragment = null;
 
         switch (position){
             case 0://Pins tab
-                fragment = new DemoObjectFragment();
+                fragment = new HaystackPinsTabFragment();
                 break;
-            case 1://Directions tab
-                fragment = new DemoObjectFragment();
-                break;
-            case 2://Users tab
+            case 1://Users tab
                 fragment = new HaystackUsersTabFragment();
-                break;
-            default:
-                fragment = new DemoObjectFragment();
                 break;
         }
 
-        fragmentList.add(position, fragment);
-
-        Bundle args = new Bundle();
-        // Our object is just an integer :-P
-        args.putInt(DemoObjectFragment.ARG_OBJECT, position + 1);
-        fragment.setArguments(args);
+        if(fragment != null){
+            fragmentList.add(position, fragment);
+        }
 
         return fragment;
     }
 
     @Override
     public int getCount() {
-        return 3;
+        return 2;
     }
 
     @Override
@@ -67,9 +59,6 @@ public class SlidingPanelPagerAdapter extends FragmentStatePagerAdapter {
                 title = context.getString(R.string.title_pins);
                 break;
             case 1:
-                title = context.getString(R.string.title_directions);
-                break;
-            case 2:
                 title = context.getString(R.string.title_users);
                 break;
             default:
@@ -87,9 +76,6 @@ public class SlidingPanelPagerAdapter extends FragmentStatePagerAdapter {
                 icon = context.getResources().getDrawable(R.drawable.ic_action_place);
                 break;
             case 1:
-                icon= context.getResources().getDrawable(R.drawable.ic_action_directions);
-                break;
-            case 2:
                 icon= context.getResources().getDrawable(R.drawable.ic_action_group);
                 break;
             default:
@@ -112,22 +98,5 @@ public class SlidingPanelPagerAdapter extends FragmentStatePagerAdapter {
     public void destroyItem(View container, int position, Object object) {
         super.destroyItem(container, position, object);
         fragmentList.remove(position);
-    }
-
-    public static class DemoObjectFragment extends Fragment {
-        public static final String ARG_OBJECT = "object";
-
-        @Override
-        public View onCreateView(LayoutInflater inflater,
-                                 ViewGroup container, Bundle savedInstanceState) {
-            // The last two arguments ensure LayoutParams are inflated
-            // properly.
-            View rootView = inflater.inflate(
-                    R.layout.fragment_collection_object, container, false);
-            Bundle args = getArguments();
-            ((TextView) rootView.findViewById(R.id.view_pager_label)).setText(
-                    Integer.toString(args.getInt(ARG_OBJECT)));
-            return rootView;
-        }
     }
 }

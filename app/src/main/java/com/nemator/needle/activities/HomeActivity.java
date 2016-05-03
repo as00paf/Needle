@@ -225,7 +225,6 @@ public class HomeActivity extends AppCompatActivity {
                 setHaystacksCount(result.getHaystackCount());
                 setLocationSharingCount(result.getLocationSharingCount());
                 setNotificationsCount(result.getNotificationCount());
-                //TODO : notification count
             }
         }
 

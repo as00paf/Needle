@@ -66,25 +66,8 @@ public class HaystackCardAdapter extends RecyclerView.Adapter<HaystackCardHolder
 
         switch (cardType) {
             case TYPE_ITEM:
-                HaystackVO haystack = (HaystackVO) listData.get(position);
-                holder.titleView.setText(haystack.getName());
-
-                int count = haystack.getActiveUsers().size();
-                String userCount = count + " " +mContext.getResources().getString(R.string.activeUsers);
-                holder.userCountView.setText(userCount);
-
-                String activeUntil = haystack.getTimeLimit();
-                activeUntil = activeUntil.replace("00:00:00", "");
-                activeUntil = activeUntil.replace(":00", "");
-                holder.active_until.setText(activeUntil);
-
-                if (holder.imageView != null && haystack.getPictureURL() != null) {
-                    String encodedURL = AppConstants.HAYSTACK_PICTURES_URL + Uri.encode(haystack.getPictureURL());
-                   // new ImageDownloaderTask(holder.imageView, mContext.getResources().getDrawable(R.drawable.haystack_picture_placeholder)).execute(encodedURL);
-                }
-
+                HaystackVO haystack = listData.get(position);
                 holder.setData(haystack);
-
                 break;
             case TYPE_EMPTY:
                 holder.emptyText.setText(mContext.getResources().getString(R.string.noHaystackAvailable));

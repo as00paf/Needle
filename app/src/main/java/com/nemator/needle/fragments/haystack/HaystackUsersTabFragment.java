@@ -70,7 +70,7 @@ public class HaystackUsersTabFragment extends Fragment{
 
         @Override
         public void onFailure(Call<UsersResult> call, Throwable t) {
-
+            Log.d(TAG, "Could not fetch users : " + t.getMessage());
         }
     };
 

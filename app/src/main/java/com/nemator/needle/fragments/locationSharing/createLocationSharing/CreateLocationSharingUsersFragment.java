@@ -8,6 +8,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.nemator.needle.Needle;
 import com.nemator.needle.R;
@@ -114,7 +115,7 @@ public class CreateLocationSharingUsersFragment extends CreateHaystackBaseFragme
     }
 
     public UserVO getSelectedUser(){
-        if(mAdapter.getSelectedItems() != null){
+        if(mAdapter.getSelectedItems() != null && mAdapter.getSelectedItems().size() > 0){
             return mAdapter.getSelectedItems().get(0);
         }
 

@@ -15,6 +15,8 @@
     <string name="title_settings">Settings</string>
     <string name="title_helpAndSupport">Help &amp; Support</string>
     <string name="title_logOut">Log Out</string>
+    <string name="create">Create</string>
+    <string name="ends">Ends %1$s</string>
 
     <!-- App Settings Activity -->
     <string name="rememberMeSummary">Make the Needle remember your credentials</string>
@@ -95,7 +97,6 @@
     <string name="confirm">Confirm</string>
     <string name="addRemoveUsers">Add/Remove Users</string>
     <string name="get_directions_to_user">Get Directions To User</string>
-    <string name="add_pin">Add Pin</string>
     <string name="adding_users">Adding Users...</string>
     <string name="haystack_created">Haystack Created</string>
     <string name="sharing_location_error">Error Sharing Your Location</string>
@@ -114,6 +115,7 @@
     <string name="friend_name_hint">Friend\'s Name</string>
     <string name="general_infos">General Infos</string>
     <string name="noLocationSharingAvailable">No Location Sharing Available</string>
+    <string name="noPinsAvailable">No Pins Available</string>
     <string name="create_location_sharing">Create Location Sharing</string>
     <string name="receivedHeader">Received</string>
     <string name="sentHeader">Sent</string>
@@ -138,6 +140,7 @@
 
     <!-- Location Sharing -->
     <string name="fetch_location_sharings_error">Could Not Fetch Location Sharings</string>
+    <string name="no_users_selected_msg">You need to select someone to share your location with</string>
 
     <!-- Notifications -->
     <string name="no_notifications_yet">No notifications yet</string>
@@ -186,5 +189,15 @@
     <string name="facebook_account">Facebook Account</string>
     <string name="twitter_account">Twitter Account</string>
     <string name="google_account_title">Google Account</string>
+
+    <!-- Pins -->
+    <string name="delete_pin">Delete Pin</string>
+    <string name="move_pin">Move Pin</string>
+    <string name="edit_pin">Edit Pin</string>
+    <string name="new_pin">New Pin</string>
+    <string name="set_pins_location">Set Pin\'s Location</string>
+    <string name="pin_name">Pin Name</string>
+    <string name="add_pin">Add Pin</string>
+
 
 </resources>

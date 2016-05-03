@@ -13,9 +13,9 @@ import android.widget.TextView;
 
 import com.nemator.needle.Needle;
 import com.nemator.needle.R;
-import com.nemator.needle.fragments.haystacks.HaystackListFragment;
 import com.nemator.needle.fragments.haystacks.HaystackListTabFragment;
 import com.nemator.needle.models.vo.HaystackVO;
+import com.nemator.needle.utils.AppUtils;
 
 public class HaystackCardHolder extends RecyclerView.ViewHolder implements PopupMenu.OnMenuItemClickListener, View.OnClickListener {
 
@@ -35,7 +35,7 @@ public class HaystackCardHolder extends RecyclerView.ViewHolder implements Popup
     public HaystackCardHolder(View view, HaystackListTabFragment.HaystackListFragmentInteractionListener listener) {
         super(view);
         this.listener = listener;
-        titleView =  (TextView) view.findViewById(R.id.description);
+        titleView =  (TextView) view.findViewById(R.id.title);
         userCountView = (TextView)  view.findViewById(R.id.active_users);
         active_until = (TextView)  view.findViewById(R.id.active_until);
         menuButton = (ImageButton) view.findViewById(R.id.location_sharing_card_menu_button);
@@ -52,8 +52,16 @@ public class HaystackCardHolder extends RecyclerView.ViewHolder implements Popup
             }
         });
 
-
         isOwner = haystack.getOwner() == Needle.userModel.getUserId();
+
+        titleView.setText(haystack.getName());
+
+        int count = haystack.getActiveUsers().size();
+        String userCount = count + " " + itemView.getResources().getString(R.string.activeUsers);
+        userCountView.setText(userCount);
+
+        active_until.setText(AppUtils.formatDateUntil(itemView.getContext(), haystack.getTimeLimit()));
+
         menuButton.setOnClickListener(this);
     }
 
@@ -72,7 +80,7 @@ public class HaystackCardHolder extends RecyclerView.ViewHolder implements Popup
     @Override
     public boolean onMenuItemClick(MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.menu_option_cancel:
+            case R.id.menu_option_cancel_haystack:
                 new AlertDialog.Builder(itemView.getContext())
                         .setIcon(android.R.drawable.ic_dialog_alert)
                         .setTitle(itemView.getContext().getString(R.string.cancel))

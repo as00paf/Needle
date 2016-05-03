@@ -37,7 +37,7 @@ public class HaystackVO implements Serializable, Parcelable {
     private int zoneRadius;
 
     @SerializedName("isCircle")
-    private Boolean isCircle = true;
+    private Boolean isCircle;
 
     @SerializedName("location")
     private LocationVO position;

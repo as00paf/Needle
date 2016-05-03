@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -131,6 +132,7 @@ public class LocationSharingListFragment extends Fragment {
                 }
             });
 
+            mSlidingTabLayout.setSelectedIndicatorColors(ContextCompat.getColor(getContext(), android.R.color.white));
             mSlidingTabLayout.setViewPager(locationSharingViewPager);
             mSlidingTabLayout.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
                 @Override
@@ -198,7 +200,7 @@ public class LocationSharingListFragment extends Fragment {
                     }
 
                     if(receivedLocationsList != null && getActivity() != null){
-                        ((HomeActivity) getActivity()).setLocationSharingCount(receivedLocationsList.size());
+                        ((HomeActivity) getActivity()).setLocationSharingCount(receivedLocationsList.size() + sentLocationsList.size());
                     }
 
                     if(receivedTab != null) receivedTab.updateLocationSharingList(receivedLocationsList);

@@ -1,13 +1,20 @@
 package com.nemator.needle.activities;
 
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.location.Location;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.view.ViewPager;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
@@ -18,16 +25,23 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.appcompat.view.slidingTab.SlidingTabLayout;
+import com.google.android.gms.maps.model.LatLng;
 import com.nemator.needle.Needle;
 import com.nemator.needle.R;
 import com.nemator.needle.adapter.SlidingPanelPagerAdapter;
 import com.nemator.needle.api.ApiClient;
 import com.nemator.needle.api.result.HaystackResult;
+import com.nemator.needle.api.result.PinResult;
+import com.nemator.needle.fragments.haystack.AddPinDialogFragment;
+import com.nemator.needle.fragments.haystack.HaystackMapFragment;
 import com.nemator.needle.fragments.haystack.HaystackUsersTabFragment;
 import com.nemator.needle.models.vo.HaystackVO;
+import com.nemator.needle.models.vo.PinVO;
 import com.nemator.needle.models.vo.UserVO;
 import com.nemator.needle.utils.AppConstants;
+import com.nemator.needle.utils.AppUtils;
 import com.nemator.needle.views.CustomBottomSheetLayout;
+import com.nemator.needle.views.LocationMarker;
 
 import java.util.ArrayList;
 
@@ -35,22 +49,28 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class HaystackActivity extends AppCompatActivity{
+public class HaystackActivity extends AppCompatActivity implements AddPinDialogFragment.Listener{
 
     private static final String TAG = "HaystackActivity";
 
+    public static final int DEFAULT_STATE = 0;
+    public static final int ADD_PIN_STATE = 1;
+
     private Toolbar toolbar;
+    private HaystackMapFragment mapFragment;
     private SlidingPanelPagerAdapter pagerAdapter;
     private ViewPager slidingPanelViewPager;
     private SlidingTabLayout tabLayout;
     private CustomBottomSheetLayout bottomSheet;
     private TextView activeUntilLabel;
     private FloatingActionButton fab;
+    private LocationMarker locationMarker;
 
     private HaystackVO haystack;
     private boolean mIsOwner;
 
     private Menu menu;
+    private int currentState = DEFAULT_STATE;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,6 +90,8 @@ public class HaystackActivity extends AppCompatActivity{
             haystack = (HaystackVO) getIntent().getExtras().get(AppConstants.TAG_HAYSTACK);
         }
 
+        mapFragment = (HaystackMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
+
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         toolbar.setTitle(haystack.getName());
         setSupportActionBar(toolbar);
@@ -84,12 +106,8 @@ public class HaystackActivity extends AppCompatActivity{
         bottomSheet.setInterceptContentTouch(false);
 
         //Active Until Label
-        String activeUntil = getResources().getString(R.string.activeUntil)+ " " + haystack.getTimeLimit();
-        activeUntil = activeUntil.replace(" 00:00:00", "");
-        activeUntil = activeUntil.replace(":00", "");
-
         activeUntilLabel = (TextView) bottomSheet.findViewById(R.id.active_until_label);
-        activeUntilLabel.setText(activeUntil);
+        activeUntilLabel.setText(AppUtils.formatDateUntil(this, haystack.getTimeLimit()));
 
         //View pager
         pagerAdapter = new SlidingPanelPagerAdapter(getSupportFragmentManager(), this);
@@ -165,6 +183,9 @@ public class HaystackActivity extends AppCompatActivity{
         }else{
             fab.setVisibility(View.INVISIBLE);
         }
+
+        locationMarker = (LocationMarker) findViewById(R.id.locationMarker);
+        locationMarker.setVisibility(View.INVISIBLE);
     }
 
     @Override
@@ -271,5 +292,93 @@ public class HaystackActivity extends AppCompatActivity{
         Needle.serviceController.unbindService();
 
         super.onDestroy();
+    }
+
+    public void addPin() {
+        setCurrentState(ADD_PIN_STATE);
+        bottomSheet.peekSheet();
+
+        toolbar.setTitle(R.string.add_pin);
+
+        menu.clear();
+        getMenuInflater().inflate(R.menu.menu_confirm_cancel, menu);
+
+        locationMarker.setTitle(getString(R.string.set_pins_location));
+        locationMarker.setVisibility(View.VISIBLE);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if(item.getItemId() == R.id.menu_option_cancel){
+            setCurrentState(DEFAULT_STATE);
+        }else if(item.getItemId() == R.id.menu_option_confirm){
+            showAddPinDialog();
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
+    private void showAddPinDialog() {
+        setCurrentState(DEFAULT_STATE);
+
+        DialogFragment newFragment = new AddPinDialogFragment();
+        newFragment.show(getSupportFragmentManager(), "add_pin");
+    }
+
+    public int getCurrentState() {
+        return currentState;
+    }
+
+    public void setCurrentState(int currentState) {
+        this.currentState = currentState;
+        if(currentState == DEFAULT_STATE){
+            menu.clear();
+            int menuRes = mIsOwner ? R.menu.haystack_owner : R.menu.haystack;
+            getMenuInflater().inflate(menuRes, menu);
+
+            toolbar.setTitle(haystack.getName());
+
+            locationMarker.setVisibility(View.INVISIBLE);
+        }
+    }
+
+    @Override
+    public void onConfirm(String title) {
+        LatLng location = mapFragment.getMapTarget();
+
+        PinVO pin = new PinVO();
+        pin.setText(title);
+        pin.setLatitude(location.latitude);
+        pin.setLongitude(location.longitude);
+        pin.setOwnerId(Needle.userModel.getUserId());
+        pin.setHaystackId(haystack.getId());
+
+        ApiClient.getInstance().createHaystackPin(pin, createPinCallback);
+
+        setCurrentState(DEFAULT_STATE);
+    }
+
+    private Callback<PinResult> createPinCallback = new Callback<PinResult>() {
+        @Override
+        public void onResponse(Call<PinResult> call, Response<PinResult> response) {
+            PinResult result = response.body();
+
+            if(result.getSuccessCode() == 1){
+                mapFragment.updateMap();
+            }else{
+                Toast.makeText(HaystackActivity.this, "Could not create pin", Toast.LENGTH_SHORT).show();//TODO : use strings
+                Log.e(TAG, "Error creating pin : " + result.getMessage());
+            }
+        }
+
+        @Override
+        public void onFailure(Call<PinResult> call, Throwable t) {
+            Log.e(TAG, "Error creating pin : " + t.getMessage());
+        }
+    };
+
+    @Override
+    public void onCancel() {
+        setCurrentState(DEFAULT_STATE);
     }
 }

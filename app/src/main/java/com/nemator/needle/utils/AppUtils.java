@@ -3,11 +3,18 @@ package com.nemator.needle.utils;
 import android.content.Context;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.support.v4.content.ContextCompat;
+import android.text.format.DateUtils;
 import android.util.Base64;
 import android.util.Log;
 
+import com.nemator.needle.R;
+
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 /**
  * Created by Alex on 23/08/2015.
@@ -27,5 +34,24 @@ public class AppUtils {
         } catch (PackageManager.NameNotFoundException e) {
         } catch (NoSuchAlgorithmException e) {
         }
+    }
+
+    public static CharSequence formatDateUntil(Context context, String activeUntil) {
+        CharSequence result = null;
+
+        //2016-04-27 20:47:00
+        SimpleDateFormat srcDf = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+
+        try {
+            Date date = srcDf.parse(activeUntil);
+            long now = System.currentTimeMillis();
+
+            result = context.getString(R.string.ends, DateUtils.getRelativeTimeSpanString(date.getTime(), now, 0L, DateUtils.FORMAT_ABBREV_ALL));
+
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        return result;
     }
 }

@@ -43,6 +43,7 @@ public class UserMarker extends MarkerTarget{
 
     public void remove() {
         marker.remove();
+        circle.remove();
     }
 
     //Getters/Setters

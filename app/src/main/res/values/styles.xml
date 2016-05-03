@@ -73,4 +73,10 @@
         <item name="android:textColor">@android:color/white</item>
     </style>
 
+    <style name="AppDialogTheme" parent="Theme.AppCompat.Light.Dialog">
+        <item name="colorControlNormal">@color/primary</item>
+        <item name="colorPrimary">@color/primary</item>
+        <item name="colorAccent">@color/primary</item>
+    </style>
+
 </resources>

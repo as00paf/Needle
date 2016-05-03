@@ -4,6 +4,8 @@ import com.nemator.needle.api.result.HaystackResult;
 import com.nemator.needle.api.result.LocationSharingResult;
 import com.nemator.needle.api.result.LoginResult;
 import com.nemator.needle.api.result.NotificationResult;
+import com.nemator.needle.api.result.PinResult;
+import com.nemator.needle.api.result.PinsResult;
 import com.nemator.needle.api.result.UserRegistrationResult;
 import com.nemator.needle.api.result.UserResult;
 import com.nemator.needle.api.result.UsersResult;
@@ -11,6 +13,7 @@ import com.nemator.needle.models.vo.HaystackUserVO;
 import com.nemator.needle.models.vo.HaystackVO;
 import com.nemator.needle.models.vo.LocationSharingVO;
 import com.nemator.needle.models.vo.NotificationVO;
+import com.nemator.needle.models.vo.PinVO;
 import com.nemator.needle.models.vo.UserVO;
 import com.nemator.needle.api.result.TaskResult;
 
@@ -68,6 +71,13 @@ public interface NeedleApiClient {
 
     @HTTP(method = "DELETE", path = "haystack.php", hasBody = true)
     Call<TaskResult> cancelHaystack(@Body HaystackUserVO vo);
+
+    //Pins
+    @GET("pin.php")
+    Call<PinsResult> getHaystackPins(@Query("haystackId") int haystackId);
+
+    @POST("pin.php")
+    Call<PinResult> createPin(@Body PinVO pin);
 
     //Location
     @PUT("location.php")

@@ -5,6 +5,8 @@ import android.util.Log;
 import com.nemator.needle.Needle;
 import com.nemator.needle.api.result.LocationSharingResult;
 import com.nemator.needle.api.result.NotificationResult;
+import com.nemator.needle.api.result.PinResult;
+import com.nemator.needle.api.result.PinsResult;
 import com.nemator.needle.api.result.UserRegistrationResult;
 import com.nemator.needle.api.result.UserResult;
 import com.nemator.needle.api.result.UsersResult;
@@ -12,6 +14,7 @@ import com.nemator.needle.models.vo.HaystackUserVO;
 import com.nemator.needle.models.vo.HaystackVO;
 import com.nemator.needle.models.vo.LocationSharingVO;
 import com.nemator.needle.models.vo.NotificationVO;
+import com.nemator.needle.models.vo.PinVO;
 import com.nemator.needle.models.vo.UserVO;
 import com.nemator.needle.api.result.TaskResult;
 import com.nemator.needle.api.result.HaystackResult;
@@ -144,6 +147,17 @@ public class ApiClient {
 
     public void fetchUsersNotInHaystack(int haystackId, Callback<UsersResult> callback) {
         Call<UsersResult> call = client.fetchUsersNotInHaystack(haystackId);
+        call.enqueue(callback);
+    }
+
+    //Pins
+    public void getHaystackPins(int haystackId, Callback<PinsResult> callback){
+        Call<PinsResult> call = client.getHaystackPins(haystackId);
+        call.enqueue(callback);
+    }
+
+    public void createHaystackPin(PinVO pin, Callback<PinResult> callback){
+        Call<PinResult> call = client.createPin(pin);
         call.enqueue(callback);
     }
 

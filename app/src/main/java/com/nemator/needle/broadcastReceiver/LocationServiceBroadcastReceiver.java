@@ -4,17 +4,17 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.location.Location;
+import android.util.Log;
 
 import com.google.android.gms.maps.model.LatLng;
 import com.nemator.needle.utils.AppConstants;
 
 public class LocationServiceBroadcastReceiver extends BroadcastReceiver {
-    public static final String TAG = "LocationServiceBroadcastReceiver";
+    public static final String TAG = "LocationServiceReceiver";
 
-    private LocationServiceDelegate mDelegate;
+    private LocationServiceDelegate  mDelegate;
 
-    public LocationServiceBroadcastReceiver(){
-    }
+    public LocationServiceBroadcastReceiver(){}
 
     public LocationServiceBroadcastReceiver(LocationServiceDelegate delegate) {
         mDelegate = delegate;
@@ -24,8 +24,12 @@ public class LocationServiceBroadcastReceiver extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
         // Make sure we are getting the right intent
         if( AppConstants.LOCATION_UPDATED.equals(intent.getAction())) {
-            Location location = intent.getParcelableExtra(AppConstants.TAG_LOCATION);
-            mDelegate.onLocationUpdated(location);
+            try {
+                Location location = intent.getParcelableExtra(AppConstants.TAG_LOCATION);
+                mDelegate.onLocationUpdated(location);
+            }catch (Exception ex){
+                Log.e(TAG, "Error : " + ex.getMessage());
+            }
         }
     }
 

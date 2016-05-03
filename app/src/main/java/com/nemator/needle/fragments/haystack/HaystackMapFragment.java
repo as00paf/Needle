@@ -183,7 +183,7 @@ public class HaystackMapFragment extends SupportMapFragment implements LocationS
             case R.id.menu_option_leave:
                 leaveHaystack();
                 return true;
-            case R.id.menu_option_cancel:
+            case R.id.menu_option_cancel_haystack:
                 cancelHaystack();
                 return true;
         }
@@ -242,7 +242,7 @@ public class HaystackMapFragment extends SupportMapFragment implements LocationS
             if(userMarker == null){
                 userMarker = MarkerUtils.createUserMarker(getContext(), mMap, Needle.userModel.getUser(), mCurrentPosition, "Your Position");
             }else{
-                userMarker.setLocation(mCurrentPosition);
+                userMarker.updateLocation(mMap, mCurrentPosition);
             }
         }
 
@@ -265,8 +265,8 @@ public class HaystackMapFragment extends SupportMapFragment implements LocationS
 
                     if(mMarkers.containsKey(id)){
                         marker = mMarkers.get(id);
-                        if(!marker.getLocation().equals(position)){
-                            marker.setLocation(position);
+                        if(marker.getLocation() != null && !marker.getLocation().equals(position)){
+                            marker.updateLocation(mMap, position);
 
                             Location loc = new Location("");
                             loc.setLatitude(lat);
@@ -325,12 +325,35 @@ public class HaystackMapFragment extends SupportMapFragment implements LocationS
         if(mMap==null)
             mMap = getMap();
 
+        //Show Bounds
+        if(haystack != null){
+            if(haystack.getIsCircle()){
+                if(haystackBoundsCircle == null){
+                    CircleOptions circleOptions = new CircleOptions()
+                            .center(haystack.getPositionLatLng())
+                            .radius(haystack.getZoneRadius())
+                            .fillColor(ContextCompat.getColor(getContext(), R.color.circleColor))
+                            .strokeColor(ContextCompat.getColor(getContext(), R.color.primary_dark))
+                            .strokeWidth(8);
+                    haystackBoundsCircle = mMap.addCircle(circleOptions);
+                }else{
+                    haystackBoundsCircle.setCenter(haystack.getPositionLatLng());
+                }
+            }else{
+                if(haystackBoundsPolygon == null){
+                    haystackBoundsPolygon = GoogleMapDrawingUtils.drawHaystackPolygon(getContext(), mMap, haystack);
+                }else{
+                    haystackBoundsPolygon =  GoogleMapDrawingUtils.updateHaystackPolygon(haystackBoundsPolygon, haystack);
+                }
+            }
+        }
+
         //Add user's marker back
         MarkerOptions markerOptions = new MarkerOptions();
         if(userMarker == null){
             userMarker = MarkerUtils.createUserMarker(getContext(), mMap, Needle.userModel.getUser(), mCurrentPosition, "Your Position");
         }else{
-            userMarker.setLocation(mCurrentPosition);
+            userMarker.updateLocation(mMap, mCurrentPosition);
         }
 
         //Add other user's markers back
@@ -567,5 +590,9 @@ public class HaystackMapFragment extends SupportMapFragment implements LocationS
     //Getters/Setters
     public Boolean isPostingLocationUpdates() {
         return mPostingLocationUpdates;
+    }
+
+    public LatLng getMapTarget() {
+        return mMap.getCameraPosition().target;
     }
 }

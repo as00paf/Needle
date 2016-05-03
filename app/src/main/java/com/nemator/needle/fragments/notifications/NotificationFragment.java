@@ -15,6 +15,7 @@ import android.widget.Toast;
 import com.google.android.gms.common.api.Api;
 import com.nemator.needle.Needle;
 import com.nemator.needle.R;
+import com.nemator.needle.activities.HomeActivity;
 import com.nemator.needle.adapter.NotificationCardAdapter;
 import com.nemator.needle.api.ApiClient;
 import com.nemator.needle.api.result.NotificationResult;
@@ -95,6 +96,7 @@ public class NotificationFragment  extends Fragment {
                 Log.d(TAG, "Fetch notifications. Success : " + result.getMessage());
 
                 updateNotficationList(result.getNotifications());
+                ApiClient.getInstance().seenNotifications(result.getNotifications(), seendNotificationsCallback);
             }else{
                 Toast.makeText(getContext(), "Could not fetch notifications", Toast.LENGTH_SHORT).show();
                 Log.d(TAG, "Could not fetch notifications. Error : " + result.getMessage());
@@ -111,6 +113,24 @@ public class NotificationFragment  extends Fragment {
         }
     };
 
+    private Callback<NotificationResult> seendNotificationsCallback = new Callback<NotificationResult>() {
+        @Override
+        public void onResponse(Call<NotificationResult> call, Response<NotificationResult> response) {
+            NotificationResult result = response.body();
+            if(result.getSuccessCode() == 1){
+                Log.d(TAG, "Seen notifications. Success : " + result.getMessage());
+                ((HomeActivity) getActivity()).setNotificationsCount(0);
+            }else{
+                Toast.makeText(getContext(), "Could not mark notifications as seen ", Toast.LENGTH_SHORT).show();
+                Log.d(TAG, "Could not mark notifications as seen . Error : " + result.getMessage());
+            }
+        }
+
+        @Override
+        public void onFailure(Call<NotificationResult> call, Throwable t) {
+            Log.d(TAG, "Could not mark notifications as seen . Error : " + t.getMessage());
+        }
+    };
 
     private NotificationCardHolder.NotificationCardListener cardListener = new NotificationCardHolder.NotificationCardListener() {
         @Override

@@ -70,7 +70,7 @@ public class LocationSharingCardHolder extends RecyclerView.ViewHolder implement
             case R.id.menu_option_share_back:
                 adapter.shareLocationBack(item, me);
                 break;
-            case R.id.menu_option_cancel:
+            case R.id.menu_option_cancel_haystack:
                 new AlertDialog.Builder(itemView.getContext())
                         .setIcon(android.R.drawable.ic_dialog_alert)
                         .setTitle(itemView.getContext().getString(R.string.cancel))

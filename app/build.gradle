@@ -23,7 +23,7 @@ android {
     }
 
     compileSdkVersion 23
-    buildToolsVersion '23.0.1'
+    buildToolsVersion '23.0.3'
 
     def versionPropsFile = file('version.properties')
 
@@ -122,7 +122,7 @@ buildscript {
         maven { url 'https://maven.fabric.io/public' }
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:2.0.0'
+        classpath 'com.android.tools.build:gradle:2.1.0'
         classpath 'com.google.gms:google-services:2.0.0-alpha3'
 
         // NOTE: Do not place your application dependencies here; they belong

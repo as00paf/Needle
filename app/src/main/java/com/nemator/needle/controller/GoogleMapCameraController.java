@@ -17,6 +17,7 @@ import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.nemator.needle.Needle;
+import com.nemator.needle.views.UserMarker;
 
 /**
  * Created by Alex on 09/12/2015.
@@ -87,13 +88,16 @@ public class GoogleMapCameraController {
         updateCameraOnPosition(scrollPosition, config.getZoomedLevel());
     }
 
-    public void focus(LatLng newPosition) {
-        LatLng scrollPosition = new LatLng(newPosition.latitude + config.getCorrectionY(), newPosition.longitude + config.getCorrectionX());
+    public void focus(LatLng newPosition, boolean lockScroll) {
+        if(newPosition != null){
+            LatLng scrollPosition = new LatLng(newPosition.latitude + config.getCorrectionY(), newPosition.longitude + config.getCorrectionX());
 
-        isFocussed = true;
-        mGoogleMap.getUiSettings().setScrollGesturesEnabled(false);
+            isFocussed = true;
+            mGoogleMap.getUiSettings().setScrollGesturesEnabled(!lockScroll);
 
-        updateCameraOnPosition(scrollPosition, config.getZoomedLevel());
+            float zoomLevel = config.getZoomedLevel() > getCameraZoom() ? config.getZoomedLevel() : getCameraZoom();
+            updateCameraOnPosition(scrollPosition, zoomLevel);
+        }
     }
 
     public void unfocus() {
@@ -177,6 +181,32 @@ public class GoogleMapCameraController {
 
     public void setCameraChangedListener(CameraChangedListener listener) {
         this.listener = listener;
+    }
+
+    public void focusOnMarkers(UserMarker... markers) {
+        LatLngBounds.Builder builder = new LatLngBounds.Builder();
+
+        for (UserMarker marker : markers) {
+            builder.include(marker.getMarker().getPosition());
+        }
+
+        LatLngBounds bounds = builder.build();
+
+        previousCameraTarget = getCameraTarget();
+
+        CameraUpdate update = CameraUpdateFactory.newLatLngBounds(bounds, 100);
+
+        mGoogleMap.animateCamera(update, 300, new GoogleMap.CancelableCallback() {
+            @Override
+            public void onFinish() {
+                onCameraChanged(null);
+            }
+
+            @Override
+            public void onCancel() {
+                onCameraChanged(null);
+            }
+        });
     }
 
     //Interfaces

@@ -3,16 +3,17 @@ package com.nemator.needle.adapter;
 import android.content.Context;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentStatePagerAdapter;
+import android.support.v4.app.FragmentPagerAdapter;
 import android.view.View;
 
 import com.nemator.needle.R;
 import com.nemator.needle.fragments.haystacks.createHaystack.CreateHaystackGeneralInfosFragment;
 import com.nemator.needle.fragments.haystacks.createHaystack.CreateHaystackMapFragment;
 import com.nemator.needle.fragments.haystacks.createHaystack.CreateHaystackUsersFragment;
+
 import java.util.ArrayList;
 
-public class CreateHaystackPagerAdapter extends FragmentStatePagerAdapter implements IconPagerAdapter {
+public class CreateHaystackPagerAdapter extends FragmentPagerAdapter implements IconPagerAdapter {
     public final int GENERAL_INFOS = 0;
     public final int MAP = 1;
     public final int USERS = 2;

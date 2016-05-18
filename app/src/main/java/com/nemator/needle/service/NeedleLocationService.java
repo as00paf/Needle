@@ -22,6 +22,7 @@ import com.nemator.needle.api.ApiClient;
 import com.nemator.needle.api.result.UserResult;
 import com.nemator.needle.models.vo.LocationVO;
 import com.nemator.needle.api.result.TaskResult;
+import com.nemator.needle.tasks.db.PostLocationRequestDBCleanupTask.PostLocationRequestDBCleanupTask;
 import com.nemator.needle.tasks.db.addPostLocationRequest.AddPostLocationRequestParams;
 import com.nemator.needle.tasks.db.addPostLocationRequest.AddPostLocationRequestTask;
 import com.nemator.needle.tasks.db.isPostLocationRequestDBEmpty.IsPostLocationRequestDBEmptyTask;
@@ -56,7 +57,6 @@ public class NeedleLocationService extends Service implements
     private Boolean mRequestingLocationUpdates = false;
     private Boolean servicesAvailable = false;
     private boolean mInProgress;
-    private boolean checkForPostRequests;
 
     public class LocalBinder extends Binder {
         public NeedleLocationService getService() {
@@ -72,10 +72,10 @@ public class NeedleLocationService extends Service implements
     public void onCreate() {
         mInProgress = false;
         createLocationRequest();
-        servicesAvailable = servicesConnected();
+        servicesAvailable = isServicesConnected();
     }
 
-    private boolean servicesConnected() {
+    private boolean isServicesConnected() {
         // Check that Google Play services is available
         int resultCode = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this);
 
@@ -89,7 +89,6 @@ public class NeedleLocationService extends Service implements
             return START_STICKY;
 
         connectToApiClient();
-        checkForPostRequests = true;
         return START_STICKY;
     }
 
@@ -144,7 +143,9 @@ public class NeedleLocationService extends Service implements
     }
 
     @Override
-    public void onConnected(Bundle connectionHint) {
+    public void onConnected(Bundle connectionHint){
+        Log.d(TAG, "NeedleLocationService connected !");
+
         if (mRequestingLocationUpdates && PermissionManager.getInstance(this).isPermissionGranted(Manifest.permission.ACCESS_FINE_LOCATION)) {
             startLocationUpdates();
 
@@ -158,10 +159,11 @@ public class NeedleLocationService extends Service implements
             mCurrentPosition = new LatLng(lat, lng);
         }
 
-        if(checkForPostRequests){
-            checkForPostRequests = false;
-            isPostLocationRequestDBEmpty();
-        }
+        isPostLocationRequestDBEmpty();
+    }
+
+    private void cleanUpDB(){
+        new PostLocationRequestDBCleanupTask(this).execute();
     }
 
     @Override
@@ -180,24 +182,36 @@ public class NeedleLocationService extends Service implements
         isPostLocationRequestDBEmpty();
     }
 
-    private void isPostLocationRequestDBEmpty(){
+    public void isPostLocationRequestDBEmpty(){
+        Log.d(TAG, "isPostLocationRequestDBEmpty");
         new IsPostLocationRequestDBEmptyTask(this, this).execute();
     }
 
     @Override
     public void onPostLocationRequestDBIsEmptyResult(Boolean isNotEmpty) {
-        mPostingLocationUpdates = isNotEmpty;
-
         if(isNotEmpty){
             if(!mRequestingLocationUpdates){
-                mRequestingLocationUpdates = true;
-                shareLocation();
+                Log.d(TAG, "Post Location Request DB is not empty, starting to request location updates");
+                startLocationUpdates();
+            }else{
+                Log.d(TAG, "Post Location Request DB is not empty, location updates already requested");
             }
 
+            if(!mPostingLocationUpdates){
+                Log.d(TAG, "Post Location Request DB is not empty, starting to post location updates");
+                shareLocation();
+            }else{
+                Log.d(TAG, "Post Location Request DB is not empty, already posting location updates");
+                postLocation();
+            }
         }else if(!mRequestingLocationUpdates){
+            Log.d(TAG, "Post location request DB is empty and not requesting location updates, stopping needle location service");
             stopLocationUpdates();
             mPostingLocationUpdates = false;
+            mGoogleApiClient.disconnect();
             stopSelf();
+        }else{
+            mPostingLocationUpdates = false;
         }
     }
 
@@ -209,7 +223,7 @@ public class NeedleLocationService extends Service implements
 
         mLastUpdatedPosition = mCurrentPosition;
 
-        Needle.userModel.getUser().setLocation(new LocationVO(mCurrentPosition));
+        Needle.userModel.getUser(this).setLocation(new LocationVO(mCurrentPosition));
 
         ApiClient.getInstance().updateLocation(Needle.userModel.getUser(), new Callback<UserResult>() {
             @Override
@@ -228,6 +242,8 @@ public class NeedleLocationService extends Service implements
     public void startLocationUpdates() {
         if(mGoogleApiClient.isConnected()){//TODO: don't think that's needed anymore
             LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
+        }else{
+            mGoogleApiClient.connect();
         }
         mRequestingLocationUpdates = true;
     }
@@ -274,6 +290,7 @@ public class NeedleLocationService extends Service implements
     public Boolean isPostingLocationUpdates() {
         return mPostingLocationUpdates;
     }
+
     public void setRequestingLocationUpdates(Boolean mRequestingLocationUpdates) {
         this.mRequestingLocationUpdates = mRequestingLocationUpdates;
     }

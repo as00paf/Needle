@@ -27,15 +27,20 @@ import com.squareup.picasso.Transformation;
 public class MarkerUtils {
 
     public static UserMarker createUserMarker(Context context, GoogleMap map, UserVO user, LatLng location, String snippet){
+        int strokeColor = ContextCompat.getColor(context, android.R.color.black);
+        int shadeColor = ContextCompat.getColor(context, R.color.transparent_grey);
+
+        return createUserMarker(context, map, user, location, snippet, strokeColor, shadeColor);
+    }
+
+    public static UserMarker createUserMarker(Context context, GoogleMap map, UserVO user, LatLng location, String snippet, int strokeColor, int shadeColor){
         //Create map marker with options
         MarkerOptions myMarkerOptions = new MarkerOptions().position(location);
         myMarkerOptions.flat(true);
-        myMarkerOptions.anchor(0.5f, 0.75f);
+        myMarkerOptions.anchor(1.0f, 0.6f);
 
         //Circle
         double radiusInMeters = 10.0;
-        int strokeColor = ContextCompat.getColor(context, android.R.color.black);
-        int shadeColor = ContextCompat.getColor(context, R.color.transparent_grey);
 
         CircleOptions circleOptions = new CircleOptions().center(location).radius(radiusInMeters).fillColor(shadeColor).strokeColor(strokeColor).strokeWidth(8);
         Circle circle = map.addCircle(circleOptions);
@@ -49,11 +54,11 @@ public class MarkerUtils {
         marker.setSnippet(snippet);
 
         //Create marker target
-        UserMarker userMarker = new UserMarker(user, marker);
+        final UserMarker userMarker = new UserMarker(user, marker);
         userMarker.setCircle(circle);
         String pictureURL = user.getPictureURL();
 
-        MarkerImageTransform transform = new MarkerImageTransform(context);
+        final MarkerImageTransform transform = new MarkerImageTransform(context);
 
         //Load and transform picture into marker
         Picasso.with(context).load(pictureURL)

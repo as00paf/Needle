@@ -4,8 +4,6 @@ import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
 
-import com.google.android.gms.location.FusedLocationProviderApi;
-import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -13,7 +11,10 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.nemator.needle.Needle;
+import com.nemator.needle.models.vo.UserVO;
+import com.nemator.needle.utils.MarkerUtils;
 import com.nemator.needle.utils.PermissionManager;
+import com.nemator.needle.views.UserMarker;
 
 public class GoogleMapController {
 
@@ -29,13 +30,22 @@ public class GoogleMapController {
 
     public GoogleMapCameraController cameraController;
 
+    private GoogleMap.OnMarkerClickListener markerClickListener;
+
     public GoogleMapController(Context context, GoogleMapCameraControllerConfig config, GoogleMapCallback callback) {
         this.context = context;
         this.config = config;
         this.callback = callback;
     }
 
-    public void initMap(final SupportMapFragment mapFragment) {
+    public GoogleMapController(Context context, GoogleMapCameraControllerConfig config, GoogleMapCallback callback, GoogleMap.OnMarkerClickListener markerClickListener) {
+        this.context = context;
+        this.config = config;
+        this.callback = callback;
+        this.markerClickListener = markerClickListener;
+    }
+
+    public void initMap(final SupportMapFragment mapFragment){
         if(mapFragment == null){
             throw new Error(TAG + " - initMap(MapFragment)::MapFragment cannot be null");
         }
@@ -53,22 +63,29 @@ public class GoogleMapController {
 
                     //Permission & Location
                     if(PermissionManager.getInstance(context).isPermissionGranted(Manifest.permission.ACCESS_FINE_LOCATION)){
-                        googleMap.setMyLocationEnabled(true);
+                        googleMap.setMyLocationEnabled(config.getMyLocationEnabled());
 
-                        cameraController.zoom(Needle.googleApiController.getLastKnownLocation());
+                        if(Needle.googleApiController.getLastKnownLocation() != null){
+                            cameraController.zoom(Needle.googleApiController.getLastKnownLocation());
+                        }
                     }else{
                         PermissionManager.getInstance(context).requestPermission((Activity) context, Manifest.permission.ACCESS_FINE_LOCATION);
                     }
 
                     //UI Settings
-                    mGoogleMap.getUiSettings().setZoomControlsEnabled(false);
-                    mGoogleMap.getUiSettings().setMyLocationButtonEnabled(false);
-                    mGoogleMap.getUiSettings().setTiltGesturesEnabled(false);
-                    mGoogleMap.getUiSettings().setZoomGesturesEnabled(true);
-                    mGoogleMap.getUiSettings().setScrollGesturesEnabled(true);
+                    mGoogleMap.getUiSettings().setZoomControlsEnabled(config.getZoomControlsEnabled());
+                    mGoogleMap.getUiSettings().setMyLocationButtonEnabled(config.getMyLocationButtonEnabled());
+                    mGoogleMap.getUiSettings().setTiltGesturesEnabled(config.getTiltGesturesEnabled());
+                    mGoogleMap.getUiSettings().setZoomGesturesEnabled(config.getZoomGesturesEndabled());
+                    mGoogleMap.getUiSettings().setScrollGesturesEnabled(config.getScrollGesturesEnabled());
 
                     //Map Type
                     googleMap.setMapType(config.getMapType());
+
+                    //Click
+                    if(markerClickListener != null){
+                        mGoogleMap.setOnMarkerClickListener(markerClickListener);
+                    }
 
                     if(callback != null)
                         callback.onMapInitialized();
@@ -125,6 +142,18 @@ public class GoogleMapController {
 
     public LatLngBounds getCurrentCameraTargetBounds() {
         return cameraController.getCameraTargetBounds();
+    }
+
+    public UserMarker createUserMarker(Context context, UserVO user, LatLng position, String snippet) {
+        return MarkerUtils.createUserMarker(context, mGoogleMap, user, position, snippet);
+    }
+
+    public UserMarker createUserMarker(Context context, UserVO user, LatLng location, String snippet, int strokeColor, int shadeColor){
+        return MarkerUtils.createUserMarker(context, mGoogleMap, user, location, snippet, strokeColor, shadeColor);
+    }
+
+    public void updateMarkersLocation(UserMarker marker, LatLng position) {
+        marker.updateLocation(mGoogleMap, position);
     }
 
     public interface GoogleMapCallback{

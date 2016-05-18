@@ -7,7 +7,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 
-import com.nemator.needle.data.LocationServiceDBHelper;
+import com.nemator.needle.data.PostLocationRequest;
 import com.nemator.needle.tasks.db.addPostLocationRequest.AddPostLocationRequestParams;
 import com.nemator.needle.tasks.db.removePostLocationRequest.RemovePostLocationRequestTask;
 
@@ -31,13 +31,13 @@ public class PostLocationRequestAlarm extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         //Params
-        int type = intent.getIntExtra(LocationServiceDBHelper.PostLocationRequest.COLUMN_NAME_TYPE, -1);
-        String expiration = intent.getStringExtra(LocationServiceDBHelper.PostLocationRequest.COLUMN_NAME_EXPIRATION);
-        int posterId = intent.getIntExtra(LocationServiceDBHelper.PostLocationRequest.COLUMN_NAME_POSTER_ID, -1);
-        String itemId = intent.getStringExtra(LocationServiceDBHelper.PostLocationRequest.COLUMN_NAME_ITEM_ID);
+        int type = intent.getIntExtra(PostLocationRequest.COLUMN_NAME_TYPE, -1);
+        String expiration = intent.getStringExtra(PostLocationRequest.COLUMN_NAME_EXPIRATION);
+        int posterId = intent.getIntExtra(PostLocationRequest.COLUMN_NAME_POSTER_ID, -1);
+        String itemId = intent.getStringExtra(PostLocationRequest.COLUMN_NAME_ITEM_ID);
 
         AddPostLocationRequestParams params = new AddPostLocationRequestParams(context, type, expiration, posterId, itemId );
-        params.rowId = intent.getLongExtra(LocationServiceDBHelper.PostLocationRequest._ID, -1);
+        params.id = intent.getIntExtra(PostLocationRequest._ID, -1);
         params.posterId = posterId;
         params.type = type;
         params.expiration = expiration;
@@ -50,10 +50,10 @@ public class PostLocationRequestAlarm extends BroadcastReceiver {
         Log.i(TAG, "Setting Alarm @ " + expiration);
 
         Intent intent = new Intent(context, PostLocationRequestAlarm.class);
-        intent.putExtra(LocationServiceDBHelper.PostLocationRequest._ID, rowId);
-        intent.putExtra(LocationServiceDBHelper.PostLocationRequest.COLUMN_NAME_POSTER_ID, posterId);
-        intent.putExtra(LocationServiceDBHelper.PostLocationRequest.COLUMN_NAME_EXPIRATION, expiration);
-        intent.putExtra(LocationServiceDBHelper.PostLocationRequest.COLUMN_NAME_ITEM_ID, itemId);
+        intent.putExtra(PostLocationRequest._ID, rowId);
+        intent.putExtra(PostLocationRequest.COLUMN_NAME_POSTER_ID, posterId);
+        intent.putExtra(PostLocationRequest.COLUMN_NAME_EXPIRATION, expiration);
+        intent.putExtra(PostLocationRequest.COLUMN_NAME_ITEM_ID, itemId);
 
         alarmIntent = PendingIntent.getBroadcast(context, 0, intent, 0);
         Date date = new Date();
@@ -75,7 +75,7 @@ public class PostLocationRequestAlarm extends BroadcastReceiver {
     public void CancelAlarm(Context context, long rowId)
     {
         Intent intent = new Intent(context, PostLocationRequestAlarm.class);
-        intent.putExtra(LocationServiceDBHelper.PostLocationRequest._ID, rowId);
+        intent.putExtra(PostLocationRequest._ID, rowId);
         alarmIntent = PendingIntent.getBroadcast(context, 0, intent, 0);
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         alarmManager.cancel(alarmIntent);

@@ -224,7 +224,7 @@ public class HaystackListFragment extends Fragment implements HaystackListTabFra
                 privateTab.getRefreshLayout().setRefreshing(false);
                 ownedTab.getRefreshLayout().setRefreshing(false);
 
-                Toast.makeText(getContext(), R.string.fetch_haystack_error, Toast.LENGTH_SHORT).show();
+                Toast.makeText(getActivity(), R.string.fetch_haystack_error, Toast.LENGTH_SHORT).show();
             }
         });
     }

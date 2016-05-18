@@ -1,22 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <!-- App -->
+    <!-- General -->
     <string name="app_name">Needle</string>
-    <string name="google_maps_key">AIzaSyBZS_9kxDcH5hrUZx3TdD9YP9HhU3vAEF4</string>
     <string name="facebook_app_id">1085989064752650</string>
-    <string name="facebook_secret">686ec7dd8b37e4eede018a34bf11ba5b</string>
-    <string name="title_activity_maps">Needle</string>
     <string name="title_haystacks">Haystacks</string>
-    <string name="title_location_sharing">Location Sharing</string>
+    <string name="title_needles">Needles</string>
     <string name="title_notifications">Notifications</string>
     <string name="title_people">People</string>
-    <string name="title_activity_haystack">Haystacks</string>
     <string name="title_settings">Settings</string>
     <string name="title_helpAndSupport">Help &amp; Support</string>
-    <string name="title_logOut">Log Out</string>
     <string name="create">Create</string>
     <string name="ends">Ends %1$s</string>
+    <string name="yes">Yeah</string>
+    <string name="no">Nah</string>
+    <string name="cancel">Cancel</string>
+    <string name="ok">Okay</string>
+
 
     <!-- App Settings Activity -->
     <string name="rememberMeSummary">Make the Needle remember your credentials</string>
@@ -30,36 +30,23 @@
     <!-- Login -->
     <string name="initializing">Initializing ...</string>
     <string name="login">Login</string>
-    <string name="login_message">Logging in ...</string>
-    <string name="login_via_fb">Login via Facebook</string>
-    <string name="login_via_twitter">Login via Twitter</string>
-    <string name="use_fb_account">Use Facebook Account</string>
-    <string name="use_twitter_account">Use Twitter Account</string>
     <string name="register">Register</string>
     <string name="rememberMe">Remember Me</string>
     <string name="notifications">Notifications</string>
-    <string name="registerDialog">Creating User...</string>
     <string name="username">Username</string>
     <string name="email_hint">Email Address</string>
     <string name="password">Password</string>
     <string name="email">Email</string>
     <string name="forgot_password">Forgot Password ?</string>
-    <string name="or">OR</string>
 
     <!-- Haystack List Fragment -->
     <string name="publicHeader">Public Haystacks</string>
     <string name="privateHeader">Private Haystacks</string>
     <string name="ownedHeader">My Haystacks</string>
     <string name="noHaystackAvailable">No Haystacks Available</string>
-    <string name="activeUntil">Active Until</string>
     <string name="activeUsers"> Active Users</string>
-    <string name="refresh">Refresh</string>
 
     <!-- Create Haystack Fragment -->
-    <string name="change">Change</string>
-    <string name="creating_haystack">Creating Haystack...</string>
-    <string name="creating_location_sharing">Creating Location Sharing...</string>
-    <string name="cancelling_location_sharing">Cancelling Location Sharing...</string>
 
     <!-- Haystack Map Fragment -->
     <string name="map_view">Map View</string>
@@ -68,66 +55,31 @@
     <string name="action_settings">Settings</string>
     <string name="name">Name</string>
     <string name="isPublic">Public</string>
-    <string name="timeLimit">Time Limit</string>
     <string name="time">Time</string>
     <string name="date">Date</string>
     <string name="friend">Friend</string>
+    <string name="expiration">Expiration</string>
     <string name="privateLabel">Private</string>
     <string name="location">Location</string>
     <string name="users">Users</string>
-    <string name="lock_map">Lock Map</string>
-    <string name="move_map">Move Map</string>
     <string name="search_for_places">Search for Places</string>
-    <string name="search_for_friends">Search for Friends</string>
     <string name="done">Done</string>
-    <string name="circle">Circle</string>
-    <string name="rectangle">Rectangle</string>
-    <string name="zone">Zone</string>
     <string name="picture">Picture</string>
     <string name="create_haystack">Create Haystack</string>
     <string name="add_users">Add Users</string>
-    <string name="remove_users">Remove Users</string>
     <string name="leave_haystack">Leave Haystack</string>
-    <string name="privacy">Privacy</string>
-    <string name="userList">User List</string>
     <string name="shareLocation">Share My Location</string>
-    <string name="get_directions">Get Directions...</string>
-    <string name="stopSharingLocation">Stop Sharing Location</string>
-    <string name="title_activity_haystack_user">HaystackUserActivity</string>
     <string name="confirm">Confirm</string>
-    <string name="addRemoveUsers">Add/Remove Users</string>
-    <string name="get_directions_to_user">Get Directions To User</string>
-    <string name="adding_users">Adding Users...</string>
     <string name="haystack_created">Haystack Created</string>
-    <string name="sharing_location_error">Error Sharing Your Location</string>
-    <string name="sharing_location">Sharing Location ...</string>
-    <string name="unsharing_location_error">Error Removing Location Sharing</string>
-    <string name="quit_confirmation_title">Exit App Confirmation</string>
-    <string name="quit_confirmation_msg">Are you sure you want to quit Needle ?</string>
-    <string name="hello_blank_fragment">Hello blank fragment</string>
-    <string name="title_activity_haystacks">Haystacks</string>
-    <string name="hello_world">Hello world!</string>
-    <string name="title_directions">Directions</string>
-    <string name="title_leave">Leave</string>
     <string name="title_users">Users</string>
     <string name="title_pins">Pins</string>
     <string name="haystack_name_hint">Haystack Name</string>
-    <string name="friend_name_hint">Friend\'s Name</string>
     <string name="general_infos">General Infos</string>
-    <string name="noLocationSharingAvailable">No Location Sharing Available</string>
-    <string name="noPinsAvailable">No Pins Available</string>
-    <string name="create_location_sharing">Create Location Sharing</string>
     <string name="receivedHeader">Received</string>
     <string name="sentHeader">Sent</string>
     <string name="log_out">Log Out</string>
     <string name="log_out_confirmation_msg">Are you sure you want to log out?</string>
-    <string name="location_sharing_ended">Location Sharing Ended</string>
-    <string name="location_sharing_ended_msg">Location Sharing ended so you should go back or something.</string>
-    <string name="yes">Yeah</string>
-    <string name="no">Nah</string>
-    <string name="cancel">Cancel</string>
-    <string name="cancel_location_sharing_confirmation">Are you sure you want to cancel this Location Sharing ?</string>
-    <string name="ok">Okay</string>
+
     <string name="cancel_haystack">Cancel Haystack</string>
     <string name="cancel_haystack_confirmation">Are you sure you want to cancel this Haystack ?</string>
     <string name="cancel_haystack_leave_confirmation">Are you sure you want to leave this Haystack ?</string>
@@ -136,27 +88,24 @@
     <string name="share_location_back">Share Location Back</string>
     <string name="location_shared_back">Location Shared Back!</string>
     <string name="stop_sharing_location">Stop Sharing Location</string>
-    <string name="share_location_back_confirmation">Are you sure you want to share you location back ?</string>
 
-    <!-- Location Sharing -->
-    <string name="fetch_location_sharings_error">Could Not Fetch Location Sharings</string>
-    <string name="no_users_selected_msg">You need to select someone to share your location with</string>
+    <!-- Needle -->
+    <string name="fetch_needles_error">Could Not Fetch Needles</string>
+    <string name="cancelling_needle">Cancelling Needle...</string>
+    <string name="needle_expired">Needle Expired</string>
+    <string name="needle_expired_msg">Needle with %1$s expired. Taking you back home.</string>
+    <string name="needle_cancelled">Needle Cancelled</string>
+    <string name="needle_cancelled_msg">Needle with %1$s was cancelled. Taking you back home.</string>
+    <string name="cancel_needle_confirmation">Are you sure you want to cancel this Needle ?</string>
+    <string name="noNeedleAvailable">No Needle Available</string>
+    <string name="create_needle">Create Needle</string>
 
     <!-- Notifications -->
     <string name="no_notifications_yet">No notifications yet</string>
 
     <!-- GCM -->
-    <string name="gcm_send_message">Token retrieved and sent to server! You can now use gcmsender to send downstream messages to this app.</string>
-    <string name="registering_message">Generating InstanceID token...</string>
-    <string name="unregistering_message">Unregistering user</string>
-    <string name="token_error_message">An error occurred while either fetching the InstanceID token, sending the fetched token to the server or subscribing to the PubSub topic. Please try running the sample again.</string>
-    <string name="title_activity_facebook">FacebookActivity</string>
     <string name="user_not_found_message">User not foud. Please Register first</string>
-    <string name="location_of">Location of </string>
 
-    <string name="no_internet_connection">No Internet Connection</string>
-    <string name="permission_denied_title">Permission Denied</string>
-    <string name="location_permission_denied">Location permission was denied</string>
     <string name="nearby_places">Nearby Places</string>
     <string name="search_results">Search Results</string>
     <string name="recent_places">Recent Places</string>
@@ -164,15 +113,9 @@
     <string name="action_search_started">searchStarted</string>
     <string name="action_search_finished">searchFinished</string>
     <string name="searchFragmentTag">searchFragmentTag</string>
-    <string name="selected_location">Selected Location</string>
     <string name="set_haystacks_location">Set Haystack\'s Location</string>
     <string name="action_lock_map">Lock Map</string>
     <string name="action_polygon">Polygon</string>
-    <string name="permission_granted">Permission Granted !</string>
-    <string name="permission_denied">Permission Denied !</string>
-    <string name="signing_in">Signing in ...</string>
-    <string name="empty_user_or_password_error">You must enter a username or email and a password</string>
-    <string name="title_activity_login">LoginActivity</string>
     <string name="terms_and_conditions"><![CDATA[Terms & Conditions]]></string>
     <string name="logged_in_with_needle_account">Needle Account</string>
     <string name="logged_in_with_google_account">Google Account</string>
@@ -183,17 +126,12 @@
     <string name="error_adding_users">Error adding users to the Haystack</string>
     <string name="select_users_to_add">Select users to add</string>
     <string name="fetching_users_failed">Fetching users failed</string>
-    <string name="user" translatable="false">user</string>
     <string name="delete_account">Delete Account</string>
     <string name="delete_account_info">This will delete your account permanently</string>
     <string name="facebook_account">Facebook Account</string>
-    <string name="twitter_account">Twitter Account</string>
     <string name="google_account_title">Google Account</string>
 
     <!-- Pins -->
-    <string name="delete_pin">Delete Pin</string>
-    <string name="move_pin">Move Pin</string>
-    <string name="edit_pin">Edit Pin</string>
     <string name="new_pin">New Pin</string>
     <string name="set_pins_location">Set Pin\'s Location</string>
     <string name="pin_name">Pin Name</string>

@@ -37,8 +37,10 @@ public class MarkerTarget implements Target {
     @Override
     public void onBitmapFailed(Drawable errorDrawable)
     {
-        Bitmap placeHolderBitmap = BitmapUtils.drawableToBitmap(errorDrawable);
-        marker.setIcon(BitmapDescriptorFactory.fromBitmap(placeHolderBitmap));
+        if(errorDrawable != null){
+            Bitmap placeHolderBitmap = BitmapUtils.drawableToBitmap(errorDrawable);
+            marker.setIcon(BitmapDescriptorFactory.fromBitmap(placeHolderBitmap));
+        }
     }
 
     @Override

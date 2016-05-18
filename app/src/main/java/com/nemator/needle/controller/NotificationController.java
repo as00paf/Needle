@@ -15,9 +15,9 @@ import com.google.gson.GsonBuilder;
 import com.nemator.needle.R;
 import com.nemator.needle.activities.HaystackActivity;
 import com.nemator.needle.activities.HomeActivity;
-import com.nemator.needle.activities.LocationSharingActivity;
+import com.nemator.needle.activities.NeedleActivity;
 import com.nemator.needle.models.vo.HaystackVO;
-import com.nemator.needle.models.vo.LocationSharingVO;
+import com.nemator.needle.models.vo.NeedleVO;
 import com.nemator.needle.models.vo.NotificationVO;
 import com.nemator.needle.utils.AppConstants;
 
@@ -49,14 +49,14 @@ public class NotificationController {
             intent = new Intent(context, HomeActivity.class);
             intent.putExtra(AppConstants.TAG_SECTION, AppConstants.SECTION_HAYSTACKS);
             intent.putExtra(AppConstants.TAG_ACTION, AppConstants.TAG_NOTIFICATION);
-        }else if(notification.getType() == AppConstants.USER_LOCATION_SHARING || notification.getType() == AppConstants.USER_SHARING_LOCATION_BACK){
-            intent = new Intent(context, LocationSharingActivity.class);
-            LocationSharingVO locationSharing = gson.fromJson(data.getString("data"), LocationSharingVO.class);
+        }else if(notification.getType() == AppConstants.USER_NEEDLE || notification.getType() == AppConstants.USER_NEEDLE_BACK){
+            intent = new Intent(context, NeedleActivity.class);
+            NeedleVO locationSharing = gson.fromJson(data.getString("data"), NeedleVO.class);
             intent.putExtra(AppConstants.TAG_LOCATION_SHARING, (Serializable) locationSharing );
             intent.putExtra(AppConstants.TAG_ACTION, AppConstants.TAG_NOTIFICATION);
-        }else if(notification.getType() == AppConstants.USER_CANCELLED_LOCATION_SHARING || notification.getType() == AppConstants.USER_STOPPED_SHARING_LOCATION){
+        }else if(notification.getType() == AppConstants.USER_CANCELLED_NEEDLE || notification.getType() == AppConstants.USER_STOPPED_NEEDLE){
             intent = new Intent(context, HomeActivity.class);
-            intent.putExtra(AppConstants.TAG_SECTION, AppConstants.SECTION_LOCATION_SHARING_LIST);
+            intent.putExtra(AppConstants.TAG_SECTION, AppConstants.SECTION_NEEDLES);
             intent.putExtra(AppConstants.TAG_ACTION, AppConstants.TAG_NOTIFICATION);
         }else{
             intent = new Intent(context, HomeActivity.class);

@@ -1,18 +1,26 @@
 package com.nemator.needle.controller;
 
+import android.Manifest;
 import android.app.Activity;
 import android.content.ComponentName;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.location.LocationManager;
 import android.os.IBinder;
 import android.support.v4.app.FragmentActivity;
+import android.support.v7.app.AlertDialog;
 
 import com.nemator.needle.Needle;
+import com.nemator.needle.api.result.UserResult;
 import com.nemator.needle.service.NeedleLocationService;
 import com.nemator.needle.tasks.db.addPostLocationRequest.AddPostLocationRequestParams;
 import com.nemator.needle.tasks.db.addPostLocationRequest.AddPostLocationRequestTask;
 import com.nemator.needle.tasks.db.removePostLocationRequest.RemovePostLocationRequestTask;
+import com.nemator.needle.utils.PermissionManager;
+
+import retrofit2.Callback;
 
 /**
  * Created by Alex on 20/02/2016.
@@ -44,7 +52,7 @@ public class NeedleServiceController {
         initService(activity, true);
     }
 
-    private void initService(Activity activity, final Boolean startUpdates) {
+    private void initService(final Activity activity, final Boolean startUpdates) {
         this.activity = activity;
 
         //Needle Location Service
@@ -54,7 +62,13 @@ public class NeedleServiceController {
                 isConnected = true;
 
                 if(startUpdates){
-                    locationService.startLocationUpdates();
+                   if(!PermissionManager.getInstance(activity).isPermissionGranted(Manifest.permission.ACCESS_FINE_LOCATION)){
+                        PermissionManager.getInstance(activity).requestPermission(activity, Manifest.permission.ACCESS_FINE_LOCATION);
+                    }else{
+                        locationService.startLocationUpdates();
+                    }
+                }else{
+                    locationService.isPostLocationRequestDBEmpty();
                 }
             }
 
@@ -97,13 +111,14 @@ public class NeedleServiceController {
         locationService.stopLocationUpdates();
     }
 
-    public void addPostLocationRequest(Context context, int type, String expiration, int posterId, String itemId){
-        AddPostLocationRequestParams params = new AddPostLocationRequestParams(context, type, expiration, posterId, itemId);
+    //TODO : check if necessary
+    public void addPostLocationRequest(Context context, int id,  int type, String expiration, int posterId, String itemId){
+        AddPostLocationRequestParams params = new AddPostLocationRequestParams(context, id, type, expiration, posterId, itemId);
         new AddPostLocationRequestTask(params, null).execute();
     }
 
-    public void removePostLocationRequest(Context context, int type, String expiration, int posterId, String itemId){
-        AddPostLocationRequestParams params = new AddPostLocationRequestParams(context, type, expiration, posterId, itemId);
+    public void removePostLocationRequest(Context context, int id, int type, String expiration, int posterId, String itemId){
+        AddPostLocationRequestParams params = new AddPostLocationRequestParams(context, id, type, expiration, posterId, itemId);
         new RemovePostLocationRequestTask(params).execute();
     }
 }

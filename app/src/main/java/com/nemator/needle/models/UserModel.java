@@ -14,6 +14,7 @@ public class UserModel {
     private static UserModel instance;
 
     private boolean loggedIn = false;
+    private boolean initialized = false;
 
     private UserVO user;
     private SharedPreferences sharedPreferences;
@@ -35,10 +36,18 @@ public class UserModel {
         editor = sharedPreferences.edit();
         user = UserVO.retrieve(sharedPreferences);
         loggedIn = sharedPreferences.getBoolean(AppConstants.TAG_LOGGED_IN, false);
+        initialized = true;
     }
 
     //Getters/Setters
     public UserVO getUser(){
+        return this.user;
+    }
+
+    public UserVO getUser(Context context){
+        if(this.user == null){
+            this.user =  UserVO.retrieve(context.getSharedPreferences("com.nemator.needle", Context.MODE_PRIVATE));
+        }
         return this.user;
     }
 
@@ -75,6 +84,10 @@ public class UserModel {
         return user.getGcmRegId();
     }
 
+    public String getGcmRegId(Context context) {
+        return getUser(context).getGcmRegId();
+    }
+
     public Boolean setGcmRegId(String gcmRegId) {
         Boolean wereTheSame = user.getGcmRegId() != null && !user.getGcmRegId().equals(gcmRegId);
         user.setGcmRegId(gcmRegId);
@@ -103,5 +116,9 @@ public class UserModel {
         this.user.setUserName(fbUser.getName());
         this.user.setSocialNetworkUserId(fbUser.getId());
         this.user.setLoginType(AuthenticationController.LOGIN_TYPE_FACEBOOK);
+    }
+
+    public boolean isInitialized() {
+        return initialized;
     }
 }

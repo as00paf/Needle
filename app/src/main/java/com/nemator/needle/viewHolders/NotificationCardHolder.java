@@ -17,6 +17,7 @@ import com.nemator.needle.R;
 import com.nemator.needle.activities.UserProfileActivity;
 import com.nemator.needle.models.vo.NotificationVO;
 import com.nemator.needle.utils.AppConstants;
+import com.nemator.needle.utils.AppUtils;
 import com.squareup.picasso.Picasso;
 
 public class NotificationCardHolder extends RecyclerView.ViewHolder {
@@ -67,15 +68,14 @@ public class NotificationCardHolder extends RecyclerView.ViewHolder {
                 ds.setUnderlineText(false);
             }
         };
-        ss.setSpan(clickableSpan, 0, data.getDescription().indexOf(" "), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        ss.setSpan(clickableSpan, data.getDescription().indexOf(data.getSenderName()), data.getSenderName().length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
 
         titleView.setText(ss);
         titleView.setMovementMethod(LinkMovementMethod.getInstance());
         titleView.setHighlightColor(ContextCompat.getColor(itemView.getContext(), R.color.primary_dark));
 
         //Date
-
-        sentAt.setText(notification.getSentAt());
+        sentAt.setText(AppUtils.formatDateRelative(notification.getSentAt()));
 
         //User Profile Pictyre
         Picasso.with(imageView.getContext()).cancelRequest(imageView);

@@ -5,7 +5,6 @@ import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Parcelable;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -25,18 +24,16 @@ import com.nemator.needle.Needle;
 import com.nemator.needle.R;
 import com.nemator.needle.activities.AuthenticationActivity;
 import com.nemator.needle.activities.CreateHaystackActivity;
-import com.nemator.needle.activities.HaystackActivity;
 import com.nemator.needle.activities.HomeActivity;
 import com.nemator.needle.api.ApiClient;
 import com.nemator.needle.api.result.TaskResult;
 import com.nemator.needle.fragments.haystacks.HaystackListFragment;
 import com.nemator.needle.fragments.haystacks.OnActivityStateChangeListener;
-import com.nemator.needle.fragments.locationSharing.LocationSharingListFragment;
-import com.nemator.needle.fragments.locationSharing.createLocationSharing.CreateLocationSharingExpirationFragment;
+import com.nemator.needle.fragments.needle.NeedleListFragment;
+import com.nemator.needle.fragments.needle.createNeedle.CreateNeedleExpirationFragment;
 import com.nemator.needle.fragments.notifications.NotificationFragment;
 import com.nemator.needle.fragments.people.PeopleFragment;
 import com.nemator.needle.fragments.settings.SettingsFragment;
-import com.nemator.needle.models.vo.HaystackVO;
 import com.nemator.needle.utils.AppConstants;
 import com.nemator.needle.utils.AppState;
 
@@ -54,9 +51,9 @@ public class NavigationController implements HomeActivity.NavigationHandler, OnA
 
     //Fragments
     private HaystackListFragment haystacksListFragment;
-    private LocationSharingListFragment locationSharingListFragment;
+    private NeedleListFragment needleListFragment;
     private SettingsFragment settingsFragment;
-    private CreateLocationSharingExpirationFragment createLocationSharingExpirationFragment;
+    private CreateNeedleExpirationFragment createNeedleExpirationFragment;
     private PeopleFragment peopleFragment;
     private NotificationFragment notificationFragment;
 
@@ -78,8 +75,8 @@ public class NavigationController implements HomeActivity.NavigationHandler, OnA
                 case R.id.drawer_haystacks:
                     showSection(AppConstants.SECTION_HAYSTACKS);
                     break;
-                case R.id.drawer_location_sharing:
-                    showSection(AppConstants.SECTION_LOCATION_SHARING);
+                case R.id.drawer_needle:
+                    showSection(AppConstants.SECTION_NEEDLES);
                     break;
                 case R.id.drawer_notifications:
                     showSection(AppConstants.SECTION_NOTIFICATIONS);
@@ -87,11 +84,6 @@ public class NavigationController implements HomeActivity.NavigationHandler, OnA
                 case R.id.drawer_log_out:
                     logOut();
                     return true;
-                case R.id.drawer_settings:
-                    showSection(AppConstants.SECTION_SETTINGS);
-                case R.id.drawer_help:
-                    showSection(AppConstants.SECTION_HELP);
-                    break;
                 case R.id.drawer_people:
                     showSection(AppConstants.SECTION_PEOPLE);
                     break;
@@ -153,16 +145,16 @@ public class NavigationController implements HomeActivity.NavigationHandler, OnA
                 Intent intent = new Intent(activity, CreateHaystackActivity.class);
                 activity.startActivity(intent);
                 return;
-            case AppConstants.SECTION_LOCATION_SHARING:
-                if(locationSharingListFragment == null) locationSharingListFragment = new LocationSharingListFragment();
-                newFragment = locationSharingListFragment;
-                onStateChange(AppState.LOCATION_SHARING_RECEIVED_TAB);
-                actionBar.setTitle(R.string.title_location_sharing);
+            case AppConstants.SECTION_NEEDLES:
+                if(needleListFragment == null) needleListFragment = new NeedleListFragment();
+                newFragment = needleListFragment;
+                onStateChange(AppState.NEEDLE_RECEIVED_TAB);
+                actionBar.setTitle(R.string.title_needles);
                 break;
-            case AppConstants.SECTION_CREATE_LOCATION_SHARING:
-                if(createLocationSharingExpirationFragment == null) createLocationSharingExpirationFragment = new CreateLocationSharingExpirationFragment();
-                newFragment = createLocationSharingExpirationFragment;
-                onStateChange(AppState.LOCATION_SHARING_RECEIVED_TAB);
+            case AppConstants.SECTION_CREATE_NEEDLE:
+                if(createNeedleExpirationFragment == null) createNeedleExpirationFragment = new CreateNeedleExpirationFragment();
+                newFragment = createNeedleExpirationFragment;
+                onStateChange(AppState.NEEDLE_RECEIVED_TAB);
                 break;
             case AppConstants.SECTION_SETTINGS:
                 if(settingsFragment == null) settingsFragment = new SettingsFragment();
@@ -234,20 +226,20 @@ public class NavigationController implements HomeActivity.NavigationHandler, OnA
                 showSection(AppConstants.SECTION_HAYSTACKS);
                 //removeSection(AppConstants.SECTION_CREATE_HAYSTACK);
                 break;
-            case AppState.LOCATION_SHARING_RECEIVED_TAB:
+            case AppState.NEEDLE_RECEIVED_TAB:
                 showSection(AppConstants.SECTION_HAYSTACKS);
                 haystacksListFragment.goToTab(0);
                 onStateChange(AppState.PUBLIC_HAYSTACK_TAB);
                 break;
-            case AppState.LOCATION_SHARING_SENT_TAB:
+            case AppState.NEEDLE_SENT_TAB:
                 //Goto Received Tab
-                locationSharingListFragment.goToPage(0);
-                onStateChange(AppState.LOCATION_SHARING_RECEIVED_TAB);
+                needleListFragment.goToPage(0);
+                onStateChange(AppState.NEEDLE_RECEIVED_TAB);
                 break;
-            case AppState.CREATE_LOCATION_SHARING:
-                showSection(AppConstants.SECTION_LOCATION_SHARING_LIST);
-                locationSharingListFragment.goToPage(0);
-                onStateChange(AppState.LOCATION_SHARING_RECEIVED_TAB);
+            case AppState.CREATE_NEEDLE:
+                showSection(AppConstants.SECTION_NEEDLES);
+                needleListFragment.goToPage(0);
+                onStateChange(AppState.NEEDLE_RECEIVED_TAB);
                 break;
             case AppState.HAYSTACK:
                 //removeSection(AppConstants.SECTION_HAYSTACK);
@@ -255,10 +247,10 @@ public class NavigationController implements HomeActivity.NavigationHandler, OnA
                 haystacksListFragment.goToTab(0);
                 onStateChange(AppState.PUBLIC_HAYSTACK_TAB);
                 break;
-            case AppState.LOCATION_SHARING:
-                showSection(AppConstants.SECTION_LOCATION_SHARING_LIST);
+            case AppState.NEEDLE:
+                showSection(AppConstants.SECTION_NEEDLES);
                 //removeSection(AppConstants.SECTION_LOCATION_SHARING);
-                onStateChange(AppState.LOCATION_SHARING_RECEIVED_TAB);
+                onStateChange(AppState.NEEDLE_RECEIVED_TAB);
                 break;
             case AppState.SETTINGS:
                 restorePreviousState();
@@ -378,14 +370,20 @@ public class NavigationController implements HomeActivity.NavigationHandler, OnA
     }
 
     public void refreshLocationSharingList() {
-        if(locationSharingListFragment != null){
-            locationSharingListFragment.fetchLocationSharing(true);
+        if(needleListFragment != null){
+            needleListFragment.fetchLocationSharing(true);
         }
     }
 
     public void refreshHaystackList() {
         if(haystacksListFragment != null){
             haystacksListFragment.fetchHaystacks(true);
+        }
+    }
+
+    public void refreshNotificationList() {
+        if(notificationFragment != null){
+            notificationFragment.fetchNotifications();
         }
     }
 

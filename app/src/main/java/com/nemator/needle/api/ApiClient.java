@@ -3,7 +3,7 @@ package com.nemator.needle.api;
 import android.util.Log;
 
 import com.nemator.needle.Needle;
-import com.nemator.needle.api.result.LocationSharingResult;
+import com.nemator.needle.api.result.NeedleResult;
 import com.nemator.needle.api.result.NotificationResult;
 import com.nemator.needle.api.result.PinResult;
 import com.nemator.needle.api.result.PinsResult;
@@ -12,7 +12,7 @@ import com.nemator.needle.api.result.UserResult;
 import com.nemator.needle.api.result.UsersResult;
 import com.nemator.needle.models.vo.HaystackUserVO;
 import com.nemator.needle.models.vo.HaystackVO;
-import com.nemator.needle.models.vo.LocationSharingVO;
+import com.nemator.needle.models.vo.NeedleVO;
 import com.nemator.needle.models.vo.NotificationVO;
 import com.nemator.needle.models.vo.PinVO;
 import com.nemator.needle.models.vo.UserVO;
@@ -82,6 +82,11 @@ public class ApiClient {
 
     public void login(UserVO user, Callback<LoginResult> callBack){
         Call<LoginResult> call = client.logIn(user);
+        call.enqueue(callBack);
+    }
+
+    public void getUserInfos(UserVO user, Callback<LoginResult> callBack){
+        Call<LoginResult> call = client.getUserInfos(user.getId());
         call.enqueue(callBack);
     }
 
@@ -162,23 +167,23 @@ public class ApiClient {
     }
 
     //Location Sharing
-    public void createLocationSharing(LocationSharingVO locationSharingVO, Callback<LocationSharingResult> callBack) {
-        Call<LocationSharingResult> call = client.createLocationSharing(locationSharingVO);
+    public void createNeedle(NeedleVO needleVO, Callback<NeedleResult> callBack) {
+        Call<NeedleResult> call = client.createNeedle(needleVO);
         call.enqueue(callBack);
     }
 
-    public void fetchLocationSharings(Callback<LocationSharingResult> callBack) {
-        Call<LocationSharingResult> call = client.getLocationSharings(Needle.userModel.getUserId());
+    public void fetchNeedles(Callback<NeedleResult> callBack) {
+        Call<NeedleResult> call = client.getNeedles(Needle.userModel.getUserId());
         call.enqueue(callBack);
     }
 
-    public void shareLocationBack(LocationSharingVO vo, Callback<LocationSharingResult> callBack){
-        Call<LocationSharingResult> call = client.shareLocationBack(vo);
+    public void shareLocationBack(NeedleVO vo, Callback<NeedleResult> callBack){
+        Call<NeedleResult> call = client.shareLocationBack(vo);
         call.enqueue(callBack);
     }
 
-    public void cancelLocationSharing(LocationSharingVO vo, Callback<LocationSharingResult> callBack){
-        Call<LocationSharingResult> call = client.cancelLocationSharing(vo);
+    public void cancelNeedle(NeedleVO vo, Callback<NeedleResult> callBack){
+        Call<NeedleResult> call = client.cancelNeedle(vo);
         call.enqueue(callBack);
     }
 
@@ -188,12 +193,12 @@ public class ApiClient {
         call.enqueue(callBack);
     }
 
-    public void retrieveSenderLocation(int userId, LocationSharingVO vo, Callback<UserResult> callBack) {
+    public void retrieveSenderLocation(int userId, NeedleVO vo, Callback<UserResult> callBack) {
         Call<UserResult> call = client.retrieveUserLocation(vo.getId(), userId, "sender");
         call.enqueue(callBack);
     }
 
-    public void retrieveReceiverLocation(int userId, LocationSharingVO vo, Callback<UserResult> callBack) {
+    public void retrieveReceiverLocation(int userId, NeedleVO vo, Callback<UserResult> callBack) {
         Call<UserResult> call = client.retrieveUserLocation(vo.getId(), userId, "receiver");
         call.enqueue(callBack);
     }

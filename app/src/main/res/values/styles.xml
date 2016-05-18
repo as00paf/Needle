@@ -79,4 +79,8 @@
         <item name="colorAccent">@color/primary</item>
     </style>
 
+    <style name="calendar_height">
+        <item name="android:layout_height">300dp</item>
+    </style>
+
 </resources>

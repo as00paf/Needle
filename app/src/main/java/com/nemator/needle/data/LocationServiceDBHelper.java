@@ -5,9 +5,6 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.provider.BaseColumns;
 
-/**
- * Created by Alex on 29/06/2015.
- */
 public class LocationServiceDBHelper extends SQLiteOpenHelper {
     private static final String TEXT_TYPE = " TEXT";
     private static final String INT_TYPE = " INTEGER";
@@ -51,19 +48,5 @@ public class LocationServiceDBHelper extends SQLiteOpenHelper {
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         db.execSQL(SQL_DELETE_ENTRIES);
         onCreate(db);
-    }
-
-    public static abstract class PostLocationRequest implements BaseColumns {
-        public static final String TABLE_NAME = "NeedleLocationServicePostRequest";
-        public static final String COLUMN_NAME_TYPE = "type";
-        public static final String COLUMN_NAME_DATE = "date";
-        public static final String COLUMN_NAME_EXPIRATION = "expiration";
-        public static final String COLUMN_NAME_POSTER_ID = "posterId";
-        public static final String COLUMN_NAME_ITEM_ID = "itemId";
-
-        public static final int POSTER_TYPE_HAYSTACK = 0;
-        public static final int POSTER_TYPE_LOCATION_SHARING = 1;
-        public static final int POSTER_TYPE_LOCATION_SHARING_BACK = 2;
-
     }
 }

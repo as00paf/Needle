@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="calendar_height">
+        <item name="android:layout_height">@integer/custom_match_parent</item>
+    </style>
+</resources>

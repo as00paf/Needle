@@ -7,6 +7,7 @@ import android.os.AsyncTask;
 import com.nemator.needle.broadcastReceiver.PostLocationRequestAlarm;
 import com.nemator.needle.data.LocationServiceDBHelper;
 import com.nemator.needle.api.result.TaskResult;
+import com.nemator.needle.data.PostLocationRequest;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -55,16 +56,16 @@ public class AddPostLocationRequestTask extends AsyncTask<Void, Void, TaskResult
         String currentDate = sdf.format(new Date(year-1900, month, day, hours, minutes));
 
         ContentValues values = new ContentValues();
-        values.put(LocationServiceDBHelper.PostLocationRequest.COLUMN_NAME_TYPE, params.type);
-        values.put(LocationServiceDBHelper.PostLocationRequest.COLUMN_NAME_DATE, currentDate);
-        values.put(LocationServiceDBHelper.PostLocationRequest.COLUMN_NAME_EXPIRATION, params.expiration);
-        values.put(LocationServiceDBHelper.PostLocationRequest.COLUMN_NAME_POSTER_ID, params.posterId);
-        values.put(LocationServiceDBHelper.PostLocationRequest.COLUMN_NAME_ITEM_ID, params.itemId);
+        values.put(PostLocationRequest.COLUMN_NAME_TYPE, params.type);
+        values.put(PostLocationRequest.COLUMN_NAME_DATE, currentDate);
+        values.put(PostLocationRequest.COLUMN_NAME_EXPIRATION, params.expiration);
+        values.put(PostLocationRequest.COLUMN_NAME_POSTER_ID, params.posterId);
+        values.put(PostLocationRequest.COLUMN_NAME_ITEM_ID, params.itemId);
 
         // Insert the new row, returning the primary key value of the new row
         long newRowId;
         newRowId = db.insert(
-                LocationServiceDBHelper.PostLocationRequest.TABLE_NAME,
+                PostLocationRequest.TABLE_NAME,
                 null,
                 values);
 

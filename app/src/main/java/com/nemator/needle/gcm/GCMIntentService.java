@@ -44,7 +44,7 @@ public class GCMIntentService extends IntentService {
             }else{
                 String registrationId = extras.getString("registration_id");
 
-                String regId = Needle.userModel.getGcmRegId();
+                String regId = Needle.userModel.getGcmRegId(this);
                 if((regId == null || regId.isEmpty()) && !regId.equals(registrationId)){
                     getSharedPreferences("com.nemator.needle", Context.MODE_PRIVATE).edit().
                             putString(AppConstants.TAG_GCM_REG_ID, registrationId).

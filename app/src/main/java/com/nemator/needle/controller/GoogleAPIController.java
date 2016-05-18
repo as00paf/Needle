@@ -145,7 +145,9 @@ public class GoogleAPIController implements GoogleApiClient.ConnectionCallbacks,
                 Location lastLocation = LocationServices.FusedLocationApi.getLastLocation(
                         mGoogleApiClient);
 
-                lastKnownLocation = new LatLng(lastLocation.getLatitude(), lastLocation.getLongitude());
+                if(lastLocation != null){
+                    lastKnownLocation = new LatLng(lastLocation.getLatitude(), lastLocation.getLongitude());
+                }
             }
 
             sendIntent(AppConstants.GOOGLE_API_CONNECTED);

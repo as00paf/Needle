@@ -39,11 +39,14 @@ public class NotificationVO implements Serializable, Parcelable {
     @SerializedName("senderPictureURL")
     private String senderPictureURL;
 
+    @SerializedName("senderName")
+    private String senderName;
+
     public NotificationVO(){
 
     }
 
-    public NotificationVO(int id, int type, int userId, int dataId, String title, String description, String sentAt, Boolean seen, int senderId, String senderPictureURL){
+    public NotificationVO(int id, int type, int userId, int dataId, String title, String description, String sentAt, Boolean seen, int senderId, String senderPictureURL, String senderName){
         this.id = id;
         this.type = type;
         this.userId = userId;
@@ -54,6 +57,7 @@ public class NotificationVO implements Serializable, Parcelable {
         this.seen = seen;
         this.senderId = senderId;
         this.senderPictureURL = senderPictureURL;
+        this.senderName = senderName;
     }
 
     @Override
@@ -72,6 +76,8 @@ public class NotificationVO implements Serializable, Parcelable {
         this.seen = (Boolean) in.readValue(Boolean.class.getClassLoader());
         this.senderId = in.readInt();
         this.senderPictureURL = in.readString();
+        this.senderName = in.readString();
+
     }
 
     @Override
@@ -86,6 +92,7 @@ public class NotificationVO implements Serializable, Parcelable {
         parcel.writeValue(seen);
         parcel.writeInt(senderId);
         parcel.writeString(senderPictureURL);
+        parcel.writeString(senderName);
     }
 
     public static final Creator<NotificationVO> CREATOR = new Creator<NotificationVO>() {
@@ -180,5 +187,13 @@ public class NotificationVO implements Serializable, Parcelable {
 
     public void setTitle(String title) {
         this.title = title;
+    }
+
+    public String getSenderName() {
+        return senderName;
+    }
+
+    public void setSenderName(String senderName) {
+        this.senderName = senderName;
     }
 }

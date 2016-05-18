@@ -1,14 +1,13 @@
 package com.nemator.needle.adapter;
 
-import android.content.Context;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentStatePagerAdapter;
+import android.support.v4.app.FragmentPagerAdapter;
 
 import com.nemator.needle.fragments.authentication.LoginFragment;
 import com.nemator.needle.fragments.authentication.RegisterFragment;
 
-public class AuthenticationPagerAdapter extends FragmentStatePagerAdapter {
+public class AuthenticationPagerAdapter extends FragmentPagerAdapter {
 
     private LoginFragment loginFragment;
     private RegisterFragment registerFragment;

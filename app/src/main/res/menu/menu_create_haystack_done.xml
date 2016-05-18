@@ -1,6 +1,19 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
+    <item
+        android:id="@+id/menu_option_settings"
+        android:title="@string/action_settings"
+        android:icon="@drawable/ic_action_settings"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/menu_option_help"
+        android:title="@string/title_helpAndSupport"
+        android:description="@string/title_helpAndSupport"
+        app:showAsAction="never"
+        android:icon="@drawable/ic_action_help"/>
+
     <item android:id="@+id/action_search"
         android:description="@string/search_for_places"
         android:title="@string/search_for_places"

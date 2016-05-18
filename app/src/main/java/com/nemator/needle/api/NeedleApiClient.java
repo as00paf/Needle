@@ -1,7 +1,7 @@
 package com.nemator.needle.api;
 
 import com.nemator.needle.api.result.HaystackResult;
-import com.nemator.needle.api.result.LocationSharingResult;
+import com.nemator.needle.api.result.NeedleResult;
 import com.nemator.needle.api.result.LoginResult;
 import com.nemator.needle.api.result.NotificationResult;
 import com.nemator.needle.api.result.PinResult;
@@ -11,15 +11,13 @@ import com.nemator.needle.api.result.UserResult;
 import com.nemator.needle.api.result.UsersResult;
 import com.nemator.needle.models.vo.HaystackUserVO;
 import com.nemator.needle.models.vo.HaystackVO;
-import com.nemator.needle.models.vo.LocationSharingVO;
+import com.nemator.needle.models.vo.NeedleVO;
 import com.nemator.needle.models.vo.NotificationVO;
 import com.nemator.needle.models.vo.PinVO;
 import com.nemator.needle.models.vo.UserVO;
 import com.nemator.needle.api.result.TaskResult;
 
 import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.http.Body;
@@ -58,6 +56,9 @@ public interface NeedleApiClient {
     //Authentication
     @POST("login.php")
     Call<LoginResult> logIn(@Body UserVO user);
+
+    @GET("login.php")
+    Call<LoginResult> getUserInfos(@Query("userId") int userId);
 
     @GET("logout.php")
     Call<TaskResult> logOut();
@@ -107,16 +108,16 @@ public interface NeedleApiClient {
 
     //LocationSharing
     @GET("locationSharing.php")
-    Call<LocationSharingResult> getLocationSharings(@Query("userId") int userId);
+    Call<NeedleResult> getNeedles(@Query("userId") int userId);
 
     @POST("locationSharing.php")
-    Call<LocationSharingResult> createLocationSharing(@Body LocationSharingVO locationSharingVO);
+    Call<NeedleResult> createNeedle(@Body NeedleVO needleVO);
 
     @PUT("locationSharing.php")
-    Call<LocationSharingResult> shareLocationBack(@Body LocationSharingVO vo);
+    Call<NeedleResult> shareLocationBack(@Body NeedleVO vo);
 
     @HTTP(method = "DELETE", path = "locationSharing.php", hasBody = true)
-    Call<LocationSharingResult> cancelLocationSharing(@Body LocationSharingVO vo);
+    Call<NeedleResult> cancelNeedle(@Body NeedleVO vo);
 
     //Notifications
     @GET("notification.php")

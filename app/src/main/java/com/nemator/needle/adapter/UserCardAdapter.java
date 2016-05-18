@@ -13,11 +13,12 @@ import android.widget.TextView;
 
 import com.nemator.needle.R;
 import com.nemator.needle.models.vo.UserVO;
+import com.nemator.needle.viewHolders.UserCardViewHolder;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 
-public class UserCardAdapter extends RecyclerView.Adapter<UserCardAdapter.UserCardViewHolder> {
+public class UserCardAdapter extends RecyclerView.Adapter<UserCardViewHolder> {
     public static final String TAG = "UserListAdapter";
 
     private ArrayList<UserVO> listData;
@@ -25,11 +26,13 @@ public class UserCardAdapter extends RecyclerView.Adapter<UserCardAdapter.UserCa
     private ArrayList<UserVO> selectedItems = new ArrayList<UserVO>();
     private UserVO selectedItem;
     private Context mContext;
+    private boolean isSingleSelect;
 
-    public UserCardAdapter(ArrayList<UserVO> data, Context context) {
+    public UserCardAdapter(Context context, ArrayList<UserVO> data, boolean isSingleSelect) {
         listData = data;
         filteredListData = data;
         mContext = context;
+        this.isSingleSelect = isSingleSelect;
 
         if(listData == null){
             listData = new ArrayList<UserVO>();
@@ -66,7 +69,7 @@ public class UserCardAdapter extends RecyclerView.Adapter<UserCardAdapter.UserCa
         View userCard;
 
         userCard = LayoutInflater.from(parent.getContext()).inflate(R.layout.card_user, parent, false);
-        viewHolder = new UserCardViewHolder(userCard);
+        viewHolder = new UserCardViewHolder(userCard, delegate);
 
         return viewHolder;
     }
@@ -103,40 +106,30 @@ public class UserCardAdapter extends RecyclerView.Adapter<UserCardAdapter.UserCa
         return filteredListData.size();
     }
 
-    public class UserCardViewHolder extends RecyclerView.ViewHolder{
-        //Item
-        TextView userNameView;
-        ImageView imageView;
+    private UserCardViewHolder.Delegate delegate = new UserCardViewHolder.Delegate() {
+        private View lastSelected;
 
-        UserVO userData;
-
-        public UserCardViewHolder(View view) {
-            super(view);
-            userNameView =  (TextView) view.findViewById(R.id.username_label);
-            imageView = (ImageView) view.findViewById(R.id.user_profile_picture);
-
-            view.setClickable(true);
-        }
-
-        public void setData(final UserVO user){
-            userData = user;
-            itemView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    view.setSelected(!view.isSelected());
-
-                    if(view.isSelected()){
-                        view.findViewById(R.id.username_label).setBackgroundColor(view.getContext().getResources().getColor(R.color.primary));
-                        selectedItems.add(userData);
-                        selectedItem = userData;
-                    }else{
-                        view.findViewById(R.id.username_label).setBackgroundColor(view.getContext().getResources().getColor(android.R.color.transparent));
-                        selectedItems.remove(userData);
-                        selectedItem = null;
-                    }
+        @Override
+        public void onUserSelected(View view, UserVO user) {
+            if(isSingleSelect){
+                if(lastSelected != null){
+                    lastSelected.setSelected(false);
+                    lastSelected.findViewById(R.id.username_label).setBackgroundColor(view.getContext().getResources().getColor(android.R.color.transparent));
                 }
-            });
+                lastSelected = view;
+            }
+
+            view.setSelected(!view.isSelected());
+
+            if(view.isSelected()){
+                selectedItems.add(user);
+                selectedItem = user;
+            }else{
+                selectedItems.remove(user);
+                selectedItem = null;
+                lastSelected = null;
+            }
         }
-    }
+    };
 }
 

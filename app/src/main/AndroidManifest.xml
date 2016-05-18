@@ -112,8 +112,8 @@
         </activity>
 
         <activity
-            android:name=".activities.CreateLocationSharingActivity"
-            android:label="@string/create_location_sharing"
+            android:name=".activities.CreateNeedleActivity"
+            android:label="@string/create_needle"
             android:parentActivityName=".activities.HomeActivity"
             android:theme="@style/AppTheme"
             android:windowSoftInputMode="adjustPan"
@@ -132,7 +132,7 @@
             android:parentActivityName=".activities.HomeActivity"
             android:theme="@style/AppTheme"/>
 
-        <activity android:name=".activities.LocationSharingActivity"
+        <activity android:name=".activities.NeedleActivity"
             android:label="Location Sharing"
             android:parentActivityName=".activities.HomeActivity"
             android:theme="@style/AppTheme"/>

@@ -38,7 +38,7 @@ public class HaystackCardHolder extends RecyclerView.ViewHolder implements Popup
         titleView =  (TextView) view.findViewById(R.id.title);
         userCountView = (TextView)  view.findViewById(R.id.active_users);
         active_until = (TextView)  view.findViewById(R.id.active_until);
-        menuButton = (ImageButton) view.findViewById(R.id.location_sharing_card_menu_button);
+        menuButton = (ImageButton) view.findViewById(R.id.menu_button);
         emptyText = (TextView) view.findViewById(R.id.title);
         imageView = (ImageView) view.findViewById(R.id.thumbImage);
     }

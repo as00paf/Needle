@@ -8,16 +8,16 @@
         android:id="@+id/group_feature">
 
         <item
-            android:id="@+id/drawer_haystacks"
+            android:id="@+id/drawer_needle"
             android:checked="true"
-            android:icon="@drawable/ic_haystack"
-            android:title="@string/title_haystacks"
+            android:icon="@drawable/ic_app_black"
+            android:title="@string/title_needles"
             app:actionLayout="@layout/menu_counter"/>
 
         <item
-            android:id="@+id/drawer_location_sharing"
-            android:icon="@drawable/ic_near_me_black_24dp"
-            android:title="@string/title_location_sharing"
+            android:id="@+id/drawer_haystacks"
+            android:icon="@drawable/ic_haystack"
+            android:title="@string/title_haystacks"
             app:actionLayout="@layout/menu_counter"/>
 
         <item

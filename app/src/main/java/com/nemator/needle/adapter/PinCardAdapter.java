@@ -1,30 +1,17 @@
 package com.nemator.needle.adapter;
 
-import android.app.Activity;
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
-import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.nemator.needle.R;
-import com.nemator.needle.api.ApiClient;
-import com.nemator.needle.api.result.LocationSharingResult;
-import com.nemator.needle.fragments.locationSharing.LocationSharingCardListener;
-import com.nemator.needle.models.vo.LocationSharingVO;
 import com.nemator.needle.models.vo.PinVO;
-import com.nemator.needle.viewHolders.LocationSharingCardHolder;
 import com.nemator.needle.viewHolders.PinCardHolder;
-import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
-
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 
 public class PinCardAdapter extends RecyclerView.Adapter<PinCardHolder>{
     public static String TAG = "PinCardAdapter";

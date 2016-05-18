@@ -54,4 +54,68 @@ public class AppUtils {
 
         return result;
     }
+
+    public static CharSequence formatDateRelative(String activeUntil) {
+        CharSequence result = null;
+
+        //2016-04-27 20:47:00
+        SimpleDateFormat srcDf = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+
+        try {
+            Date date = srcDf.parse(activeUntil);
+            long now = System.currentTimeMillis();
+
+            result = DateUtils.getRelativeTimeSpanString(date.getTime(), now, 0L, DateUtils.FORMAT_ABBREV_ALL);
+
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        return result;
+    }
+
+    public static String formatDistance(float meters) {
+        if (meters < 1000) {
+            return ((int) meters) + "m";
+        } else if (meters < 10000) {
+            return formatDec(meters / 1000f, 1) + "km";
+        } else {
+            return ((int) (meters / 1000f)) + "km";
+        }
+    }
+
+    private static String formatDec(float val, int dec) {
+        int factor = (int) Math.pow(10, dec);
+
+        int front = (int) (val);
+        int back = (int) Math.abs(val * (factor)) % factor;
+
+        return front + "." + back;
+    }
+
+    public static boolean isDateAfterNow(String date, String format) {
+        SimpleDateFormat srcDf = new SimpleDateFormat(format);
+
+        Date strDate = null;
+        try {
+            strDate = srcDf.parse(date);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        return System.currentTimeMillis() > strDate.getTime();
+    }
+
+    public static boolean isDateBeforeNow(String date, String format) {
+        SimpleDateFormat srcDf = new SimpleDateFormat(format);
+
+        Date strDate = null;
+        try {
+            strDate = srcDf.parse(date);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        return System.currentTimeMillis() < strDate.getTime();
+    }
 }

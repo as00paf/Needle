@@ -25,6 +25,13 @@ public class GoogleMapCameraControllerConfig {
     private LatLngBounds initialBounds = DEFAULT_INITIAL_BOUNDS;
     private int mapType = GoogleMap.MAP_TYPE_NORMAL;
 
+    private Boolean zoomControlsEnabled = false;
+    private Boolean myLocationButtonEnabled = false;
+    private Boolean tiltGesturesEnabled = false;
+    private Boolean zoomGesturesEndabled = true;
+    private Boolean scrollGesturesEnabled = true;
+    private Boolean myLocationEnabled = true;
+
     public static GoogleMapCameraControllerConfig create(){
         return new GoogleMapCameraControllerConfig();
     }
@@ -142,5 +149,59 @@ public class GoogleMapCameraControllerConfig {
 
     public void setMapType(int mapType) {
         this.mapType = mapType;
+    }
+
+    public Boolean getZoomControlsEnabled() {
+        return zoomControlsEnabled;
+    }
+
+    public GoogleMapCameraControllerConfig setZoomControlsEnabled(Boolean zoomControlsEnabled) {
+        this.zoomControlsEnabled = zoomControlsEnabled;
+        return this;
+    }
+
+    public Boolean getMyLocationButtonEnabled() {
+        return myLocationButtonEnabled;
+    }
+
+    public GoogleMapCameraControllerConfig setMyLocationButtonEnabled(Boolean myLocationButtonEnabled) {
+        this.myLocationButtonEnabled = myLocationButtonEnabled;
+        return this;
+    }
+
+    public Boolean getTiltGesturesEnabled() {
+        return tiltGesturesEnabled;
+    }
+
+    public GoogleMapCameraControllerConfig setTiltGesturesEnabled(Boolean tiltGesturesEnabled) {
+        this.tiltGesturesEnabled = tiltGesturesEnabled;
+        return this;
+    }
+
+    public Boolean getZoomGesturesEndabled() {
+        return zoomGesturesEndabled;
+    }
+
+    public GoogleMapCameraControllerConfig setZoomGesturesEndabled(Boolean zoomGesturesEndabled) {
+        this.zoomGesturesEndabled = zoomGesturesEndabled;
+        return this;
+    }
+
+    public Boolean getScrollGesturesEnabled() {
+        return scrollGesturesEnabled;
+    }
+
+    public GoogleMapCameraControllerConfig setScrollGesturesEnabled(Boolean scrollGesturesEnabled) {
+        this.scrollGesturesEnabled = scrollGesturesEnabled;
+        return this;
+    }
+
+    public Boolean getMyLocationEnabled() {
+        return myLocationEnabled;
+    }
+
+    public GoogleMapCameraControllerConfig setMyLocationEnabled(Boolean myLocationEnabled) {
+        this.myLocationEnabled = myLocationEnabled;
+        return this;
     }
 }

@@ -107,5 +107,6 @@ CREATE TABLE notification
 	sentAt datetime,
 	seen BOOLEAN,
 	senderId INT,
-	senderPictureURL TEXT
+	senderPictureURL TEXT,
+	senderName TEXT
 );

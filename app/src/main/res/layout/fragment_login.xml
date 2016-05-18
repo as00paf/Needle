@@ -119,7 +119,7 @@
             app:backgroundTint="@color/com_facebook_blue"
             android:padding="16dp"
             android:scaleType="centerInside"
-            android:src="@drawable/facebook_logo"
+            android:src="@drawable/ic_facebook_white_24dp"
             android:layout_marginLeft="12dp"
             android:layout_marginRight="12dp"
             app:rippleColor="@android:color/white"/>
@@ -130,8 +130,8 @@
             android:elevation="4dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:backgroundTint="@android:color/white"
-            android:src="@drawable/common_google_signin_btn_icon_dark"
+            app:backgroundTint="@android:color/holo_red_dark"
+            android:src="@drawable/ic_google_white_24dp"
             android:layout_marginLeft="32dp"
             android:layout_marginRight="32dp"
             app:rippleColor="@color/circleColor"/>

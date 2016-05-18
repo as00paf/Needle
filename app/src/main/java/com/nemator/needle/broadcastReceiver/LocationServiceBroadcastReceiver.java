@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.location.Location;
 import android.util.Log;
 
-import com.google.android.gms.maps.model.LatLng;
 import com.nemator.needle.utils.AppConstants;
 
 public class LocationServiceBroadcastReceiver extends BroadcastReceiver {

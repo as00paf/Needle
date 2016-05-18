@@ -31,7 +31,7 @@ import com.nemator.needle.api.ApiClient;
 import com.nemator.needle.api.result.TaskResult;
 import com.nemator.needle.api.result.UsersResult;
 import com.nemator.needle.broadcastReceiver.LocationServiceBroadcastReceiver;
-import com.nemator.needle.data.LocationServiceDBHelper;
+import com.nemator.needle.data.PostLocationRequest;
 import com.nemator.needle.models.vo.HaystackVO;
 import com.nemator.needle.models.vo.UserVO;
 import com.nemator.needle.utils.AppConstants;
@@ -174,7 +174,7 @@ public class HaystackMapFragment extends SupportMapFragment implements LocationS
         int id = item.getItemId();
 
         switch (id) {
-            case R.id.location_sharing:
+            case R.id.share_my_location:
                 toggleLocationSharing();
                 item.setIcon(isPostingLocationUpdates() ?
                         getResources().getDrawable(R.drawable.ic_my_location_white_24dp) :
@@ -433,7 +433,7 @@ public class HaystackMapFragment extends SupportMapFragment implements LocationS
                 TaskResult result = response.body();
                 isActivated = result.getSuccessCode() == 1;
 
-                MenuItem item = ((HaystackActivity) getActivity()).getMenu().findItem(R.id.location_sharing);
+                MenuItem item = ((HaystackActivity) getActivity()).getMenu().findItem(R.id.share_my_location);
                 item.setIcon(isActivated ?
                         getResources().getDrawable(R.drawable.ic_location_disabled_white_24dp) :
                         getResources().getDrawable(R.drawable.ic_my_location_white_24dp));
@@ -445,7 +445,7 @@ public class HaystackMapFragment extends SupportMapFragment implements LocationS
 
             @Override
             public void onFailure(Call<TaskResult> call, Throwable t) {
-                MenuItem item = ((HaystackActivity) getActivity()).getMenu().findItem(R.id.location_sharing);
+                MenuItem item = ((HaystackActivity) getActivity()).getMenu().findItem(R.id.share_my_location);
                 item.setIcon(isActivated ?
                         getResources().getDrawable(R.drawable.ic_location_disabled_white_24dp) :
                         getResources().getDrawable(R.drawable.ic_my_location_white_24dp));
@@ -466,7 +466,7 @@ public class HaystackMapFragment extends SupportMapFragment implements LocationS
                 TaskResult result = response.body();
                 isActivated = !(result.getSuccessCode() == 1);
 
-                MenuItem item = ((HaystackActivity) getActivity()).getMenu().findItem(R.id.location_sharing);
+                MenuItem item = ((HaystackActivity) getActivity()).getMenu().findItem(R.id.share_my_location);
                 item.setIcon(!isActivated ?
                         getResources().getDrawable(R.drawable.ic_my_location_white_24dp) :
                         getResources().getDrawable(R.drawable.ic_location_disabled_white_24dp));
@@ -478,7 +478,7 @@ public class HaystackMapFragment extends SupportMapFragment implements LocationS
 
             @Override
             public void onFailure(Call<TaskResult> call, Throwable t) {
-                MenuItem item = ((HaystackActivity) getActivity()).getMenu().findItem(R.id.location_sharing);
+                MenuItem item = ((HaystackActivity) getActivity()).getMenu().findItem(R.id.share_my_location);
                 item.setIcon(isActivated ?
                         getResources().getDrawable(R.drawable.ic_my_location_white_24dp) :
                         getResources().getDrawable(R.drawable.ic_location_disabled_white_24dp));
@@ -566,7 +566,7 @@ public class HaystackMapFragment extends SupportMapFragment implements LocationS
         mPostingLocationUpdates = true;
         activateUser();
         Needle.serviceController.getService()
-                .addPostLocationRequest(LocationServiceDBHelper.PostLocationRequest.POSTER_TYPE_HAYSTACK, haystack.getTimeLimit(), haystack.getOwner(), String.valueOf(haystack.getId()));
+                .addPostLocationRequest(PostLocationRequest.Type.HAYSTACK, haystack.getTimeLimit(), haystack.getOwner(), String.valueOf(haystack.getId()));
 
         Needle.serviceController.getService()
                 .postLocation();
@@ -575,7 +575,7 @@ public class HaystackMapFragment extends SupportMapFragment implements LocationS
     public void stopSharingLocation(){
         mPostingLocationUpdates = false;
         Needle.serviceController.getService()
-                .removePostLocationRequest(LocationServiceDBHelper.PostLocationRequest.POSTER_TYPE_HAYSTACK, haystack.getTimeLimit(), haystack.getOwner(), String.valueOf(haystack.getId()));
+                .removePostLocationRequest(PostLocationRequest.Type.HAYSTACK, haystack.getTimeLimit(), haystack.getOwner(), String.valueOf(haystack.getId()));
         deactivateUser();
     }
 

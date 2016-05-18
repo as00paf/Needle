@@ -11,7 +11,6 @@ import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.os.Parcelable;
 import android.support.annotation.IdRes;
 import android.support.design.widget.NavigationView;
 import android.support.v4.content.LocalBroadcastManager;
@@ -28,27 +27,19 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.google.android.gms.common.api.ResultCallback;
-import com.google.android.gms.common.data.DataBufferUtils;
-import com.google.android.gms.location.places.PlaceLikelihood;
-import com.google.android.gms.location.places.PlaceLikelihoodBuffer;
 import com.nemator.needle.Needle;
 import com.nemator.needle.R;
+import com.nemator.needle.api.ApiClient;
 import com.nemator.needle.api.result.LoginResult;
 import com.nemator.needle.controller.AuthenticationController;
-import com.nemator.needle.controller.NavigationController;
-import com.nemator.needle.models.vo.CustomPlace;
-import com.nemator.needle.models.vo.HaystackVO;
-import com.nemator.needle.models.vo.LocationSharingVO;
-import com.nemator.needle.models.vo.UserVO;
 import com.nemator.needle.utils.AppConstants;
-import com.nemator.needle.utils.AppState;
 import com.nemator.needle.utils.CropCircleTransformation;
 import com.nemator.needle.utils.PermissionManager;
 import com.squareup.picasso.Picasso;
 
-import java.io.Serializable;
-import java.util.ArrayList;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class HomeActivity extends AppCompatActivity {
 
@@ -68,9 +59,7 @@ public class HomeActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         Needle.networkController.init(HomeActivity.this);
-        if(Needle.networkController.isNetworkConnected()) {
-            initUser(savedInstanceState);
-        }
+        initUser(savedInstanceState);
 
         initToolbar();
         setupDrawerLayout();
@@ -85,7 +74,13 @@ public class HomeActivity extends AppCompatActivity {
         initNotificationListener();
     }
 
-   private void requestPermission() {
+    @Override
+    protected void onResume() {
+        super.onResume();
+        Needle.serviceController.initService(this);
+    }
+
+    private void requestPermission() {
         if(!PermissionManager.getInstance(this).isPermissionGranted(Manifest.permission.ACCESS_FINE_LOCATION)){
             PermissionManager.getInstance(this).requestPermission(this, Manifest.permission.ACCESS_FINE_LOCATION);
         }
@@ -182,6 +177,7 @@ public class HomeActivity extends AppCompatActivity {
         public void onReceive(Context context, Intent intent) {
             Needle.navigationController.refreshLocationSharingList();
             Needle.navigationController.refreshHaystackList();
+            Needle.navigationController.refreshNotificationList();
         }
     };
 
@@ -218,19 +214,42 @@ public class HomeActivity extends AppCompatActivity {
         navigationView.setNavigationItemSelectedListener(Needle.navigationController.getNavigationItemListener());
 
         navigationView.getMenu().findItem(R.id.drawer_log_out).setChecked(false);
-        navigationView.getMenu().findItem(R.id.drawer_haystacks).setChecked(true);
+        navigationView.getMenu().findItem(R.id.drawer_needle).setChecked(true);
         if(getIntent() != null && getIntent().getExtras() != null){
             LoginResult result = (LoginResult) getIntent().getExtras().get("loginResult");//TODO : use constant
             if(result != null){
                 setHaystacksCount(result.getHaystackCount());
-                setLocationSharingCount(result.getLocationSharingCount());
+                setNeedleCount(result.getLocationSharingCount());
                 setNotificationsCount(result.getNotificationCount());
+            }
+        }else{
+            ApiClient.getInstance().getUserInfos(Needle.userModel.getUser(), userInfosCallback);
+        }
+
+        Needle.navigationController.showSection(AppConstants.SECTION_NEEDLES);
+        showNavigationDrawerIfFirstTime();
+    }
+
+    private Callback<LoginResult> userInfosCallback = new Callback<LoginResult>() {
+        @Override
+        public void onResponse(Call<LoginResult> call, Response<LoginResult> response) {
+            LoginResult result = response.body();
+
+            if(result.getSuccessCode() > 0){
+                Log.d(TAG, "User infos retrieved successfully");
+                setHaystacksCount(result.getHaystackCount());
+                setNeedleCount(result.getLocationSharingCount());
+                setNotificationsCount(result.getNotificationCount());
+            }else{
+                Log.d(TAG, "Failed to retrieve user infos. Error " + result.getMessage());
             }
         }
 
-        Needle.navigationController.showSection(AppConstants.SECTION_HAYSTACKS);
-        showNavigationDrawerIfFirstTime();
-    }
+        @Override
+        public void onFailure(Call<LoginResult> call, Throwable t) {
+            Log.d(TAG, "Failed to retrieve user infos. Error : " + t.getMessage());
+        }
+    };
 
     private void showNavigationDrawerIfFirstTime() {
         Thread t = new Thread(new Runnable() {
@@ -316,11 +335,16 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     @Override
+    protected void onPause() {
+        super.onPause();
+        Needle.serviceController.unbindService();
+    }
+
+    @Override
     protected void onDestroy() {
         super.onDestroy();
 
         Needle.networkController.unregister();
-        Needle.serviceController.unbindService();
         Needle.googleApiController.disconnect();
     }
 
@@ -358,8 +382,8 @@ public class HomeActivity extends AppCompatActivity {
         setMenuCounter(R.id.drawer_haystacks, count);
     }
 
-    public void setLocationSharingCount(int count) {
-        setMenuCounter(R.id.drawer_location_sharing, count);
+    public void setNeedleCount(int count) {
+        setMenuCounter(R.id.drawer_needle, count);
     }
 
     public void setNotificationsCount(int count) {

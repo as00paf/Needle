@@ -1,27 +1,16 @@
 package com.nemator.needle.viewHolders;
 
-import android.app.AlertDialog;
-import android.content.DialogInterface;
-import android.content.Intent;
-import android.os.Parcelable;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ImageButton;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.nemator.needle.R;
-import com.nemator.needle.activities.LocationSharingActivity;
-import com.nemator.needle.adapter.LocationSharingCardAdapter;
 import com.nemator.needle.adapter.PinCardAdapter;
-import com.nemator.needle.fragments.locationSharing.LocationSharingCardListener;
-import com.nemator.needle.models.vo.LocationSharingVO;
 import com.nemator.needle.models.vo.PinVO;
-import com.nemator.needle.utils.AppConstants;
 
 public class PinCardHolder extends RecyclerView.ViewHolder implements PopupMenu.OnMenuItemClickListener, View.OnClickListener {
     public ImageButton menuButton;

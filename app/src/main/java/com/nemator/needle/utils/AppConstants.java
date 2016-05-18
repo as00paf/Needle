@@ -53,18 +53,13 @@ public class AppConstants {
     public static final String IS_FIRST_START = "isFirstStart";
 
     //App Sections
-    public static final int SECTION_SPLASH_LOGIN = 0;
-    public static final int SECTION_REGISTER = 1;
     public static final int SECTION_LOGIN = 2;
     public static final int SECTION_HAYSTACKS = 3;
-    public static final int SECTION_LOCATION_SHARING_LIST = 4;
-    public static final int SECTION_LOG_OUT = 5;
+    public static final int SECTION_NEEDLES = 4;
     public static final int SECTION_SETTINGS = 6;
     public static final int SECTION_HELP = 7;
     public static final int SECTION_CREATE_HAYSTACK = 8;
-    public static final int SECTION_CREATE_LOCATION_SHARING = 9;
-    public static final int SECTION_HAYSTACK = 10;
-    public static final int SECTION_LOCATION_SHARING = 11;
+    public static final int SECTION_CREATE_NEEDLE = 9;
     public static final int SECTION_NOTIFICATIONS = 12;
     public static final int SECTION_LOGIN_PICTURE = 13;
     public static final int SECTION_PEOPLE = 14;
@@ -80,10 +75,10 @@ public class AppConstants {
     public static final int HAYSTACK_INVITATION = 0;
     public static final int USER_JOINED_HAYSTACK = 1;
     public static final int USER_LEFT_HAYSTACK = 2;
-    public static final int USER_LOCATION_SHARING = 3;
-    public static final int USER_CANCELLED_LOCATION_SHARING = 4;
-    public static final int USER_SHARING_LOCATION_BACK = 5;
-    public static final int USER_STOPPED_SHARING_LOCATION = 6;
+    public static final int USER_NEEDLE = 3;
+    public static final int USER_CANCELLED_NEEDLE = 4;
+    public static final int USER_NEEDLE_BACK = 5;
+    public static final int USER_STOPPED_NEEDLE = 6;
     public static final int HAYSTACK_CANCELLED = 7;
     public static final int PIN_DELETED_FROM_HAYSTACK = 8;
 }

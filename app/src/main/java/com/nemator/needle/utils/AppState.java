@@ -16,7 +16,6 @@ public class AppState {
     public static final int CREATE_NEEDLE = 12;
     public static final int HAYSTACK = 13;
     public static final int NEEDLE = 14;
-    public static final int SETTINGS = 15;
     public static final int NOTIFICATIONS = 16;
     public static final int PEOPLE = 17;
 }

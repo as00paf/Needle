@@ -52,7 +52,6 @@ public class NavigationController implements HomeActivity.NavigationHandler, OnA
     //Fragments
     private HaystackListFragment haystacksListFragment;
     private NeedleListFragment needleListFragment;
-    private SettingsFragment settingsFragment;
     private CreateNeedleExpirationFragment createNeedleExpirationFragment;
     private PeopleFragment peopleFragment;
     private NotificationFragment notificationFragment;
@@ -135,11 +134,6 @@ public class NavigationController implements HomeActivity.NavigationHandler, OnA
 
                 if(actionBar != null) actionBar.setTitle(R.string.title_haystacks);
                 onStateChange(AppState.PUBLIC_HAYSTACK_TAB);
-
-                if(previousState == AppState.SETTINGS){
-                    enterAnimation = R.anim.enter_from_left;
-                    exitAnimation = R.anim.exit_to_right;
-                }
                 break;
             case AppConstants.SECTION_CREATE_HAYSTACK:
                 Intent intent = new Intent(activity, CreateHaystackActivity.class);
@@ -155,14 +149,6 @@ public class NavigationController implements HomeActivity.NavigationHandler, OnA
                 if(createNeedleExpirationFragment == null) createNeedleExpirationFragment = new CreateNeedleExpirationFragment();
                 newFragment = createNeedleExpirationFragment;
                 onStateChange(AppState.NEEDLE_RECEIVED_TAB);
-                break;
-            case AppConstants.SECTION_SETTINGS:
-                if(settingsFragment == null) settingsFragment = new SettingsFragment();
-                newFragment = settingsFragment;
-                onStateChange(AppState.SETTINGS);
-                enterAnimation = R.anim.enter_from_right;
-                exitAnimation = R.anim.exit_to_left;
-                actionBar.setTitle(R.string.title_settings);
                 break;
             case AppConstants.SECTION_PEOPLE:
                 if(peopleFragment == null) peopleFragment = new PeopleFragment();
@@ -252,10 +238,6 @@ public class NavigationController implements HomeActivity.NavigationHandler, OnA
                 //removeSection(AppConstants.SECTION_LOCATION_SHARING);
                 onStateChange(AppState.NEEDLE_RECEIVED_TAB);
                 break;
-            case AppState.SETTINGS:
-                restorePreviousState();
-                removeFragment(settingsFragment);
-                break;
             default:
                 activity.onBackPressed();
                 break;
@@ -270,32 +252,11 @@ public class NavigationController implements HomeActivity.NavigationHandler, OnA
         int state = getCurrentState();
         if(state == AppState.HAYSTACK){
             activity.getMenuInflater().inflate(R.menu.haystack, menu);
-        }else if(state == AppState.SETTINGS){
-            activity.getMenuInflater().inflate(R.menu.menu_settings, menu);
         }else if(state != AppState.LOGIN && state != AppState.SPLASH_LOGIN && state != AppState.REGISTER){
             activity.getMenuInflater().inflate(R.menu.menu_haystacks, menu);
         }
 
         return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-
-        switch (id) {
-            case android.R.id.home:
-                drawerLayout.openDrawer(GravityCompat.START);
-                return true;
-            case R.id.menu_option_settings:
-                showSection(AppConstants.SECTION_SETTINGS);
-                return true;
-            case R.id.menu_option_help:
-
-                return true;
-        }
-
-        return false;
     }
 
     @Override
@@ -438,8 +399,6 @@ public class NavigationController implements HomeActivity.NavigationHandler, OnA
             case AppState.PUBLIC_HAYSTACK_TAB:
             case AppState.PRIVATE_HAYSTACK_TAB:
                 return haystacksListFragment;
-            case AppState.SETTINGS:
-                return settingsFragment;
             case AppState.NOTIFICATIONS:
                 return notificationFragment;
         }

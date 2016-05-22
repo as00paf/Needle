@@ -5,6 +5,7 @@
     <string name="app_name">Needle</string>
     <string name="facebook_app_id">1085989064752650</string>
     <string name="title_haystacks">Haystacks</string>
+    <string name="title_needle">Needle</string>
     <string name="title_needles">Needles</string>
     <string name="title_notifications">Notifications</string>
     <string name="title_people">People</string>
@@ -137,5 +138,39 @@
     <string name="pin_name">Pin Name</string>
     <string name="add_pin">Add Pin</string>
 
+    <!-- Preferences -->
+    <string name="pref_key_show_notifications" translatable="false">pref_key_show_notifications</string>
+    <string name="pref_key_ringtone_notifications" translatable="false">pref_key_ringtone_notifications</string>
+    <string name="pref_key_led_notifications" translatable="false">pref_key_led_notifications</string>
+    <string name="pref_key_vibrate_notifications" translatable="false">pref_key_vibrate_notifications</string>
+    <string name="pref_key_location_permission" translatable="false">pref_key_location_permission</string>
+    <string name="pref_key_storage_permission" translatable="false">pref_key_storage_permission</string>
+    <string name="pref_key_account" translatable="false">pref_key_account</string>
+    <string name="pref_key_general" translatable="false">pref_key_general</string>
 
+    <string name="pref_cat_notifications">Notifications</string>
+    <string name="pref_notifications_summary">Receive Push Notifications</string>
+    <string name="pref_push_notifications">Push Notifications</string>
+    <string name="pref_ringtone">Ringtone</string>
+    <string name="pref_ringtone_summary">Play ringtone when a notification is received</string>
+    <string name="pref_led">Light</string>
+    <string name="pref_led_summary">Indicate a notification has been received by flashing the notification light</string>
+    <string name="pref_vibrate">Vibration</string>
+    <string name="pref_vibrate_summary">Vibrate when a notification is received</string>
+
+    <string name="pref_cat_permissions">Permissions</string>
+    <string name="pref_location_permission">Location</string>
+    <string name="pref_location_summary">Allow access to device\'s location</string>
+    <string name="pref_storage_permission">Storage</string>
+    <string name="pref_storage_summary">Allow access to device\'s storage</string>
+
+    <string name="pref_cat_account">Account</string>
+
+    <string name="edit_account">Edit Account</string>
+
+    <!-- Permissions -->
+    <string name="permission_granted" translatable="false">permission_granted</string>
+    <string name="permission_denied" translatable="false">permission_denied</string>
+    <string name="permission_granted_msg">%1$s permission is granted</string>
+    <string name="permission_denied_msg">%1$s permission is denied</string>
 </resources>

@@ -27,6 +27,7 @@ import com.google.android.gms.maps.model.Marker;
 import com.nemator.needle.Needle;
 import com.nemator.needle.R;
 import com.nemator.needle.activities.NeedleActivity;
+import com.nemator.needle.activities.SettingsActivity;
 import com.nemator.needle.api.ApiClient;
 import com.nemator.needle.api.result.UserResult;
 import com.nemator.needle.broadcastReceiver.LocationServiceBroadcastReceiver;
@@ -162,7 +163,7 @@ public class NeedleMapFragment extends SupportMapFragment
 
         switch (id) {
             case R.id.menu_option_settings:
-
+                startActivity(new Intent(getContext(), SettingsActivity.class));
                 return true;
             case R.id.menu_option_help:
 

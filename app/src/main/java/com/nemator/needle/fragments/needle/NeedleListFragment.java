@@ -78,6 +78,8 @@ public class NeedleListFragment extends Fragment {
             if(receivedTab != null) receivedTab.updateLocationSharingList(receivedLocationsList);
             if(sentTab != null) sentTab.updateLocationSharingList(sentLocationsList);
         }
+
+        setRetainInstance(true);
     }
 
     @Override

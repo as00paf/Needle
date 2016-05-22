@@ -56,7 +56,6 @@ public class AppConstants {
     public static final int SECTION_LOGIN = 2;
     public static final int SECTION_HAYSTACKS = 3;
     public static final int SECTION_NEEDLES = 4;
-    public static final int SECTION_SETTINGS = 6;
     public static final int SECTION_HELP = 7;
     public static final int SECTION_CREATE_HAYSTACK = 8;
     public static final int SECTION_CREATE_NEEDLE = 9;

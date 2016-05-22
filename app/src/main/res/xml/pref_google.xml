@@ -1,5 +1,0 @@
-<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
-
-    <Preference android:widgetLayout="@layout/google_button" android:key="google_layout"></Preference>
-
-</PreferenceScreen>

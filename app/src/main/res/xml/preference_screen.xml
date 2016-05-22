@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <PreferenceCategory
+        android:title="@string/title_needle"
+        android:key="pref_key_general">
+
+        <SwitchPreference
+            android:key="rememberMe"
+            android:text="@string/rememberMe"
+            android:summary="@string/rememberMeSummary"
+            android:defaultValue="true" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:title="@string/pref_cat_account"
+        android:key="pref_key_account">
+
+        <Preference
+            android:widgetLayout="@layout/app_account_button"
+            android:key="app_account_layout"/>
+
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:title="@string/pref_cat_notifications"
+        android:key="pref_key_notifications">
+
+        <SwitchPreference
+            android:key="pref_key_show_notifications"
+            android:summary="@string/pref_notifications_summary"
+            android:title="@string/pref_push_notifications"
+            android:defaultValue="true" />
+
+        <SwitchPreference
+            android:key="pref_key_ringtone_notifications"
+            android:summary="@string/pref_ringtone_summary"
+            android:title="@string/pref_ringtone"
+            android:defaultValue="true" />
+
+        <SwitchPreference
+            android:key="pref_key_led_notifications"
+            android:summary="@string/pref_led_summary"
+            android:title="@string/pref_led"
+            android:defaultValue="true" />
+
+        <SwitchPreference
+            android:key="pref_key_vibrate_notifications"
+            android:summary="@string/pref_vibrate_summary"
+            android:title="@string/pref_vibrate"
+            android:defaultValue="true" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:title="@string/pref_cat_permissions"
+        android:key="pref_key_permissions">
+
+        <SwitchPreference
+            android:key="pref_key_location_permission"
+            android:summary="@string/pref_location_summary"
+            android:title="@string/pref_location_permission"
+            android:defaultValue="false" />
+
+        <SwitchPreference
+            android:key="pref_key_storage_permission"
+            android:summary="@string/pref_storage_summary"
+            android:title="@string/pref_storage_permission"
+            android:defaultValue="false" />
+
+        <Preference />
+
+   </PreferenceCategory>
+</PreferenceScreen>

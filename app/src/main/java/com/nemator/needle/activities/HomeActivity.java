@@ -14,6 +14,7 @@ import android.os.Bundle;
 import android.support.annotation.IdRes;
 import android.support.design.widget.NavigationView;
 import android.support.v4.content.LocalBroadcastManager;
+import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -213,8 +214,8 @@ public class HomeActivity extends AppCompatActivity {
         navigationView = (NavigationView) findViewById(R.id.navigation_view);
         navigationView.setNavigationItemSelectedListener(Needle.navigationController.getNavigationItemListener());
 
-        navigationView.getMenu().findItem(R.id.drawer_log_out).setChecked(false);
         navigationView.getMenu().findItem(R.id.drawer_needle).setChecked(true);
+        navigationView.getMenu().findItem(R.id.drawer_log_out).setChecked(false);
         if(getIntent() != null && getIntent().getExtras() != null){
             LoginResult result = (LoginResult) getIntent().getExtras().get("loginResult");//TODO : use constant
             if(result != null){
@@ -305,7 +306,21 @@ public class HomeActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        return Needle.navigationController.onOptionsItemSelected(item);
+        int id = item.getItemId();
+
+        switch (id) {
+            case android.R.id.home:
+                drawerLayout.openDrawer(GravityCompat.START);
+                return true;
+            case R.id.menu_option_settings:
+                startActivity(new Intent(this, SettingsActivity.class));
+                return true;
+            case R.id.menu_option_help:
+
+                return true;
+        }
+
+        return false;
     }
 
     /*@Override
@@ -348,36 +363,6 @@ public class HomeActivity extends AppCompatActivity {
         Needle.googleApiController.disconnect();
     }
 
-    //TODO : move to authentication controller
-    public void onClickRevokeGoogleAccess(View view){
-        new AlertDialog.Builder(this)
-                .setIcon(android.R.drawable.ic_dialog_alert)
-                .setTitle(getString(R.string.revoke_google_access))
-                .setMessage(getString(R.string.revoke_google_access_confirmation_msg))
-                .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-
-                        Needle.authenticationController.revokeGoogleAccess();
-                    }
-                })
-                .setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-                    }
-                })
-                .setOnCancelListener(new DialogInterface.OnCancelListener() {
-                    @Override
-                    public void onCancel(DialogInterface dialog) {
-                        dialog.cancel();
-                    }
-                })
-                .create()
-                .show();
-    }
-
     public void setHaystacksCount(int count) {
         setMenuCounter(R.id.drawer_haystacks, count);
     }
@@ -404,7 +389,6 @@ public class HomeActivity extends AppCompatActivity {
     public interface NavigationHandler{
         void onBackPressed();
         boolean onCreateOptionsMenu(Menu menu);
-        boolean onOptionsItemSelected(MenuItem item);
         Menu getMenu();
     }
 }

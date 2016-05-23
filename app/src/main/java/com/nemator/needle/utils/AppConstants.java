@@ -62,6 +62,7 @@ public class AppConstants {
     public static final int SECTION_NOTIFICATIONS = 12;
     public static final int SECTION_LOGIN_PICTURE = 13;
     public static final int SECTION_PEOPLE = 14;
+    public static final int SECTION_USER_PROFILE = 15;
 
     //App
     public static final String GOOGLE_API_CONNECTED = "googleApiConnected";
@@ -80,4 +81,6 @@ public class AppConstants {
     public static final int USER_STOPPED_NEEDLE = 6;
     public static final int HAYSTACK_CANCELLED = 7;
     public static final int PIN_DELETED_FROM_HAYSTACK = 8;
+    public static final int FRIEND_REQUEST = 9;
+    public static final int ACCEPTED_FRIEND_REQUEST = 10;
 }

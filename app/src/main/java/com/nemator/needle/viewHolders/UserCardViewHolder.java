@@ -11,7 +11,7 @@ import com.nemator.needle.models.vo.UserVO;
 public class UserCardViewHolder extends RecyclerView.ViewHolder{
     private final Delegate delegate;
     //Item
-    public TextView userNameView;
+    public TextView userNameView, emptyText;
     public ImageView imageView;
 
     private UserVO userData;
@@ -21,6 +21,8 @@ public class UserCardViewHolder extends RecyclerView.ViewHolder{
         this.delegate = delegate;
         userNameView =  (TextView) view.findViewById(R.id.username_label);
         imageView = (ImageView) view.findViewById(R.id.user_profile_picture);
+
+        emptyText = (TextView) view.findViewById(R.id.title);
 
         view.setClickable(true);
     }

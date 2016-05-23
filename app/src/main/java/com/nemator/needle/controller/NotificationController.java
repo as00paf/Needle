@@ -69,8 +69,6 @@ public class NotificationController {
                     .setStyle(new NotificationCompat.BigTextStyle().bigText(notification.getDescription()))
                     .setContentText(notification.getDescription())
                     .setColor(context.getResources().getColor(R.color.primary))
-                    .setLights(context.getResources().getColor(R.color.primary), 1500, 2000)
-                    .setDefaults(NotificationCompat.DEFAULT_VIBRATE)
                     .setSound(ringtonURI)
                     .setAutoCancel(true)
                     .setContentIntent(contentIntent);
@@ -123,6 +121,14 @@ public class NotificationController {
             intent = new Intent(context, HomeActivity.class);
             intent.putExtra(AppConstants.TAG_SECTION, AppConstants.SECTION_NEEDLES);
             intent.putExtra(AppConstants.TAG_ACTION, AppConstants.TAG_NOTIFICATION);
+        }else if(notification.getType() == AppConstants.FRIEND_REQUEST){
+            intent = new Intent(context, HomeActivity.class);
+            intent.putExtra(AppConstants.TAG_ACTION, AppConstants.TAG_SECTION);
+            intent.putExtra(AppConstants.TAG_SECTION, AppConstants.SECTION_PEOPLE);
+        }else if(notification.getType() == AppConstants.ACCEPTED_FRIEND_REQUEST){
+            intent = new Intent(context, HomeActivity.class);
+            intent.putExtra(AppConstants.TAG_ACTION, AppConstants.TAG_SECTION);
+            intent.putExtra(AppConstants.TAG_SECTION, AppConstants.SECTION_USER_PROFILE);
         }else{
             intent = new Intent(context, HomeActivity.class);
             intent.putExtra(AppConstants.TAG_ACTION, AppConstants.TAG_SECTION);

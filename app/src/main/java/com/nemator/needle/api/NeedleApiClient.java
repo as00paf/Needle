@@ -1,5 +1,7 @@
 package com.nemator.needle.api;
 
+import com.nemator.needle.api.result.FriendResult;
+import com.nemator.needle.api.result.FriendsResult;
 import com.nemator.needle.api.result.HaystackResult;
 import com.nemator.needle.api.result.NeedleResult;
 import com.nemator.needle.api.result.LoginResult;
@@ -9,6 +11,7 @@ import com.nemator.needle.api.result.PinsResult;
 import com.nemator.needle.api.result.UserRegistrationResult;
 import com.nemator.needle.api.result.UserResult;
 import com.nemator.needle.api.result.UsersResult;
+import com.nemator.needle.models.vo.FriendshipVO;
 import com.nemator.needle.models.vo.HaystackUserVO;
 import com.nemator.needle.models.vo.HaystackVO;
 import com.nemator.needle.models.vo.NeedleVO;
@@ -126,4 +129,16 @@ public interface NeedleApiClient {
     @PUT("notification.php")
     Call<NotificationResult> seenNotifications(@Body ArrayList<NotificationVO> notifications);
 
+    //Friends
+    @GET("friends.php")
+    Call<FriendsResult> getFriends(@Query("userId") int userId);
+
+    @POST("friends.php")
+    Call<FriendResult> sendFriendRequest(@Body FriendshipVO friendshipVO);
+
+    @PUT("friends.php")
+    Call<FriendResult> acceptFriendRequest(@Body FriendshipVO friendshipVO);
+
+    @HTTP(method = "DELETE", path = "friends.php", hasBody = true)
+    Call<TaskResult> unFriend(@Body FriendshipVO friendshipVO);
 }

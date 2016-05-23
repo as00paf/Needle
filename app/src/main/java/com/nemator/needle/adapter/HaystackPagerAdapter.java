@@ -5,11 +5,12 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.app.FragmentStatePagerAdapter;
 
 import com.nemator.needle.R;
 import com.nemator.needle.fragments.haystacks.HaystackListTabFragment;
 
-public class HaystackPagerAdapter extends FragmentPagerAdapter {
+public class HaystackPagerAdapter extends FragmentStatePagerAdapter {
 
     //Tabs
     private HaystackListTabFragment publicHaystackListFragment;

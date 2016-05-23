@@ -1,16 +1,10 @@
--- Friendship Table
+-- Friendship
 DROP TABLE IF EXISTS friendship;
 CREATE TABLE friendship
 (
-	id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
-	email text,
-	username varchar(25),
-	password varchar(25),
-	gcm_regid text,
-	loginType INT,
-	fbId text,
-	twitterId text,
-	googleId text,
-	pictureURL text,
-	coverURL text
+	userId INT not null,
+	friendId INT not null,
+	status INT,
+	acceptDate datetime,
+	CONSTRAINT pk_friends primary key (userId, friendId)
 );

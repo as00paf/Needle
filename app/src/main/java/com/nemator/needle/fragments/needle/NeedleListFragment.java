@@ -32,9 +32,8 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-
 public class NeedleListFragment extends Fragment {
-    public static String TAG = "LocationSharingFragment";
+    public static String TAG = "NeedleListFragment";
 
     //Views
     private View rootView;
@@ -75,11 +74,11 @@ public class NeedleListFragment extends Fragment {
                 ((HomeActivity) getActivity()).setNeedleCount(receivedLocationsList.size());
             }
 
-            if(receivedTab != null) receivedTab.updateLocationSharingList(receivedLocationsList);
-            if(sentTab != null) sentTab.updateLocationSharingList(sentLocationsList);
+            if(receivedTab != null) receivedTab.updateNeedlesList(receivedLocationsList);
+            if(sentTab != null) sentTab.updateNeedlesList(sentLocationsList);
         }
 
-        setRetainInstance(true);
+       // setRetainInstance(true);
     }
 
     @Override
@@ -204,8 +203,8 @@ public class NeedleListFragment extends Fragment {
                         ((HomeActivity) getActivity()).setNeedleCount(receivedLocationsList.size() + sentLocationsList.size());
                     }
 
-                    if(receivedTab != null) receivedTab.updateLocationSharingList(receivedLocationsList);
-                    if(sentTab != null) sentTab.updateLocationSharingList(sentLocationsList);
+                    if(receivedTab != null) receivedTab.updateNeedlesList(receivedLocationsList);
+                    if(sentTab != null) sentTab.updateNeedlesList(sentLocationsList);
                 }else{
                     Log.e(TAG, "Could not fetch location sharings. Error : " + result.getMessage());
                     Toast.makeText(getActivity(), R.string.fetch_needles_error, Toast.LENGTH_SHORT).show();
@@ -230,10 +229,6 @@ public class NeedleListFragment extends Fragment {
     public void onResume(){
         super.onResume();
         fetchLocationSharing(true);
-    }
-
-    private int getUserId() {
-        return Needle.userModel.getUserId();
     }
 
     public void goToPage(int page){

@@ -162,6 +162,9 @@ public class NavigationController implements HomeActivity.NavigationHandler, OnA
                 onStateChange(AppState.NOTIFICATIONS);
                 if(actionBar != null) actionBar.setTitle(R.string.title_notifications);
                 break;
+            case AppConstants.SECTION_USER_PROFILE:
+                Log.d(TAG, "do something here");
+                break;
         }
 
         if (newFragment != null){
@@ -174,11 +177,8 @@ public class NavigationController implements HomeActivity.NavigationHandler, OnA
                         .setCustomAnimations(enterAnimation, exitAnimation)
                         .replace(containerViewId, newFragment)
                         .commit();
-                        //.commitAllowingStateLoss();
             }
         }
-
-        //System.gc();
     }
 
     private void removeFragment(Fragment fragment){
@@ -345,6 +345,12 @@ public class NavigationController implements HomeActivity.NavigationHandler, OnA
     public void refreshNotificationList() {
         if(notificationFragment != null){
             notificationFragment.fetchNotifications();
+        }
+    }
+
+    public void refreshFriendsList() {
+        if(peopleFragment != null){
+            peopleFragment.fetchFriends(true);
         }
     }
 

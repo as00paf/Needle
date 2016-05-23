@@ -281,7 +281,7 @@ public class HomeActivity extends AppCompatActivity {
 
             if(action.equals(AppConstants.TAG_SECTION)){
                 int section =  extras.getInt(AppConstants.TAG_SECTION);
-                Needle.navigationController.showSection(section);
+                Needle.navigationController.showSection(section, extras);
             }
 
             Log.i(TAG, "here");
@@ -373,6 +373,10 @@ public class HomeActivity extends AppCompatActivity {
 
     public void setNotificationsCount(int count) {
         setMenuCounter(R.id.drawer_notifications, count);
+    }
+
+    public void setFriendRequestsCount(int count) {
+        setMenuCounter(R.id.drawer_people, count);
     }
 
     private void setMenuCounter(@IdRes int itemId, int count) {

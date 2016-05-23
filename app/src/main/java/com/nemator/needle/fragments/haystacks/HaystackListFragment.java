@@ -54,9 +54,9 @@ public class HaystackListFragment extends Fragment implements HaystackListTabFra
     private OnActivityStateChangeListener stateChangeCallback;
 
     //Data
-    public ArrayList<HaystackVO> publicHaystacks = null;
-    public ArrayList<HaystackVO> privateHaystacks = null;
-    public ArrayList<HaystackVO> ownedHaystacks = null;
+    public ArrayList<HaystackVO> publicHaystacks = new ArrayList<HaystackVO>();
+    public ArrayList<HaystackVO> privateHaystacks = new ArrayList<HaystackVO>();
+    public ArrayList<HaystackVO> ownedHaystacks = new ArrayList<HaystackVO>();
     private long lastUpdate;
 
     public static HaystackListFragment newInstance() {
@@ -75,7 +75,21 @@ public class HaystackListFragment extends Fragment implements HaystackListTabFra
             publicHaystacks = savedInstanceState.getParcelableArrayList("publicHaystacks");
             privateHaystacks = savedInstanceState.getParcelableArrayList("privateHaystacks");
             ownedHaystacks = savedInstanceState.getParcelableArrayList("ownedHaystacks");
+
+            HaystackListTabFragment publicTab = mHaystackPagerAdapter.getPublicHaystackListFragment();
+            HaystackListTabFragment privateTab = mHaystackPagerAdapter.getPrivateHaystackListFragment();
+            HaystackListTabFragment ownedTab = mHaystackPagerAdapter.getOwnedHaystackListFragment();
+
+            if (publicTab != null) publicTab.updateHaystackList(publicHaystacks);
+            if (privateTab != null) privateTab.updateHaystackList(privateHaystacks);
+            if (ownedTab != null) ownedTab.updateHaystackList(ownedHaystacks);
+
+            if (privateHaystacks != null && publicHaystacks != null && getActivity() != null) {
+                ((HomeActivity) getActivity()).setHaystacksCount(privateHaystacks.size() + publicHaystacks.size());
+            }
         }
+
+        setRetainInstance(true);
     }
 
     @Override
@@ -103,35 +117,36 @@ public class HaystackListFragment extends Fragment implements HaystackListTabFra
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        rootView = inflater.inflate(R.layout.fragment_haystack_list, container, false);
+        //if(rootView == null){
+            rootView = inflater.inflate(R.layout.fragment_haystack_list, container, false);
 
-        //Navigation Drawer
-        Boolean firstNavDrawerLearned = getContext().getSharedPreferences("com.nemator.needle", Context.MODE_PRIVATE).getBoolean("firstNavDrawerLearned", false);
+            //Navigation Drawer
+            Boolean firstNavDrawerLearned = getContext().getSharedPreferences("com.nemator.needle", Context.MODE_PRIVATE).getBoolean("firstNavDrawerLearned", false);
 
-        if(!firstNavDrawerLearned){
-            SharedPreferences.Editor edit = getContext().getSharedPreferences("com.nemator.needle", Context.MODE_PRIVATE).edit();
-            edit.putBoolean("firstNavDrawerLearned", true);
-            edit.commit();
-        }
-
-        //FAB
-        fab = (FloatingActionButton) rootView.findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                NavigationController.getInstance().showSection(AppConstants.SECTION_CREATE_HAYSTACK);
+            if(!firstNavDrawerLearned){
+                SharedPreferences.Editor edit = getContext().getSharedPreferences("com.nemator.needle", Context.MODE_PRIVATE).edit();
+                edit.putBoolean("firstNavDrawerLearned", true);
+                edit.commit();
             }
-        });
 
-        //View pager
-        haystackListViewPager = (ViewPager) rootView.findViewById(R.id.haystackListViewPager);
-        mHaystackPagerAdapter = new HaystackPagerAdapter(getActivity().getSupportFragmentManager(), getContext(), this);
-        haystackListViewPager.setOffscreenPageLimit(3);
-        haystackListViewPager.setAdapter(mHaystackPagerAdapter);
+            //FAB
+            fab = (FloatingActionButton) rootView.findViewById(R.id.fab);
+            fab.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    NavigationController.getInstance().showSection(AppConstants.SECTION_CREATE_HAYSTACK);
+                }
+            });
 
-        //Tabs
-        mSlidingTabLayout = (SlidingTabLayout) rootView.findViewById(R.id.haystack_list_sliding_tabs);
-        mSlidingTabLayout.setDistributeEvenly(true);
+            //View pager
+            haystackListViewPager = (ViewPager) rootView.findViewById(R.id.haystackListViewPager);
+            mHaystackPagerAdapter = new HaystackPagerAdapter(getActivity().getSupportFragmentManager(), getContext(), this);
+            haystackListViewPager.setOffscreenPageLimit(3);
+            haystackListViewPager.setAdapter(mHaystackPagerAdapter);
+
+            //Tabs
+            mSlidingTabLayout = (SlidingTabLayout) rootView.findViewById(R.id.haystack_list_sliding_tabs);
+            mSlidingTabLayout.setDistributeEvenly(true);
        /* mSlidingTabLayout.setCustomTabColorizer(new SlidingTabLayout.TabColorizer() {
             @Override
             public int getIndicatorColor(int position) {
@@ -139,31 +154,33 @@ public class HaystackListFragment extends Fragment implements HaystackListTabFra
             }
         });
 */
-        mSlidingTabLayout.setSelectedIndicatorColors(ContextCompat.getColor(getContext(), android.R.color.white));
-        mSlidingTabLayout.setViewPager(haystackListViewPager);
-        mSlidingTabLayout.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
-            @Override
-            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+            mSlidingTabLayout.setSelectedIndicatorColors(ContextCompat.getColor(getContext(), android.R.color.white));
+            mSlidingTabLayout.setViewPager(haystackListViewPager);
+            mSlidingTabLayout.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+                @Override
+                public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
 
-            }
-
-            @Override
-            public void onPageSelected(int position) {
-                switch(position){
-                    case 0:
-                        stateChangeCallback.onStateChange(AppState.PUBLIC_HAYSTACK_TAB);
-                        break;
-                    case 1:
-                        stateChangeCallback.onStateChange(AppState.PRIVATE_HAYSTACK_TAB);
-                        break;
                 }
-            }
 
-            @Override
-            public void onPageScrollStateChanged(int state) {
+                @Override
+                public void onPageSelected(int position) {
+                    switch(position){
+                        case 0:
+                            stateChangeCallback.onStateChange(AppState.PUBLIC_HAYSTACK_TAB);
+                            break;
+                        case 1:
+                            stateChangeCallback.onStateChange(AppState.PRIVATE_HAYSTACK_TAB);
+                            break;
+                    }
+                }
 
-            }
-        });
+                @Override
+                public void onPageScrollStateChanged(int state) {
+
+                }
+            });
+        //}
+
 
         return rootView;
     }

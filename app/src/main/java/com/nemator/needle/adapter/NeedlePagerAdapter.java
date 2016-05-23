@@ -21,7 +21,7 @@ public class NeedlePagerAdapter extends FragmentPagerAdapter {
 
     @Override
     public Fragment getItem(int position) {
-        NeedleListTabFragment fragment = new NeedleListTabFragment();
+        NeedleListTabFragment fragment;
 
         Bundle args = new Bundle();
         Boolean isReceived = (position == 0);

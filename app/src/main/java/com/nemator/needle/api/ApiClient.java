@@ -3,6 +3,8 @@ package com.nemator.needle.api;
 import android.util.Log;
 
 import com.nemator.needle.Needle;
+import com.nemator.needle.api.result.FriendResult;
+import com.nemator.needle.api.result.FriendsResult;
 import com.nemator.needle.api.result.NeedleResult;
 import com.nemator.needle.api.result.NotificationResult;
 import com.nemator.needle.api.result.PinResult;
@@ -10,6 +12,7 @@ import com.nemator.needle.api.result.PinsResult;
 import com.nemator.needle.api.result.UserRegistrationResult;
 import com.nemator.needle.api.result.UserResult;
 import com.nemator.needle.api.result.UsersResult;
+import com.nemator.needle.models.vo.FriendshipVO;
 import com.nemator.needle.models.vo.HaystackUserVO;
 import com.nemator.needle.models.vo.HaystackVO;
 import com.nemator.needle.models.vo.NeedleVO;
@@ -221,6 +224,26 @@ public class ApiClient {
     }
 
     //Friends
+    public void getFriends(Callback<FriendsResult> callBack){
+        Call<FriendsResult> call = client.getFriends(Needle.userModel.getUserId());
+        call.enqueue(callBack);
+    }
+
+    public void sendFriendRequest(int userId, int friendId, Callback<FriendResult> callBack){
+        Call<FriendResult> call = client.sendFriendRequest(new FriendshipVO(userId, friendId));
+        call.enqueue(callBack);
+    }
+
+    public void acceptFriendRequest(int userId, int friendId, Callback<FriendResult> callBack){
+        Call<FriendResult> call = client.acceptFriendRequest(new FriendshipVO(userId, friendId));
+        call.enqueue(callBack);
+    }
+
+    public void unfriend(int userId, int friendId, Callback<TaskResult> callBack){
+        Call<TaskResult> call = client.unFriend(new FriendshipVO(userId, friendId));
+        call.enqueue(callBack);
+    }
+
     public void getFriendById(int callerId, int userId,  Callback<UsersResult> callBack) {
        /* Call<UsersResult> call = client.getUser(userId);
         call.enqueue(callBack);*/

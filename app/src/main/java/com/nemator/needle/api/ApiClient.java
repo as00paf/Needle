@@ -3,7 +3,7 @@ package com.nemator.needle.api;
 import android.util.Log;
 
 import com.nemator.needle.Needle;
-import com.nemator.needle.api.result.FriendResult;
+import com.nemator.needle.api.result.FriendshipResult;
 import com.nemator.needle.api.result.FriendsResult;
 import com.nemator.needle.api.result.NeedleResult;
 import com.nemator.needle.api.result.NotificationResult;
@@ -229,24 +229,29 @@ public class ApiClient {
         call.enqueue(callBack);
     }
 
-    public void sendFriendRequest(int userId, int friendId, Callback<FriendResult> callBack){
-        Call<FriendResult> call = client.sendFriendRequest(new FriendshipVO(userId, friendId));
+    public void getFriends(int userId, Callback<FriendsResult> callBack){
+        Call<FriendsResult> call = client.getFriends(userId);
         call.enqueue(callBack);
     }
 
-    public void acceptFriendRequest(int userId, int friendId, Callback<FriendResult> callBack){
-        Call<FriendResult> call = client.acceptFriendRequest(new FriendshipVO(userId, friendId));
+    public void sendFriendRequest(int friendId, Callback<FriendshipResult> callBack){
+        Call<FriendshipResult> call = client.sendFriendRequest(new FriendshipVO(Needle.userModel.getUserId(), friendId));
         call.enqueue(callBack);
     }
 
-    public void unfriend(int userId, int friendId, Callback<TaskResult> callBack){
-        Call<TaskResult> call = client.unFriend(new FriendshipVO(userId, friendId));
+    public void acceptFriendRequest(int userId, int friendId, Callback<FriendshipResult> callBack){
+        Call<FriendshipResult> call = client.acceptFriendRequest(new FriendshipVO(userId, friendId));
         call.enqueue(callBack);
     }
 
-    public void getFriendById(int callerId, int userId,  Callback<UsersResult> callBack) {
-       /* Call<UsersResult> call = client.getUser(userId);
-        call.enqueue(callBack);*/
+    public void unfriend(int friendId, Callback<FriendshipResult> callBack){
+        Call<FriendshipResult> call = client.unFriend(new FriendshipVO(Needle.userModel.getUserId(), friendId));
+        call.enqueue(callBack);
+    }
+
+    public void getFriendship(int friendId,  Callback<FriendshipResult> callBack) {
+        Call<FriendshipResult> call = client.getFriendship(Needle.userModel.getUserId(), friendId);
+        call.enqueue(callBack);
     }
 
 }

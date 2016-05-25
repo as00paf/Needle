@@ -32,6 +32,7 @@ public class AppConstants {
     public static final String TAG_USERS = "users";
     public static final String TAG_SECTION = "section";
     public static final String TAG_NOTIFICATION = "notification";
+    public static final String TAG_FRIENDSHIP = "friendship";
 
     //Location updates
     public static final int MILLISECONDS_PER_SECOND = 1000;
@@ -83,4 +84,8 @@ public class AppConstants {
     public static final int PIN_DELETED_FROM_HAYSTACK = 8;
     public static final int FRIEND_REQUEST = 9;
     public static final int ACCEPTED_FRIEND_REQUEST = 10;
+
+    //Friendship Status
+    public static final int FRIEND_REQUESTED = 0;
+    public static final int FRIEND = 1;
 }

@@ -182,7 +182,7 @@ public class PeopleFragment extends Fragment {
                         ((HomeActivity) getActivity()).setFriendRequestsCount(friendRequests.size());
                     }
 
-                    Log.d(TAG, friends.size() + " Friends fetched !");
+                    if(friends != null) Log.d(TAG, friends.size() + " Friends fetched !");
 
                     if(friendsTab != null) friendsTab.updateFriendsList(friends);
                     if(friendRequestsTab != null) friendRequestsTab.updateFriendsList(friendRequests);

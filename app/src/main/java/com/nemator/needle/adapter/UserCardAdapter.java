@@ -2,6 +2,9 @@ package com.nemator.needle.adapter;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
+import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -12,8 +15,11 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.nemator.needle.R;
+import com.nemator.needle.activities.UserProfileActivity;
+import com.nemator.needle.models.vo.FriendshipVO;
 import com.nemator.needle.models.vo.NeedleVO;
 import com.nemator.needle.models.vo.UserVO;
+import com.nemator.needle.utils.AppConstants;
 import com.nemator.needle.viewHolders.LocationCardHolder;
 import com.nemator.needle.viewHolders.UserCardViewHolder;
 import com.squareup.picasso.Picasso;
@@ -28,16 +34,30 @@ public class UserCardAdapter extends RecyclerView.Adapter<UserCardViewHolder> {
 
     private ArrayList<UserVO> listData;
     private ArrayList<UserVO> filteredListData;
+    private ArrayList<FriendshipVO> friendshipData;
     private ArrayList<UserVO> selectedItems = new ArrayList<UserVO>();
     private UserVO selectedItem;
     private Context mContext;
-    private boolean isSingleSelect;
+    private int type;
 
-    public UserCardAdapter(Context context, ArrayList<UserVO> data, boolean isSingleSelect) {
+    public UserCardAdapter(Context context, ArrayList<UserVO> data, int type) {
         listData = data;
         filteredListData = data;
         mContext = context;
-        this.isSingleSelect = isSingleSelect;
+        this.type = type;
+
+        if(listData == null){
+            listData = new ArrayList<UserVO>();
+            filteredListData = new ArrayList<UserVO>();
+        }
+    }
+
+    public UserCardAdapter(Context context, ArrayList<UserVO> data, ArrayList<FriendshipVO> friendshipData, int type) {
+        this.listData = data;
+        filteredListData = data;
+        this.friendshipData = friendshipData;
+        this.type = type;
+        this.mContext = context;
 
         if(listData == null){
             listData = new ArrayList<UserVO>();
@@ -78,7 +98,7 @@ public class UserCardAdapter extends RecyclerView.Adapter<UserCardViewHolder> {
         View userCard;
 
         if(viewType == TYPE_ITEM){
-            userCard = LayoutInflater.from(parent.getContext()).inflate(R.layout.card_user, parent, false);
+            userCard = LayoutInflater.from(parent.getContext()).inflate(R.layout.card_user_new, parent, false);
             viewHolder = new UserCardViewHolder(userCard, delegate);
         }else{
             userCard = LayoutInflater.from(parent.getContext()).inflate(R.layout.haystack_empty_card_layout, parent, false);
@@ -95,40 +115,17 @@ public class UserCardAdapter extends RecyclerView.Adapter<UserCardViewHolder> {
         switch (cardType) {
             case TYPE_ITEM:
                 UserVO user = filteredListData.get(position);
-
-                //User name
-                holder.userNameView.setText(user.getUserName());
-
-                int padding = 8 * 2;
-                DisplayMetrics dm = new DisplayMetrics();
-                ((Activity) mContext).getWindowManager().getDefaultDisplay().getMetrics(dm);
-                int width = dm.widthPixels / 2 - padding;
-
-                holder.itemView.getLayoutParams().height  = width;
-
-                //Image
-                if(user.getPictureURL() != null && !user.getPictureURL().isEmpty()){
-                    Picasso.with(mContext)
-                            .load(user.getPictureURL())
-                            .resize(width,width)
-                            .into(holder.imageView);
-                }else{
-                    Log.d(TAG, "Cant get picture URL for user " + user.getUserName());
-                }
-
-                holder.setData(user);
+                holder.setData(user, null);
                 break;
             case TYPE_EMPTY :
-                holder.emptyText.setText(mContext.getResources().getString(R.string.noNeedleAvailable));
+                holder.emptyText.setText(mContext.getResources().getString(R.string.no_one_here));
                 break;
-
         }
-
     }
 
     @Override
     public int getItemCount() {
-        if(filteredListData == null) return 0;
+        if(filteredListData == null || filteredListData.size() == 0) return 1;
 
         return filteredListData.size();
     }
@@ -146,8 +143,16 @@ public class UserCardAdapter extends RecyclerView.Adapter<UserCardViewHolder> {
         private View lastSelected;
 
         @Override
-        public void onUserSelected(View view, UserVO user) {
-            if(isSingleSelect){
+        public void onUserSelected(View view, UserVO user, FriendshipVO friendshipVO) {
+            if(type == Type.SHOW_PROFILE){
+                Intent intent = new Intent(view.getContext(), UserProfileActivity.class);
+                intent.putExtra(AppConstants.TAG_USER, (Parcelable) user);
+                intent.putExtra(AppConstants.TAG_FRIENDSHIP, (Parcelable) friendshipVO);
+                view.getContext().startActivity(intent);
+                return;
+            }
+
+            if(type == Type.SINGLE_SELECT){
                 if(lastSelected != null){
                     lastSelected.setSelected(false);
                     lastSelected.findViewById(R.id.username_label).setBackgroundColor(view.getContext().getResources().getColor(android.R.color.transparent));
@@ -167,5 +172,11 @@ public class UserCardAdapter extends RecyclerView.Adapter<UserCardViewHolder> {
             }
         }
     };
+
+    public static class Type{
+        public static int SINGLE_SELECT = 0;
+        public static int MULTI_SELECT = 1;
+        public static int SHOW_PROFILE = 2;
+    }
 }
 

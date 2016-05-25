@@ -45,7 +45,7 @@ public class HaystackUsersTabFragment extends Fragment{
         listView.setLayoutManager(layoutManager);
 
         haystack = ((HaystackActivity) getActivity()).getHaystack();
-        userListAdapter = new UserCardAdapter(getActivity(), haystack.getUsers(), false);
+        userListAdapter = new UserCardAdapter(getActivity(), haystack.getUsers(), UserCardAdapter.Type.MULTI_SELECT);
         listView.setAdapter(userListAdapter);
 
         fetchAllUsers();
@@ -75,7 +75,7 @@ public class HaystackUsersTabFragment extends Fragment{
     };
 
     private void updateUserList(){
-        userListAdapter = new UserCardAdapter(getActivity(), haystack.getUsers(), true);
+        userListAdapter = new UserCardAdapter(getActivity(), haystack.getUsers(), UserCardAdapter.Type.SINGLE_SELECT);
         listView.setAdapter(userListAdapter);
 
         userListAdapter.notifyDataSetChanged();

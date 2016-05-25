@@ -100,7 +100,7 @@ public class UserSelectActivity extends AppCompatActivity{
 
             UsersResult result = response.body();
             if(result.getSuccessCode() == 1){
-                userListAdapter = new UserCardAdapter(UserSelectActivity.this, result.getUsers(), false);
+                userListAdapter = new UserCardAdapter(UserSelectActivity.this, result.getUsers(), UserCardAdapter.Type.MULTI_SELECT);
                 listView.setAdapter(userListAdapter);
             }else{
                 Toast.makeText(UserSelectActivity.this, getString(R.string.fetching_users_failed), Toast.LENGTH_SHORT).show();

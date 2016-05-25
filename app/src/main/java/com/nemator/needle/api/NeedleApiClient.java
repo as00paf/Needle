@@ -1,6 +1,6 @@
 package com.nemator.needle.api;
 
-import com.nemator.needle.api.result.FriendResult;
+import com.nemator.needle.api.result.FriendshipResult;
 import com.nemator.needle.api.result.FriendsResult;
 import com.nemator.needle.api.result.HaystackResult;
 import com.nemator.needle.api.result.NeedleResult;
@@ -133,12 +133,15 @@ public interface NeedleApiClient {
     @GET("friends.php")
     Call<FriendsResult> getFriends(@Query("userId") int userId);
 
+    @GET("friends.php")
+    Call<FriendshipResult> getFriendship(@Query("userId") int userId, @Query("friendId") int friendId);
+
     @POST("friends.php")
-    Call<FriendResult> sendFriendRequest(@Body FriendshipVO friendshipVO);
+    Call<FriendshipResult> sendFriendRequest(@Body FriendshipVO friendshipVO);
 
     @PUT("friends.php")
-    Call<FriendResult> acceptFriendRequest(@Body FriendshipVO friendshipVO);
+    Call<FriendshipResult> acceptFriendRequest(@Body FriendshipVO friendshipVO);
 
     @HTTP(method = "DELETE", path = "friends.php", hasBody = true)
-    Call<TaskResult> unFriend(@Body FriendshipVO friendshipVO);
+    Call<FriendshipResult> unFriend(@Body FriendshipVO friendshipVO);
 }

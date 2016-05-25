@@ -17,7 +17,8 @@
         android:id="@+id/card_list_view"
         android:padding="8dp"
         android:background="@android:color/white"
-        android:minHeight="100dp"/>
+        android:minHeight="100dp"
+        android:nestedScrollingEnabled="true"/>
 
 
 

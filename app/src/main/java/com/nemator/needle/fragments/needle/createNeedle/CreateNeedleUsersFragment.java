@@ -119,7 +119,7 @@ public class CreateNeedleUsersFragment extends CreateHaystackBaseFragment implem
     }
 
     private void updateUserList(){
-        mAdapter = new UserCardAdapter(getActivity(), usersList, true);
+        mAdapter = new UserCardAdapter(getActivity(), usersList, UserCardAdapter.Type.SINGLE_SELECT);
         mRecyclerView.setAdapter(mAdapter);
 
         mAdapter.notifyDataSetChanged();

@@ -127,10 +127,6 @@
     <string name="error_adding_users">Error adding users to the Haystack</string>
     <string name="select_users_to_add">Select users to add</string>
     <string name="fetching_users_failed">Fetching users failed</string>
-    <string name="delete_account">Delete Account</string>
-    <string name="delete_account_info">This will delete your account permanently</string>
-    <string name="facebook_account">Facebook Account</string>
-    <string name="google_account_title">Google Account</string>
 
     <!-- Pins -->
     <string name="new_pin">New Pin</string>
@@ -172,11 +168,25 @@
     <string name="friends">Friends</string>
     <string name="friend_requests">Friend Requests</string>
     <string name="sent_friend_requests">Sent Requests</string>
+    <string name="unfriend_successful">User Unfriended</string>
+    <string name="friend_request_sent">Friend Request Sent</string>
     <string name="fetch_friends_error">Could Not Fetch Friends</string>
+    <string name="no_one_here">No One Here</string>
 
     <!-- Permissions -->
     <string name="permission_granted" translatable="false">permission_granted</string>
     <string name="permission_denied" translatable="false">permission_denied</string>
     <string name="permission_granted_msg">%1$s permission is granted</string>
     <string name="permission_denied_msg">%1$s permission is denied</string>
+
+    <!-- User Profile -->
+    <string name="delete_account">Delete Account</string>
+    <string name="delete_account_info">This will delete your account permanently</string>
+    <string name="facebook_account">Facebook Account</string>
+    <string name="google_account_title">Google Account</string>
+    <string name="unfriend">Unfriend</string>
+    <string name="add_friend">Add Friend</string>
+    <string name="add_to_group">Add to Group</string>
+    <string name="send_needle">Send Needle</string>
+
 </resources>

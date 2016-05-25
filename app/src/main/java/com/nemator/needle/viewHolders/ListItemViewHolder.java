@@ -8,9 +8,6 @@ import android.widget.TextView;
 import com.nemator.needle.R;
 import com.nemator.needle.adapter.UserProfileAdapter;
 
-/**
- * Created by Alex on 10/04/2016.
- */
 public class ListItemViewHolder extends RecyclerView.ViewHolder{
 
     public TextView title, subtitle;

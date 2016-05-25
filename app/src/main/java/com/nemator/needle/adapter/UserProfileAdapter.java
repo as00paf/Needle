@@ -10,7 +10,9 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.nemator.needle.R;
+import com.nemator.needle.interfaces.IUserProfileListener;
 import com.nemator.needle.models.vo.UserVO;
+import com.nemator.needle.viewHolders.FriendListViewHolder;
 import com.nemator.needle.viewHolders.ListItemViewHolder;
 import com.nemator.needle.viewHolders.UserProfileListViewHolder;
 
@@ -22,29 +24,37 @@ public class UserProfileAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
 
     private final int ACCOUNT_DETAILS = 0;
     private final int DELETE_ACCOUNT = 1;
+    private final int FRIENDS = 2;
+    private final int HAYSTACKS = 3;
 
     private Context context;
     private UserVO user;
-    private Boolean isMe;
+    private ArrayList<UserVO> friends;
+    private Boolean isMe, isFriend;
     private ArrayList<Integer> positionTypes = new ArrayList<>();
+    private IUserProfileListener listener;
 
-    public UserProfileAdapter(Context context, UserVO user, Boolean isMe) {
+    public UserProfileAdapter(Context context, UserVO user, ArrayList<UserVO> friends, Boolean isMe, Boolean isFriend, IUserProfileListener listener) {
         this.context = context;
         this.user = user;
+        this.friends = friends;
         this.isMe = isMe;
+        this.isFriend = isFriend;
+        this.listener = listener;
 
         initItemPositions();
     }
 
     private void initItemPositions() {
-        positionTypes.add(ACCOUNT_DETAILS);
-
         if(isMe){
+            positionTypes.add(FRIENDS);
+            positionTypes.add(ACCOUNT_DETAILS);
             positionTypes.add(DELETE_ACCOUNT);
+        }else{
+            positionTypes.add(ACCOUNT_DETAILS);
+            positionTypes.add(FRIENDS);
         }
     }
-
-
 
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -54,11 +64,15 @@ public class UserProfileAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         switch (viewType){
             case ACCOUNT_DETAILS:
                 itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.card_user_profile_list_item, parent, false);
-                viewHolder = new UserProfileListViewHolder(itemView, user, isMe);
+                viewHolder = new UserProfileListViewHolder(itemView, user, isMe, isFriend, listener);
                 break;
             case DELETE_ACCOUNT:
                 itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.card_user_profile_item, parent, false);
                 viewHolder = new ListItemViewHolder(itemView);
+                break;
+            case FRIENDS:
+                itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.card_user_profile_friends_item, parent, false);
+                viewHolder = new FriendListViewHolder(itemView);
                 break;
         }
 
@@ -70,6 +84,9 @@ public class UserProfileAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         int type = getItemViewType(position);
         switch (type){
             case ACCOUNT_DETAILS:
+                break;
+            case FRIENDS:
+                ((FriendListViewHolder) holder).setFriends(friends);
                 break;
             case DELETE_ACCOUNT :
                 holder.itemView.setOnClickListener(new View.OnClickListener() {

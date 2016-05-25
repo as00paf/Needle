@@ -60,7 +60,7 @@ public class FriendsTabFragment extends Fragment{
             });
             mRecyclerView.setLayoutManager(layoutManager);
 
-            listAdapter = new UserCardAdapter(getActivity(), dataList, false);
+            listAdapter = new UserCardAdapter(getActivity(), dataList, UserCardAdapter.Type.SHOW_PROFILE);
             mRecyclerView.setAdapter(listAdapter);
 
             //Swipe To Refresh
@@ -79,7 +79,7 @@ public class FriendsTabFragment extends Fragment{
 
     public void updateFriendsList(ArrayList<UserVO> data){
         this.dataList = data;
-        listAdapter = new UserCardAdapter(getActivity(), dataList, false);
+        listAdapter = new UserCardAdapter(getActivity(), dataList, UserCardAdapter.Type.SHOW_PROFILE);
 
         if(mRecyclerView != null){
             mRecyclerView.setAdapter(listAdapter);

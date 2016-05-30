@@ -1,26 +1,19 @@
 package com.nemator.needle.adapter;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.v7.widget.RecyclerView;
-import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.TextView;
 
 import com.nemator.needle.R;
 import com.nemator.needle.activities.UserProfileActivity;
 import com.nemator.needle.models.vo.FriendshipVO;
-import com.nemator.needle.models.vo.NeedleVO;
 import com.nemator.needle.models.vo.UserVO;
 import com.nemator.needle.utils.AppConstants;
-import com.nemator.needle.viewHolders.LocationCardHolder;
 import com.nemator.needle.viewHolders.UserCardViewHolder;
 import com.squareup.picasso.Picasso;
 
@@ -29,8 +22,8 @@ import java.util.ArrayList;
 public class UserCardAdapter extends RecyclerView.Adapter<UserCardViewHolder> {
     public static final String TAG = "UserListAdapter";
 
-    private static final int TYPE_ITEM = 0;
-    private static final int TYPE_EMPTY = 1;
+    public static final int TYPE_ITEM = 0;
+    public static final int TYPE_EMPTY = 1;
 
     private ArrayList<UserVO> listData;
     private ArrayList<UserVO> filteredListData;
@@ -50,6 +43,7 @@ public class UserCardAdapter extends RecyclerView.Adapter<UserCardViewHolder> {
             listData = new ArrayList<UserVO>();
             filteredListData = new ArrayList<UserVO>();
         }
+        setHasStableIds(true);
     }
 
     public UserCardAdapter(Context context, ArrayList<UserVO> data, ArrayList<FriendshipVO> friendshipData, int type) {
@@ -101,7 +95,7 @@ public class UserCardAdapter extends RecyclerView.Adapter<UserCardViewHolder> {
             userCard = LayoutInflater.from(parent.getContext()).inflate(R.layout.card_user_new, parent, false);
             viewHolder = new UserCardViewHolder(userCard, delegate);
         }else{
-            userCard = LayoutInflater.from(parent.getContext()).inflate(R.layout.haystack_empty_card_layout, parent, false);
+            userCard = LayoutInflater.from(parent.getContext()).inflate(R.layout.card_empty_title_view, parent, false);
             viewHolder = new UserCardViewHolder(userCard, delegate);
         }
 
@@ -116,6 +110,7 @@ public class UserCardAdapter extends RecyclerView.Adapter<UserCardViewHolder> {
             case TYPE_ITEM:
                 UserVO user = filteredListData.get(position);
                 holder.setData(user, null);
+
                 break;
             case TYPE_EMPTY :
                 holder.emptyText.setText(mContext.getResources().getString(R.string.no_one_here));

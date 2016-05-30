@@ -77,7 +77,7 @@ public class NotificationCardHolder extends RecyclerView.ViewHolder {
         //Date
         sentAt.setText(AppUtils.formatDateRelative(notification.getSentAt()));
 
-        //User Profile Pictyre
+        //User Profile Picture
         Picasso.with(imageView.getContext()).cancelRequest(imageView);
 
         Picasso.with(imageView.getContext())

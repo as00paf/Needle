@@ -8,6 +8,7 @@ import android.view.View;
 import com.nemator.needle.R;
 import com.nemator.needle.adapter.UserAccountAdapter;
 import com.nemator.needle.interfaces.IUserProfileListener;
+import com.nemator.needle.models.vo.FriendshipVO;
 import com.nemator.needle.models.vo.UserVO;
 
 public class UserProfileListViewHolder extends RecyclerView.ViewHolder{
@@ -15,14 +16,14 @@ public class UserProfileListViewHolder extends RecyclerView.ViewHolder{
     public RecyclerView listView;
     private UserVO user;
     private boolean isMe;
-    private boolean isFriend = false;
+    private FriendshipVO friendship;
     private IUserProfileListener listener;
 
-    public UserProfileListViewHolder(View itemView, UserVO user, boolean isMe, boolean isFriend, IUserProfileListener listener) {
+    public UserProfileListViewHolder(View itemView, UserVO user, boolean isMe, FriendshipVO friendship, IUserProfileListener listener) {
         super(itemView);
         this.user = user;
         this.isMe = isMe;
-        this.isFriend = isFriend;
+        this.friendship = friendship;
         this.listener = listener;
 
         init();
@@ -41,7 +42,7 @@ public class UserProfileListViewHolder extends RecyclerView.ViewHolder{
         }
         listView.setLayoutManager(manager);
 
-        UserAccountAdapter adapter = new UserAccountAdapter(itemView.getContext(), user, isMe, isFriend, listener);
+        UserAccountAdapter adapter = new UserAccountAdapter(itemView.getContext(), user, isMe, friendship, listener);
         listView.setAdapter(adapter);
         adapter.notifyDataSetChanged();
     }

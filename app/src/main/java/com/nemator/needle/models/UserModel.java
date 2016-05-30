@@ -9,6 +9,8 @@ import com.nemator.needle.models.vo.FacebookUserVO;
 import com.nemator.needle.models.vo.UserVO;
 import com.nemator.needle.utils.AppConstants;
 
+import java.util.ArrayList;
+
 public class UserModel {
 
     private static UserModel instance;
@@ -19,6 +21,7 @@ public class UserModel {
     private UserVO user;
     private SharedPreferences sharedPreferences;
     private SharedPreferences.Editor editor;
+    private ArrayList<UserVO> friends;
 
     public UserModel(){
     }
@@ -120,5 +123,13 @@ public class UserModel {
 
     public boolean isInitialized() {
         return initialized;
+    }
+
+    public ArrayList<UserVO> getFriends() {
+        return friends;
+    }
+
+    public void setFriends(ArrayList<UserVO> friends) {
+        this.friends = friends;
     }
 }

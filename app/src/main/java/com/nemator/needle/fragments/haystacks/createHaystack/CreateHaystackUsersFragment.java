@@ -1,6 +1,5 @@
 package com.nemator.needle.fragments.haystacks.createHaystack;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.GridLayoutManager;
@@ -14,7 +13,7 @@ import com.nemator.needle.Needle;
 import com.nemator.needle.R;
 import com.nemator.needle.adapter.UserCardAdapter;
 import com.nemator.needle.api.ApiClient;
-import com.nemator.needle.api.result.UsersResult;
+import com.nemator.needle.api.result.FriendsResult;
 import com.nemator.needle.models.vo.UserVO;
 
 import java.util.ArrayList;
@@ -34,7 +33,7 @@ public class CreateHaystackUsersFragment extends CreateHaystackBaseFragment impl
     private SwipeRefreshLayout swipeLayout;
 
     //Data
-    private ArrayList<UserVO> usersList;
+    private ArrayList<UserVO> friends;
     private int userId = -1;
 
     public static CreateHaystackUsersFragment newInstance() {
@@ -51,44 +50,6 @@ public class CreateHaystackUsersFragment extends CreateHaystackBaseFragment impl
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         rootView = inflater.inflate(R.layout.fragment_create_haystack_users, container, false);
 
-        //Search Box
-        /*
-        searchListener = new SearchBox.SearchListener() {
-            @Override
-            public void onSearchOpened() {
-                //Use this to tint the screen
-                stateChangeCallback.onStateChange(AppState.CREATE_HAYSTACK_USERS_SEARCH_OPEN);
-
-                if(searchBox.getSearchables().size() == 0){
-                    addFriendsSuggestion();
-                }
-            }
-
-            @Override
-            public void onSearchClosed() {
-                //Use this to un-tint the screen
-            }
-
-            @Override
-            public void onSearchTermChanged() {
-                //React to the search term changing
-                //Called after it has updated results
-
-                mAdapter.setFilter(searchBox.getSearchText());
-            }
-
-            @Override
-            public void onSearch(String searchTerm) {
-                mAdapter.setFilter(searchTerm);
-            }
-
-            @Override
-            public void onSearchCleared() {
-                mAdapter.flushFilter();
-            }
-        };
-        searchBox.setSearchListener(searchListener);
-*/
         //Recycler View
         mRecyclerView = (RecyclerView) rootView.findViewById(R.id.create_haystack_users_list);
         mRecyclerView.setHasFixedSize(true);
@@ -102,59 +63,15 @@ public class CreateHaystackUsersFragment extends CreateHaystackBaseFragment impl
         return rootView;
     }
 
-    private void addFriendsSuggestion(){
-
-    }
-
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-       /* if (isAdded() && requestCode == SearchBox.VOICE_RECOGNITION_CODE && resultCode == getActivity().RESULT_OK) {
-            ArrayList<String> matches = data
-                    .getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
-            if(matches.size() > 0){
-                searchBox.clearSearchable();
-                searchBox.setSearchString(matches.get(0));
-
-                //Match voice search with users
-                for (int i = 0; i < matches.size(); i++) {
-                    String currentMatch = matches.get(i);
-                    if(usersList != null && usersList.size() > 0 ){
-                        for (int j = 0; j < usersList.size(); j++) {
-                            String currentUserName = usersList.get(j).getName().toLowerCase();
-                            if(currentUserName.contains(currentMatch)){
-                                SearchResult newSearchResult = new SearchResult(usersList.get(j).getName(), getResources().getDrawable(R.drawable.person_placeholder_24));
-                                Boolean alreadyAdded = false;
-                                for (int k = 0; k < searchBox.getSearchables().size(); k++) {
-                                    SearchResult oldResult = searchBox.getSearchables().get(k);
-                                    if(oldResult.description.equals(newSearchResult.description)){
-                                        alreadyAdded = true;
-                                    }
-                                }
-
-                                if(!alreadyAdded){
-                                    searchBox.addSearchable(newSearchResult);
-                                }
-                            }
-                        }
-
-                        searchListener.onSearchTermChanged();
-                        searchBox.toggleSearch();
-                    }
-                }
-            }
-        }*/
-        super.onActivityResult(requestCode, resultCode, data);
-    }
-
     @Override
     public void onResume(){
         super.onResume();
-        fetchAllUsers();
+        getFriends();
     }
 
     @Override
     public void onRefresh(){
-        fetchAllUsers();
+        getFriends();
     }
 
     public void closeSearchResults(){
@@ -162,27 +79,27 @@ public class CreateHaystackUsersFragment extends CreateHaystackBaseFragment impl
     }
 
     //Actions
-    private void fetchAllUsers(){
-        ApiClient.getInstance().fetchAllUsers(Needle.userModel.getUserId(), new Callback<UsersResult>() {
+    private void getFriends(){
+        ApiClient.getInstance().getFriends(Needle.userModel.getUserId(), new Callback<FriendsResult>() {
             @Override
-            public void onResponse(Call<UsersResult> call, Response<UsersResult> response) {
-                UsersResult result = response.body();
-                usersList = result.getUsers();
-                updateUserList();
+            public void onResponse(Call<FriendsResult> call, Response<FriendsResult> response) {
+                FriendsResult result = response.body();
+                friends = result.getFriends();
+                updateFriendList();
             }
 
             @Override
-            public void onFailure(Call<UsersResult> call, Throwable t) {
-                Log.d(TAG, "Retrieving users failed ! Error : " + t.getMessage());
+            public void onFailure(Call<FriendsResult> call, Throwable t) {
+                Log.d(TAG, "Retrieving friends failed ! Error : " + t.getMessage());
 
-                usersList = new ArrayList<UserVO>();
-                updateUserList();
+                friends = new ArrayList<UserVO>();
+                updateFriendList();
             }
         });
     }
 
-    private void updateUserList(){
-        mAdapter = new UserCardAdapter(getActivity(), usersList, UserCardAdapter.Type.MULTI_SELECT);
+    private void updateFriendList(){
+        mAdapter = new UserCardAdapter(getActivity(), friends, UserCardAdapter.Type.MULTI_SELECT);
         mRecyclerView.setAdapter(mAdapter);
 
         mAdapter.notifyDataSetChanged();

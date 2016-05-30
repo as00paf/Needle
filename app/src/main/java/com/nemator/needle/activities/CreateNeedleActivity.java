@@ -39,12 +39,19 @@ public class CreateNeedleActivity extends AppCompatActivity implements NeedleCon
     private CreateNeedlePagerAdapter pagerAdapter;
 
     //Data
+    private boolean userAlreadySelected;
     private NeedleVO needleVO;
     private UserVO selectedUser;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        Bundle extras = getIntent().getExtras();
+        if (extras != null) {
+            selectedUser = extras.getParcelable(AppConstants.TAG_USER);
+            userAlreadySelected = selectedUser != null;
+        }
 
         //Toolbar
         setContentView(R.layout.activity_create);
@@ -54,31 +61,48 @@ public class CreateNeedleActivity extends AppCompatActivity implements NeedleCon
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         //ViewPager
-        pagerAdapter = new CreateNeedlePagerAdapter(getSupportFragmentManager(), this);
+        pagerAdapter = new CreateNeedlePagerAdapter(getSupportFragmentManager(), this, userAlreadySelected);
         viewPager = (ViewPager) findViewById(R.id.view_pager);
         viewPager.setAdapter(pagerAdapter);
 
         //Tabs
         tabs = (SlidingTabLayout) findViewById(R.id.sliding_tabs);
-        tabs.setCustomTabView(R.layout.layout_tab_title, R.id.tab_text);
-        tabs.setDistributeEvenly(true);
-        tabs.setViewPager(viewPager, toolbar);
+        if(!userAlreadySelected){
+            tabs.setCustomTabView(R.layout.layout_tab_title, R.id.tab_text);
+            tabs.setDistributeEvenly(true);
+            tabs.setViewPager(viewPager, toolbar);
 
-        tabs.setCustomTabColorizer(new SlidingTabLayout.TabColorizer() {
+            tabs.setCustomTabColorizer(new SlidingTabLayout.TabColorizer() {
 
-            @Override
-            public int getIndicatorColor(int position) {
-                return Color.WHITE;
-            }
+                @Override
+                public int getIndicatorColor(int position) {
+                    return Color.WHITE;
+                }
 
-        });
+            });
+        }else{
+            tabs.setVisibility(View.GONE);
+        }
 
         //FAB
         fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setVisibility(View.GONE);
+        if(!userAlreadySelected){
+            fab.setVisibility(View.GONE);
+        }else{
+            fab.setImageResource(R.drawable.ic_done_white_24dp);
+            fab.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
 
+                }
+            });
+        }
 
-        getSupportActionBar().setTitle(pagerAdapter.getPageTitle(0));
+        if(!userAlreadySelected){
+            getSupportActionBar().setTitle(pagerAdapter.getPageTitle(0));
+        }else{
+            getSupportActionBar().setTitle(getString(R.string.send_needle_to, selectedUser.getReadableUserName()));
+        }
 
         initializeBroadcastListener();
     }
@@ -109,7 +133,7 @@ public class CreateNeedleActivity extends AppCompatActivity implements NeedleCon
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         if(viewPager.getCurrentItem() == 0){
-            getMenuInflater().inflate(R.menu.menu_settings, menu);
+            getMenuInflater().inflate(R.menu.menu_default, menu);
         }else{
             getMenuInflater().inflate(R.menu.menu_create_haystack_done, menu);
         }
@@ -134,7 +158,9 @@ public class CreateNeedleActivity extends AppCompatActivity implements NeedleCon
     }
 
     private void createLocationSharing(){
-        selectedUser = pagerAdapter.getSelectedUser();
+        if(selectedUser == null){
+            selectedUser = pagerAdapter.getSelectedUser();
+        }
 
         if(!validate()) {
             Toast.makeText(this, "Please select a user from the list", Toast.LENGTH_SHORT).show();

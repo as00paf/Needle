@@ -119,7 +119,9 @@ public class NotificationFragment  extends Fragment {
             NotificationResult result = response.body();
             if(result.getSuccessCode() == 1){
                 Log.d(TAG, "Seen notifications. Success : " + result.getMessage());
-                ((HomeActivity) getActivity()).setNotificationsCount(0);
+                if(getActivity() != null){
+                    ((HomeActivity) getActivity()).setNotificationsCount(0);
+                }
             }else{
                 Toast.makeText(getContext(), "Could not mark notifications as seen ", Toast.LENGTH_SHORT).show();
                 Log.d(TAG, "Could not mark notifications as seen . Error : " + result.getMessage());

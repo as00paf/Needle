@@ -48,7 +48,7 @@ public class NotificationCardAdapter extends RecyclerView.Adapter<NotificationCa
             notificationCard = LayoutInflater.from(parent.getContext()).inflate(R.layout.card_notification, parent, false);
             viewHolder = new NotificationCardHolder(notificationCard, listener);
         }else{
-            notificationCard = LayoutInflater.from(parent.getContext()).inflate(R.layout.haystack_empty_card_layout, parent, false);
+            notificationCard = LayoutInflater.from(parent.getContext()).inflate(R.layout.card_empty_title_view, parent, false);
             viewHolder = new NotificationCardHolder(notificationCard, listener);
         }
 

@@ -1,10 +1,8 @@
 package com.nemator.needle.activities;
 
 import android.Manifest;
-import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
@@ -167,6 +165,7 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     private void initNotificationListener(){
+        //TODO : stop listening ?
         LocalBroadcastManager localBroadcastManager = LocalBroadcastManager.getInstance(this);
 
         localBroadcastManager.registerReceiver(notificationReceiver,
@@ -176,7 +175,7 @@ public class HomeActivity extends AppCompatActivity {
     private BroadcastReceiver notificationReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            Needle.navigationController.refreshLocationSharingList();
+            Needle.navigationController.refreshNeedleList();
             Needle.navigationController.refreshHaystackList();
             Needle.navigationController.refreshNotificationList();
         }
@@ -381,7 +380,7 @@ public class HomeActivity extends AppCompatActivity {
 
     private void setMenuCounter(@IdRes int itemId, int count) {
         TextView view = (TextView) navigationView.getMenu().findItem(itemId).getActionView();
-        view.setText(count > 0 ? String.valueOf(count) : null);
+        if(view != null) view.setText(count > 0 ? String.valueOf(count) : null);
     }
 
 

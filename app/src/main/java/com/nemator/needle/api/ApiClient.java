@@ -26,6 +26,7 @@ import com.nemator.needle.utils.AppConstants;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Iterator;
 
 import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
@@ -239,13 +240,23 @@ public class ApiClient {
         call.enqueue(callBack);
     }
 
-    public void acceptFriendRequest(int userId, int friendId, Callback<FriendshipResult> callBack){
-        Call<FriendshipResult> call = client.acceptFriendRequest(new FriendshipVO(userId, friendId));
+    public void acceptFriendRequest(int friendId, Callback<FriendshipResult> callBack){
+        Call<FriendshipResult> call = client.acceptFriendRequest(new FriendshipVO(Needle.userModel.getUserId(), friendId, true));
         call.enqueue(callBack);
     }
 
-    public void unfriend(int friendId, Callback<FriendshipResult> callBack){
-        Call<FriendshipResult> call = client.unFriend(new FriendshipVO(Needle.userModel.getUserId(), friendId));
+    public void rejectFriendRequest(int friendId, Callback<FriendshipResult> callBack){
+        Call<FriendshipResult> call = client.rejectFriendRequest(new FriendshipVO(Needle.userModel.getUserId(), friendId, false));
+        call.enqueue(callBack);
+    }
+
+    public void cancelFriendRequest(int friendId, Callback<TaskResult> callBack){
+        Call<TaskResult> call = client.cancelFriendRequest(new FriendshipVO(Needle.userModel.getUserId(), friendId));
+        call.enqueue(callBack);
+    }
+
+    public void unfriend(int friendId, Callback<TaskResult> callBack){
+        Call<TaskResult> call = client.unFriend(new FriendshipVO(Needle.userModel.getUserId(), friendId));
         call.enqueue(callBack);
     }
 
@@ -254,4 +265,16 @@ public class ApiClient {
         call.enqueue(callBack);
     }
 
+    public void getPotentialFriends(ArrayList<UserVO> excepted, Callback<FriendsResult> callBack) {
+        int[] exceptions = new int[excepted.size()];
+        Iterator<UserVO> iterator = excepted.iterator();
+        while(iterator.hasNext()){
+            UserVO user = iterator.next();
+            int index = excepted.indexOf(user);
+            exceptions[index] = user.getId();
+        }
+
+        Call<FriendsResult> call = client.getPotentialFriends(exceptions);
+        call.enqueue(callBack);
+    }
 }

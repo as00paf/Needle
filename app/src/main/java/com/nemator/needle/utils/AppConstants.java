@@ -84,6 +84,7 @@ public class AppConstants {
     public static final int PIN_DELETED_FROM_HAYSTACK = 8;
     public static final int FRIEND_REQUEST = 9;
     public static final int ACCEPTED_FRIEND_REQUEST = 10;
+    public static final int REJECTED_FRIEND_REQUEST = 11;
 
     //Friendship Status
     public static final int FRIEND_REQUESTED = 0;

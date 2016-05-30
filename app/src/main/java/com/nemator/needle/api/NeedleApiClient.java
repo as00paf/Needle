@@ -103,11 +103,11 @@ public interface NeedleApiClient {
     @GET("haystackUser.php")
     Call<UsersResult> fetchHaystackUsers(@Query("userId") int userId, @Query("haystackId") int haystackId);
 
+    @GET("fetchUsersNotInHaystack.php")
+    Call<UsersResult> fetchUsersNotInHaystack(@Query("haystackId") int haystackId);//TODO : replace
+
     @POST("haystackUser.php")
     Call<HaystackResult> addUsersToHaystack(@Body HaystackVO haystack);
-
-    @GET("fetchUsersNotInHaystack.php")
-    Call<UsersResult> fetchUsersNotInHaystack(@Query("haystackId") int haystackId);
 
     //LocationSharing
     @GET("locationSharing.php")
@@ -134,6 +134,9 @@ public interface NeedleApiClient {
     Call<FriendsResult> getFriends(@Query("userId") int userId);
 
     @GET("friends.php")
+    Call<FriendsResult> getPotentialFriends(@Query("exceptions") int... exceptions);
+
+    @GET("friends.php")
     Call<FriendshipResult> getFriendship(@Query("userId") int userId, @Query("friendId") int friendId);
 
     @POST("friends.php")
@@ -142,6 +145,12 @@ public interface NeedleApiClient {
     @PUT("friends.php")
     Call<FriendshipResult> acceptFriendRequest(@Body FriendshipVO friendshipVO);
 
+    @PUT("friends.php")
+    Call<FriendshipResult> rejectFriendRequest(@Body FriendshipVO friendshipVO);
+
     @HTTP(method = "DELETE", path = "friends.php", hasBody = true)
-    Call<FriendshipResult> unFriend(@Body FriendshipVO friendshipVO);
+    Call<TaskResult> unFriend(@Body FriendshipVO friendshipVO);
+
+    @HTTP(method = "DELETE", path = "friends.php", hasBody = true)
+    Call<TaskResult> cancelFriendRequest(@Body FriendshipVO friendshipVO);
 }

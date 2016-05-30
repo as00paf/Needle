@@ -1,18 +1,14 @@
 package com.nemator.needle.adapter;
 
 import android.content.Context;
-import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.nemator.needle.Needle;
 import com.nemator.needle.R;
-import com.nemator.needle.fragments.haystacks.HaystackListFragment;
 import com.nemator.needle.fragments.haystacks.HaystackListTabFragment;
 import com.nemator.needle.models.vo.HaystackVO;
-import com.nemator.needle.utils.AppConstants;
 import com.nemator.needle.viewHolders.HaystackCardHolder;
 
 import java.util.ArrayList;
@@ -53,7 +49,7 @@ public class HaystackCardAdapter extends RecyclerView.Adapter<HaystackCardHolder
             haystackCard = LayoutInflater.from(parent.getContext()).inflate(R.layout.card_haystack, parent, false);
             viewHolder = new HaystackCardHolder(haystackCard, mListener);
         }else{
-            haystackCard = LayoutInflater.from(parent.getContext()).inflate(R.layout.haystack_empty_card_layout, parent, false);
+            haystackCard = LayoutInflater.from(parent.getContext()).inflate(R.layout.card_empty_title_view, parent, false);
             viewHolder = new HaystackCardHolder(haystackCard, mListener);
         }
 

@@ -100,6 +100,7 @@
     <string name="cancel_needle_confirmation">Are you sure you want to cancel this Needle ?</string>
     <string name="noNeedleAvailable">No Needle Available</string>
     <string name="create_needle">Create Needle</string>
+    <string name="send_needle_to">Send Needle to %1$s</string>
 
     <!-- Notifications -->
     <string name="no_notifications_yet">No notifications yet</string>
@@ -168,10 +169,14 @@
     <string name="friends">Friends</string>
     <string name="friend_requests">Friend Requests</string>
     <string name="sent_friend_requests">Sent Requests</string>
+    <string name="friend_request_accepted">Friend Request Accepted</string>
+    <string name="friend_request_rejected">Friend Request Rejected</string>
+    <string name="friend_request_cancelled">Friend Request Cancelled</string>
     <string name="unfriend_successful">User Unfriended</string>
     <string name="friend_request_sent">Friend Request Sent</string>
     <string name="fetch_friends_error">Could Not Fetch Friends</string>
     <string name="no_one_here">No One Here</string>
+    <string name="discover">Discover</string>
 
     <!-- Permissions -->
     <string name="permission_granted" translatable="false">permission_granted</string>
@@ -185,6 +190,9 @@
     <string name="facebook_account">Facebook Account</string>
     <string name="google_account_title">Google Account</string>
     <string name="unfriend">Unfriend</string>
+    <string name="accept_friend_request">Accept Request</string>
+    <string name="cancel_friend_request">Cancel Request</string>
+    <string name="reject_friend_request">Reject Request</string>
     <string name="add_friend">Add Friend</string>
     <string name="add_to_group">Add to Group</string>
     <string name="send_needle">Send Needle</string>

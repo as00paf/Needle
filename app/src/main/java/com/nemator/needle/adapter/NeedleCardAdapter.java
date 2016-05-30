@@ -56,7 +56,7 @@ public class NeedleCardAdapter extends RecyclerView.Adapter<LocationCardHolder>{
             locationSharingCard = LayoutInflater.from(parent.getContext()).inflate(R.layout.card_needle, parent, false);
             viewHolder = new LocationCardHolder(locationSharingCard, mListener, isSent);
         }else{
-            locationSharingCard = LayoutInflater.from(parent.getContext()).inflate(R.layout.haystack_empty_card_layout, parent, false);
+            locationSharingCard = LayoutInflater.from(parent.getContext()).inflate(R.layout.card_empty_title_view, parent, false);
             viewHolder = new LocationCardHolder(locationSharingCard, mListener, isSent);
         }
 

@@ -11,6 +11,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.NotificationCompat;
+import android.support.v4.app.NotificationManagerCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
@@ -38,7 +39,7 @@ public class NotificationController {
     private static final long[] VIBRATION_PATTERN = new long[]{ 6000, 1400 };
 
     public static void sendNotification(Context context, Bundle data) {
-        NotificationManager mNotificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+        NotificationManagerCompat mNotificationManager = NotificationManagerCompat.from(context);
 
         //Preferences
         SharedPreferences pref = context.getSharedPreferences("com.nemator.needle", Context.MODE_PRIVATE);
@@ -74,7 +75,6 @@ public class NotificationController {
                     .setContentIntent(contentIntent);
 
             int id = new AtomicInteger(NOTIFICATION_ID).incrementAndGet();
-            mNotificationManager.notify(id, mBuilder.build());
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
                 mBuilder.setPriority(Notification.PRIORITY_HIGH);
@@ -129,6 +129,10 @@ public class NotificationController {
             intent = new Intent(context, HomeActivity.class);
             intent.putExtra(AppConstants.TAG_ACTION, AppConstants.TAG_SECTION);
             intent.putExtra(AppConstants.TAG_SECTION, AppConstants.SECTION_USER_PROFILE);
+        }else if(notification.getType() == AppConstants.REJECTED_FRIEND_REQUEST){
+            intent = new Intent(context, HomeActivity.class);
+            intent.putExtra(AppConstants.TAG_ACTION, AppConstants.TAG_SECTION);
+            intent.putExtra(AppConstants.TAG_SECTION, AppConstants.SECTION_NOTIFICATIONS);
         }else{
             intent = new Intent(context, HomeActivity.class);
             intent.putExtra(AppConstants.TAG_ACTION, AppConstants.TAG_SECTION);

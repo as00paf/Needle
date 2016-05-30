@@ -28,12 +28,13 @@ public class FriendListViewHolder extends RecyclerView.ViewHolder{
         listView = (RecyclerView) itemView.findViewById(R.id.card_list_view);
         listView.setHasFixedSize(true);
 
-        RecyclerView.LayoutManager manager = new GridLayoutManager(itemView.getContext(), 3);
-        listView.setHasFixedSize(true);
-        listView.setLayoutManager(manager);
-
         UserCardAdapter adapter = new UserCardAdapter(itemView.getContext(), friends, UserCardAdapter.Type.SHOW_PROFILE);
         listView.setAdapter(adapter);
+
+        RecyclerView.LayoutManager manager = new GridLayoutManager(itemView.getContext(), 3);
+        listView.setLayoutManager(manager);
+
+
         adapter.notifyDataSetChanged();
     }
 }

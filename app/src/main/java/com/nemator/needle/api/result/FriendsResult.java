@@ -1,6 +1,7 @@
 package com.nemator.needle.api.result;
 
 import com.google.gson.annotations.SerializedName;
+import com.nemator.needle.models.vo.FriendVO;
 import com.nemator.needle.models.vo.FriendshipVO;
 import com.nemator.needle.models.vo.UserVO;
 
@@ -11,10 +12,10 @@ public class FriendsResult extends TaskResult{
     private ArrayList<UserVO> friends;
 
     @SerializedName("receivedFriendRequests")
-    private ArrayList<UserVO> receivedFriendRequests;
+    private ArrayList<FriendVO> receivedFriendRequests;
 
     @SerializedName("sentFriendRequests")
-    private ArrayList<UserVO> sentFriendRequests;
+    private ArrayList<FriendVO> sentFriendRequests;
 
     public FriendsResult(int successCode, String message) {
         super(successCode, message);
@@ -28,7 +29,7 @@ public class FriendsResult extends TaskResult{
         this.friends = friends;
     }
 
-    public FriendsResult(int successCode, String message, ArrayList<UserVO> friends, ArrayList<UserVO> receivedFriendRequests, ArrayList<UserVO> sentFriendRequests) {
+    public FriendsResult(int successCode, String message, ArrayList<UserVO> friends, ArrayList<FriendVO> receivedFriendRequests, ArrayList<FriendVO> sentFriendRequests) {
         super(successCode, message);
         this.friends = friends;
         this.receivedFriendRequests = receivedFriendRequests;
@@ -43,19 +44,19 @@ public class FriendsResult extends TaskResult{
         this.friends = friends;
     }
 
-    public ArrayList<UserVO> getReceivedFriendRequests() {
+    public ArrayList<FriendVO> getReceivedFriendRequests() {
         return receivedFriendRequests;
     }
 
-    public void setReceivedFriendRequests(ArrayList<UserVO> receivedFriendRequests) {
+    public void setReceivedFriendRequests(ArrayList<FriendVO> receivedFriendRequests) {
         this.receivedFriendRequests = receivedFriendRequests;
     }
 
-    public ArrayList<UserVO> getSentFriendRequests() {
+    public ArrayList<FriendVO> getSentFriendRequests() {
         return sentFriendRequests;
     }
 
-    public void setSentFriendRequests(ArrayList<UserVO> sentFriendRequests) {
+    public void setSentFriendRequests(ArrayList<FriendVO> sentFriendRequests) {
         this.sentFriendRequests = sentFriendRequests;
     }
 }

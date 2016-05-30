@@ -11,6 +11,7 @@ import android.view.ViewGroup;
 
 import com.nemator.needle.R;
 import com.nemator.needle.interfaces.IUserProfileListener;
+import com.nemator.needle.models.vo.FriendshipVO;
 import com.nemator.needle.models.vo.UserVO;
 import com.nemator.needle.viewHolders.FriendListViewHolder;
 import com.nemator.needle.viewHolders.ListItemViewHolder;
@@ -30,16 +31,17 @@ public class UserProfileAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     private Context context;
     private UserVO user;
     private ArrayList<UserVO> friends;
-    private Boolean isMe, isFriend;
+    private Boolean isMe;
+    private FriendshipVO friendship;
     private ArrayList<Integer> positionTypes = new ArrayList<>();
     private IUserProfileListener listener;
 
-    public UserProfileAdapter(Context context, UserVO user, ArrayList<UserVO> friends, Boolean isMe, Boolean isFriend, IUserProfileListener listener) {
+    public UserProfileAdapter(Context context, UserVO user, ArrayList<UserVO> friends, Boolean isMe, FriendshipVO friendship, IUserProfileListener listener) {
         this.context = context;
         this.user = user;
         this.friends = friends;
         this.isMe = isMe;
-        this.isFriend = isFriend;
+        this.friendship = friendship;
         this.listener = listener;
 
         initItemPositions();
@@ -64,7 +66,7 @@ public class UserProfileAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         switch (viewType){
             case ACCOUNT_DETAILS:
                 itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.card_user_profile_list_item, parent, false);
-                viewHolder = new UserProfileListViewHolder(itemView, user, isMe, isFriend, listener);
+                viewHolder = new UserProfileListViewHolder(itemView, user, isMe, friendship, listener);
                 break;
             case DELETE_ACCOUNT:
                 itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.card_user_profile_item, parent, false);

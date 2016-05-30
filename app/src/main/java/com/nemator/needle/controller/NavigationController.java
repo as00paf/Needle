@@ -9,7 +9,6 @@ import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.util.Log;
@@ -33,7 +32,6 @@ import com.nemator.needle.fragments.needle.NeedleListFragment;
 import com.nemator.needle.fragments.needle.createNeedle.CreateNeedleExpirationFragment;
 import com.nemator.needle.fragments.notifications.NotificationFragment;
 import com.nemator.needle.fragments.people.PeopleFragment;
-import com.nemator.needle.fragments.settings.SettingsFragment;
 import com.nemator.needle.utils.AppConstants;
 import com.nemator.needle.utils.AppState;
 
@@ -330,9 +328,9 @@ public class NavigationController implements HomeActivity.NavigationHandler, OnA
         showSection(previousState);
     }
 
-    public void refreshLocationSharingList() {
+    public void refreshNeedleList() {
         if(needleListFragment != null){
-            needleListFragment.fetchLocationSharing(true);
+            needleListFragment.fetchNeedles(true);
         }
     }
 

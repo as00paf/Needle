@@ -42,12 +42,15 @@ public class UserCardViewHolder extends RecyclerView.ViewHolder{
         userNameView.setText(user.getReadableUserName());
 
         //Image
+        Picasso.with(itemView.getContext()).cancelRequest(imageView);
+
         if(user.getPictureURL() != null && !user.getPictureURL().isEmpty()){
             Picasso.with(itemView.getContext())
                     .load(user.getPictureURL())
                     .into(imageView);
         }else{
             Log.d(TAG, "Cant get picture URL for user " + user.getUserName());
+            imageView.setImageResource(R.drawable.person_placeholder);
         }
 
         itemView.setOnClickListener(new View.OnClickListener() {

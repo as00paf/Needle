@@ -89,7 +89,7 @@ public class NeedleListTabFragment extends Fragment implements NeedleCardListene
                     onRefreshList();
                 }
             });
-
+            swipeLayout.setRefreshing(true);
         }
 
 
@@ -118,7 +118,7 @@ public class NeedleListTabFragment extends Fragment implements NeedleCardListene
     //Handlers
     @Override
     public void onRefreshList() {
-        Needle.navigationController.refreshLocationSharingList();
+        Needle.navigationController.refreshNeedleList();
     }
 
     @Override

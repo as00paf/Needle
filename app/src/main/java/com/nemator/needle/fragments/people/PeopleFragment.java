@@ -1,24 +1,37 @@
 package com.nemator.needle.fragments.people;
 
+import android.animation.Animator;
+import android.app.SearchManager;
+import android.content.Context;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v4.view.ViewPager;
+import android.support.v7.app.ActionBar;
+import android.support.v7.widget.SearchView;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Toast;
 
 import com.appcompat.view.slidingTab.SlidingTabLayout;
+import com.google.android.gms.maps.model.LatLngBounds;
+import com.google.android.gms.plus.People;
 import com.nemator.needle.R;
 import com.nemator.needle.activities.HomeActivity;
-import com.nemator.needle.adapter.FriendsPagerAdapter;
+import com.nemator.needle.adapter.PeoplePagerAdapter;
 import com.nemator.needle.api.ApiClient;
 import com.nemator.needle.api.result.FriendsResult;
+import com.nemator.needle.models.vo.FriendVO;
 import com.nemator.needle.models.vo.UserVO;
-import com.nemator.needle.utils.AppState;
+import com.nemator.needle.utils.SphericalUtil;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -35,14 +48,18 @@ public class PeopleFragment extends Fragment {
     private ViewPager viewPager;
     private SlidingTabLayout mSlidingTabLayout;
     private FloatingActionButton fab;
+    private Menu menu;
+    private SearchView searchView;
+    private MenuItem mSearchAction;
+    private boolean isSearchOpened = false;
 
     //Objects
-    private FriendsPagerAdapter pagerAdapter;
+    private PeoplePagerAdapter pagerAdapter;
 
     //Data
     public ArrayList<UserVO> friends = new ArrayList<>();
-    public ArrayList<UserVO> friendRequests = new ArrayList<>();
-    public ArrayList<UserVO> sentFriendRequests = new ArrayList<>();
+    public ArrayList<FriendVO> friendRequests = new ArrayList<>();
+    public ArrayList<FriendVO> sentFriendRequests = new ArrayList<>();
 
     private long lastUpdate;
 
@@ -61,7 +78,6 @@ public class PeopleFragment extends Fragment {
         if(savedInstanceState != null){
             FriendsTabFragment friendsTab = pagerAdapter.getFriendsFragment();
             FriendsTabFragment friendRequestsTab = pagerAdapter.getFriendRequestsFragment();
-            FriendsTabFragment sentRequestsTab = pagerAdapter.getSentFriendRequestsFragment();
 
             friends = savedInstanceState.getParcelableArrayList("friends");
             friendRequests = savedInstanceState.getParcelableArrayList("friendRequests");
@@ -72,8 +88,7 @@ public class PeopleFragment extends Fragment {
             }
 
             if(friendsTab != null) friendsTab.updateFriendsList(friends);
-            if(friendRequestsTab != null) friendRequestsTab.updateFriendsList(friendRequests);
-            if(sentRequestsTab != null) sentRequestsTab.updateFriendsList(sentFriendRequests);
+            if(friendRequestsTab != null) friendRequestsTab.updateFriendshipList(friendRequests, sentFriendRequests);
         }
 
         setRetainInstance(true);
@@ -105,7 +120,7 @@ public class PeopleFragment extends Fragment {
             });
 
             //View pager
-            pagerAdapter = new FriendsPagerAdapter(getActivity().getSupportFragmentManager(), this);
+            pagerAdapter = new PeoplePagerAdapter(getActivity().getSupportFragmentManager(), this);
             viewPager = (ViewPager) rootView.findViewById(R.id.view_pager);
             viewPager.setOffscreenPageLimit(3);
             viewPager.setAdapter(pagerAdapter);
@@ -145,6 +160,8 @@ public class PeopleFragment extends Fragment {
 
                 }
             });
+
+            setHasOptionsMenu(true);
         }
         return rootView;
     }
@@ -165,11 +182,10 @@ public class PeopleFragment extends Fragment {
             public void onResponse(Call<FriendsResult> call, Response<FriendsResult> response) {
                 FriendsTabFragment friendsTab = pagerAdapter.getFriendsFragment();
                 FriendsTabFragment friendRequestsTab = pagerAdapter.getFriendRequestsFragment();
-                FriendsTabFragment sentRequestsTab = pagerAdapter.getSentFriendRequestsFragment();
+                FriendsTabFragment discoverTab = pagerAdapter.getDiscoverFragment();
 
                 if(friendsTab != null) friendsTab.setRefreshing(false);
                 if(friendRequestsTab != null) friendRequestsTab.setRefreshing(false);
-                if(sentRequestsTab != null) sentRequestsTab.setRefreshing(false);
 
                 FriendsResult result = response.body();
                 if(result.getSuccessCode() == 1){
@@ -185,8 +201,12 @@ public class PeopleFragment extends Fragment {
                     if(friends != null) Log.d(TAG, friends.size() + " Friends fetched !");
 
                     if(friendsTab != null) friendsTab.updateFriendsList(friends);
-                    if(friendRequestsTab != null) friendRequestsTab.updateFriendsList(friendRequests);
-                    if(sentRequestsTab != null) sentRequestsTab.updateFriendsList(sentFriendRequests);
+                    if(friendRequestsTab != null) friendRequestsTab.updateFriendshipList(friendRequests, sentFriendRequests);
+                    if(discoverTab != null) {
+                        discoverTab.setFriends(friends);
+                        discoverTab.setReceivedRequests(friendRequests);
+                        discoverTab.fetchDiscoverUsers();
+                    }
                 }else{
                     Log.e(TAG, "Could not fetch location sharings. Error : " + result.getMessage());
                     Toast.makeText(getActivity(), R.string.fetch_needles_error, Toast.LENGTH_SHORT).show();
@@ -197,7 +217,7 @@ public class PeopleFragment extends Fragment {
             public void onFailure(Call<FriendsResult> call, Throwable t) {
                 FriendsTabFragment friendsTab = pagerAdapter.getFriendsFragment();
                 FriendsTabFragment friendRequestsTab = pagerAdapter.getFriendRequestsFragment();
-                FriendsTabFragment sentRequestsTab = pagerAdapter.getSentFriendRequestsFragment();
+                FriendsTabFragment sentRequestsTab = pagerAdapter.getDiscoverFragment();
 
                 friendsTab.getRefreshLayout().setRefreshing(false);
                 friendRequestsTab.getRefreshLayout().setRefreshing(false);
@@ -213,6 +233,153 @@ public class PeopleFragment extends Fragment {
     public void onResume(){
         super.onResume();
         fetchFriends(true);
+
+        if(pagerAdapter != null && pagerAdapter.getDiscoverFragment() != null){
+            pagerAdapter.getDiscoverFragment().fetchDiscoverUsers();
+        }
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        this.menu = menu;
+        if(viewPager.getCurrentItem() != PeoplePagerAdapter.REQUESTS ){
+            inflater.inflate(R.menu.menu_default_search, menu);
+            setupSearchView(menu);
+        }else{
+            inflater.inflate(R.menu.menu_default, menu);
+        }
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+
+        switch(id) {
+            case R.id.action_search:
+                handleMenuSearch();
+                break;
+            case android.R.id.home:
+                if(isSearchOpened) {
+                    closeSearchMenu();
+                }
+                return true;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
+    private void setupSearchView(Menu menu) {
+        MenuItem menuItem = menu.findItem(R.id.action_search);
+        mSearchAction = menu.findItem(R.id.action_search);
+
+        searchView = (SearchView) MenuItemCompat.getActionView(menuItem);
+        SearchManager searchManager = (SearchManager) getContext().getSystemService(getContext().SEARCH_SERVICE);
+        searchView.setSearchableInfo(searchManager.getSearchableInfo(getActivity().getComponentName()));
+        searchView.setIconifiedByDefault(false);
+        searchView.setOnSearchClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                searchView.clearFocus();
+            }
+        });
+
+        MenuItemCompat.setShowAsAction(menuItem, MenuItem.SHOW_AS_ACTION_COLLAPSE_ACTION_VIEW
+                | MenuItem.SHOW_AS_ACTION_ALWAYS);
+
+        MenuItemCompat.setOnActionExpandListener(menuItem, new MenuItemCompat.OnActionExpandListener() {
+            @Override
+            public boolean onMenuItemActionCollapse(MenuItem item) {
+                InputMethodManager imm = (InputMethodManager) getContext().getSystemService(getActivity().INPUT_METHOD_SERVICE);
+                imm.hideSoftInputFromWindow(searchView.getWindowToken(), 0);
+
+                ActionBar action = ((HomeActivity) getActivity()).getSupportActionBar();
+                mSearchAction.setIcon(getResources().getDrawable(R.drawable.ic_search_white_24dp));
+                action.setTitle(getResources().getString(R.string.app_name));
+                action.setDisplayShowCustomEnabled(false);
+                action.setDisplayShowTitleEnabled(true);
+                action.setDisplayShowHomeEnabled(true);
+
+                pagerAdapter.getDiscoverFragment().clearSearch();
+                isSearchOpened = false;
+
+                return true;  // Return true to collapse action view
+            }
+
+            @Override
+            public boolean onMenuItemActionExpand(MenuItem item) {
+                return true;  // Return true to expand action view
+            }
+        });
+
+        ActionBar.LayoutParams params = new ActionBar.LayoutParams(ActionBar.LayoutParams.MATCH_PARENT, ActionBar.LayoutParams.MATCH_PARENT);
+        searchView.setLayoutParams(params);
+        searchView.setMaxWidth(2000);
+    }
+
+    private void handleMenuSearch() {
+        if(isSearchOpened){
+            closeSearchMenu();
+        } else {
+            openSearchMenu();
+        }
+    }
+
+    private void openSearchMenu(){
+        ActionBar action = ((HomeActivity) getActivity()).getSupportActionBar();
+        action.setCustomView(R.layout.search_bar);
+
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                doSearch(query);
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(final String newText) {
+                doSearch(newText);
+                return false;
+            }
+        });
+
+        //add the close icon
+        mSearchAction.setIcon(getResources().getDrawable(R.drawable.ic_clear_white_24dp));
+        action.setTitle(getResources().getString(R.string.app_name));
+
+        //Show keyboard
+        searchView.requestFocus();
+
+        InputMethodManager imm = (InputMethodManager) getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.showSoftInput(searchView.findViewById(android.support.v7.appcompat.R.id.search_src_text), InputMethodManager.SHOW_FORCED);
+
+        isSearchOpened = true;
+    }
+
+    private void closeSearchMenu(){
+        //Hide keyboard
+        InputMethodManager imm = (InputMethodManager) getContext().getSystemService(getActivity().INPUT_METHOD_SERVICE);
+        imm.hideSoftInputFromWindow(searchView.getWindowToken(), 0);
+
+        ActionBar action = ((HomeActivity) getActivity()).getSupportActionBar();
+        mSearchAction.collapseActionView();
+        mSearchAction.setIcon(getResources().getDrawable(R.drawable.ic_search_white_24dp));
+        action.setTitle(getResources().getString(R.string.app_name));
+        action.setDisplayShowCustomEnabled(false);
+        action.setDisplayShowTitleEnabled(true);
+        action.setDisplayShowHomeEnabled(true);
+
+        pagerAdapter.getDiscoverFragment().clearSearch();
+        isSearchOpened = false;
+    }
+
+    private void doSearch(String query) {
+        Log.d(TAG, "doSearch::query : " + query);
+
+        if(viewPager.getCurrentItem() == PeoplePagerAdapter.DISCOVER){
+            pagerAdapter.getDiscoverFragment().searchForUser(query);
+        }else{
+            pagerAdapter.getFriendsFragment().searchForUser(query);
+        }
     }
 
 }

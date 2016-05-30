@@ -18,6 +18,7 @@ public class CreateNeedlePagerAdapter extends FragmentPagerAdapter implements Ic
     private Context context;
 
     private Boolean isPublic = false;
+    private Boolean userAlreadySelected = false;
 
     private CreateNeedleExpirationFragment expirationFragment;
     private CreateNeedleUsersFragment usersFragment;
@@ -27,7 +28,7 @@ public class CreateNeedlePagerAdapter extends FragmentPagerAdapter implements Ic
             R.drawable.users_icon_selector
     };
 
-    public CreateNeedlePagerAdapter(FragmentManager fm, Context context) {
+    public CreateNeedlePagerAdapter(FragmentManager fm, Context context, boolean userAlreadySelected) {
         super(fm);
         this.context = context;
     }
@@ -56,7 +57,7 @@ public class CreateNeedlePagerAdapter extends FragmentPagerAdapter implements Ic
 
     @Override
     public int getCount() {
-        return 2;
+        return userAlreadySelected ? 1 : 2;
     }
 
     //TODO : localize

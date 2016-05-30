@@ -164,7 +164,7 @@ public class NeedleListFragment extends Fragment {
         return rootView;
     }
 
-    public void fetchLocationSharing(Boolean force){
+    public void fetchNeedles(Boolean force){
         long now = new Date().getTime();
 
         if(!force){
@@ -220,7 +220,9 @@ public class NeedleListFragment extends Fragment {
                 sentTab.getRefreshLayout().setRefreshing(false);
 
                 Log.e(TAG, "Could not fetch location sharings. Error : " + t.getMessage());
-                Toast.makeText(getContext(), R.string.fetch_needles_error, Toast.LENGTH_SHORT).show();
+                if(getActivity() != null){
+                    Toast.makeText(getActivity(), R.string.fetch_needles_error, Toast.LENGTH_SHORT).show();
+                }
             }
         });
     }
@@ -228,7 +230,7 @@ public class NeedleListFragment extends Fragment {
     @Override
     public void onResume(){
         super.onResume();
-        fetchLocationSharing(true);
+        fetchNeedles(true);
     }
 
     public void goToPage(int page){

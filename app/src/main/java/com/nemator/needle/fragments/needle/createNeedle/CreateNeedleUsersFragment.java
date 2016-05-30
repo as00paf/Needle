@@ -16,7 +16,7 @@ import com.nemator.needle.Needle;
 import com.nemator.needle.R;
 import com.nemator.needle.adapter.UserCardAdapter;
 import com.nemator.needle.api.ApiClient;
-import com.nemator.needle.api.result.UsersResult;
+import com.nemator.needle.api.result.FriendsResult;
 import com.nemator.needle.fragments.haystacks.createHaystack.CreateHaystackBaseFragment;
 import com.nemator.needle.models.vo.UserVO;
 
@@ -37,7 +37,7 @@ public class CreateNeedleUsersFragment extends CreateHaystackBaseFragment implem
     private SwipeRefreshLayout swipeLayout;
 
     //Data
-    private ArrayList<UserVO> usersList;
+    private ArrayList<UserVO> friends;
     private int userId = -1;
 
     public static CreateNeedleUsersFragment newInstance() {
@@ -70,12 +70,12 @@ public class CreateNeedleUsersFragment extends CreateHaystackBaseFragment implem
     @Override
     public void onResume(){
         super.onResume();
-        fetchAllUsers();
+        getFriends();
     }
 
     @Override
     public void onRefresh(){
-        fetchAllUsers();
+        getFriends();
     }
 
     @Override
@@ -99,27 +99,27 @@ public class CreateNeedleUsersFragment extends CreateHaystackBaseFragment implem
     }
 
     //Actions
-    private void fetchAllUsers(){
-        ApiClient.getInstance().fetchAllUsers(Needle.userModel.getUserId(), new Callback<UsersResult>() {
+    private void getFriends(){
+        ApiClient.getInstance().getFriends(Needle.userModel.getUserId(), new Callback<FriendsResult>() {
             @Override
-            public void onResponse(Call<UsersResult> call, Response<UsersResult> response) {
-                UsersResult result = response.body();
-                usersList = result.getUsers();
-                updateUserList();
+            public void onResponse(Call<FriendsResult> call, Response<FriendsResult> response) {
+                FriendsResult result = response.body();
+                friends = result.getFriends();
+                updateFriendsList();
             }
 
             @Override
-            public void onFailure(Call<UsersResult> call, Throwable t) {
+            public void onFailure(Call<FriendsResult> call, Throwable t) {
                 Log.d(TAG, "Retrieving users failed ! Error : " + t.getMessage());
 
-                usersList = new ArrayList<UserVO>();
-                updateUserList();
+                friends = new ArrayList<UserVO>();
+                updateFriendsList();
             }
         });
     }
 
-    private void updateUserList(){
-        mAdapter = new UserCardAdapter(getActivity(), usersList, UserCardAdapter.Type.SINGLE_SELECT);
+    private void updateFriendsList(){
+        mAdapter = new UserCardAdapter(getActivity(), friends, UserCardAdapter.Type.SINGLE_SELECT);
         mRecyclerView.setAdapter(mAdapter);
 
         mAdapter.notifyDataSetChanged();

@@ -1,11 +1,15 @@
 package com.nemator.needle.activities;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -52,12 +56,12 @@ public class UserProfileActivity extends AppCompatActivity implements IUserProfi
     private ArrayList<UserVO> friends;
     private FriendshipVO friendship;
     private Boolean isMe = false;
+    private boolean userLoaded = false;
     private boolean friendsLoaded = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Boolean isUserLoading = false;
 
         Bundle bundle = getIntent().getExtras();
         if(bundle != null){
@@ -68,18 +72,19 @@ public class UserProfileActivity extends AppCompatActivity implements IUserProfi
                 isMe = user.getId() == Needle.userModel.getUserId();
 
                 if(friendship == null){
-                    isUserLoading = true;
                     ApiClient.getInstance().getFriendship(user.getId(), friendshipResultCallback);
                 }
             }else if(bundle.containsKey(AppConstants.TAG_USER_ID)){
-                //Load user details
-                isUserLoading = true;
-
                 int userId = bundle.getInt(AppConstants.TAG_USER_ID);
-                isMe = Needle.userModel.getUserId() == userId;
+                isMe = false;
+                user = new UserVO().setId(userId);
 
                 ApiClient.getInstance().getFriendship(userId, friendshipResultCallback);
             }
+        }else{
+            isMe = true;
+            userLoaded = true;
+            user = Needle.userModel.getUser();
         }
 
         setContentView(R.layout.activity_user_profile);
@@ -98,18 +103,15 @@ public class UserProfileActivity extends AppCompatActivity implements IUserProfi
         editAvatar = (ImageButton) findViewById(R.id.edit_avatar_button);
         editCover = (ImageButton) findViewById(R.id.edit_cover_button);
 
-        if(!isUserLoading){
-            if(user == null){
-                user = Needle.userModel.getUser();
-                isMe = true;
-            }
-
+        if(userLoaded && friendsLoaded){
             if(friendsLoaded){
-                initUser();
             }else{
                 ApiClient.getInstance().getFriends(user.getId(), friendsResultCallback);
             }
         }
+
+        //Notifications
+        initNotificationListener();
     }
 
     private Callback<FriendshipResult> friendshipResultCallback = new Callback<FriendshipResult>() {
@@ -117,8 +119,11 @@ public class UserProfileActivity extends AppCompatActivity implements IUserProfi
         public void onResponse(Call<FriendshipResult> call, Response<FriendshipResult> response) {
             FriendshipResult result = response.body();
             if(result.getSuccessCode() == 1){
-                if(user == null) user = result.getFriend();
                 friendship = result.getFriendship();
+                if(user.getId() == result.getFriend().getId()){
+                    user = result.getFriend();
+                }
+                userLoaded = true;
 
                 if(friendsLoaded){
                     initUser();
@@ -193,8 +198,7 @@ public class UserProfileActivity extends AppCompatActivity implements IUserProfi
             Log.e(TAG, "Can't load cover pic");
         }
 
-        Boolean isFriend = friendship != null ? friendship.getStatus() == AppConstants.FRIEND : false;
-        UserProfileAdapter adapter = new UserProfileAdapter(this, user, friends, isMe, isFriend, this);
+        UserProfileAdapter adapter = new UserProfileAdapter(this, user, friends, isMe, friendship, this);
         listView.setAdapter(adapter);
 
         //Edit buttons
@@ -215,35 +219,17 @@ public class UserProfileActivity extends AppCompatActivity implements IUserProfi
         }else{
             editAvatar.setVisibility(View.INVISIBLE);
             editCover.setVisibility(View.INVISIBLE);
-
-
         }
     }
 
-    private void refreshUser() {
-        if(isMe){
-            ApiClient.getInstance().getUserById(Needle.userModel.getUserId(), user.getId(), new Callback<UserResult>() {
-                @Override
-                public void onResponse(Call<UserResult> call, Response<UserResult> response) {
-                    UserResult result = response.body();
-                    if (result.getSuccessCode() == 1) {
-                        user = result.getUser();
-                        initUser();
-                    } else {
-                        Log.e(TAG, "Error getting user : " + result.getMessage());
-                    }
-                }
+    private void refreshFriend() {
+        userLoaded = false;
+        friendsLoaded = false;
 
-                @Override
-                public void onFailure(Call<UserResult> call, Throwable t) {
-                    Log.e(TAG, "Error getting user : " + t.getMessage());
-                }
-            });
-        }else{
-
-        }
+        ApiClient.getInstance().getFriendship(user.getId(), friendshipResultCallback);
     }
 
+    //Menu
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         int menuRes = isMe ? R.menu.menu_user_profile : R.menu.menu_friend_profile;
@@ -274,6 +260,21 @@ public class UserProfileActivity extends AppCompatActivity implements IUserProfi
     }
 
     @Override
+    public void acceptFriendRequest(UserVO user) {
+        ApiClient.getInstance().acceptFriendRequest(user.getId(), acceptfriendRequestCallback);
+    }
+
+    @Override
+    public void cancelFriendRequest(UserVO user) {
+        ApiClient.getInstance().cancelFriendRequest(user.getId(), cancelFriendRequestCallback);
+    }
+
+    @Override
+    public void rejectFriendRequest(UserVO user) {
+        ApiClient.getInstance().rejectFriendRequest(user.getId(), rejectfriendRequestCallback);
+    }
+
+    @Override
     public void addUserToGroup(UserVO user) {
         //TODO: implement this
     }
@@ -285,16 +286,40 @@ public class UserProfileActivity extends AppCompatActivity implements IUserProfi
         startActivity(intent);
     }
 
-    //Callbacks
-    private Callback<FriendshipResult> unfriendCallback = new Callback<FriendshipResult>() {
+    //Notifications
+    private void initNotificationListener(){
+        //TODO : stop listening ?
+        LocalBroadcastManager localBroadcastManager = LocalBroadcastManager.getInstance(this);
+
+        localBroadcastManager.registerReceiver(notificationReceiver,
+                new IntentFilter(AppConstants.TAG_NOTIFICATION));
+    }
+
+    private BroadcastReceiver notificationReceiver = new BroadcastReceiver() {
         @Override
-        public void onResponse(Call<FriendshipResult> call, Response<FriendshipResult> response) {
-            FriendshipResult result = response.body();
+        public void onReceive(Context context, Intent intent) {
+            Bundle extras = intent.getExtras();
+            int type = extras.getInt(AppConstants.TAG_TYPE);
+
+            if(type == AppConstants.FRIEND_REQUEST || type == AppConstants.ACCEPTED_FRIEND_REQUEST ||
+                    type == AppConstants.REJECTED_FRIEND_REQUEST){
+                UserVO notificationUser = new UserVO().setId(extras.getInt(AppConstants.TAG_ID));
+                if(notificationUser.getId() == user.getId()){
+                    refreshFriend();
+                }
+            }
+        }
+    };
+
+    //Callbacks
+    private Callback<TaskResult> unfriendCallback = new Callback<TaskResult>() {
+        @Override
+        public void onResponse(Call<TaskResult> call, Response<TaskResult> response) {
+            TaskResult result = response.body();
 
             if(result.getSuccessCode() == 1){
-                FriendshipVO friendship = result.getFriendship();
-                UserProfileActivity.this.friendship = friendship;
-                initUser();
+                friendship = null;
+                ApiClient.getInstance().getFriends(user.getId(), friendsResultCallback);
 
                 Toast.makeText(UserProfileActivity.this, R.string.unfriend_successful, Toast.LENGTH_SHORT).show();
             }else{
@@ -303,7 +328,7 @@ public class UserProfileActivity extends AppCompatActivity implements IUserProfi
         }
 
         @Override
-        public void onFailure(Call<FriendshipResult> call, Throwable t) {
+        public void onFailure(Call<TaskResult> call, Throwable t) {
             Log.e(TAG, "Could not unfriend user. Error : " + t.getMessage());
         }
     };
@@ -329,6 +354,72 @@ public class UserProfileActivity extends AppCompatActivity implements IUserProfi
         @Override
         public void onFailure(Call<FriendshipResult> call, Throwable t) {
             Log.e(TAG, "Could not send friend request. Error : " + t.getMessage());
+        }
+    };
+
+    private Callback<FriendshipResult> acceptfriendRequestCallback = new Callback<FriendshipResult>() {
+        @Override
+        public void onResponse(Call<FriendshipResult> call, Response<FriendshipResult> response) {
+            FriendshipResult result = response.body();
+
+            if(result.getSuccessCode() == 1){
+                Log.e(TAG, "Friend Request Accepted");
+
+                UserProfileActivity.this.friendship.setStatus(AppConstants.FRIEND);
+                ApiClient.getInstance().getFriends(user.getId(), friendsResultCallback);
+
+                Toast.makeText(UserProfileActivity.this, R.string.friend_request_accepted, Toast.LENGTH_SHORT).show();
+            }else{
+                Log.e(TAG, "Could not accept friend request. Error : " + result.getMessage());
+            }
+        }
+
+        @Override
+        public void onFailure(Call<FriendshipResult> call, Throwable t) {
+            Log.e(TAG, "Could not send friend request. Error : " + t.getMessage());
+        }
+    };
+
+    private Callback<FriendshipResult> rejectfriendRequestCallback = new Callback<FriendshipResult>() {
+        @Override
+        public void onResponse(Call<FriendshipResult> call, Response<FriendshipResult> response) {
+            FriendshipResult result = response.body();
+
+            if(result.getSuccessCode() == 1){
+                Log.e(TAG, "Friend Request Rejected");
+
+                friendship = null;
+                initUser();
+
+                Toast.makeText(UserProfileActivity.this, R.string.friend_request_rejected, Toast.LENGTH_SHORT).show();
+            }else{
+                Log.e(TAG, "Could not reject friend request. Error : " + result.getMessage());
+            }
+        }
+
+        @Override
+        public void onFailure(Call<FriendshipResult> call, Throwable t) {
+            Log.e(TAG, "Could not reject friend request. Error : " + t.getMessage());
+        }
+    };
+
+    private Callback<TaskResult> cancelFriendRequestCallback = new Callback<TaskResult>() {
+        @Override
+        public void onResponse(Call<TaskResult> call, Response<TaskResult> response) {
+            TaskResult result = response.body();
+
+            if(result.getSuccessCode() == 1){
+                Toast.makeText(UserProfileActivity.this, R.string.friend_request_cancelled, Toast.LENGTH_SHORT).show();
+                friendship = null;
+                initUser();
+            }else{
+                Log.e(TAG, "Could not cancel friend request. Error : " + result.getMessage());
+            }
+        }
+
+        @Override
+        public void onFailure(Call<TaskResult> call, Throwable t) {
+            Log.e(TAG, "Could not cancel friend request. Error : " + t.getMessage());
         }
     };
 }

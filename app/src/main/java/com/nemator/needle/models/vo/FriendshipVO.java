@@ -20,6 +20,9 @@ public class FriendshipVO implements Serializable, Parcelable {
     @SerializedName("acceptDate")
     private String acceptDate;
 
+    @SerializedName("accept")
+    private boolean accept;
+
     public FriendshipVO(){
 
     }
@@ -34,6 +37,7 @@ public class FriendshipVO implements Serializable, Parcelable {
         this.friendId = in.readInt();
         this.status = in.readInt();
         this.acceptDate = in.readString();
+        this.accept = (Boolean) in.readValue(Boolean.class.getClassLoader());
     }
 
     public FriendshipVO(int userId, int friendId, int status, String acceptDate){
@@ -41,6 +45,14 @@ public class FriendshipVO implements Serializable, Parcelable {
         this.friendId = friendId;
         this.status = status;
         this.acceptDate = acceptDate;
+    }
+
+    public FriendshipVO(int userId, int friendId, int status, String acceptDate, boolean accept){
+        this.userId = userId;
+        this.friendId = friendId;
+        this.status = status;
+        this.acceptDate = acceptDate;
+        this.accept = accept;
     }
 
     public static final Creator<FriendshipVO> CREATOR = new Creator<FriendshipVO>() {
@@ -55,6 +67,12 @@ public class FriendshipVO implements Serializable, Parcelable {
         }
     };
 
+    public FriendshipVO(int userId, int friendId, boolean accept) {
+        this.userId = userId;
+        this.friendId = friendId;
+        this.accept = accept;
+    }
+
     @Override
     public int describeContents() {
         return 0;
@@ -66,6 +84,7 @@ public class FriendshipVO implements Serializable, Parcelable {
      dest.writeInt(friendId);
      dest.writeInt(status);
      dest.writeString(acceptDate);
+     dest.writeValue(accept);
     }
 
     //Getters/Setters
@@ -99,5 +118,13 @@ public class FriendshipVO implements Serializable, Parcelable {
 
     public void setAcceptDate(String acceptDate) {
         this.acceptDate = acceptDate;
+    }
+
+    public boolean isAccept() {
+        return accept;
+    }
+
+    public void setAccept(boolean accept) {
+        this.accept = accept;
     }
 }

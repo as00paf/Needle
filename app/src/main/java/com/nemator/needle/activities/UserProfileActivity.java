@@ -70,6 +70,10 @@ public class UserProfileActivity extends AppCompatActivity implements IUserProfi
                 friendship = bundle.getParcelable(AppConstants.TAG_FRIENDSHIP);
 
                 isMe = user.getId() == Needle.userModel.getUserId();
+                if(isMe){
+                    user = Needle.userModel.getUser();
+                    userLoaded = true;
+                }
 
                 if(friendship == null){
                     ApiClient.getInstance().getFriendship(user.getId(), friendshipResultCallback);
@@ -103,8 +107,9 @@ public class UserProfileActivity extends AppCompatActivity implements IUserProfi
         editAvatar = (ImageButton) findViewById(R.id.edit_avatar_button);
         editCover = (ImageButton) findViewById(R.id.edit_cover_button);
 
-        if(userLoaded && friendsLoaded){
+        if(userLoaded){
             if(friendsLoaded){
+                initUser();
             }else{
                 ApiClient.getInstance().getFriends(user.getId(), friendsResultCallback);
             }
@@ -120,7 +125,7 @@ public class UserProfileActivity extends AppCompatActivity implements IUserProfi
             FriendshipResult result = response.body();
             if(result.getSuccessCode() == 1){
                 friendship = result.getFriendship();
-                if(user.getId() == result.getFriend().getId()){
+                if(!userLoaded && user.getId() == result.getFriend().getId()){
                     user = result.getFriend();
                 }
                 userLoaded = true;

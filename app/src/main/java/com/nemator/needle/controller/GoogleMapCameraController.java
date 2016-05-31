@@ -17,6 +17,7 @@ import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.nemator.needle.Needle;
+import com.nemator.needle.views.ICustomMarker;
 import com.nemator.needle.views.UserMarker;
 
 /**
@@ -183,10 +184,10 @@ public class GoogleMapCameraController {
         this.listener = listener;
     }
 
-    public void focusOnMarkers(UserMarker... markers) {
+    public void focusOnMarkers(ICustomMarker... markers) {
         LatLngBounds.Builder builder = new LatLngBounds.Builder();
 
-        for (UserMarker marker : markers) {
+        for (ICustomMarker marker : markers) {
             builder.include(marker.getMarker().getPosition());
         }
 

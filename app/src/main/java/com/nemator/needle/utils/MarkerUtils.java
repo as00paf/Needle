@@ -19,7 +19,9 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.nemator.needle.R;
+import com.nemator.needle.models.vo.PinVO;
 import com.nemator.needle.models.vo.UserVO;
+import com.nemator.needle.views.PinMarker;
 import com.nemator.needle.views.UserMarker;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Transformation;
@@ -36,7 +38,6 @@ public class MarkerUtils {
     public static UserMarker createUserMarker(Context context, GoogleMap map, UserVO user, LatLng location, String snippet, int strokeColor, int shadeColor){
         //Create map marker with options
         MarkerOptions myMarkerOptions = new MarkerOptions().position(location);
-        myMarkerOptions.flat(true);
         myMarkerOptions.anchor(1.0f, 0.6f);
 
         //Circle
@@ -67,6 +68,77 @@ public class MarkerUtils {
                 .into(userMarker);
 
         return userMarker;
+    }
+
+    public static PinMarker createPinMarker(Context context, GoogleMap map, PinVO pin) {
+        //Create map marker with options
+        MarkerOptions myMarkerOptions = new MarkerOptions().position(pin.getLatLng());
+        myMarkerOptions.anchor(1.0f, 0.6f);
+
+        //Set Background
+        Bitmap pinBitmap = BitmapUtils.drawableToBitmap(context.getResources().getDrawable(R.drawable.ic_place_black_24dp));//TODO : use 48dp
+        Bitmap scaledBitmap = BitmapUtils.scaleBitmap(pinBitmap, pinBitmap.getWidth() * 2, true);
+
+        Marker marker = map.addMarker(myMarkerOptions);
+        marker.setIcon(BitmapDescriptorFactory.fromBitmap(scaledBitmap));
+        marker.setSnippet(pin.getText());
+
+        //Create marker target
+        final PinMarker pinMarker = new PinMarker(pin, marker);
+        final MarkerImageTransform transform = new MarkerImageTransform(context);
+
+        //Load and transform picture into marker
+        Picasso.with(context).load(R.drawable.ic_place_black_48dp)
+                .placeholder(R.drawable.ic_place_black_48dp)
+                .transform(transform)
+                .into(pinMarker);
+
+        return pinMarker;
+    }
+
+    public static void animatePinMarker(GoogleMap map, final Marker marker, final LatLng toPosition, final boolean hideMarker) {
+        final Handler handler = new Handler();
+        final long start = SystemClock.uptimeMillis();
+        Projection proj = map.getProjection();
+        Point startPoint = proj.toScreenLocation(marker.getPosition());
+        final LatLng startLatLng = proj.fromScreenLocation(startPoint);
+        final long duration = 500;
+        final Interpolator interpolator = new LinearInterpolator();
+
+        Location startLocation = new Location("");
+        startLocation.setLatitude(startLatLng.latitude);
+        startLocation.setLongitude(startLatLng.longitude);
+
+        Location endLocation = new Location("");
+        endLocation.setLatitude(toPosition.latitude);
+        endLocation.setLongitude(toPosition.longitude);
+
+        float distance = startLocation.distanceTo(endLocation);
+
+        if(distance > 1){
+            handler.post(new Runnable() {
+                @Override
+                public void run() {
+                    long elapsed = SystemClock.uptimeMillis() - start;
+                    float t = interpolator.getInterpolation((float) elapsed / duration);
+                    double lng = t * toPosition.longitude + (1 - t) * startLatLng.longitude;
+                    double lat = t * toPosition.latitude + (1 - t) * startLatLng.latitude;
+                    LatLng currentPosition = new LatLng(lat, lng);
+                    marker.setPosition(currentPosition);
+
+                    if (t < 1.0) {
+                        // Post again 16ms later.
+                        handler.postDelayed(this, 16);
+                    } else {
+                        if (hideMarker) {
+                            marker.setVisible(false);
+                        } else {
+                            marker.setVisible(true);
+                        }
+                    }
+                }
+            });
+        }
     }
 
     private static class MarkerImageTransform implements Transformation {

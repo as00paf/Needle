@@ -36,7 +36,7 @@ public class NeedleActivity extends AppCompatActivity implements View.OnClickLis
     private Menu menu;
 
     //Data
-    private NeedleVO locationSharing;
+    private NeedleVO needle;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,7 +44,7 @@ public class NeedleActivity extends AppCompatActivity implements View.OnClickLis
         if(savedInstanceState != null){
             updateValuesFromBundle(savedInstanceState);
         }else{
-            locationSharing = (NeedleVO) getIntent().getExtras().get(AppConstants.TAG_LOCATION_SHARING);
+            needle = (NeedleVO) getIntent().getExtras().get(AppConstants.TAG_LOCATION_SHARING);
         }
 
         setContentView(R.layout.activity_needle);
@@ -53,8 +53,8 @@ public class NeedleActivity extends AppCompatActivity implements View.OnClickLis
             Needle.userModel.init(this);
         }
         toolbar = (Toolbar) findViewById(R.id.toolbar);
-        String name = locationSharing.getReceiver().getId() != Needle.userModel.getUserId() ?
-                locationSharing.getReceiver().getReadableUserName() : locationSharing.getSender().getReadableUserName();
+        String name = needle.getReceiver().getId() != Needle.userModel.getUserId() ?
+                needle.getReceiver().getReadableUserName() : needle.getSender().getReadableUserName();
         toolbar.setTitle(name);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -83,13 +83,13 @@ public class NeedleActivity extends AppCompatActivity implements View.OnClickLis
 
     @Override
     public void onSaveInstanceState(Bundle savedInstanceState) {
-        savedInstanceState.putParcelable(AppConstants.TAG_LOCATION_SHARING, locationSharing);
+        savedInstanceState.putParcelable(AppConstants.TAG_LOCATION_SHARING, needle);
     }
 
     private void updateValuesFromBundle(Bundle savedInstanceState) {
         if (savedInstanceState != null) {
             if (savedInstanceState.keySet().contains(AppConstants.TAG_LOCATION_SHARING)) {
-                locationSharing = savedInstanceState.getParcelable(AppConstants.TAG_LOCATION_SHARING);
+                needle = savedInstanceState.getParcelable(AppConstants.TAG_LOCATION_SHARING);
             }
         }
     }
@@ -99,8 +99,8 @@ public class NeedleActivity extends AppCompatActivity implements View.OnClickLis
         getMenuInflater().inflate(R.menu.menu_needle, menu);
         this.menu = menu;
 
-        if(locationSharing.getReceiver().getId() == Needle.userModel.getUserId()){
-            if(locationSharing.isSharedBack()){
+        if(needle.getReceiver().getId() == Needle.userModel.getUserId()){
+            if(needle.isSharedBack()){
                 menu.findItem(R.id.share_location_back).setIcon(R.drawable.ic_location_disabled_white_24dp);
             }else{
                 menu.findItem(R.id.share_location_back).setIcon(R.drawable.ic_my_location_white_24dp);
@@ -125,7 +125,7 @@ public class NeedleActivity extends AppCompatActivity implements View.OnClickLis
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()){
             case R.id.share_location_back:
-                if(locationSharing.isSharedBack()){
+                if(needle.isSharedBack()){
                     cancelShareBack();
                 }else{
                     shareLocationBack();
@@ -159,7 +159,7 @@ public class NeedleActivity extends AppCompatActivity implements View.OnClickLis
     }
 
     public void shareLocationBack(){
-        NeedleController.shareLocationBack(locationSharing, this);
+        NeedleController.shareLocationBack(needle, this);
     }
 
     @Override
@@ -168,7 +168,7 @@ public class NeedleActivity extends AppCompatActivity implements View.OnClickLis
         Log.d(TAG, "Location shared back ? " + locationSharing.isSharedBack());
         Toast.makeText(NeedleActivity.this, getString(R.string.location_shared_back), Toast.LENGTH_SHORT).show();
 
-        this.locationSharing = locationSharing;
+        this.needle = locationSharing;
         menu.findItem(R.id.share_location_back).setIcon(R.drawable.ic_location_disabled_white_24dp);
     }
 
@@ -178,7 +178,7 @@ public class NeedleActivity extends AppCompatActivity implements View.OnClickLis
     }
 
     public void cancelShareBack(){
-        NeedleController.cancelShareBack(locationSharing, this);
+        NeedleController.cancelShareBack(needle, this);
     }
 
     @Override
@@ -186,7 +186,7 @@ public class NeedleActivity extends AppCompatActivity implements View.OnClickLis
         Log.d(TAG, "Location shared back ? " + locationSharing.isSharedBack());
         Toast.makeText(NeedleActivity.this, getString(R.string.location_shared_back), Toast.LENGTH_SHORT).show();
 
-        this.locationSharing = locationSharing;
+        this.needle = locationSharing;
         menu.findItem(R.id.share_location_back).setIcon(R.drawable.ic_my_location_white_24dp);
     }
 
@@ -196,7 +196,7 @@ public class NeedleActivity extends AppCompatActivity implements View.OnClickLis
     }
 
     public void cancelLocationSharing(){
-        NeedleController.cancelNeedle(locationSharing, this);
+        NeedleController.cancelNeedle(needle, this);
     }
 
     @Override
@@ -222,12 +222,12 @@ public class NeedleActivity extends AppCompatActivity implements View.OnClickLis
     }
 
     //Getters/Setters
-    public NeedleVO getLocationSharing() {
-        return locationSharing;
+    public NeedleVO getNeedle() {
+        return needle;
     }
 
-    public void setLocationSharing(NeedleVO locationSharing) {
-        this.locationSharing = locationSharing;
+    public void setNeedle(NeedleVO needle) {
+        this.needle = needle;
     }
 
     @Override

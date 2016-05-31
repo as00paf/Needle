@@ -11,14 +11,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 
-import com.nemator.needle.Needle;
 import com.nemator.needle.R;
 import com.nemator.needle.activities.HaystackActivity;
 import com.nemator.needle.adapter.PinCardAdapter;
-import com.nemator.needle.adapter.UserCardAdapter;
 import com.nemator.needle.api.ApiClient;
 import com.nemator.needle.api.result.PinsResult;
-import com.nemator.needle.api.result.UsersResult;
 import com.nemator.needle.models.vo.HaystackVO;
 import com.nemator.needle.models.vo.PinVO;
 
@@ -91,7 +88,8 @@ public class HaystackPinsTabFragment extends Fragment{
             Log.d(TAG, result.getPins().size() + " pins fetched");
 
             pins = result.getPins();
-            updateUserList();
+            ((HaystackActivity) getActivity()).getHaystack().setPins(pins);
+            updatePinList();
         }
 
         @Override
@@ -100,7 +98,7 @@ public class HaystackPinsTabFragment extends Fragment{
         }
     };
 
-    private void updateUserList(){
+    private void updatePinList(){
         pinAdapter = new PinCardAdapter(pins, getActivity(), cardListener);
         listView.setAdapter(pinAdapter);
 
@@ -110,6 +108,6 @@ public class HaystackPinsTabFragment extends Fragment{
 
     public void setHaystack(HaystackVO haystack) {
         this.haystack = haystack;
-        updateUserList();
+        updatePinList();
     }
 }

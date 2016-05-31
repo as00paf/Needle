@@ -1,8 +1,12 @@
 package com.nemator.needle.utils;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
 import android.text.format.DateUtils;
 import android.util.Base64;
@@ -117,5 +121,31 @@ public class AppUtils {
         }
 
         return System.currentTimeMillis() < strDate.getTime();
+    }
+
+    //Move to app utils
+    public static void buildAlertMessageNoGps(final Context context, @Nullable final AlertGPSNegativeButtonListener negativeButtonListener) {
+        final AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        builder.setMessage("Your GPS seems to be disabled, do you want to enable it?")
+                .setCancelable(false)
+                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    public void onClick(@SuppressWarnings("unused") final DialogInterface dialog, @SuppressWarnings("unused") final int id) {
+                        context.startActivity(new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS));
+                    }
+                })
+                .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                    public void onClick(final DialogInterface dialog, @SuppressWarnings("unused") final int id) {
+                        dialog.cancel();
+                        if(negativeButtonListener != null){
+                            negativeButtonListener.onClickNo();
+                        }
+                    }
+                });
+        final AlertDialog alert = builder.create();
+        alert.show();
+    }
+
+    public static interface AlertGPSNegativeButtonListener{
+        void onClickNo();
     }
 }

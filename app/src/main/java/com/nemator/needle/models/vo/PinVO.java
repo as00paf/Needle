@@ -142,4 +142,13 @@ public class PinVO implements Parcelable, Serializable {
     public void setAddedAt(String addedAt) {
         this.addedAt = addedAt;
     }
+
+    public void setLocation(LatLng location) {
+        this.latitude = location.latitude;
+        this.longitude = location.longitude;
+    }
+
+    public LatLng getLocation() {
+        return new LatLng(latitude, longitude);
+    }
 }

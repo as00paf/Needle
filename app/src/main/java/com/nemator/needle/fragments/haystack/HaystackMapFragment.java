@@ -1,43 +1,52 @@
 package com.nemator.needle.fragments.haystack;
 
 import android.Manifest;
+import android.app.AlarmManager;
 import android.app.AlertDialog;
+import android.app.PendingIntent;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.IntentFilter;
 import android.location.Location;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.MenuItem;
 import android.widget.Toast;
 
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.GooglePlayServicesUtil;
-import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.BitmapDescriptor;
-import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.Circle;
 import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
-import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polygon;
 import com.nemator.needle.Needle;
 import com.nemator.needle.R;
 import com.nemator.needle.activities.HaystackActivity;
+import com.nemator.needle.activities.NeedleActivity;
 import com.nemator.needle.api.ApiClient;
 import com.nemator.needle.api.result.TaskResult;
+import com.nemator.needle.api.result.UserResult;
 import com.nemator.needle.api.result.UsersResult;
 import com.nemator.needle.broadcastReceiver.LocationServiceBroadcastReceiver;
+import com.nemator.needle.controller.GoogleMapCameraControllerConfig;
+import com.nemator.needle.controller.GoogleMapController;
 import com.nemator.needle.data.PostLocationRequest;
 import com.nemator.needle.models.vo.HaystackVO;
+import com.nemator.needle.models.vo.PinVO;
 import com.nemator.needle.models.vo.UserVO;
 import com.nemator.needle.utils.AppConstants;
+import com.nemator.needle.utils.AppUtils;
 import com.nemator.needle.utils.GoogleMapDrawingUtils;
 import com.nemator.needle.utils.MarkerUtils;
 import com.nemator.needle.utils.PermissionManager;
+import com.nemator.needle.utils.SphericalUtil;
+import com.nemator.needle.views.ICustomMarker;
+import com.nemator.needle.views.PinMarker;
 import com.nemator.needle.views.UserMarker;
 
 import java.util.ArrayList;
@@ -65,7 +74,10 @@ public class HaystackMapFragment extends SupportMapFragment implements LocationS
 
     //Map data
     private HashMap<Integer, UserMarker> mMarkers;
+    private HashMap<Integer, PinMarker> pinMarkers;
     private HaystackVO haystack;
+    private GoogleMapController mapController;
+    private GoogleMapCameraControllerConfig config;
     private Boolean cameraUpdated = false;
 
     //Location Service
@@ -73,6 +85,10 @@ public class HaystackMapFragment extends SupportMapFragment implements LocationS
     private Boolean mPostingLocationUpdates = false;
     private Boolean mRequestingLocationUpdates = true;
     private Boolean isActivated = false;
+    private boolean followUser = false;
+    private boolean focusOnMarkers = false;
+    private PendingIntent standaloneTrackIntent;
+    private UserVO trackedUser;
 
     //Constructors
     public static HaystackMapFragment newInstance() {
@@ -90,12 +106,6 @@ public class HaystackMapFragment extends SupportMapFragment implements LocationS
         super.onCreate(savedInstanceState);
         if(savedInstanceState != null){
             updateValuesFromBundle(savedInstanceState);
-        }
-
-        //Map
-        if (GooglePlayServicesUtil.isGooglePlayServicesAvailable(getActivity()) != ConnectionResult.SUCCESS) {
-            Toast.makeText(getActivity(), "Google Play Services Unavailable", Toast.LENGTH_SHORT).show();
-            Log.e(TAG, "Google Play Services Unavailable");
         }
 
         //Location Service
@@ -164,12 +174,6 @@ public class HaystackMapFragment extends SupportMapFragment implements LocationS
     }
 
     @Override
-    public void onStop() {
-        super.onStop();
-        //stopLocationUpdates();
-    }
-
-    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
 
@@ -205,9 +209,15 @@ public class HaystackMapFragment extends SupportMapFragment implements LocationS
 
     //Map methods
     public void setUpMapIfNeeded() {
-        if (mMap == null) {
-            mMap = getMap();
-            mMap.getUiSettings().setMyLocationButtonEnabled(true);
+        if (mapController == null) {
+            config = new GoogleMapCameraControllerConfig().setMyLocationEnabled(false);
+            mapController = new GoogleMapController(getContext(), config, new GoogleMapController.GoogleMapCallback() {
+                @Override
+                public void onMapInitialized() {
+                    resumeOperations();
+                }
+            }, markerClickListener);
+            mapController.initMap(this);
         }else if(Needle.serviceController.isConnected()){
             resumeOperations();
         }
@@ -319,83 +329,101 @@ public class HaystackMapFragment extends SupportMapFragment implements LocationS
                 }
             }
         }
-    }
 
-    private void resumeOperations(){
-        if(mMap==null)
-            mMap = getMap();
-
-        //Show Bounds
-        if(haystack != null){
-            if(haystack.getIsCircle()){
-                if(haystackBoundsCircle == null){
-                    CircleOptions circleOptions = new CircleOptions()
-                            .center(haystack.getPositionLatLng())
-                            .radius(haystack.getZoneRadius())
-                            .fillColor(ContextCompat.getColor(getContext(), R.color.circleColor))
-                            .strokeColor(ContextCompat.getColor(getContext(), R.color.primary_dark))
-                            .strokeWidth(8);
-                    haystackBoundsCircle = mMap.addCircle(circleOptions);
-                }else{
-                    haystackBoundsCircle.setCenter(haystack.getPositionLatLng());
-                }
-            }else{
-                if(haystackBoundsPolygon == null){
-                    haystackBoundsPolygon = GoogleMapDrawingUtils.drawHaystackPolygon(getContext(), mMap, haystack);
-                }else{
-                    haystackBoundsPolygon =  GoogleMapDrawingUtils.updateHaystackPolygon(haystackBoundsPolygon, haystack);
-                }
-            }
-        }
-
-        //Add user's marker back
-        MarkerOptions markerOptions = new MarkerOptions();
-        if(userMarker == null){
-            userMarker = MarkerUtils.createUserMarker(getContext(), mMap, Needle.userModel.getUser(), mCurrentPosition, "Your Position");
-        }else{
-            userMarker.updateLocation(mMap, mCurrentPosition);
-        }
-
-        //Add other user's markers back
-        if(usersList!=null){
-            Log.i(TAG,"Markers to add : "+usersList.size());
-            Iterator<UserVO> iterator = usersList.iterator();
+        //Update Pins
+        ArrayList<PinVO> haystackPins = haystack.getPins();
+        if(haystackPins != null && haystackPins.size() > 0){
+            Iterator<PinVO> iterator = haystackPins.iterator();
             while(iterator.hasNext()){
-                UserVO user = iterator.next();
+                PinVO pin = iterator.next();
+                int id = pin.getId();
+                PinMarker pinMarker = MarkerUtils.createPinMarker(getContext(), mMap, pin);
 
-                int id = user.getId();
-                Double lat = user.getLocation().getLatitude();
-                Double lng = user.getLocation().getLongitude();
+                if(pinMarkers == null){
+                    pinMarkers = new HashMap<Integer, PinMarker>();
+                }
 
-                if(id != Needle.userModel.getUserId()){
-                    Marker marker;
-                    LatLng position = new LatLng(lat, lng);
+                if(pinMarkers.containsKey(id)){
+                    pinMarker = pinMarkers.get(id);
+                    if(pin.getLocation() != null && !pinMarker.getLocation().equals(pin.getLocation())){
+                        pinMarker.updateLocation(mMap, pin.getLocation());
 
-                    markerOptions = new MarkerOptions();
-                    markerOptions.position(position);
-                    BitmapDescriptor icon = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_VIOLET);
-                    markerOptions.icon(icon);
+                        pinMarker.setSnippet(pin.getText());
+                    }
+                }else{
+                    pinMarker = MarkerUtils.createPinMarker(getContext(), mMap, pin);
 
-                    marker = mMap.addMarker(markerOptions);
-                    marker.setPosition(position);
+                    Log.i(TAG,"Adding pinMarker with id : "+id+" to map.");
 
-                    Log.i(TAG,"Adding marker with id : "+id+" to map.");
+                    pinMarker.setTitle(pin.getText());
+                    pinMarker.showInfoWindow();
 
-                    marker.setTitle(id+"'s Position");
-                    marker.showInfoWindow();
+                    pinMarkers.put(id, pinMarker);
                 }
             }
         }
 
+        //Remove no longer active Pins
+        if(pinMarkers != null){
+            Iterator markerIterator = pinMarkers.keySet().iterator();
+            while(markerIterator.hasNext()) {
+                int markerId = (int) markerIterator.next();
+                PinMarker marker = (PinMarker) pinMarkers.get(markerId);
+
+                Boolean isActive = false;
+
+                if(haystackPins != null){
+                    Iterator<PinVO> iterator = haystackPins.iterator();
+                    while(iterator.hasNext()){
+                        PinVO pin = iterator.next();
+
+                        if(pin.getId() == markerId){
+                            isActive = true;
+                        }
+                    }
+
+                    if(!isActive){
+                        marker.remove();
+                        pinMarkers.remove(marker);
+                    }
+                }
+            }
+        }
+    }
+    private void resumeOperations(){
         updateMap();
         moveCamera();
-
-        retrieveLocations();
     }
 
     public void moveCamera(){
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(mCurrentPosition, 19.0f));
-        cameraUpdated = true;
+        if(usersList == null){
+            mapController.cameraController.focusOnMyPosition();
+        }else{
+            zoomOnMarkers(false);
+            cameraUpdated = true;
+        }
+    }
+
+    public void zoomOnMarkers(boolean focus) {
+        followUser = false;
+        focusOnMarkers = focus;
+
+        //Add pins markers
+        ArrayList<ICustomMarker> markers = pinMarkers == null ? new ArrayList<ICustomMarker>() :
+                                                    (ArrayList<ICustomMarker>) pinMarkers.clone();
+
+        //Add others marker
+        if(mMarkers != null && mMarkers.size() > 0){
+            Iterator<Integer> iterator = mMarkers.keySet().iterator();
+            while(iterator.hasNext()){
+                ICustomMarker marker = mMarkers.get(iterator.next());
+                markers.add(marker);
+            }
+        }
+
+        //TODO : add user marker ?
+
+        mapController.cameraController.focusOnMarkers((ICustomMarker[]) markers.toArray());
     }
 
     //Actions
@@ -586,6 +614,20 @@ public class HaystackMapFragment extends SupportMapFragment implements LocationS
             shareLocation();
         }
     }
+
+    private GoogleMap.OnMarkerClickListener markerClickListener = new GoogleMap.OnMarkerClickListener() {
+        @Override
+        public boolean onMarkerClick(Marker marker) {
+            if(!marker.equals(userMarker.getMarker())){
+                mapController.cameraController.focus(SphericalUtil.computeOffset(marker.getPosition(), 300, 180), false);
+                marker.showInfoWindow();
+            }else{
+                mapController.cameraController.focus(marker.getPosition(), false);
+            }
+
+            return false;
+        }
+    };
 
     //Getters/Setters
     public Boolean isPostingLocationUpdates() {

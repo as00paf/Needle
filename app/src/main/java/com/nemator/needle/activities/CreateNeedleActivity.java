@@ -196,7 +196,7 @@ public class CreateNeedleActivity extends AppCompatActivity implements NeedleCon
 
         //Launch Activity
                /* Intent locationSharingIntent = new Intent(CreateNeedleActivity.this, NeedleActivity.class);
-                locationSharingIntent.putExtra(AppConstants.TAG_LOCATION_SHARING, (Parcelable) result.getLocationSharing());
+                locationSharingIntent.putExtra(AppConstants.TAG_LOCATION_SHARING, (Parcelable) result.getNeedle());
                 startActivity(locationSharingIntent);*/
 
         finish();

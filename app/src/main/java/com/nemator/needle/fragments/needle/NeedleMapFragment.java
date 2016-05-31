@@ -16,10 +16,7 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageButton;
-import android.widget.Toast;
 
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
@@ -61,7 +58,7 @@ public class NeedleMapFragment extends SupportMapFragment
     private GoogleMapCameraControllerConfig config;
 
     //Map data
-    private NeedleVO locationSharing;
+    private NeedleVO needle;
     private Boolean cameraUpdated = false;
 
     //Location Service
@@ -88,15 +85,10 @@ public class NeedleMapFragment extends SupportMapFragment
         if(savedInstanceState != null){
             updateValuesFromBundle(savedInstanceState);
         }else{
-            locationSharing = (NeedleVO)  getActivity().getIntent().getExtras().get(AppConstants.TAG_LOCATION_SHARING);
+            needle = (NeedleVO)  getActivity().getIntent().getExtras().get(AppConstants.TAG_LOCATION_SHARING);
         }
 
-        //Map
-        if (GooglePlayServicesUtil.isGooglePlayServicesAvailable(getActivity()) != ConnectionResult.SUCCESS) {
-            Toast.makeText(getActivity(), "Google Play Services Unavailable", Toast.LENGTH_SHORT).show();
-            Log.e(TAG, "Google Play Services Unavailable");
-        }
-
+        //Broadcast Receiver
         locationServiceBroadcastReceiver = new LocationServiceBroadcastReceiver(this);
 
         //Action Bar
@@ -116,6 +108,8 @@ public class NeedleMapFragment extends SupportMapFragment
                 myPosition = new LatLng(lat, lng);
             }
         }
+
+        needle = ((NeedleActivity) getActivity()).getNeedle();;
     }
 
     @Override
@@ -133,7 +127,7 @@ public class NeedleMapFragment extends SupportMapFragment
     @Override
     public void onResume() {
         //Broadcast Receiver
-        locationSharing = ((NeedleActivity) getActivity()).getLocationSharing();
+        needle = ((NeedleActivity) getActivity()).getNeedle();
         getActivity().registerReceiver(locationServiceBroadcastReceiver, new IntentFilter(AppConstants.LOCATION_UPDATED));
 
         super.onResume();
@@ -222,8 +216,8 @@ public class NeedleMapFragment extends SupportMapFragment
         if(mReceivedPosition != null){
 
             if(otherUsersMarker == null){
-                UserVO user = Needle.userModel.getUserId() == locationSharing.getSender().getId() ?
-                        locationSharing.getReceiver() : locationSharing.getSender();
+                UserVO user = Needle.userModel.getUserId() == needle.getSender().getId() ?
+                        needle.getReceiver() : needle.getSender();
                 otherUsersMarker = mapController.createUserMarker(getContext(), user, mReceivedPosition, user.getReadableUserName() + "'s Position",
                         ContextCompat.getColor(getContext(), R.color.primary_dark),
                         ContextCompat.getColor(getContext(), R.color.circleColor));
@@ -315,8 +309,8 @@ public class NeedleMapFragment extends SupportMapFragment
         if(mReceivedPosition == null){
             mapController.cameraController.focusOnMyPosition();
 
-            Boolean isSender = Needle.userModel.getUserId() == locationSharing.getSender().getId();
-            if(isSender && !locationSharing.isSharedBack()){
+            Boolean isSender = Needle.userModel.getUserId() == needle.getSender().getId();
+            if(isSender && !needle.isSharedBack()){
                 cameraUpdated = true;
             }
         }else{
@@ -340,10 +334,10 @@ public class NeedleMapFragment extends SupportMapFragment
 
     //Actions
     private void trackUser(){
-        if(Needle.userModel.getUserId() == locationSharing.getReceiver().getId()){
-            ApiClient.getInstance().retrieveSenderLocation(locationSharing.getSender().getId(), locationSharing, userLocationRetrievedCallback);
-        }else if(locationSharing.isSharedBack()){
-            ApiClient.getInstance().retrieveReceiverLocation(locationSharing.getReceiver().getId(), locationSharing, userLocationRetrievedCallback);
+        if(Needle.userModel.getUserId() == needle.getReceiver().getId()){
+            ApiClient.getInstance().retrieveSenderLocation(needle.getSender().getId(), needle, userLocationRetrievedCallback);
+        }else if(needle.isSharedBack()){
+            ApiClient.getInstance().retrieveReceiverLocation(needle.getReceiver().getId(), needle, userLocationRetrievedCallback);
         }else{
             Log.e(TAG, "Location is not shared back. Will only be showing your location");
         }
@@ -360,7 +354,7 @@ public class NeedleMapFragment extends SupportMapFragment
                 mRequestingLocationUpdates = false;
 
                 int titleRes, msgRes;
-                if(AppUtils.isDateAfterNow(locationSharing.getTimeLimit(), "yyyy-MM-dd hh:mm")){
+                if(AppUtils.isDateAfterNow(needle.getTimeLimit(), "yyyy-MM-dd hh:mm")){
                     titleRes = R.string.needle_expired;
                     msgRes = R.string.needle_expired_msg;
                 }else{
@@ -369,10 +363,10 @@ public class NeedleMapFragment extends SupportMapFragment
                 }
 
                 UserVO otherUser;
-                if(Needle.userModel.getUserId() == locationSharing.getSender().getId()){
-                    otherUser = locationSharing.getReceiver();
+                if(Needle.userModel.getUserId() == needle.getSender().getId()){
+                    otherUser = needle.getReceiver();
                 }else{
-                    otherUser = locationSharing.getSender();
+                    otherUser = needle.getSender();
                 }
 
                 new AlertDialog.Builder(getActivity())

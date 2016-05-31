@@ -364,11 +364,15 @@ public class HaystackActivity extends AppCompatActivity implements AddPinDialogF
             PinResult result = response.body();
 
             if(result.getSuccessCode() == 1){
+                haystack.addPin(result.getPin());
+
                 mapFragment.updateMap();
             }else{
                 Toast.makeText(HaystackActivity.this, "Could not create pin", Toast.LENGTH_SHORT).show();//TODO : use strings
                 Log.e(TAG, "Error creating pin : " + result.getMessage());
             }
+
+            bottomSheet.peekSheet();
         }
 
         @Override

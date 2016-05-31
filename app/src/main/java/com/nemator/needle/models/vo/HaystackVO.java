@@ -55,6 +55,9 @@ public class HaystackVO implements Serializable, Parcelable {
 
     private ArrayList<UserVO> bannedUsers;
 
+    @SerializedName("pins")
+    private ArrayList<PinVO> pins;
+
     public HaystackVO(){
 
     }
@@ -274,6 +277,18 @@ public class HaystackVO implements Serializable, Parcelable {
 
     public void addUsers(ArrayList<UserVO> newUserList) {
         users.addAll(newUserList);
+    }
+
+    public ArrayList<PinVO> getPins(){
+        return pins;
+    }
+
+    public void addPin(PinVO pin) {
+        pins.add(pin);
+    }
+
+    public void setPins(ArrayList<PinVO> pins) {
+        this.pins = pins;
     }
 
     /*public static class Deserializer implements JsonDeserializer<LocationVO>

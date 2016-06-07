@@ -135,7 +135,7 @@ buildscript {
 }
 
 play {
-    track = 'alpha'
+    track = 'beta'
     jsonFile = file('keys.json')
 }
 

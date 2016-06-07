@@ -78,6 +78,11 @@ public class AppUtils {
         return result;
     }
 
+    /**
+     * Format Distance
+     * @param meters a float value distance to format in meters
+     * @return a String value with the smallest format possible
+     */
     public static String formatDistance(float meters) {
         if (meters < 1000) {
             return ((int) meters) + "m";

@@ -213,7 +213,8 @@ public class HaystackMapFragment extends SupportMapFragment implements LocationS
             config = new GoogleMapCameraControllerConfig().setMyLocationEnabled(false);
             mapController = new GoogleMapController(getContext(), config, new GoogleMapController.GoogleMapCallback() {
                 @Override
-                public void onMapInitialized() {
+                public void onMapInitialized(GoogleMap mGoogleMap) {
+                    mMap = mGoogleMap;
                     resumeOperations();
                 }
             }, markerClickListener);
@@ -225,6 +226,7 @@ public class HaystackMapFragment extends SupportMapFragment implements LocationS
 
     public void updateMap() {
         //Show Bounds
+        //TODO : do this in mapController
         if(haystack != null){
             if(haystack.getIsCircle()){
                 if(haystackBoundsCircle == null){
@@ -422,8 +424,11 @@ public class HaystackMapFragment extends SupportMapFragment implements LocationS
         }
 
         //TODO : add user marker ?
-
-        mapController.cameraController.focusOnMarkers((ICustomMarker[]) markers.toArray());
+        try{//TODO : wtf
+            mapController.cameraController.focusOnMarkers((ICustomMarker[]) markers.toArray());
+        }catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
     //Actions

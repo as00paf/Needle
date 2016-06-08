@@ -101,15 +101,15 @@ public class CreateHaystackActivity extends AppCompatActivity implements ImageUp
                 //FAB & Back-Stack
                 switch (position) {
                     case 0:
-                        fab.setImageDrawable(getResources().getDrawable(R.drawable.ic_photo_camera_black_24dp));
+                        fab.setVisibility(View.INVISIBLE);
                         stateChangeCallback.onStateChange(AppState.CREATE_HAYSTACK_GENERAL_INFOS);
                         break;
                     case 1:
-                        fab.setImageDrawable(getResources().getDrawable(R.drawable.ic_action_location_found));
+                        fab.setVisibility(View.INVISIBLE);
                         stateChangeCallback.onStateChange(AppState.CREATE_HAYSTACK_MAP);
                         break;
                     case 2:
-                        fab.setImageDrawable(getResources().getDrawable(R.drawable.ic_person_add_black_24dp));
+                        fab.setVisibility(View.VISIBLE);
                         stateChangeCallback.onStateChange(AppState.CREATE_HAYSTACK_USERS);
                         break;
                 }
@@ -141,31 +141,19 @@ public class CreateHaystackActivity extends AppCompatActivity implements ImageUp
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                int position = createHaystackViewPager.getCurrentItem();
-                switch (position) {
-                    case 0:
-                        //Take Picture
-                        Intent intent = CameraUtils.getImageCaptureIntent();
-                        intent.putExtra(MediaStore.EXTRA_SCREEN_ORIENTATION, ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
-
-                        startActivityForResult(intent, TAKE_PICTURE);
-                        break;
-                    case 1:
-
-                        //TODO : Add method for that
-                        //Focus Camera on current position
-                        ((CreateHaystackMapFragment) mCreateHaystackPagerAdapter.getFragmentByType(
-                                        CreateHaystackMapFragment.class)).getMapController().focusOnMyPosition();
-                        break;
-                    case 2:
-                        //Invite Friend
-
-                        break;
-                }
+                createHaystack();
             }
         });
+        fab.setVisibility(View.INVISIBLE);
 
         initializeBroadcastListener();
+    }
+
+    private void takePicture(){
+        Intent intent = CameraUtils.getImageCaptureIntent();
+        intent.putExtra(MediaStore.EXTRA_SCREEN_ORIENTATION, ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+
+        startActivityForResult(intent, TAKE_PICTURE);
     }
 
     private BroadcastReceiver apiConnectedReceiver = new BroadcastReceiver() {
@@ -332,7 +320,7 @@ public class CreateHaystackActivity extends AppCompatActivity implements ImageUp
 
     //TODO: finish validation
     private Boolean validateHaystack(HaystackVO haystack){
-        if(haystack.getName().isEmpty()) return false;
+        if(haystack.getName() == null || haystack.getName().isEmpty()) return false;
 
         return true;
     }

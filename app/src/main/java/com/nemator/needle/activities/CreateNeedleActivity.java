@@ -88,15 +88,14 @@ public class CreateNeedleActivity extends AppCompatActivity implements NeedleCon
         fab = (FloatingActionButton) findViewById(R.id.fab);
         if(!userAlreadySelected){
             fab.setVisibility(View.GONE);
-        }else{
-            fab.setImageResource(R.drawable.ic_done_white_24dp);
-            fab.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-
-                }
-            });
         }
+
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                createNeedle();
+            }
+        });
 
         if(!userAlreadySelected){
             getSupportActionBar().setTitle(pagerAdapter.getPageTitle(0));
@@ -144,11 +143,6 @@ public class CreateNeedleActivity extends AppCompatActivity implements NeedleCon
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
-        if(id == R.id.action_done){
-            createLocationSharing();
-            return true;
-        }
-
         return super.onOptionsItemSelected(item);
     }
 
@@ -157,7 +151,7 @@ public class CreateNeedleActivity extends AppCompatActivity implements NeedleCon
         return true;
     }
 
-    private void createLocationSharing(){
+    private void createNeedle(){
         if(selectedUser == null){
             selectedUser = pagerAdapter.getSelectedUser();
         }

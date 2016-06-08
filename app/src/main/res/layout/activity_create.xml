@@ -54,7 +54,7 @@
         android:layout_gravity="bottom|right"
         android:layout_marginRight="16dp"
         android:layout_marginBottom="16dp"
-        android:src="@drawable/ic_photo_camera_black_24dp"
+        android:src="@drawable/ic_done_white_24dp"
         android:windowSoftInputMode="stateAlwaysHidden|adjustNothing"/>
 
 </android.support.design.widget.CoordinatorLayout>

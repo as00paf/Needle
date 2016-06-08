@@ -192,7 +192,7 @@ public class NeedleMapFragment extends SupportMapFragment
             config = new GoogleMapCameraControllerConfig().setMyLocationEnabled(false);
             mapController = new GoogleMapController(getContext(), config, new GoogleMapController.GoogleMapCallback() {
                 @Override
-                public void onMapInitialized() {
+                public void onMapInitialized(GoogleMap googleMap) {
                     resumeOperations();
                 }
             }, markerClickListener);

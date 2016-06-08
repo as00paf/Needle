@@ -88,7 +88,7 @@ public class GoogleMapController {
                     }
 
                     if(callback != null)
-                        callback.onMapInitialized();
+                        callback.onMapInitialized(mGoogleMap);
                 }
             }
         });
@@ -157,6 +157,6 @@ public class GoogleMapController {
     }
 
     public interface GoogleMapCallback{
-        void onMapInitialized();
+        void onMapInitialized(GoogleMap map);
     }
 }

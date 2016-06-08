@@ -26,6 +26,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.FrameLayout;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -33,6 +34,7 @@ import com.google.android.gms.common.api.PendingResult;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.location.places.PlaceLikelihoodBuffer;
 import com.google.android.gms.location.places.Places;
+import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.Circle;
@@ -55,7 +57,8 @@ import com.nemator.needle.utils.SphericalUtil;
 public class CreateHaystackMapFragment extends CreateHaystackBaseFragment implements GoogleMapController.GoogleMapCallback {
     public static String TAG = "CreateHaystackMapFragment";
 
-    //Children
+    //Views
+    private ImageButton lockMapButton, haystackShapeButton, myLocationButton;
     private TextView mRadiusLabel;
     private SupportMapFragment mapFragment;
     private Menu menu;
@@ -138,6 +141,30 @@ public class CreateHaystackMapFragment extends CreateHaystackBaseFragment implem
             PermissionManager.getInstance(getActivity()).requestPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION);
         }
 
+        //Buttons
+        lockMapButton = (ImageButton) rootView.findViewById(R.id.lock_map_button);
+        lockMapButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                toggleLockMap();
+            }
+        });
+
+        haystackShapeButton = (ImageButton) rootView.findViewById(R.id.map_shape_button);
+        haystackShapeButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                toggleHaystackShape();
+            }
+        });
+
+        myLocationButton = (ImageButton) rootView.findViewById(R.id.my_position_button);
+        myLocationButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mapController.cameraController.focusOnMyPosition();
+            }
+        });
         return rootView;
     }
 
@@ -176,38 +203,6 @@ public class CreateHaystackMapFragment extends CreateHaystackBaseFragment implem
             case R.id.action_search:
                 handleMenuSearch();
                 break;
-            case R.id.action_lock_map:
-                if (mIsMapMoveable != true) {
-                    mIsMapMoveable = true;
-                    item.setIcon(getResources().getDrawable(R.drawable.ic_edit_location_white_24dp));
-                } else {
-                    mIsMapMoveable = false;
-                    item.setIcon(getResources().getDrawable(R.drawable.ic_vpn_lock_white_24dp));
-                }
-
-                updateMap();
-                break;
-            case R.id.action_polygon:
-                if (mIsPolygonCircle != true) {
-                    if (mPolygon != null) {
-                        mPolygon.remove();
-                        mPolygon = null;
-                    }
-
-                    mIsPolygonCircle = true;
-                    item.setIcon(getResources().getDrawable(R.drawable.square24));
-                } else {
-                    if (mCircle != null) {
-                        mCircle.remove();
-                        mCircle = null;
-                    }
-
-                    mIsPolygonCircle = false;
-                    item.setIcon(getResources().getDrawable(R.drawable.circle24));
-                }
-
-                updateMap();
-                break;
             case android.R.id.home:
                 if (isSearchOpened) {
                     handleMenuSearch();
@@ -216,6 +211,40 @@ public class CreateHaystackMapFragment extends CreateHaystackBaseFragment implem
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private void toggleLockMap(){
+        if (mIsMapMoveable != true) {
+            mIsMapMoveable = true;
+            lockMapButton.setImageDrawable(getResources().getDrawable(R.drawable.ic_edit_location_black_24dp));
+        } else {
+            mIsMapMoveable = false;
+            lockMapButton.setImageDrawable(getResources().getDrawable(R.drawable.ic_vpn_lock_black_24dp));
+        }
+
+        updateMap();
+    }
+
+    private void toggleHaystackShape(){
+        if (mIsPolygonCircle != true) {
+            if (mPolygon != null) {
+                mPolygon.remove();
+                mPolygon = null;
+            }
+
+            mIsPolygonCircle = true;
+            haystackShapeButton.setImageDrawable(getResources().getDrawable(R.drawable.square_black_24));
+        } else {
+            if (mCircle != null) {
+                mCircle.remove();
+                mCircle = null;
+            }
+
+            mIsPolygonCircle = false;
+            haystackShapeButton.setImageDrawable(getResources().getDrawable(R.drawable.circle_black_24));
+        }
+
+        updateMap();
     }
 
     private void handleMenuSearch() {
@@ -475,7 +504,7 @@ public class CreateHaystackMapFragment extends CreateHaystackBaseFragment implem
     }
 
     @Override
-    public void onMapInitialized() {
+    public void onMapInitialized(GoogleMap googleMap) {
         mapController.cameraController.setCameraChangedListener(new GoogleMapCameraController.CameraChangedListener() {
             @Override
             public void onCameraChanged(CameraPosition cameraPosition) {

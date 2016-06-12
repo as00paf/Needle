@@ -161,8 +161,8 @@ public class CreateNeedleActivity extends AppCompatActivity implements NeedleCon
             return;
         }
 
-        progressDialog = ProgressDialog.show(this, "Sharing Location",
-                "Creating Location Sharing with " + selectedUser.getReadableUserName(), true);
+        progressDialog = ProgressDialog.show(this, getString(R.string.creating_needle),
+                getString(R.string.sending_needle_to, selectedUser.getReadableUserName()), true);
 
         needleVO = new NeedleVO();
 
@@ -199,6 +199,7 @@ public class CreateNeedleActivity extends AppCompatActivity implements NeedleCon
     @Override
     public void onNeedleCreationFailed(String result) {
         progressDialog.dismiss();
+        //TODO : use strings
         Toast.makeText(CreateNeedleActivity.this, "Location Sharing not created !", Toast.LENGTH_SHORT).show();
     }
 

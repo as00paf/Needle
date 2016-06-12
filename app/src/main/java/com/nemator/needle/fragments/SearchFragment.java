@@ -110,6 +110,9 @@ public class SearchFragment extends Fragment implements PlacesRecyclerAdapter.Ne
     public void initNearbyPlaces() {
         if(PermissionManager.getInstance(getActivity()).isPermissionGranted(Manifest.permission.ACCESS_FINE_LOCATION)){
             Needle.googleApiController.getCurrentPlace(nearbyPlacesCallback, getActivity());
+        }else{
+            Log.d(TAG, "Permission denied");
+            PermissionManager.getInstance(getActivity()).requestPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION);
         }
     }
 
@@ -161,7 +164,7 @@ public class SearchFragment extends Fragment implements PlacesRecyclerAdapter.Ne
     }
 
     public void show(Animator.AnimatorListener listener){
-        showSuggestions();
+        //showSuggestions();
 
         rootView.animate()
                 .y(0)

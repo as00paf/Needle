@@ -1,11 +1,22 @@
 package com.nemator.needle.fragments.haystacks.createHaystack;
 
+import android.Manifest;
 import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
+import android.content.Context;
+import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
+import android.provider.MediaStore;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SwitchCompat;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,21 +29,24 @@ import android.widget.TimePicker;
 
 import com.nemator.needle.R;
 import com.nemator.needle.activities.CreateHaystackActivity;
+import com.nemator.needle.utils.AppConstants;
+import com.nemator.needle.utils.BitmapUtils;
+import com.nemator.needle.utils.CameraUtils;
+import com.nemator.needle.utils.PermissionManager;
 
+import java.io.File;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 
-/**
- * Created by Alex on 12/04/2015.
- */
 public class CreateHaystackGeneralInfosFragment extends CreateHaystackBaseFragment{
 
     public static final String SQL_DATE_FORMAT = "yyyy-MM-dd";
     public static final String SQL_DATETIME_FORMAT = "yyyy-MM-dd HH:mm:ss";
     public static final String SQL_TIME_FORMAT = "HH:mm";
-    public static final String TAG = "CreateHaystackGeneralInfosFragment";
+    public static final String TAG = "CreateHSGenFragment";
 
     //Children
     private EditText txtName, dateLimitEditText, timeLimitEditText;
@@ -45,6 +59,8 @@ public class CreateHaystackGeneralInfosFragment extends CreateHaystackBaseFragme
     private String timeLimit;
     private ImageView photoView;
     private Bitmap mBitmap;
+    private boolean isCameraShown = false;
+    private File captureFile = null;
 
     private OnPrivacySettingsUpdatedListener privacySettingsCallback;
 
@@ -141,6 +157,12 @@ public class CreateHaystackGeneralInfosFragment extends CreateHaystackBaseFragme
         });
 
         photoView = (ImageView) rootView.findViewById(R.id.new_haystack_photo);
+        photoView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                takePicture();
+            }
+        });
 
         return rootView;
     }
@@ -157,7 +179,65 @@ public class CreateHaystackGeneralInfosFragment extends CreateHaystackBaseFragme
         }
     }
 
-    public void updatePhoto(Bitmap bitmap) {
+    private void takePicture(){
+        if(PermissionManager.getInstance(getContext()).isPermissionGranted(Manifest.permission.WRITE_EXTERNAL_STORAGE)){
+            Intent intent = CameraUtils.getImageCaptureIntent();
+
+            if (intent.resolveActivity(getActivity().getPackageManager()) != null) {
+                intent.putExtra(MediaStore.EXTRA_SCREEN_ORIENTATION, ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+                try {
+                    captureFile = createImageFile();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(captureFile));
+
+                startActivityForResult(intent, AppConstants.TAKE_PICTURE);
+            }
+            isCameraShown = true;
+        }else{
+            PermissionManager.getInstance(getContext()).requestPermission(getActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE);
+        }
+    }
+
+    private File createImageFile() throws IOException {
+        // Create an image file name
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        String imageFileName = "JPEG_" + timeStamp + "_";
+        File storageDir = Environment.getExternalStoragePublicDirectory(
+                Environment.DIRECTORY_PICTURES);
+        File image = File.createTempFile(
+                imageFileName,  // prefix
+                ".jpg",         // suffix
+                storageDir      // directory
+        );
+
+        return image;
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == AppConstants.TAKE_PICTURE) {
+            isCameraShown = false;
+            if (resultCode == Activity.RESULT_OK && data != null) {
+                Bundle extras = data.getExtras();
+                Bitmap bitmap = BitmapFactory.decodeFile(captureFile.getAbsolutePath());
+
+                //Rotate if portrait
+                if (bitmap.getHeight() > bitmap.getWidth()) {
+                    Matrix matrix = new Matrix();
+                    matrix.postRotate(90);
+                    bitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
+                }
+
+                updatePhoto(bitmap);
+            }else{
+                Log.d(TAG, "cancelled");
+            }
+        }
+    }
+
+    private void updatePhoto(Bitmap bitmap) {
         mBitmap = bitmap;
         photoView.setScaleType(ImageView.ScaleType.CENTER_CROP);
         photoView.setImageBitmap(mBitmap);
@@ -181,6 +261,14 @@ public class CreateHaystackGeneralInfosFragment extends CreateHaystackBaseFragme
 
     public Bitmap getPicture(){
         return mBitmap;
+    }
+
+    public boolean isCameraShown() {
+        return isCameraShown;
+    }
+
+    public void setCameraShown(boolean cameraShown) {
+        isCameraShown = cameraShown;
     }
 
     public interface OnPrivacySettingsUpdatedListener{

@@ -14,7 +14,7 @@ import retrofit2.Response;
 
 public class CreateNeedleCallback implements Callback<NeedleResult> {
 
-    private static final String TAG = "LocShrngCreateCallback";
+    private static final String TAG = "CreateNeedleCallback";
 
     private final NeedleController.CreateNeedleDelegate delegate;
 

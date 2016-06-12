@@ -18,7 +18,6 @@
     <string name="cancel">Cancel</string>
     <string name="ok">Okay</string>
 
-
     <!-- App Settings Activity -->
     <string name="rememberMeSummary">Make the Needle remember your credentials</string>
     <string name="notificationsSummary">Allow Needle to Notify you about events that occur</string>
@@ -40,16 +39,12 @@
     <string name="email">Email</string>
     <string name="forgot_password">Forgot Password ?</string>
 
-    <!-- Haystack List Fragment -->
+    <!-- Haystack -->
     <string name="publicHeader">Public Haystacks</string>
     <string name="privateHeader">Private Haystacks</string>
     <string name="ownedHeader">My Haystacks</string>
     <string name="noHaystackAvailable">No Haystacks Available</string>
     <string name="activeUsers"> Active Users</string>
-
-    <!-- Create Haystack Fragment -->
-
-    <!-- Haystack Map Fragment -->
     <string name="map_view">Map View</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
@@ -85,6 +80,12 @@
     <string name="cancel_haystack_confirmation">Are you sure you want to cancel this Haystack ?</string>
     <string name="cancel_haystack_leave_confirmation">Are you sure you want to leave this Haystack ?</string>
 
+    <string name="creating_haystack">Creating Haystack...</string>
+    <string name="haystack_name_error_msg">Haystack needs a name</string>
+    <string name="haystack_users_error_msg">Haystack needs other users</string>
+    <string name="haystack_creation_failed_msg">Could not create Haystack. Try again !</string>
+    <string name="haystack_image_upload_failed_msg">An error occured while uploading Haystack\'s Image</string>
+
     <string name="fetch_haystack_error">Could Not Fetch Haystacks</string>
     <string name="share_location_back">Share Location Back</string>
     <string name="location_shared_back">Location Shared Back!</string>
@@ -100,7 +101,9 @@
     <string name="cancel_needle_confirmation">Are you sure you want to cancel this Needle ?</string>
     <string name="noNeedleAvailable">No Needle Available</string>
     <string name="create_needle">Create Needle</string>
+    <string name="creating_needle">Creating Needle...</string>
     <string name="send_needle_to">Send Needle to %1$s</string>
+    <string name="sending_needle_to">Sending Needle to %1$s</string>
 
     <!-- Notifications -->
     <string name="no_notifications_yet">No notifications yet</string>

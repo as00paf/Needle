@@ -4,8 +4,11 @@ import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SearchView;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -70,12 +73,28 @@ public class CreateHaystackUsersFragment extends CreateHaystackBaseFragment impl
     }
 
     @Override
-    public void onRefresh(){
-        getFriends();
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+
+        SearchView searchView = (SearchView) menu.findItem(R.id.action_search).getActionView();
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                mAdapter.setFilter(query);
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                mAdapter.setFilter(newText);
+                return false;
+            }
+        });
     }
 
-    public void closeSearchResults(){
-        //searchBox.toggleSearch();
+    @Override
+    public void onRefresh(){
+        getFriends();
     }
 
     //Actions

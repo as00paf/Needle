@@ -133,7 +133,7 @@ public class NeedleActivity extends AppCompatActivity implements View.OnClickLis
 
                 break;
             case R.id.cancel_needle:
-                cancelLocationSharing();
+                cancelNeedle();
                 break;
         }
 
@@ -195,7 +195,7 @@ public class NeedleActivity extends AppCompatActivity implements View.OnClickLis
         Toast.makeText(NeedleActivity.this, result, Toast.LENGTH_SHORT).show();
     }
 
-    public void cancelLocationSharing(){
+    public void cancelNeedle(){
         NeedleController.cancelNeedle(needle, this);
     }
 

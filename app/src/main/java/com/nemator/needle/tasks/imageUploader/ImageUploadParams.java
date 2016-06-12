@@ -7,18 +7,15 @@ import android.widget.ProgressBar;
 public class ImageUploadParams {
     public String fileName;
     public Bitmap bitmap;
-    public Context context;
     public ProgressBar progressBar;
 
-    public ImageUploadParams(Bitmap bitmap, String fileName, Context context){
+    public ImageUploadParams(Bitmap bitmap, String fileName){
         this.bitmap = bitmap;
         this.fileName = fileName;
-        this.context = context;
     }
 
-    public ImageUploadParams(Bitmap bitmap, Context context, ProgressBar progressbar){
+    public ImageUploadParams(Bitmap bitmap, ProgressBar progressbar){
         this.bitmap = bitmap;
-        this.context = context;
         this.progressBar = progressbar;
     }
 }

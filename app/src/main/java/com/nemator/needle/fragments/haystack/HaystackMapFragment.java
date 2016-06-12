@@ -424,11 +424,8 @@ public class HaystackMapFragment extends SupportMapFragment implements LocationS
         }
 
         //TODO : add user marker ?
-        try{//TODO : wtf
-            mapController.cameraController.focusOnMarkers((ICustomMarker[]) markers.toArray());
-        }catch (Exception e){
-            e.printStackTrace();
-        }
+        ICustomMarker[] allMarkers = (ICustomMarker[]) markers.toArray();
+        mapController.cameraController.focusOnMarkers(allMarkers);
     }
 
     //Actions

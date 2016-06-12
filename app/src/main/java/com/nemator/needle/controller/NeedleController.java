@@ -11,7 +11,7 @@ import com.nemator.needle.models.vo.NeedleVO;
 
 public class NeedleController {
 
-    private static final String TAG = "LocationSharingCtlr";
+    private static final String TAG = "NeedleCtlr";
 
     public static void createNeedle(NeedleVO locationSharing, CreateNeedleDelegate delegate){
         ApiClient.getInstance().createNeedle(locationSharing, new CreateNeedleCallback(delegate));

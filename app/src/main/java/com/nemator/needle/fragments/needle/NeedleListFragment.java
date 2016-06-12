@@ -23,6 +23,7 @@ import com.nemator.needle.api.ApiClient;
 import com.nemator.needle.api.result.NeedleResult;
 import com.nemator.needle.fragments.haystacks.OnActivityStateChangeListener;
 import com.nemator.needle.models.vo.NeedleVO;
+import com.nemator.needle.utils.AppConstants;
 import com.nemator.needle.utils.AppState;
 
 import java.util.ArrayList;
@@ -64,28 +65,27 @@ public class NeedleListFragment extends Fragment {
         super.onCreate(savedInstanceState);
 
         if(savedInstanceState != null){
-            NeedleListTabFragment receivedTab = mNeedlePagerAdapter.getReceivedFragment();
-            NeedleListTabFragment sentTab = mNeedlePagerAdapter.getSentFragment();
+            if(mNeedlePagerAdapter != null){
+                NeedleListTabFragment receivedTab = mNeedlePagerAdapter.getReceivedFragment();
 
-            receivedLocationsList = savedInstanceState.getParcelableArrayList("receivedLocationsList");
-            sentLocationsList = savedInstanceState.getParcelableArrayList("sentLocationsList");
+                NeedleListTabFragment sentTab = mNeedlePagerAdapter.getSentFragment();
+                receivedLocationsList = savedInstanceState.getParcelableArrayList(AppConstants.RECEIVED_LOCATION_LIST);
+                sentLocationsList = savedInstanceState.getParcelableArrayList(AppConstants.SENT_LOCATION_LIST);
 
-            if(receivedLocationsList != null && getActivity() != null){
-                ((HomeActivity) getActivity()).setNeedleCount(receivedLocationsList.size());
+                if(receivedLocationsList != null && getActivity() != null){
+                    ((HomeActivity) getActivity()).setNeedleCount(receivedLocationsList.size());
+                }
+
+                if(receivedTab != null) receivedTab.updateNeedlesList(receivedLocationsList);
+                if(sentTab != null) sentTab.updateNeedlesList(sentLocationsList);
             }
-
-            if(receivedTab != null) receivedTab.updateNeedlesList(receivedLocationsList);
-            if(sentTab != null) sentTab.updateNeedlesList(sentLocationsList);
         }
-
-       // setRetainInstance(true);
     }
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
-        //TODO : use constants
-        outState.putParcelableArrayList("receivedLocationsList", receivedLocationsList);
-        outState.putParcelableArrayList("sentLocationsList", sentLocationsList);
+        outState.putParcelableArrayList(AppConstants.RECEIVED_LOCATION_LIST, receivedLocationsList);
+        outState.putParcelableArrayList(AppConstants.SENT_LOCATION_LIST, sentLocationsList);
         super.onSaveInstanceState(outState);
     }
 

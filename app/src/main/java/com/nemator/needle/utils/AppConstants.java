@@ -52,6 +52,8 @@ public class AppConstants {
     public static final String APP_STATE = "appState";
     public static final String APP_PREVIOUS_STATE = "appPrevState";
     public static final String IS_FIRST_START = "isFirstStart";
+    public static String RECEIVED_LOCATION_LIST = "receivedLocationList";
+    public static String SENT_LOCATION_LIST = "sentLocationList";
 
     //App Sections
     public static final int SECTION_LOGIN = 2;
@@ -71,6 +73,7 @@ public class AppConstants {
 
     //Request Codes
     public static final int SELECT_NEW_HAYSTACK_USERS = 1000;
+    public static final int TAKE_PICTURE = 226;
 
     //Notification Types
     public static final int HAYSTACK_INVITATION = 0;
@@ -89,4 +92,5 @@ public class AppConstants {
     //Friendship Status
     public static final int FRIEND_REQUESTED = 0;
     public static final int FRIEND = 1;
+
 }

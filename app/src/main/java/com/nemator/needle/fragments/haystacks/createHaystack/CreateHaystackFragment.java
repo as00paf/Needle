@@ -255,7 +255,7 @@ public class CreateHaystackFragment extends CreateHaystackBaseFragment implement
                 bitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
             }
             CreateHaystackGeneralInfosFragment fragment = (CreateHaystackGeneralInfosFragment) mCreateHaystackPagerAdapter.getFragmentAt(0);
-            fragment.updatePhoto(bitmap);
+            //fragment.updatePhoto(bitmap);
         }
     }
 

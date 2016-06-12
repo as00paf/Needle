@@ -7,7 +7,7 @@
     android:layout_height="wrap_content"
     android:layout_gravity="center"
     card_view:cardCornerRadius="2dp"
-    card_view:cardElevation="4dp"
+    card_view:cardElevation="2dp"
     app:cardUseCompatPadding="true"
     android:foreground="?android:attr/selectableItemBackground"
     android:clickable="true">
@@ -15,16 +15,16 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="4dp"
+        android:padding="8dp"
         android:gravity="center_vertical">
 
         <ImageView
             android:layout_width="wrap_content"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:id="@+id/search_history_icon"
             android:layout_alignParentLeft="true"
             android:layout_centerVertical="true"
-            android:layout_marginRight="16dp"
+            android:padding="8dp"
             android:src="@drawable/ic_history_black_24dp"
             android:contentDescription="@string/search_results"/>
 
@@ -34,7 +34,8 @@
             android:id="@+id/title_label"
             android:layout_centerVertical="true"
             android:layout_toRightOf="@+id/search_history_icon"
-            android:textAppearance="?android:attr/textAppearanceSearchResultTitle"
+            android:textAppearance="?android:attr/textAppearanceSearchResultSubtitle"
+            android:padding="4dp"
             />
 
     </RelativeLayout>

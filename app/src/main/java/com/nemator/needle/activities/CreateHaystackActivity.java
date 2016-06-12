@@ -1,17 +1,13 @@
 package com.nemator.needle.activities;
 
+import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.pm.ActivityInfo;
-import android.graphics.Bitmap;
 import android.graphics.Color;
-import android.graphics.Matrix;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Parcelable;
-import android.provider.MediaStore;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.ViewPager;
@@ -26,57 +22,38 @@ import android.widget.Toast;
 import com.nemator.needle.Needle;
 import com.nemator.needle.R;
 import com.nemator.needle.adapter.CreateHaystackPagerAdapter;
-import com.nemator.needle.api.ApiClient;
-import com.nemator.needle.api.result.HaystackResult;
-import com.nemator.needle.fragments.haystacks.OnActivityStateChangeListener;
+import com.nemator.needle.controller.HaystackController;
 import com.nemator.needle.fragments.haystacks.createHaystack.CreateHaystackGeneralInfosFragment;
 import com.nemator.needle.fragments.haystacks.createHaystack.CreateHaystackMapFragment;
 import com.nemator.needle.fragments.haystacks.createHaystack.CreateHaystackUsersFragment;
 import com.nemator.needle.models.vo.HaystackVO;
 import com.nemator.needle.models.vo.UserVO;
-import com.nemator.needle.tasks.imageUploader.ImageUploadParams;
-import com.nemator.needle.tasks.imageUploader.ImageUploadResult;
-import com.nemator.needle.tasks.imageUploader.ImageUploaderTask;
 import com.nemator.needle.utils.AppConstants;
-import com.nemator.needle.utils.AppState;
-import com.nemator.needle.utils.CameraUtils;
 import com.nemator.needle.views.SlidingTabLayout;
 
 import java.util.ArrayList;
 
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
-
-public class CreateHaystackActivity extends AppCompatActivity implements ImageUploaderTask.ImageUploadResponseHandler,
-        CreateHaystackGeneralInfosFragment.OnPrivacySettingsUpdatedListener{
+public class CreateHaystackActivity extends AppCompatActivity implements CreateHaystackGeneralInfosFragment.OnPrivacySettingsUpdatedListener,
+        HaystackController.CreateHaystackDelegate {
 
     public static final String TAG = "CreateHaystackActivity";
-
-    //TODO : put this in constants
-    //Activity Results
-    public static int TAKE_PICTURE = 226;
 
     //View
     private FloatingActionButton fab;
     private SlidingTabLayout mSlidingTabLayout;
+    private ProgressDialog progressDialog;
 
     //Data
-    private String userName;
     private HaystackVO haystack;
-    private int userId = -1;
     private ArrayList<UserVO> userList = new ArrayList<UserVO>();
 
     private ViewPager createHaystackViewPager;
     private CreateHaystackPagerAdapter mCreateHaystackPagerAdapter;
     private Boolean isPublic = false;
-    private OnActivityStateChangeListener stateChangeCallback;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        stateChangeCallback = Needle.navigationController;
 
         //Toolbar
         setContentView(R.layout.activity_create);
@@ -98,20 +75,10 @@ public class CreateHaystackActivity extends AppCompatActivity implements ImageUp
 
             @Override
             public void onPageSelected(int position) {
-                //FAB & Back-Stack
-                switch (position) {
-                    case 0:
-                        fab.setVisibility(View.INVISIBLE);
-                        stateChangeCallback.onStateChange(AppState.CREATE_HAYSTACK_GENERAL_INFOS);
-                        break;
-                    case 1:
-                        fab.setVisibility(View.INVISIBLE);
-                        stateChangeCallback.onStateChange(AppState.CREATE_HAYSTACK_MAP);
-                        break;
-                    case 2:
-                        fab.setVisibility(View.VISIBLE);
-                        stateChangeCallback.onStateChange(AppState.CREATE_HAYSTACK_USERS);
-                        break;
+                if(position == 2){
+                    fab.setVisibility(View.VISIBLE);
+                }else{
+                    fab.setVisibility(View.INVISIBLE);
                 }
             }
 
@@ -149,13 +116,6 @@ public class CreateHaystackActivity extends AppCompatActivity implements ImageUp
         initializeBroadcastListener();
     }
 
-    private void takePicture(){
-        Intent intent = CameraUtils.getImageCaptureIntent();
-        intent.putExtra(MediaStore.EXTRA_SCREEN_ORIENTATION, ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
-
-        startActivityForResult(intent, TAKE_PICTURE);
-    }
-
     private BroadcastReceiver apiConnectedReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -169,23 +129,6 @@ public class CreateHaystackActivity extends AppCompatActivity implements ImageUp
 
     private void initPermissionsAndServices() {
         Needle.googleApiController.checkLocationSettings();
-    }
-
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == TAKE_PICTURE && resultCode == RESULT_OK && data != null){
-            Bundle extras = data.getExtras();
-
-            Bitmap bitmap = (Bitmap) extras.get("data");
-            //Rotate if portrait
-            if(bitmap.getHeight() > bitmap.getWidth()){
-                Matrix matrix = new Matrix();
-                matrix.postRotate(90);
-                bitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
-            }
-            CreateHaystackGeneralInfosFragment fragment = (CreateHaystackGeneralInfosFragment) mCreateHaystackPagerAdapter.getFragmentAt(0);
-            fragment.updatePhoto(bitmap);
-        }
     }
 
     @Override
@@ -219,7 +162,6 @@ public class CreateHaystackActivity extends AppCompatActivity implements ImageUp
                 return true;
             case 2:
                 getMenuInflater().inflate(R.menu.menu_create_haystack_done, menu);
-                //setupSearchView(menu);
                 return true;
         }
 
@@ -234,12 +176,33 @@ public class CreateHaystackActivity extends AppCompatActivity implements ImageUp
             case R.id.action_done:
                 createHaystack();
                 return true;
+            case android.R.id.home:
+                return false;
         }
 
         return super.onOptionsItemSelected(item);
     }
 
+    @Override
+    public void onBackPressed() {
+        CreateHaystackGeneralInfosFragment mCreateHaystackGenInfosFragment = (CreateHaystackGeneralInfosFragment) mCreateHaystackPagerAdapter.getFragmentByType(CreateHaystackGeneralInfosFragment.class);
+
+        if(mCreateHaystackGenInfosFragment.isCameraShown()){
+            mCreateHaystackGenInfosFragment.setCameraShown(false);
+            return;
+        }
+
+        CreateHaystackMapFragment mCreateHaystackMapFragment = (CreateHaystackMapFragment) mCreateHaystackPagerAdapter.getFragmentByType(CreateHaystackMapFragment.class);
+        if(mCreateHaystackMapFragment.isSearchOpened()){
+            mCreateHaystackMapFragment.closeSearchMenu();
+            return;
+        }
+
+        super.onBackPressed();
+    }
+
     public void createHaystack(){
+        //Create VO
         haystack = new HaystackVO();
         CreateHaystackGeneralInfosFragment mCreateHaystackGenInfosFragment = (CreateHaystackGeneralInfosFragment) mCreateHaystackPagerAdapter.getFragmentByType(CreateHaystackGeneralInfosFragment.class);
         CreateHaystackMapFragment mCreateHaystackMapFragment = (CreateHaystackMapFragment) mCreateHaystackPagerAdapter.getFragmentByType(CreateHaystackMapFragment.class);
@@ -275,64 +238,35 @@ public class CreateHaystackActivity extends AppCompatActivity implements ImageUp
         haystack.setBannedUsers(bannedUsers);
 
         if(!validateHaystack(haystack)){
-            Toast.makeText(this, "Haystack Invalid !", Toast.LENGTH_SHORT);
             return;
         }
 
-        //File Upload
-        Bitmap image = mCreateHaystackGenInfosFragment.getPicture();
-        if(image != null){
-            ImageUploadParams uploadParams = new ImageUploadParams(image, haystack.getName(), this);
-            try{
-                ImageUploaderTask uploadTask = new ImageUploaderTask(uploadParams, this);
-                uploadTask.execute();
-            }catch (Exception e) {
-                Toast.makeText(this, "An error occured while uploading Haystack's Image", Toast.LENGTH_SHORT).show();
-            }
-        }else{
-            //Create Haystack
-            ApiClient.getInstance().createHaystack(haystack, createHaystackHandler);
-        }
+        progressDialog = ProgressDialog.show(this, getString(R.string.creating_haystack),
+                getString(R.string.creating_haystack), true);
+
+        HaystackController.createHaystack(haystack, mCreateHaystackGenInfosFragment.getPicture(), this);
     }
 
-    private Callback<HaystackResult> createHaystackHandler = new Callback<HaystackResult>() {
-        @Override
-        public void onResponse(Call<HaystackResult> call, Response<HaystackResult> response) {
-            HaystackResult result = response.body();
-            if(result.getSuccessCode() == 0){
-                Toast.makeText(CreateHaystackActivity.this, "An error occured while creating Haystack", Toast.LENGTH_SHORT).show();
-            }else{
-                Toast.makeText(CreateHaystackActivity.this, getResources().getString(R.string.haystack_created), Toast.LENGTH_SHORT).show();
-
-                //TODO : move this part to nav controller
-                Intent haystackIntent = new Intent(CreateHaystackActivity.this, HaystackActivity.class);
-                haystackIntent.putExtra(AppConstants.TAG_HAYSTACK, (Parcelable) result.getHaystack());
-                CreateHaystackActivity.this.startActivity(haystackIntent);
-            }
-        }
-
-        @Override
-        public void onFailure(Call<HaystackResult> call, Throwable t) {
-            Log.d(TAG, "An error occured while creating Haystack : " + t.getMessage());
-            Toast.makeText(CreateHaystackActivity.this, "An error occured while creating Haystack ", Toast.LENGTH_SHORT).show();
-        }
-    };
-
-    //TODO: finish validation
     private Boolean validateHaystack(HaystackVO haystack){
-        if(haystack.getName() == null || haystack.getName().isEmpty()) return false;
+        if(haystack.getName() == null || haystack.getName().isEmpty()){
+            if(createHaystackViewPager.getCurrentItem() != 0) createHaystackViewPager.setCurrentItem(0);
+            Toast.makeText(this, getString(R.string.haystack_name_error_msg), Toast.LENGTH_SHORT).show();
+
+            return false;
+        }
+
+        if(haystack.getUsers().size() < 1) {
+            if(createHaystackViewPager.getCurrentItem() != 2) createHaystackViewPager.setCurrentItem(2);
+            Toast.makeText(this, getString(R.string.haystack_users_error_msg), Toast.LENGTH_SHORT).show();
+            return false;
+        }
 
         return true;
     }
 
-    public void onImageUploaded(ImageUploadResult result)
-    {
-        if(result.successCode == 1) {
-            haystack.setPictureURL(result.imageURL);
-
-            //Create Haystack
-            ApiClient.getInstance().createHaystack(haystack, createHaystackHandler);
-        }
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
     }
 
     public HaystackVO getHaystack(){
@@ -346,7 +280,28 @@ public class CreateHaystackActivity extends AppCompatActivity implements ImageUp
         this.isPublic = isPublic;
     }
 
-    public void goToPage(int page){
-        createHaystackViewPager.setCurrentItem(page);
+    //Creation Handler
+    @Override
+    public void onHaystackCreationSuccess(HaystackVO haystack) {
+        progressDialog.dismiss();
+
+        Toast.makeText(CreateHaystackActivity.this, getResources().getString(R.string.haystack_created), Toast.LENGTH_SHORT).show();
+
+        Intent haystackIntent = new Intent(CreateHaystackActivity.this, HaystackActivity.class);
+        haystackIntent.putExtra(AppConstants.TAG_HAYSTACK, (Parcelable) haystack);
+        CreateHaystackActivity.this.startActivity(haystackIntent);
+    }
+
+    @Override
+    public void onHaystackCreationFailed(String result) {
+        Log.d(TAG, "An error occured while creating Haystack : " + result);
+        progressDialog.dismiss();
+        Toast.makeText(this, getString(R.string.haystack_creation_failed_msg), Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onHaystackImageUploadFailed() {
+        progressDialog.dismiss();
+        Toast.makeText(this, getString(R.string.haystack_image_upload_failed_msg), Toast.LENGTH_SHORT).show();
     }
 }

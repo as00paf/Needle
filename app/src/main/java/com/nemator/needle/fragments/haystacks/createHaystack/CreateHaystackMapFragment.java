@@ -165,6 +165,8 @@ public class CreateHaystackMapFragment extends CreateHaystackBaseFragment implem
                 mapController.cameraController.focusOnMyPosition();
             }
         });
+
+
         return rootView;
     }
 
@@ -191,7 +193,24 @@ public class CreateHaystackMapFragment extends CreateHaystackBaseFragment implem
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
-        setupSearchView(menu);
+
+        SearchView searchView = (SearchView) menu.findItem(R.id.action_search).getActionView();
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                doSearch(query);
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                doSearch(newText);
+                return false;
+            }
+        });
+
+        mSearchAction = menu.findItem(R.id.action_search);
+
         this.menu = menu;
     }
 
@@ -248,80 +267,12 @@ public class CreateHaystackMapFragment extends CreateHaystackBaseFragment implem
     }
 
     private void handleMenuSearch() {
-        int flag;
         if (isSearchOpened) {
             closeSearchMenu();
-
-            flag = MenuItem.SHOW_AS_ACTION_ALWAYS;
         } else {
-            openSearchMenu();
-            flag = MenuItem.SHOW_AS_ACTION_NEVER;
+            isSearchOpened = true;
+            searchFragment.show(null);
         }
-
-        MenuItemCompat.setShowAsAction(menu.getItem(1), flag);
-        MenuItemCompat.setShowAsAction(menu.getItem(2), flag);
-    }
-
-    private void setupSearchView(final Menu menu) {
-        MenuItem menuItem = menu.findItem(R.id.action_search);
-        mSearchAction = menu.findItem(R.id.action_search);
-
-        searchView = (SearchView) MenuItemCompat.getActionView(menuItem);
-        SearchManager searchManager = (SearchManager) getActivity().getSystemService(getActivity().SEARCH_SERVICE);
-        searchView.setSearchableInfo(searchManager.getSearchableInfo(getActivity().getComponentName()));
-        searchView.setIconifiedByDefault(false);
-        searchView.setOnSearchClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                searchView.clearFocus();
-            }
-        });
-
-        MenuItemCompat.setShowAsAction(menuItem, MenuItem.SHOW_AS_ACTION_COLLAPSE_ACTION_VIEW
-                | MenuItem.SHOW_AS_ACTION_ALWAYS);
-
-        MenuItemCompat.setOnActionExpandListener(menuItem, new MenuItemCompat.OnActionExpandListener() {
-            float originalHeight;
-
-            @Override
-            public boolean onMenuItemActionCollapse(MenuItem item) {
-                InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(getActivity().INPUT_METHOD_SERVICE);
-                imm.hideSoftInputFromWindow(searchView.getWindowToken(), 0);
-
-                ActionBar action = ((CreateHaystackActivity) getActivity()).getSupportActionBar();
-                mSearchAction.setIcon(getResources().getDrawable(R.drawable.ic_search_white_24dp));
-                action.setTitle(getResources().getString(R.string.app_name));
-                action.setDisplayShowCustomEnabled(false);
-                action.setDisplayShowTitleEnabled(true);
-                action.setDisplayShowHomeEnabled(true);
-
-                searchFragment.hide();
-                isSearchOpened = false;
-
-               /* Handler handler = new Handler();
-                handler.postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        MenuItemCompat.setShowAsAction(menu.getItem(1), MenuItem.SHOW_AS_ACTION_ALWAYS);
-                        MenuItemCompat.setShowAsAction(menu.getItem(2), MenuItem.SHOW_AS_ACTION_ALWAYS);
-                    }
-                }, 750);*/
-
-                MenuItemCompat.setShowAsAction(menu.getItem(1), MenuItem.SHOW_AS_ACTION_ALWAYS);
-                MenuItemCompat.setShowAsAction(menu.getItem(2), MenuItem.SHOW_AS_ACTION_ALWAYS);
-
-                return true;  // Return true to collapse action view
-            }
-
-            @Override
-            public boolean onMenuItemActionExpand(MenuItem item) {
-                return true;  // Return true to expand action view
-            }
-        });
-
-        ActionBar.LayoutParams params = new ActionBar.LayoutParams(ActionBar.LayoutParams.MATCH_PARENT, ActionBar.LayoutParams.MATCH_PARENT);
-        searchView.setLayoutParams(params);
-        searchView.setMaxWidth(2000);
     }
 
     private void initBroadcastListeners() {
@@ -360,59 +311,6 @@ public class CreateHaystackMapFragment extends CreateHaystackBaseFragment implem
         }
     };
 
-    private void openSearchMenu() {
-        ActionBar action = ((AppCompatActivity) getActivity()).getSupportActionBar();
-        action.setCustomView(R.layout.search_bar);
-
-        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-            @Override
-            public boolean onQueryTextSubmit(String query) {
-                doSearch(query);
-                return false;
-            }
-
-            @Override
-            public boolean onQueryTextChange(final String newText) {
-                doSearch(newText);
-                return false;
-            }
-        });
-
-        //add the close icon
-        mSearchAction.setIcon(getResources().getDrawable(R.drawable.ic_clear_white_24dp));
-        action.setTitle(getResources().getString(R.string.app_name));
-
-        searchFragment.show(new Animator.AnimatorListener() {
-            @Override
-            public void onAnimationStart(Animator animation) {
-                searchView.clearFocus();
-            }
-
-            @Override
-            public void onAnimationEnd(Animator animation) {
-                //Show keyboard
-                searchView.requestFocus();
-
-                InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
-                imm.showSoftInput(searchView.findViewById(android.support.v7.appcompat.R.id.search_src_text), InputMethodManager.SHOW_FORCED);
-
-                animation.removeListener(this);
-                animation.removeAllListeners();
-            }
-
-            @Override
-            public void onAnimationCancel(Animator animation) {
-
-            }
-
-            @Override
-            public void onAnimationRepeat(Animator animation) {
-
-            }
-        });
-        isSearchOpened = true;
-    }
-
     private void doSearch(String query) {
         if(!query.isEmpty()){
             Log.d(TAG, "doSearch::query : " + query);
@@ -422,21 +320,12 @@ public class CreateHaystackMapFragment extends CreateHaystackBaseFragment implem
         }
     }
 
-    private void closeSearchMenu() {
-        //Hide keyboard
-        InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(getActivity().INPUT_METHOD_SERVICE);
-        imm.hideSoftInputFromWindow(searchView.getWindowToken(), 0);
-
-        ActionBar action = ((CreateHaystackActivity) getActivity()).getSupportActionBar();
+    public void closeSearchMenu() {
         mSearchAction.collapseActionView();
-        mSearchAction.setIcon(getResources().getDrawable(R.drawable.ic_search_white_24dp));
-        action.setTitle(getResources().getString(R.string.app_name));
-        action.setDisplayShowCustomEnabled(false);
-        action.setDisplayShowTitleEnabled(true);
-        action.setDisplayShowHomeEnabled(true);
 
         searchFragment.hide();
         isSearchOpened = false;
+        updateMap();
     }
 
     @Override
@@ -483,10 +372,6 @@ public class CreateHaystackMapFragment extends CreateHaystackBaseFragment implem
         }
     }
 
-    public void closeSearchResults() {
-        //searchBox.toggleSearch();
-    }
-
     public int getZoneRadius(){
         return (int) Math.round(mScaleFactor * 50.0);
     }
@@ -521,6 +406,10 @@ public class CreateHaystackMapFragment extends CreateHaystackBaseFragment implem
         return mapController.getCurrentCameraTarget();
     }
 
+    public boolean isSearchOpened() {
+        return isSearchOpened;
+    }
+
     //CLASSES
     private class ScaleListener extends ScaleGestureDetector.SimpleOnScaleGestureListener {
         @Override
@@ -536,4 +425,6 @@ public class CreateHaystackMapFragment extends CreateHaystackBaseFragment implem
             return true;
         }
     }
+
+
 }

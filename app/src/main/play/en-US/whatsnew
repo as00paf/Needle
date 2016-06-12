@@ -1,2 +1,5 @@
-Updated gradle script for google play beta upload automation (fixed beta track)
-Haystack stuff
++Added HaystackController to match pattern used for Needles
+*Fixed search for users in Haystack creation
+*Fixed places search in Haystack creation
+*Fix photo capture in haystakc creation
++Added dialog for haystack creation

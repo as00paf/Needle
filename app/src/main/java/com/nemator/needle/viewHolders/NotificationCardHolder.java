@@ -71,12 +71,11 @@ public class NotificationCardHolder extends RecyclerView.ViewHolder {
             }
         };
         int start = data.getDescription().indexOf(data.getSenderName());
-        int end = start + data.getSenderName().length();
-        ss.setSpan(clickableSpan, start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-
-        //Make item clickable
-        //TODO
-
+        if(start >= 0){
+            int end = start + data.getSenderName().length();
+            ss.setSpan(clickableSpan, start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        }
+        
         titleView.setText(ss);
         titleView.setMovementMethod(LinkMovementMethod.getInstance());
         titleView.setHighlightColor(ContextCompat.getColor(itemView.getContext(), R.color.primary_dark));

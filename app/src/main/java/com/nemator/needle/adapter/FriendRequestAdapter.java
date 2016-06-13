@@ -107,10 +107,11 @@ public class FriendRequestAdapter extends RecyclerView.Adapter<RecyclerView.View
                 ((ListItemViewHolder) holder).title.setText(item.getUser().getReadableUserName());
                 ((ListItemViewHolder) holder).subtitle.setText("Wants to be your friend");
 
-                Picasso.with(context)
-                        .load(item.getUser().getPictureURL())
-                        .into(((ListItemViewHolder) holder).imageView);
-
+                if(!item.getUser().getPictureURL().isEmpty()){
+                    Picasso.with(context)
+                            .load(item.getUser().getPictureURL())
+                            .into(((ListItemViewHolder) holder).imageView);
+                }
 
                 holder.itemView.setOnClickListener(new View.OnClickListener() {
                     @Override

@@ -44,7 +44,6 @@
                     android:layout_height="144dp"
                     android:layout_marginLeft="@dimen/spacing_large"
                     android:elevation="4dp"
-                    android:src="@drawable/person_placeholder"
                     android:layout_margin="@dimen/spacing_large"
                     android:layout_centerInParent="true"/>
 

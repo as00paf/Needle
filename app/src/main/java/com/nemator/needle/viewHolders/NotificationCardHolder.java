@@ -56,6 +56,8 @@ public class NotificationCardHolder extends RecyclerView.ViewHolder {
 
         //Title
         String desc = data.getDescription().substring(0,1).toUpperCase() + data.getDescription().substring(1).toLowerCase();//Cap first letter
+
+        //Make user clickable
         SpannableString ss = new SpannableString(desc);
         ClickableSpan clickableSpan = new ClickableSpan() {
             @Override
@@ -68,7 +70,12 @@ public class NotificationCardHolder extends RecyclerView.ViewHolder {
                 ds.setUnderlineText(false);
             }
         };
-        ss.setSpan(clickableSpan, data.getDescription().indexOf(data.getSenderName()), data.getSenderName().length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        int start = data.getDescription().indexOf(data.getSenderName());
+        int end = start + data.getSenderName().length();
+        ss.setSpan(clickableSpan, start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+
+        //Make item clickable
+        //TODO
 
         titleView.setText(ss);
         titleView.setMovementMethod(LinkMovementMethod.getInstance());
@@ -80,11 +87,17 @@ public class NotificationCardHolder extends RecyclerView.ViewHolder {
         //User Profile Picture
         Picasso.with(imageView.getContext()).cancelRequest(imageView);
 
-        Picasso.with(imageView.getContext())
-                .load(notification.getSenderPictureURL())
-                .placeholder(R.color.bg_grey)
-                .error(R.drawable.person_placeholder)
-                .into(imageView);
+        if(notification.getSenderPictureURL() != null && !notification.getSenderPictureURL().isEmpty()){
+            Picasso.with(imageView.getContext())
+                    .load(notification.getSenderPictureURL())
+                    .placeholder(R.color.bg_grey)
+                    .error(R.drawable.person_placeholder)
+                    .into(imageView);
+        }else{
+            Picasso.with(imageView.getContext())
+                    .load(R.drawable.person_placeholder)
+                    .into(imageView);
+        }
     }
 
     private void onClickUser(){

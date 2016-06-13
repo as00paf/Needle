@@ -62,10 +62,16 @@ public class MarkerUtils {
         final MarkerImageTransform transform = new MarkerImageTransform(context);
 
         //Load and transform picture into marker
-        Picasso.with(context).load(pictureURL)
-                .placeholder(R.drawable.ic_place_black_48dp)
-                .transform(transform)
-                .into(userMarker);
+        if(!pictureURL.isEmpty()){
+            Picasso.with(context).load(pictureURL)
+                    .placeholder(R.drawable.person_placeholder)
+                    .transform(transform)
+                    .into(userMarker);
+        }else{
+            Picasso.with(context).load(R.drawable.person_placeholder)
+                    .transform(transform)
+                    .into(userMarker);
+        }
 
         return userMarker;
     }

@@ -186,6 +186,10 @@ public class UserProfileActivity extends AppCompatActivity implements IUserProfi
                     .transform(new CropCircleTransformation(this, 2, Color.WHITE))
                     .into(avatarImageView);
         }else{
+            Picasso.with(this).load(R.drawable.person_placeholder)
+                    .noFade()
+                    .transform(new CropCircleTransformation(this, 2, Color.WHITE))
+                    .into(avatarImageView);
             Log.e(TAG, "Can't load profile pic");
         }
 

@@ -1,5 +1,1 @@
-+Added HaystackController to match pattern used for Needles
-*Fixed search for users in Haystack creation
-*Fixed places search in Haystack creation
-*Fix photo capture in haystakc creation
-+Added dialog for haystack creation
+*Fixed notification bug

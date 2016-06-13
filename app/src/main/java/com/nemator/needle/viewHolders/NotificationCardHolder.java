@@ -75,7 +75,7 @@ public class NotificationCardHolder extends RecyclerView.ViewHolder {
             int end = start + data.getSenderName().length();
             ss.setSpan(clickableSpan, start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
         }
-        
+
         titleView.setText(ss);
         titleView.setMovementMethod(LinkMovementMethod.getInstance());
         titleView.setHighlightColor(ContextCompat.getColor(itemView.getContext(), R.color.primary_dark));

@@ -153,6 +153,10 @@
             android:parentActivityName=".activities.HomeActivity"
             android:theme="@style/AppTheme" />
         <activity
+            android:name=".activities.HelpSupportActivity"
+            android:label="@string/title_helpAndSupport"
+            android:theme="@style/AppTheme" />
+        <activity
             android:name="com.facebook.FacebookActivity"
             android:configChanges="keyboard|keyboardHidden|screenLayout|screenSize|orientation"
             android:label="@string/app_name"

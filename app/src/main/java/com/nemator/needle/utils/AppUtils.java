@@ -1,13 +1,15 @@
 package com.nemator.needle.utils;
 
+import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.support.annotation.Nullable;
-import android.support.v4.content.ContextCompat;
 import android.text.format.DateUtils;
 import android.util.Base64;
 import android.util.Log;
@@ -44,7 +46,8 @@ public class AppUtils {
         CharSequence result = null;
 
         //2016-04-27 20:47:00
-        SimpleDateFormat srcDf = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+        String format = activeUntil.length() < 17 ? "yyyy-MM-dd hh:mm" : "yyyy-MM-dd hh:mm:ss";
+        SimpleDateFormat srcDf = new SimpleDateFormat(format);
 
         try {
             Date date = srcDf.parse(activeUntil);
@@ -128,7 +131,6 @@ public class AppUtils {
         return System.currentTimeMillis() < strDate.getTime();
     }
 
-    //Move to app utils
     public static void buildAlertMessageNoGps(final Context context, @Nullable final AlertGPSNegativeButtonListener negativeButtonListener) {
         final AlertDialog.Builder builder = new AlertDialog.Builder(context);
         builder.setMessage("Your GPS seems to be disabled, do you want to enable it?")
@@ -150,7 +152,61 @@ public class AppUtils {
         alert.show();
     }
 
+    public static void launchWebsite(Activity activity, Uri uri) {
+        Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+        activity.startActivity(intent);
+    }
+
     public static interface AlertGPSNegativeButtonListener{
         void onClickNo();
     }
+
+    public static void sendEmail(Activity activity, String toEmail, String subject, String bodyText){
+        Intent emailIntent = new Intent(Intent.ACTION_SEND);
+
+        emailIntent.setType("plain/text");
+        emailIntent.putExtra(Intent.EXTRA_EMAIL, new String[]{toEmail});
+        emailIntent.putExtra(Intent.EXTRA_SUBJECT, subject);
+        emailIntent.putExtra(Intent.EXTRA_TEXT, bodyText);
+
+        activity.startActivity(Intent.createChooser(emailIntent, activity.getString(R.string.send_email_intent_title)));
+    }
+
+    public static void phoneCall(Activity activity, String phoneNumber) {
+        String uriString = "tel:" + phoneNumber;
+        Intent intent = new Intent();
+        intent.setAction(Intent.ACTION_DIAL);
+        intent.setData(Uri.parse(uriString));
+        activity.startActivity(intent);
+    }
+
+    public static void showFacebookProfile(Activity activity, String pageID){
+        Uri webUri = Uri.parse("http://www.facebook.com/" + pageID);
+
+        launchAppOrWebsite(activity, webUri, webUri);
+    }
+
+    public static void showTwitterProfile(Activity activity, String username) {
+        Uri appUri = Uri.parse("twitter://user?screen_name=" + username);
+        Uri webUri = Uri.parse("https://twitter.com/" + username);
+
+        launchAppOrWebsite(activity, appUri, webUri);
+    }
+
+    public static void launchAppOrWebsite(Activity activity, Uri appUri, Uri webUri) {
+        try{
+            Intent appIntent = new Intent(Intent.ACTION_VIEW, appUri);
+            activity.startActivity(appIntent);
+        }catch (ActivityNotFoundException activityNotFoundException){
+            Intent webIntent = new Intent(Intent.ACTION_VIEW, webUri);
+            activity.startActivity(webIntent);
+        }
+    }
+
+    public static void showYoutubeChannel(Activity activity, String channelName){
+        Uri webUri = Uri.parse("http://www.youtube.com/user/" + channelName);
+
+        launchAppOrWebsite(activity, webUri, webUri);
+    }
+
 }

@@ -178,6 +178,12 @@ public class CreateHaystackActivity extends AppCompatActivity implements CreateH
                 return true;
             case android.R.id.home:
                 return false;
+            case R.id.menu_option_settings:
+                startActivity(new Intent(this, SettingsActivity.class));
+                return true;
+            case R.id.menu_option_help:
+                startActivity(new Intent(this, HelpSupportActivity.class));
+                return true;
         }
 
         return super.onOptionsItemSelected(item);
@@ -290,6 +296,8 @@ public class CreateHaystackActivity extends AppCompatActivity implements CreateH
         Intent haystackIntent = new Intent(CreateHaystackActivity.this, HaystackActivity.class);
         haystackIntent.putExtra(AppConstants.TAG_HAYSTACK, (Parcelable) haystack);
         CreateHaystackActivity.this.startActivity(haystackIntent);
+
+        finish();
     }
 
     @Override

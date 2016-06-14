@@ -23,6 +23,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.nemator.needle.Needle;
 import com.nemator.needle.R;
+import com.nemator.needle.activities.HelpSupportActivity;
 import com.nemator.needle.activities.NeedleActivity;
 import com.nemator.needle.activities.SettingsActivity;
 import com.nemator.needle.api.ApiClient;
@@ -160,7 +161,7 @@ public class NeedleMapFragment extends SupportMapFragment
                 startActivity(new Intent(getContext(), SettingsActivity.class));
                 return true;
             case R.id.menu_option_help:
-
+                startActivity(new Intent(getContext(), HelpSupportActivity.class));
                 return true;
         }
 

@@ -252,6 +252,12 @@ public class UserProfileActivity extends AppCompatActivity implements IUserProfi
             case android.R.id.home:
                 finish();
                 return true;
+            case R.id.menu_option_settings:
+                startActivity(new Intent(this, SettingsActivity.class));
+                return true;
+            case R.id.menu_option_help:
+                startActivity(new Intent(this, HelpSupportActivity.class));
+                return true;
         }
 
         return super.onOptionsItemSelected(item);

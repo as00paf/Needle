@@ -309,10 +309,21 @@ public class HaystackActivity extends AppCompatActivity implements AddPinDialogF
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if(item.getItemId() == R.id.menu_option_cancel){
-            setCurrentState(DEFAULT_STATE);
-        }else if(item.getItemId() == R.id.menu_option_confirm){
-            showAddPinDialog();
+        int id = item.getItemId();
+
+        switch (id){
+            case R.id.menu_option_cancel:
+                setCurrentState(DEFAULT_STATE);
+                break;
+            case R.id.menu_option_confirm :
+                showAddPinDialog();
+                break;
+            case R.id.menu_option_settings:
+                startActivity(new Intent(this, SettingsActivity.class));
+                return true;
+            case R.id.menu_option_help:
+                startActivity(new Intent(this, HelpSupportActivity.class));
+                return true;
         }
 
         return super.onOptionsItemSelected(item);

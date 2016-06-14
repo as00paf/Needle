@@ -56,30 +56,28 @@ public class FriendsTabFragment extends Fragment{
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        if(rootView == null){
-            rootView = inflater.inflate(R.layout.fragment_friends_list_tab, container, false);
+        rootView = inflater.inflate(R.layout.fragment_friends_list_tab, container, false);
 
-            //Recycler View
-            mRecyclerView = (RecyclerView) rootView.findViewById(R.id.list);
-            mRecyclerView.setHasFixedSize(true);
+        //Recycler View
+        mRecyclerView = (RecyclerView) rootView.findViewById(R.id.list);
+        mRecyclerView.setHasFixedSize(true);
 
-            layoutManager = new GridLayoutManager(getActivity(), 2);
+        layoutManager = new GridLayoutManager(getActivity(), 2);
 
-            listAdapter = new UserCardAdapter(getActivity(), null, UserCardAdapter.Type.SHOW_PROFILE);
-            mRecyclerView.setAdapter(listAdapter);
+        listAdapter = new UserCardAdapter(getActivity(), null, UserCardAdapter.Type.SHOW_PROFILE);
+        mRecyclerView.setAdapter(listAdapter);
 
-            //Swipe To Refresh
-            swipeLayout = (SwipeRefreshLayout) rootView.findViewById(R.id.swipe_container);
-            swipeLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-                @Override
-                public void onRefresh() {
-                    onRefreshList();
-                }
-            });
-            swipeLayout.setRefreshing(true);
+        //Swipe To Refresh
+        swipeLayout = (SwipeRefreshLayout) rootView.findViewById(R.id.swipe_container);
+        swipeLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                onRefreshList();
+            }
+        });
+        swipeLayout.setRefreshing(true);
 
-            setHasOptionsMenu(true);
-        }
+        setHasOptionsMenu(true);
 
         return rootView;
     }

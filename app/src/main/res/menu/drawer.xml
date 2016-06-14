@@ -28,7 +28,7 @@
 
         <item
             android:id="@+id/drawer_people"
-            android:icon="@drawable/ic_person_black_24dp"
+            android:icon="@drawable/ic_people_black_24dp"
             android:title="@string/title_people"/>
 
     </group>

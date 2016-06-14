@@ -53,8 +53,9 @@ public class CreateNeedleActivity extends AppCompatActivity implements NeedleCon
             userAlreadySelected = selectedUser != null;
         }
 
-        //Toolbar
         setContentView(R.layout.activity_create);
+
+        //Toolbar
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -143,6 +144,15 @@ public class CreateNeedleActivity extends AppCompatActivity implements NeedleCon
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
+        switch (id){
+            case R.id.menu_option_settings:
+                startActivity(new Intent(this, SettingsActivity.class));
+                return true;
+            case R.id.menu_option_help:
+                startActivity(new Intent(this, HelpSupportActivity.class));
+                return true;
+        }
+
         return super.onOptionsItemSelected(item);
     }
 

@@ -97,6 +97,7 @@ public class HaystackListTabFragment extends Fragment {
                 listener.onRefreshHaystackList();
             }
         });
+        swipeLayout.setRefreshing(true);
 
         return rootView;
     }

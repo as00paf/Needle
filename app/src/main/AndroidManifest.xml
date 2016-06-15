@@ -157,6 +157,10 @@
             android:label="@string/title_helpAndSupport"
             android:theme="@style/AppTheme" />
         <activity
+            android:name=".activities.FaqActivity"
+            android:label="@string/faq"
+            android:theme="@style/AppTheme" />
+        <activity
             android:name="com.facebook.FacebookActivity"
             android:configChanges="keyboard|keyboardHidden|screenLayout|screenSize|orientation"
             android:label="@string/app_name"

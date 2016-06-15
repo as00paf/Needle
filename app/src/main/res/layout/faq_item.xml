@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="?attr/selectableItemBackground"
+    android:animateLayoutChanges="true">
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="8dp"
+        android:layout_alignParentTop="true"
+        android:id="@+id/icon"
+        android:contentDescription="@null"
+        android:src="@drawable/ic_keyboard_arrow_right_black_24dp"/>
+
+    <com.nemator.needle.views.FontTextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/title"
+        android:text="text"
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+        android:layout_marginLeft="44dp"
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp"
+        android:layout_alignParentTop="true"
+        app:font="CircularStdMedium.otf" />
+
+    <com.nemator.needle.views.FontTextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/description"
+        android:text="text"
+        android:textAppearance="@style/TextAppearance.AppCompat.Small"
+        android:layout_below="@id/title"
+        android:paddingLeft="50dp"
+        android:paddingRight="10dp"
+        android:paddingBottom="16dp"
+        app:font="CircularStdMedium.otf"
+        android:visibility="gone"
+        android:autoLink="all"/>
+</RelativeLayout>

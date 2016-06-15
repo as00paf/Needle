@@ -1,5 +1,6 @@
 package com.nemator.needle.activities;
 
+import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.net.Uri;
@@ -57,9 +58,9 @@ public class HelpSupportActivity extends AppCompatActivity implements HelpSuppor
 
     @Override
     public void onClickItem(int position) {
-        Log.d(TAG, "Click");
         switch (position){
             case HelpSupportAdapter.FAQ:
+                startActivity(new Intent(this, FaqActivity.class));
                 break;
             case HelpSupportAdapter.HELP:
                 break;

@@ -1,6 +1,1 @@
-+Added people icon instead of person in drawer
-*Fixed expiration date missing when creating haystack
-+Added Help & Support Activity
-+Added lots of methods to app utils
--Removed lots of unused assets
-+Added icons
++Added FAQ Activity

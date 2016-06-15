@@ -200,7 +200,6 @@
     <string name="add_to_group">Add to Group</string>
     <string name="send_needle">Send Needle</string>
 
-
     <!-- Help & Support -->
     <string name="about">About</string>
     <string name="write_us">Write us</string>
@@ -223,5 +222,28 @@
     <string name="fb_page">needle.application</string>
     <string name="twitter_user">needle_app</string>
     <string name="youtube_channel">UCGlCodx423RHkYZuXo8yeHw</string>
+
+    <!-- FAQ -->
+    <string-array name="faq_question_titles">
+        <item>What is the difference between Needles and Haystacks?</item>
+        <item>Will this app post on my Facebook page?</item>
+        <item>Do I need to share my location when I\'m in a Haystack?</item>
+        <item>Why is my location not being shown accurately?</item>
+        <item>Is an internet connection required to use Needle?</item>
+        <item>How do I add people to my Friend section ?</item>
+        <item>Why are there no users available when I try to send a Needle or add someone to my Haystack?</item>
+        <item>Does the app need to be open for people to see my location?</item>
+    </string-array>
+
+    <string-array name="faq_question_descriptions">
+        <item>Needles let you share your location with only one user and allows that user to share their location back with you. Haystacks let you set a location sharing area, in which any user that joins and enters the area will automatically begin sharing their location with the other users that are in that Haystack.</item>
+        <item>Needle never publishes anything on your Facebook page, unless you choose to share the link to a Haystack yourself.</item>
+        <item>Although we recommend sharing your location, you have the option to enable or disable your location sharing. Tap the location symbol (circle within a target) located at the top right of the screen when viewing the map.</item>
+        <item>Needle relies on your smartphone\'s GPS capabilities. If the phone signal is weak or unavailable, your location cannot be determined. The accuracy of your location can also be hindered if you are indoors and have materials causing interference with your phone\'s signal.</item>
+        <item>Yes. It is necessary to have an internet connection to use Needle (Wifi, 3G, 4G).</item>
+        <item>Select the People tab(this shows you who is currently in your "Friend" section). Select Discover (this allows you to search Needle users). Select a user from the list and tap "Add Friend". This user will now show up in your Friend section when you send a Needle or when you are sending invitations to join your Haystack.</item>
+        <item>You need to add users to your Friend list before you can send Needles or add them to Haystacks.</item>
+        <item>Although Needle needs to be running in order for people to see your location, you do not need to have it open for it to work. Meaning that as long as you haven\'t closed the app, your location will still be shared.</item>
+    </string-array>
 
 </resources>

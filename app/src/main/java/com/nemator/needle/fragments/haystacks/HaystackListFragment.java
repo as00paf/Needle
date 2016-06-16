@@ -76,13 +76,15 @@ public class HaystackListFragment extends Fragment implements HaystackListTabFra
             privateHaystacks = savedInstanceState.getParcelableArrayList("privateHaystacks");
             ownedHaystacks = savedInstanceState.getParcelableArrayList("ownedHaystacks");
 
-            HaystackListTabFragment publicTab = mHaystackPagerAdapter.getPublicHaystackListFragment();
-            HaystackListTabFragment privateTab = mHaystackPagerAdapter.getPrivateHaystackListFragment();
-            HaystackListTabFragment ownedTab = mHaystackPagerAdapter.getOwnedHaystackListFragment();
+            if(mHaystackPagerAdapter != null){
+                HaystackListTabFragment publicTab = mHaystackPagerAdapter.getPublicHaystackListFragment();
+                HaystackListTabFragment privateTab = mHaystackPagerAdapter.getPrivateHaystackListFragment();
+                HaystackListTabFragment ownedTab = mHaystackPagerAdapter.getOwnedHaystackListFragment();
 
-            if (publicTab != null) publicTab.updateHaystackList(publicHaystacks);
-            if (privateTab != null) privateTab.updateHaystackList(privateHaystacks);
-            if (ownedTab != null) ownedTab.updateHaystackList(ownedHaystacks);
+                if (publicTab != null) publicTab.updateHaystackList(publicHaystacks);
+                if (privateTab != null) privateTab.updateHaystackList(privateHaystacks);
+                if (ownedTab != null) ownedTab.updateHaystackList(ownedHaystacks);
+            }
 
             if (privateHaystacks != null && publicHaystacks != null && getActivity() != null) {
                 ((HomeActivity) getActivity()).setHaystacksCount(privateHaystacks.size() + publicHaystacks.size());

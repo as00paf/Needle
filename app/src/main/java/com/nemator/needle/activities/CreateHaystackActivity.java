@@ -63,7 +63,7 @@ public class CreateHaystackActivity extends AppCompatActivity implements CreateH
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         //ViewPager
-        mCreateHaystackPagerAdapter = new CreateHaystackPagerAdapter(getSupportFragmentManager(), this);
+        mCreateHaystackPagerAdapter = new CreateHaystackPagerAdapter(getSupportFragmentManager(), this, false);
         createHaystackViewPager = (ViewPager) findViewById(R.id.view_pager);
         createHaystackViewPager.setAdapter(mCreateHaystackPagerAdapter);
         createHaystackViewPager.setOffscreenPageLimit(2);
@@ -281,9 +281,11 @@ public class CreateHaystackActivity extends AppCompatActivity implements CreateH
 
     @Override
     public void onPrivacySettingsChanged(Boolean isPublic) {
-        mCreateHaystackPagerAdapter.setIsPublic(isPublic);
-
         this.isPublic = isPublic;
+
+        mCreateHaystackPagerAdapter.setIsPublic(isPublic);
+        mCreateHaystackPagerAdapter.notifyDataSetChanged();
+        mSlidingTabLayout.invalidate();
     }
 
     //Creation Handler

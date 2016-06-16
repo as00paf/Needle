@@ -66,6 +66,27 @@ public class CreateNeedleActivity extends AppCompatActivity implements NeedleCon
         viewPager = (ViewPager) findViewById(R.id.view_pager);
         viewPager.setAdapter(pagerAdapter);
 
+        viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+                if(position == 1){
+                    fab.setVisibility(View.VISIBLE);
+                }else{
+                    fab.setVisibility(View.INVISIBLE);
+                }
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+
+            }
+        });
+
         //Tabs
         tabs = (SlidingTabLayout) findViewById(R.id.sliding_tabs);
         if(!userAlreadySelected){

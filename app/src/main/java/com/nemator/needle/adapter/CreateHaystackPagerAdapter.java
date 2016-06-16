@@ -29,9 +29,10 @@ public class CreateHaystackPagerAdapter extends FragmentPagerAdapter implements 
             R.drawable.users_icon_selector
     };
 
-    public CreateHaystackPagerAdapter(FragmentManager fm, Context context) {
+    public CreateHaystackPagerAdapter(FragmentManager fm, Context context, boolean isPublic) {
         super(fm);
         this.context = context;
+        this.isPublic = isPublic;
     }
 
     @Override

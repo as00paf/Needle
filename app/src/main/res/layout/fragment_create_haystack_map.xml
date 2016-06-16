@@ -48,7 +48,7 @@
                 android:layout_height="43dp"
                 android:background="@drawable/mapbutton_background"
                 android:layout_marginRight="10dp"
-                android:src="@drawable/circle_black_24"/>
+                android:src="@drawable/square_black_24"/>
 
             <TextView
                 android:id="@+id/radius_label"

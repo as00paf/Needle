@@ -32,7 +32,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.nemator.needle.adapter.SlidingPanelPagerAdapter;
+import com.nemator.needle.adapter.BottomSheetPagerAdapter;
 
 /**
  * To be used with ViewPager to provide a tab indicator component which give constant feedback as to
@@ -237,7 +237,7 @@ public class SlidingTabLayout extends HorizontalScrollView {
 
             //Set Icon
             if (tabIconView != null) {
-                tabIconView.setImageDrawable(((SlidingPanelPagerAdapter) adapter).getPageIcon(i));
+                tabIconView.setImageDrawable(((BottomSheetPagerAdapter) adapter).getPageIcon(i));
             }
 
             tabView.setOnClickListener(tabClickListener);

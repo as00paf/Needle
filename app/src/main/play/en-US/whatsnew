@@ -1,3 +1,2 @@
--Removed unused files
-*Fixed create needle bug
-*Fixing create haystack
+*Fixed Haystack creation public/private bug
+*Fixed all tabs

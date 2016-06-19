@@ -40,8 +40,8 @@
     <string name="forgot_password">Forgot Password ?</string>
 
     <!-- Haystack -->
-    <string name="publicHeader">Public Haystacks</string>
-    <string name="privateHeader">Private Haystacks</string>
+    <string name="publicHeader">Public</string>
+    <string name="privateHeader">Private</string>
     <string name="ownedHeader">My Haystacks</string>
     <string name="noHaystackAvailable">No Haystacks Available</string>
     <string name="activeUsers"> Active Users</string>
@@ -222,6 +222,9 @@
     <string name="fb_page">needle.application</string>
     <string name="twitter_user">needle_app</string>
     <string name="youtube_channel">UCGlCodx423RHkYZuXo8yeHw</string>
+    <string name="requests">requests</string>
+    <string name="new_needle">New Needle</string>
+    <string name="new_haystack">New Haystack</string>
 
     <!-- FAQ -->
     <string-array name="faq_question_titles">

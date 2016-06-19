@@ -8,6 +8,7 @@ import android.content.IntentFilter;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.TabLayout;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
@@ -24,7 +25,6 @@ import com.nemator.needle.controller.NeedleController;
 import com.nemator.needle.models.vo.NeedleVO;
 import com.nemator.needle.models.vo.UserVO;
 import com.nemator.needle.utils.AppConstants;
-import com.nemator.needle.views.SlidingTabLayout;
 
 public class CreateNeedleActivity extends AppCompatActivity implements NeedleController.CreateNeedleDelegate {
 
@@ -32,7 +32,7 @@ public class CreateNeedleActivity extends AppCompatActivity implements NeedleCon
 
     //View
     private FloatingActionButton fab;
-    private SlidingTabLayout tabs;
+    private TabLayout tabs;
     private ViewPager viewPager;
     private ProgressDialog progressDialog;
 
@@ -57,8 +57,8 @@ public class CreateNeedleActivity extends AppCompatActivity implements NeedleCon
 
         //Toolbar
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar.setTitle(R.string.new_needle);
         setSupportActionBar(toolbar);
-
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         //ViewPager
@@ -88,20 +88,11 @@ public class CreateNeedleActivity extends AppCompatActivity implements NeedleCon
         });
 
         //Tabs
-        tabs = (SlidingTabLayout) findViewById(R.id.sliding_tabs);
+        tabs = (TabLayout) findViewById(R.id.sliding_tabs);
         if(!userAlreadySelected){
-            tabs.setCustomTabView(R.layout.layout_tab_title, R.id.tab_text);
-            tabs.setDistributeEvenly(true);
-            tabs.setViewPager(viewPager, toolbar);
-
-            tabs.setCustomTabColorizer(new SlidingTabLayout.TabColorizer() {
-
-                @Override
-                public int getIndicatorColor(int position) {
-                    return Color.WHITE;
-                }
-
-            });
+            tabs.setTabMode(TabLayout.MODE_FIXED);
+            tabs.setTabGravity(TabLayout.GRAVITY_FILL);
+            tabs.setupWithViewPager(viewPager);
         }else{
             tabs.setVisibility(View.GONE);
         }
@@ -119,9 +110,7 @@ public class CreateNeedleActivity extends AppCompatActivity implements NeedleCon
             }
         });
 
-        if(!userAlreadySelected){
-            getSupportActionBar().setTitle(pagerAdapter.getPageTitle(0));
-        }else{
+        if(userAlreadySelected){
             getSupportActionBar().setTitle(getString(R.string.send_needle_to, selectedUser.getReadableUserName()));
         }
 

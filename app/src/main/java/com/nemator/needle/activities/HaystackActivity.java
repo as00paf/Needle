@@ -1,18 +1,15 @@
 package com.nemator.needle.activities;
 
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.location.Location;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.TabLayout;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.view.ViewPager;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -24,11 +21,10 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.appcompat.view.slidingTab.SlidingTabLayout;
 import com.google.android.gms.maps.model.LatLng;
 import com.nemator.needle.Needle;
 import com.nemator.needle.R;
-import com.nemator.needle.adapter.SlidingPanelPagerAdapter;
+import com.nemator.needle.adapter.BottomSheetPagerAdapter;
 import com.nemator.needle.api.ApiClient;
 import com.nemator.needle.api.result.HaystackResult;
 import com.nemator.needle.api.result.PinResult;
@@ -58,9 +54,9 @@ public class HaystackActivity extends AppCompatActivity implements AddPinDialogF
 
     private Toolbar toolbar;
     private HaystackMapFragment mapFragment;
-    private SlidingPanelPagerAdapter pagerAdapter;
+    private BottomSheetPagerAdapter pagerAdapter;
     private ViewPager slidingPanelViewPager;
-    private SlidingTabLayout tabLayout;
+    private TabLayout tabLayout;
     private CustomBottomSheetLayout bottomSheet;
     private TextView activeUntilLabel;
     private FloatingActionButton fab;
@@ -99,7 +95,7 @@ public class HaystackActivity extends AppCompatActivity implements AddPinDialogF
         getSupportActionBar().setDisplayShowHomeEnabled(true);
 
         bottomSheet = (CustomBottomSheetLayout) findViewById(R.id.bottomsheet);
-        bottomSheet.showWithSheetView(getLayoutInflater().inflate(R.layout.haystack_sliding_tab, bottomSheet, false));
+        bottomSheet.showWithSheetView(getLayoutInflater().inflate(R.layout.haystack_bottom_sheet, bottomSheet, false));
         bottomSheet.setShouldDimContentView(false);
         bottomSheet.setPeekOnDismiss(true);
         bottomSheet.setIsDismissableOnTouch(false);
@@ -110,22 +106,19 @@ public class HaystackActivity extends AppCompatActivity implements AddPinDialogF
         activeUntilLabel.setText(AppUtils.formatDateUntil(this, haystack.getTimeLimit()));
 
         //View pager
-        pagerAdapter = new SlidingPanelPagerAdapter(getSupportFragmentManager(), this);
+        pagerAdapter = new BottomSheetPagerAdapter(getSupportFragmentManager(), this);
         slidingPanelViewPager = (ViewPager) bottomSheet.findViewById(R.id.slidingPanelViewPager);
         slidingPanelViewPager.setAdapter(pagerAdapter);
 
         //Tabs
-        tabLayout = (SlidingTabLayout) bottomSheet.findViewById(R.id.sliding_tabs);
-        tabLayout.setDistributeEvenly(true); // To make the Tabs Fixed set this true, This makes the tabs Space Evenly in Available width
-        tabLayout.setCustomTabColorizer(new SlidingTabLayout.TabColorizer() {
-            @Override
-            public int getIndicatorColor(int position) {
-                return getResources().getColor(R.color.tabsScrollColor);
-            }
-        });
-        tabLayout.setCustomTabView(R.layout.icon_tab, R.id.icon_tab_label, R.id.icon_tab_icon);
-
-        tabLayout.setViewPager(slidingPanelViewPager);
+        tabLayout = (TabLayout) bottomSheet.findViewById(R.id.sliding_tabs);
+        tabLayout.setTabMode(TabLayout.MODE_FIXED);
+        tabLayout.setTabGravity(TabLayout.GRAVITY_FILL);
+        tabLayout.setupWithViewPager(slidingPanelViewPager);
+        for (int i = 0; i < tabLayout.getTabCount(); i++) {
+            TabLayout.Tab tab = tabLayout.getTabAt(i);
+            tab.setCustomView(pagerAdapter.getTabView(i));
+        }
 
         tabLayout.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
             @Override
@@ -138,28 +131,9 @@ public class HaystackActivity extends AppCompatActivity implements AddPinDialogF
             }
         });
 
-        tabLayout.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
-            @Override
-            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-
-            }
-
-            @Override
-            public void onPageSelected(int position) {
-                if (bottomSheet.getState().equals(CustomBottomSheetLayout.State.PEEKED)) {
-                    bottomSheet.expandSheet();
-                }
-            }
-
-            @Override
-            public void onPageScrollStateChanged(int state) {
-
-            }
-        });
-
         //Floating Action Button
         fab = (FloatingActionButton) bottomSheet.findViewById(R.id.fab_add_users);
-        if(isOwner()){
+        if(isOwner() && !haystack.getIsPublic()){
             fab.setVisibility(View.VISIBLE);
             fab.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -253,6 +227,12 @@ public class HaystackActivity extends AppCompatActivity implements AddPinDialogF
         }
     }
 
+    @Override
+    protected void onPause() {
+        super.onPause();
+        Needle.serviceController.unbindService();
+    }
+
     private void showFab(){
         fab.animate().setDuration(300).setInterpolator(new OvershootInterpolator())
                 .scaleY(1.0f).scaleX(1.0f).start();
@@ -289,7 +269,6 @@ public class HaystackActivity extends AppCompatActivity implements AddPinDialogF
     @Override
     protected void onDestroy() {
         Needle.networkController.unregister();
-        Needle.serviceController.unbindService();
 
         super.onDestroy();
     }

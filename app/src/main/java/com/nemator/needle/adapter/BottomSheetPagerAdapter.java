@@ -9,6 +9,7 @@ import android.support.v4.app.FragmentStatePagerAdapter;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.nemator.needle.R;
@@ -17,11 +18,11 @@ import com.nemator.needle.fragments.haystack.HaystackUsersTabFragment;
 
 import java.util.ArrayList;
 
-public class SlidingPanelPagerAdapter extends FragmentStatePagerAdapter {
+public class BottomSheetPagerAdapter extends FragmentStatePagerAdapter {
     private Context context;
     private ArrayList<Fragment> fragmentList = new ArrayList<Fragment>();
 
-    public SlidingPanelPagerAdapter(FragmentManager fm, Context context) {
+    public BottomSheetPagerAdapter(FragmentManager fm, Context context) {
         super(fm);
         this.context = context;
     }
@@ -70,16 +71,27 @@ public class SlidingPanelPagerAdapter extends FragmentStatePagerAdapter {
     }
 
     public Drawable getPageIcon(int position){
-        Drawable icon;
+        Drawable icon = null;
         switch (position){
             case 0:
                 icon = context.getResources().getDrawable(R.drawable.ic_action_place);
                 break;
             case 1:
-                icon= context.getResources().getDrawable(R.drawable.ic_action_group);
+                icon= context.getResources().getDrawable(R.drawable.ic_people_black_24dp);
                 break;
-            default:
-                icon = context.getResources().getDrawable(R.drawable.ic_action_directions);
+        }
+
+        return icon;
+    }
+
+    public int getPageIconRes(int position){
+        int icon = 0;
+        switch (position){
+            case 0:
+                icon = R.drawable.place_icon_selector;
+                break;
+            case 1:
+                icon= R.drawable.people_icon_selector;
                 break;
         }
 
@@ -98,5 +110,17 @@ public class SlidingPanelPagerAdapter extends FragmentStatePagerAdapter {
     public void destroyItem(View container, int position, Object object) {
         super.destroyItem(container, position, object);
         fragmentList.remove(position);
+    }
+
+    public View getTabView(int position) {
+        TextView tab = (TextView) LayoutInflater.from(context).inflate(R.layout.layout_tab_title, null);
+
+        tab.setCompoundDrawablesWithIntrinsicBounds(0, getPageIconRes(position), 0, 0);
+        tab.setText(getPageTitle(position));
+
+        if (position == 0) {
+            tab.setSelected(true);
+        }
+        return tab;
     }
 }

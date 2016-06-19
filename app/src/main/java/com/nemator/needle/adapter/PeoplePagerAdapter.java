@@ -77,7 +77,7 @@ public class PeoplePagerAdapter extends FragmentStatePagerAdapter {
                 title = fragment.getString(R.string.friends);
                 break;
             case REQUESTS:
-                title = fragment.getString(R.string.friend_requests);
+                title = fragment.getString(R.string.requests);
                 break;
             case DISCOVER:
                 title = fragment.getString(R.string.discover);

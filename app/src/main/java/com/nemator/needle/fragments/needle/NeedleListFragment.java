@@ -4,8 +4,8 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
-import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -13,7 +13,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
-import com.appcompat.view.slidingTab.SlidingTabLayout;
 import com.nemator.needle.Needle;
 import com.nemator.needle.R;
 import com.nemator.needle.activities.CreateNeedleActivity;
@@ -39,7 +38,7 @@ public class NeedleListFragment extends Fragment {
     //Views
     private View rootView;
     private ViewPager locationSharingViewPager;
-    private SlidingTabLayout mSlidingTabLayout;
+    private TabLayout mSlidingTabLayout;
     private FloatingActionButton fab;
 
     //Objects
@@ -124,18 +123,12 @@ public class NeedleListFragment extends Fragment {
             locationSharingViewPager.setAdapter(mNeedlePagerAdapter);
 
             //Tabs
-            mSlidingTabLayout = (SlidingTabLayout) rootView.findViewById(R.id.tabs);
-            mSlidingTabLayout.setDistributeEvenly(true);
-            mSlidingTabLayout.setCustomTabColorizer(new SlidingTabLayout.TabColorizer() {
-                @Override
-                public int getIndicatorColor(int position) {
-                    return getResources().getColor(R.color.tabsScrollColor);
-                }
-            });
+            mSlidingTabLayout = (TabLayout) rootView.findViewById(R.id.tabs);
+            mSlidingTabLayout.setTabMode(TabLayout.MODE_FIXED);
+            mSlidingTabLayout.setTabGravity(TabLayout.GRAVITY_FILL);
+            mSlidingTabLayout.setupWithViewPager(locationSharingViewPager);
 
-            mSlidingTabLayout.setSelectedIndicatorColors(ContextCompat.getColor(getContext(), android.R.color.white));
-            mSlidingTabLayout.setViewPager(locationSharingViewPager);
-            mSlidingTabLayout.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            locationSharingViewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
                 @Override
                 public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
 

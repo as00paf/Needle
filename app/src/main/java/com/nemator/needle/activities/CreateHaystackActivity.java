@@ -9,6 +9,7 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.TabLayout;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
@@ -29,7 +30,6 @@ import com.nemator.needle.fragments.haystacks.createHaystack.CreateHaystackUsers
 import com.nemator.needle.models.vo.HaystackVO;
 import com.nemator.needle.models.vo.UserVO;
 import com.nemator.needle.utils.AppConstants;
-import com.nemator.needle.views.SlidingTabLayout;
 
 import java.util.ArrayList;
 
@@ -40,7 +40,7 @@ public class CreateHaystackActivity extends AppCompatActivity implements CreateH
 
     //View
     private FloatingActionButton fab;
-    private SlidingTabLayout mSlidingTabLayout;
+    private TabLayout tabs;
     private ProgressDialog progressDialog;
 
     //Data
@@ -58,6 +58,7 @@ public class CreateHaystackActivity extends AppCompatActivity implements CreateH
         //Toolbar
         setContentView(R.layout.activity_create);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar.setTitle(R.string.new_haystack);
         setSupportActionBar(toolbar);
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -75,7 +76,7 @@ public class CreateHaystackActivity extends AppCompatActivity implements CreateH
 
             @Override
             public void onPageSelected(int position) {
-                if(position == 2){
+                if(position == 2 || (position == 1 && isPublic)){
                     fab.setVisibility(View.VISIBLE);
                 }else{
                     fab.setVisibility(View.INVISIBLE);
@@ -89,19 +90,10 @@ public class CreateHaystackActivity extends AppCompatActivity implements CreateH
         });
 
         //Tabs
-        mSlidingTabLayout = (SlidingTabLayout) findViewById(R.id.sliding_tabs);
-        mSlidingTabLayout.setCustomTabView(R.layout.layout_tab_title, R.id.tab_text);
-        mSlidingTabLayout.setDistributeEvenly(true);
-        mSlidingTabLayout.setViewPager(createHaystackViewPager, toolbar);
-
-        mSlidingTabLayout.setCustomTabColorizer(new SlidingTabLayout.TabColorizer() {
-
-            @Override
-            public int getIndicatorColor(int position) {
-                return Color.WHITE;
-            }
-
-        });
+        tabs = (TabLayout) findViewById(R.id.sliding_tabs);
+        tabs.setTabMode(TabLayout.MODE_FIXED);
+        tabs.setTabGravity(TabLayout.GRAVITY_FILL);
+        tabs.setupWithViewPager(createHaystackViewPager);
 
         //FAB
         fab = (FloatingActionButton) findViewById(R.id.fab);
@@ -285,7 +277,6 @@ public class CreateHaystackActivity extends AppCompatActivity implements CreateH
 
         mCreateHaystackPagerAdapter.setIsPublic(isPublic);
         mCreateHaystackPagerAdapter.notifyDataSetChanged();
-        mSlidingTabLayout.invalidate();
     }
 
     //Creation Handler

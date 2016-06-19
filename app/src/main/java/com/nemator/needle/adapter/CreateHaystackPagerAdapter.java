@@ -24,7 +24,7 @@ public class CreateHaystackPagerAdapter extends FragmentPagerAdapter implements 
     private Boolean isPublic = false;
 
     private int[] drawablesIds = {
-            R.drawable.haystack_icon_selector,
+            R.drawable.home_icon_selector,
             R.drawable.map_icon_selector,
             R.drawable.users_icon_selector
     };

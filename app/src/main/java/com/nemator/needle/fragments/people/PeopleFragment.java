@@ -1,12 +1,11 @@
 package com.nemator.needle.fragments.people;
 
-import android.animation.Animator;
 import android.app.SearchManager;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
-import android.support.v4.content.ContextCompat;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
@@ -21,9 +20,6 @@ import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Toast;
 
-import com.appcompat.view.slidingTab.SlidingTabLayout;
-import com.google.android.gms.maps.model.LatLngBounds;
-import com.google.android.gms.plus.People;
 import com.nemator.needle.R;
 import com.nemator.needle.activities.HomeActivity;
 import com.nemator.needle.adapter.PeoplePagerAdapter;
@@ -31,7 +27,6 @@ import com.nemator.needle.api.ApiClient;
 import com.nemator.needle.api.result.FriendsResult;
 import com.nemator.needle.models.vo.FriendVO;
 import com.nemator.needle.models.vo.UserVO;
-import com.nemator.needle.utils.SphericalUtil;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -46,7 +41,7 @@ public class PeopleFragment extends Fragment {
     //Views
     private View rootView;
     private ViewPager viewPager;
-    private SlidingTabLayout mSlidingTabLayout;
+    private TabLayout mSlidingTabLayout;
     private FloatingActionButton fab;
     private Menu menu;
     private SearchView searchView;
@@ -126,40 +121,10 @@ public class PeopleFragment extends Fragment {
             viewPager.setAdapter(pagerAdapter);
 
             //Tabs
-            mSlidingTabLayout = (SlidingTabLayout) rootView.findViewById(R.id.tabs);
-            mSlidingTabLayout.setDistributeEvenly(true);
-            mSlidingTabLayout.setCustomTabColorizer(new SlidingTabLayout.TabColorizer() {
-                @Override
-                public int getIndicatorColor(int position) {
-                    return getResources().getColor(R.color.tabsScrollColor);
-                }
-            });
-
-            mSlidingTabLayout.setSelectedIndicatorColors(ContextCompat.getColor(getContext(), android.R.color.white));
-            mSlidingTabLayout.setViewPager(viewPager);
-            mSlidingTabLayout.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
-                @Override
-                public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-
-                }
-
-                @Override
-                public void onPageSelected(int position) {
-                    switch(position){
-                        case 0:
-
-                            break;
-                        case 1:
-
-                            break;
-                    }
-                }
-
-                @Override
-                public void onPageScrollStateChanged(int state) {
-
-                }
-            });
+            mSlidingTabLayout = (TabLayout) rootView.findViewById(R.id.tabs);
+            mSlidingTabLayout.setTabMode(TabLayout.MODE_FIXED);
+            mSlidingTabLayout.setTabGravity(TabLayout.GRAVITY_FILL);
+            mSlidingTabLayout.setupWithViewPager(viewPager);
 
             setHasOptionsMenu(true);
         }

@@ -7,6 +7,7 @@ import android.location.Location;
 import android.os.Handler;
 import android.os.SystemClock;
 import android.support.v4.content.ContextCompat;
+import android.text.TextUtils;
 import android.view.animation.Interpolator;
 import android.view.animation.LinearInterpolator;
 
@@ -62,7 +63,7 @@ public class MarkerUtils {
         final MarkerImageTransform transform = new MarkerImageTransform(context);
 
         //Load and transform picture into marker
-        if(!pictureURL.isEmpty()){
+        if(!TextUtils.isEmpty(pictureURL)){
             Picasso.with(context).load(pictureURL)
                     .placeholder(R.drawable.person_placeholder)
                     .transform(transform)

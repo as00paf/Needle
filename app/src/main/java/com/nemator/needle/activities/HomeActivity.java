@@ -237,9 +237,13 @@ public class HomeActivity extends AppCompatActivity {
 
             if(result.getSuccessCode() > 0){
                 Log.d(TAG, "User infos retrieved successfully");
+                Needle.userModel.setUser(result.getUser());
+
                 setHaystacksCount(result.getHaystackCount());
                 setNeedleCount(result.getLocationSharingCount());
                 setNotificationsCount(result.getNotificationCount());
+
+                setAccount();
             }else{
                 Log.d(TAG, "Failed to retrieve user infos. Error " + result.getMessage());
             }
@@ -278,7 +282,7 @@ public class HomeActivity extends AppCompatActivity {
         if(extras != null){
             String action = extras.getString(AppConstants.TAG_ACTION);
 
-            if(action.equals(AppConstants.TAG_SECTION)){
+            if(action != null && action.equals(AppConstants.TAG_SECTION)){
                 int section =  extras.getInt(AppConstants.TAG_SECTION);
                 Needle.navigationController.showSection(section, extras);
             }
@@ -322,6 +326,7 @@ public class HomeActivity extends AppCompatActivity {
         return false;
     }
 
+    //TODO : Remove completely
     /*@Override
     public void onBackPressed() {
         int state = Needle.navigationController.getCurrentState();
@@ -382,7 +387,6 @@ public class HomeActivity extends AppCompatActivity {
         TextView view = (TextView) navigationView.getMenu().findItem(itemId).getActionView();
         if(view != null) view.setText(count > 0 ? String.valueOf(count) : null);
     }
-
 
     //Getters/Setters
     public ActionBarDrawerToggle getDrawerToggle() {

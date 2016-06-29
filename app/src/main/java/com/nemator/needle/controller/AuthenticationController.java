@@ -1,6 +1,5 @@
 package com.nemator.needle.controller;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
@@ -11,13 +10,13 @@ import android.content.IntentFilter;
 import android.content.IntentSender;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.v4.app.Fragment;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
+import com.facebook.AccessToken;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
@@ -43,7 +42,7 @@ import com.nemator.needle.R;
 import com.nemator.needle.activities.HomeActivity;
 import com.nemator.needle.api.ApiClient;
 import com.nemator.needle.api.result.UserRegistrationResult;
-import com.nemator.needle.models.vo.FacebookUserVO;
+import com.nemator.needle.models.vo.facebook.FacebookUserVO;
 import com.nemator.needle.models.vo.UserVO;
 import com.nemator.needle.api.result.LoginResult;
 import com.nemator.needle.utils.AppConstants;
@@ -89,6 +88,7 @@ public class AuthenticationController {
     private TwitterAuthClient twitterAuthClient;
 
     private ProgressDialog mProgressDialog;
+    private AccessToken facebookAccessToken;
 
 
     public AuthenticationController(){
@@ -130,7 +130,7 @@ public class AuthenticationController {
                 Needle.googleApiController.stopAutoManage();
 
                 Intent intent = new Intent(activity, HomeActivity.class);
-                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_TASK_ON_HOME);
+                //intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_TASK_ON_HOME);
                 intent.putExtra("loginResult", result);//TODO : use constant
                 activity.startActivity(intent);
             }
@@ -364,7 +364,6 @@ public class AuthenticationController {
         });
     }
 
-
     //Facebook
     private void initFacebook(){
         Log.d(TAG, "initFacebook");
@@ -392,7 +391,7 @@ public class AuthenticationController {
 
             LoginManager.getInstance().registerCallback(facebookCallbackManager, facebookLoginCallback);
 
-            LoginManager.getInstance().logInWithReadPermissions(activity, Arrays.asList("public_profile", "user_friends", "email"));
+            LoginManager.getInstance().logInWithReadPermissions(activity, Arrays.asList("public_profile", "user_friends", "email", "user_photos"));
         }
     };
 
@@ -528,5 +527,9 @@ public class AuthenticationController {
                 })
                 .create()
                 .show();
+    }
+
+    public AccessToken getFacebookAccessToken() {
+        return  AccessToken.getCurrentAccessToken();
     }
 }

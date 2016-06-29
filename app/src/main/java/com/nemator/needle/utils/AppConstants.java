@@ -34,6 +34,7 @@ public class AppConstants {
     public static final String TAG_NOTIFICATION = "notification";
     public static final String TAG_FRIENDSHIP = "friendship";
 
+
     //Location updates
     public static final int MILLISECONDS_PER_SECOND = 1000;
     public static final int UPDATE_INTERVAL_IN_SECONDS = 5;
@@ -52,6 +53,8 @@ public class AppConstants {
     public static final String APP_STATE = "appState";
     public static final String APP_PREVIOUS_STATE = "appPrevState";
     public static final String IS_FIRST_START = "isFirstStart";
+    public static final String PROFILE_PICTURE = "profile_picture";
+    public static final String COVER_PICTURE = "cover_picture";
     public static String RECEIVED_LOCATION_LIST = "receivedLocationList";
     public static String SENT_LOCATION_LIST = "sentLocationList";
 
@@ -74,6 +77,10 @@ public class AppConstants {
     //Request Codes
     public static final int SELECT_NEW_HAYSTACK_USERS = 1000;
     public static final int TAKE_PICTURE = 226;
+    public static final int TAKE_PICTURE_AVATAR = 226;
+    public static final int SELECT_PICTURE_AVATAR = 227;
+    public static final int TAKE_PICTURE_COVER = 228;
+    public static final int SELECT_PICTURE_COVER = 229;
 
     //Notification Types
     public static final int HAYSTACK_INVITATION = 0;
@@ -92,5 +99,13 @@ public class AppConstants {
     //Friendship Status
     public static final int FRIEND_REQUESTED = 0;
     public static final int FRIEND = 1;
+
+    //FB Stuff
+    public static final String TAG_FB_GENDER = "fb_gender";
+    public static final String TAG_FB_EMAIL = "fb_email";
+    public static final String TAG_FB_USER_NAME = "fb_name";
+    public static final String TAG_FB_USER_ID = "fb_id";
+    public static final String TAG_COVER_FB_PICTURE_URL = "fb_" + COVER_PICTURE;
+    public static final String TAG_FB_PICTURE_URL = "fb_" + PROFILE_PICTURE;
 
 }

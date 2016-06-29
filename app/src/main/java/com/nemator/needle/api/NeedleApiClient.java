@@ -1,8 +1,11 @@
 package com.nemator.needle.api;
 
+import android.graphics.Bitmap;
+
 import com.nemator.needle.api.result.FriendshipResult;
 import com.nemator.needle.api.result.FriendsResult;
 import com.nemator.needle.api.result.HaystackResult;
+import com.nemator.needle.api.result.ImageResult;
 import com.nemator.needle.api.result.NeedleResult;
 import com.nemator.needle.api.result.LoginResult;
 import com.nemator.needle.api.result.NotificationResult;
@@ -14,6 +17,7 @@ import com.nemator.needle.api.result.UsersResult;
 import com.nemator.needle.models.vo.FriendshipVO;
 import com.nemator.needle.models.vo.HaystackUserVO;
 import com.nemator.needle.models.vo.HaystackVO;
+import com.nemator.needle.models.vo.ImageVO;
 import com.nemator.needle.models.vo.NeedleVO;
 import com.nemator.needle.models.vo.NotificationVO;
 import com.nemator.needle.models.vo.PinVO;
@@ -22,12 +26,14 @@ import com.nemator.needle.api.result.TaskResult;
 
 import java.util.ArrayList;
 
+import okhttp3.RequestBody;
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.Field;
 import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
 import retrofit2.http.HTTP;
+import retrofit2.http.PATCH;
 import retrofit2.http.POST;
 import retrofit2.http.PUT;
 import retrofit2.http.Path;
@@ -55,6 +61,9 @@ public interface NeedleApiClient {
     @FormUrlEncoded
     @PUT("user.php")
     Call<TaskResult> updateGCMRegId(@Field("userId") int userId, @Field("gcmRegId") String gcmRegId);
+
+    @PUT("user.php")
+    Call<ImageResult> updatePicture(@Body ImageVO imageVO);
 
     //Authentication
     @POST("login.php")

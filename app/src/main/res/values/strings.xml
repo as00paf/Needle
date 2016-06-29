@@ -199,6 +199,8 @@
     <string name="add_friend">Add Friend</string>
     <string name="add_to_group">Add to Group</string>
     <string name="send_needle">Send Needle</string>
+    <string name="image_upload_failed_msg">An error occured while uploading the picture</string>
+    <string name="image_upload_success_msg">Picture Uploaded!</string>
 
     <!-- Help & Support -->
     <string name="about">About</string>
@@ -225,6 +227,12 @@
     <string name="requests">requests</string>
     <string name="new_needle">New Needle</string>
     <string name="new_haystack">New Haystack</string>
+    <string name="take_picture">Take Picture</string>
+    <string name="upload_picture">Select from Gallery</string>
+    <string name="uploading_picutre">Uploading Picture ...</string>
+    <string name="uploading_picutre_msg">Your picture is updating</string>
+    <string name="use_fb_picture">Use Facebook Picture</string>
+    <string name="select_fb_picture">Select from Facebook</string>
 
     <!-- FAQ -->
     <string-array name="faq_question_titles">

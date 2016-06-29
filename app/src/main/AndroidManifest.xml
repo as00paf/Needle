@@ -161,6 +161,10 @@
             android:label="@string/faq"
             android:theme="@style/AppTheme" />
         <activity
+            android:name=".activities.facebook.FacebookAlbumActivity"
+            android:label="@string/select_fb_picture"
+            android:theme="@style/AppTheme" />
+        <activity
             android:name="com.facebook.FacebookActivity"
             android:configChanges="keyboard|keyboardHidden|screenLayout|screenSize|orientation"
             android:label="@string/app_name"

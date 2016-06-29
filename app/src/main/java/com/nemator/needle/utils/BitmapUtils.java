@@ -1,5 +1,6 @@
 package com.nemator.needle.utils;
 
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Matrix;
@@ -8,6 +9,19 @@ import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
+import android.os.AsyncTask;
+import android.os.Build;
+import android.os.ParcelFileDescriptor;
+import android.util.Base64;
+
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileDescriptor;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
 
 /**
  * Created by Alex on 19/03/2016.
@@ -84,5 +98,79 @@ public class BitmapUtils {
         canvas.drawBitmap(backgroundBitmap, new Matrix(), null);
         canvas.drawBitmap(overlayBitmap, left, top, null);
         return resultBitmap;
+    }
+
+    public static class BitmapToBase64 extends AsyncTask<BitmapDecoderParams, Void, Void> {
+        public static final String TAG = "BitmapToBase64";
+
+        @Override
+        protected Void doInBackground(BitmapDecoderParams... params) {
+            Uri file = params[0].filePath;
+            if(file == null)
+                return null;
+
+            InputStream inputStream = null;//You can get an inputStream using any IO API
+            try {
+                inputStream = getSourceStream(params[0].context, file);
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }
+            if(inputStream == null){
+                try {
+                    File fileFile = new File(file.getPath());
+                    inputStream = new FileInputStream(fileFile);
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            byte[] bytes;
+            byte[] buffer = new byte[8192];
+            int bytesRead;
+            ByteArrayOutputStream output = new ByteArrayOutputStream();
+            try {
+                while ((bytesRead = inputStream.read(buffer)) != -1) {
+                    output.write(buffer, 0, bytesRead);
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            bytes = output.toByteArray();
+            String encodedString = Base64.encodeToString(bytes, Base64.DEFAULT);
+
+            params[0].delegate.onBitmapDecoded(encodedString);
+
+            return null;
+        }
+    };
+
+    public static FileInputStream getSourceStream(Context mContext, Uri u) throws FileNotFoundException {
+        FileInputStream out = null;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            ParcelFileDescriptor parcelFileDescriptor =
+                    mContext.getContentResolver().openFileDescriptor(u, "r");
+            FileDescriptor fileDescriptor = parcelFileDescriptor.getFileDescriptor();
+            out = new FileInputStream(fileDescriptor);
+        } else {
+            out = (FileInputStream) mContext.getContentResolver().openInputStream(u);
+        }
+        return out;
+    }
+
+    public static abstract class BitmapDecoderDelegate{
+        public abstract void onBitmapDecoded(String result);
+    }
+
+    public static class BitmapDecoderParams{
+
+        public BitmapDecoderDelegate delegate;
+        public Uri filePath;
+        public Context context;
+
+        public BitmapDecoderParams(Context context, Uri filePath, BitmapDecoderDelegate delegate) {
+            this.context = context;
+            this.filePath = filePath;
+            this.delegate = delegate;
+        }
     }
 }

@@ -1,10 +1,15 @@
 package com.nemator.needle.api;
 
+import android.content.Context;
+import android.graphics.Bitmap;
+import android.net.Uri;
+import android.os.Handler;
 import android.util.Log;
 
 import com.nemator.needle.Needle;
 import com.nemator.needle.api.result.FriendshipResult;
 import com.nemator.needle.api.result.FriendsResult;
+import com.nemator.needle.api.result.ImageResult;
 import com.nemator.needle.api.result.NeedleResult;
 import com.nemator.needle.api.result.NotificationResult;
 import com.nemator.needle.api.result.PinResult;
@@ -15,6 +20,7 @@ import com.nemator.needle.api.result.UsersResult;
 import com.nemator.needle.models.vo.FriendshipVO;
 import com.nemator.needle.models.vo.HaystackUserVO;
 import com.nemator.needle.models.vo.HaystackVO;
+import com.nemator.needle.models.vo.ImageVO;
 import com.nemator.needle.models.vo.NeedleVO;
 import com.nemator.needle.models.vo.NotificationVO;
 import com.nemator.needle.models.vo.PinVO;
@@ -23,13 +29,17 @@ import com.nemator.needle.api.result.TaskResult;
 import com.nemator.needle.api.result.HaystackResult;
 import com.nemator.needle.api.result.LoginResult;
 import com.nemator.needle.utils.AppConstants;
+import com.nemator.needle.utils.BitmapUtils;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.concurrent.TimeUnit;
 
 import okhttp3.Interceptor;
+import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
+import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -58,7 +68,10 @@ public class ApiClient {
                         .body(ResponseBody.create(response.body().contentType(), content))
                         .build();
             }
-        }).build();
+        })
+        .connectTimeout(1, TimeUnit.MINUTES)
+        .readTimeout(1, TimeUnit.MINUTES)
+        .build();
 
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(AppConstants.PROJECT_URL)
@@ -101,6 +114,24 @@ public class ApiClient {
 
     public void getUserById(int callerId, int userId,  Callback<UserResult> callBack) {
         Call<UserResult> call = client.getUserById(callerId, userId);
+        call.enqueue(callBack);
+    }
+
+    public void updateImage(Context context, final int userId, Uri filePath, final String type, final Callback<ImageResult> callBack) {
+        BitmapUtils.BitmapDecoderDelegate delegate = new BitmapUtils.BitmapDecoderDelegate() {
+            @Override
+            public void onBitmapDecoded(String result) {
+                Call<ImageResult> call = client.updatePicture(new ImageVO(userId, result, type));
+                call.enqueue(callBack);
+            }
+        };
+
+        BitmapUtils.BitmapDecoderParams params = new BitmapUtils.BitmapDecoderParams(context, filePath, delegate);
+        new BitmapUtils.BitmapToBase64().execute(params);
+    }
+
+    public void updateImage(Context context, final int userId, String imageUrl, final String type, final Callback<ImageResult> callBack) {
+        Call<ImageResult> call = client.updatePicture(new ImageVO(imageUrl, userId, type));
         call.enqueue(callBack);
     }
 

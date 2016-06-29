@@ -1,22 +1,35 @@
 package com.nemator.needle.activities;
 
+import android.Manifest;
+import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.ActivityInfo;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.graphics.Matrix;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Parcelable;
+import android.provider.MediaStore;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.ContextMenu;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageButton;
@@ -25,32 +38,49 @@ import android.widget.Toast;
 
 import com.nemator.needle.Needle;
 import com.nemator.needle.R;
+import com.nemator.needle.activities.facebook.FacebookAlbumActivity;
 import com.nemator.needle.adapter.UserProfileAdapter;
 import com.nemator.needle.api.ApiClient;
+import com.nemator.needle.api.callback.CreateHaystackCallback;
 import com.nemator.needle.api.result.FriendsResult;
 import com.nemator.needle.api.result.FriendshipResult;
+import com.nemator.needle.api.result.ImageResult;
 import com.nemator.needle.api.result.TaskResult;
 import com.nemator.needle.api.result.UserResult;
+import com.nemator.needle.controller.AuthenticationController;
 import com.nemator.needle.interfaces.IUserProfileListener;
 import com.nemator.needle.models.vo.FriendshipVO;
 import com.nemator.needle.models.vo.UserVO;
+import com.nemator.needle.tasks.imageUploader.ImageUploadParams;
+import com.nemator.needle.tasks.imageUploader.ImageUploadResult;
+import com.nemator.needle.tasks.imageUploader.ImageUploaderTask;
 import com.nemator.needle.utils.AppConstants;
+import com.nemator.needle.utils.BitmapUtils;
+import com.nemator.needle.utils.CameraUtils;
 import com.nemator.needle.utils.CropCircleTransformation;
+import com.nemator.needle.utils.PermissionManager;
 import com.squareup.picasso.Picasso;
 
+import java.io.File;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class UserProfileActivity extends AppCompatActivity implements IUserProfileListener{
+public class UserProfileActivity extends AppCompatActivity implements IUserProfileListener {
 
     public static final String TAG = "UserProfileActivity";
 
     private Toolbar toolbar;
     private RecyclerView listView;
     private ImageButton editAvatar, editCover;
+    private ImageView avatar, cover;
+    private ProgressDialog dialog;
+    private PopupMenu popup;
 
     private UserVO user;
     private ArrayList<UserVO> friends;
@@ -58,6 +88,8 @@ public class UserProfileActivity extends AppCompatActivity implements IUserProfi
     private Boolean isMe = false;
     private boolean userLoaded = false;
     private boolean friendsLoaded = false;
+    private boolean isCameraShown = false;
+    private File captureFile = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -177,25 +209,25 @@ public class UserProfileActivity extends AppCompatActivity implements IUserProfi
         getSupportActionBar().setDisplayShowHomeEnabled(true);
 
         //Profile Image
-        ImageView avatarImageView = (ImageView) findViewById(R.id.avatar);
+        avatar = (ImageView) findViewById(R.id.avatar);
         String pictureURL = user.getPictureURL().replace("_normal", "");
         if(!TextUtils.isEmpty(pictureURL)){
             Picasso.with(this).load(pictureURL)
                     .noFade()
                     .error(R.drawable.person_placeholder)
                     .transform(new CropCircleTransformation(this, 2, Color.WHITE))
-                    .into(avatarImageView);
+                    .into(avatar);
         }else{
             Picasso.with(this).load(R.drawable.person_placeholder)
                     .noFade()
                     .transform(new CropCircleTransformation(this, 2, Color.WHITE))
-                    .into(avatarImageView);
+                    .into(avatar);
             Log.e(TAG, "Can't load profile pic");
         }
 
         //Cover Image
         String coverUrl = user.getCoverPictureURL();
-        ImageView cover = (ImageView) findViewById(R.id.cover);
+        cover = (ImageView) findViewById(R.id.cover);
         if(!TextUtils.isEmpty(coverUrl)){
             Picasso.with(this)
                     .load(coverUrl)
@@ -216,6 +248,7 @@ public class UserProfileActivity extends AppCompatActivity implements IUserProfi
                 @Override
                 public void onClick(View v) {
                     Log.d(TAG, "Edit avatar picture");
+                    showEditPicturePopup(v, true);
                 }
             });
 
@@ -223,6 +256,7 @@ public class UserProfileActivity extends AppCompatActivity implements IUserProfi
                 @Override
                 public void onClick(View v) {
                     Log.d(TAG, "Edit cover picture");
+                    showEditPicturePopup(v, false);
                 }
             });
         }else{
@@ -241,8 +275,7 @@ public class UserProfileActivity extends AppCompatActivity implements IUserProfi
     //Menu
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        int menuRes = isMe ? R.menu.menu_user_profile : R.menu.menu_friend_profile;
-        getMenuInflater().inflate(menuRes, menu);
+        getMenuInflater().inflate(R.menu.menu_default, menu);
         return true;
     }
 
@@ -261,6 +294,233 @@ public class UserProfileActivity extends AppCompatActivity implements IUserProfi
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    public void showEditPicturePopup(View v, final boolean isAvatar) {
+        int menuRes = user.getLoginType() == AuthenticationController.LOGIN_TYPE_FACEBOOK ? R.menu.menu_update_picture_fb : R.menu.menu_update_picture;
+        PopupMenu popup = new PopupMenu(UserProfileActivity.this, v);
+
+        popup.setOnMenuItemClickListener(new MenuListener(isAvatar));
+        popup.inflate(menuRes);
+        popup.show();
+    }
+
+    private class MenuListener implements PopupMenu.OnMenuItemClickListener{
+
+        private boolean isAvatar;
+
+        public MenuListener(boolean isAvatar) {
+            this.isAvatar = isAvatar;
+        }
+
+        @Override
+        public boolean onMenuItemClick(MenuItem item) {
+            int id = item.getItemId();
+            switch (id){
+                case R.id.menu_take_picture:
+                    takePicture(isAvatar ? AppConstants.TAKE_PICTURE_AVATAR : AppConstants.TAKE_PICTURE_COVER);
+                    return true;
+                case R.id.menu_upload_picture:
+                    pickImageFromGallery(isAvatar ? AppConstants.SELECT_PICTURE_AVATAR : AppConstants.SELECT_PICTURE_COVER);
+                    return true;
+                case R.id.menu_select_fb_picture:
+                    selectPictureFromFacebook(isAvatar);
+                    return true;
+                case R.id.menu_use_fb_picture:
+                    useFacebookPicture(isAvatar);
+                    return true;
+            }
+
+            return false;
+        }
+    }
+
+    private void takePicture(int requestCode){
+        if(PermissionManager.getInstance(this).isPermissionGranted(Manifest.permission.WRITE_EXTERNAL_STORAGE)){
+            Intent intent = CameraUtils.getImageCaptureIntent();
+
+            if (intent.resolveActivity(getPackageManager()) != null) {
+                intent.putExtra(MediaStore.EXTRA_SCREEN_ORIENTATION, ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+                try {
+                    captureFile = createImageFile();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(captureFile));
+
+                startActivityForResult(intent, requestCode);
+            }
+            isCameraShown = true;
+        }else{
+            PermissionManager.getInstance(this).requestPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE);
+        }
+    }
+
+    private File createImageFile() throws IOException {
+        // Create an image file name
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        String imageFileName = "JPEG_" + timeStamp + "_";
+        File storageDir = Environment.getExternalStoragePublicDirectory(
+                Environment.DIRECTORY_PICTURES);
+        File image = File.createTempFile(
+                imageFileName,  // prefix
+                ".jpg",         // suffix
+                storageDir      // directory
+        );
+
+        return image;
+    }
+
+    private void pickImageFromGallery(int requestCode){
+        Intent intent = new Intent();
+        intent.setType("image/*");
+        intent.setAction(Intent.ACTION_GET_CONTENT);
+        startActivityForResult(Intent.createChooser(intent, "Select Picture"), requestCode);//TODO : use strings
+    }
+
+    @Override
+    protected void onActivityResult(final int requestCode, final int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        //Show dialog
+        dialog = ProgressDialog.show(this, getString(R.string.uploading_picutre),
+                getString(R.string.uploading_picutre_msg), true);
+
+        if(resultCode == RESULT_OK) {
+            //Get Image Location
+            Uri uri = null;
+            if(requestCode == AppConstants.SELECT_PICTURE_COVER || requestCode == AppConstants.SELECT_PICTURE_AVATAR){
+                uri = data.getData();
+            }else{
+                uri = Uri.fromFile(captureFile);
+            }
+            final Uri selectedImage = uri;
+
+            //Define type
+            String type = (requestCode == AppConstants.SELECT_PICTURE_COVER || requestCode == AppConstants.TAKE_PICTURE_COVER) ?
+                    AppConstants.COVER_PICTURE :
+                    AppConstants.PROFILE_PICTURE;
+
+            //Upload
+            ApiClient.getInstance().updateImage(this, Needle.userModel.getUserId(), selectedImage, type, new Callback<ImageResult>(){
+                @Override
+                public void onResponse(Call<ImageResult> call, Response<ImageResult> response) {
+                    ImageResult result = response.body();
+                    dialog.dismiss();
+                    if(result.getSuccessCode() == 1){
+
+                        if (requestCode == AppConstants.SELECT_PICTURE_COVER || requestCode == AppConstants.TAKE_PICTURE_COVER){
+                            Log.d(TAG, "Cover image updated!");
+
+                            Picasso.with(UserProfileActivity.this)
+                                    .load(selectedImage)
+                                    .error(R.drawable.mat)
+                                    .placeholder(R.drawable.gradient_foreground)
+                                    .fit()
+                                    .into(cover);
+
+                            Needle.userModel.getUser().setCoverPictureURL(result.getUrl());
+                            Needle.userModel.saveUser();
+                        }else{
+                            Log.d(TAG, "Profile image updated!");
+
+                            Picasso.with(UserProfileActivity.this)
+                                    .load(selectedImage)
+                                    .error(R.drawable.person_placeholder)
+                                    .transform(new CropCircleTransformation(UserProfileActivity.this, 2, Color.WHITE))
+                                    .into(avatar);
+
+                            Needle.userModel.getUser().setPictureURL(result.getUrl());
+                            Needle.userModel.saveUser();
+                        }
+
+                        Toast.makeText(UserProfileActivity.this, R.string.image_upload_success_msg, Toast.LENGTH_SHORT).show();
+                    }else{
+                        Log.d(TAG, "Cover image update failed! Error : " + result.getMessage()) ;
+                        Toast.makeText(UserProfileActivity.this, R.string.image_upload_failed_msg, Toast.LENGTH_SHORT).show();
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<ImageResult> call, Throwable t) {
+                    Log.d(TAG, "Cover image update failed! Error : " + t.getMessage());
+                    Toast.makeText(UserProfileActivity.this, R.string.image_upload_failed_msg, Toast.LENGTH_SHORT).show();
+
+                    dialog.dismiss();
+                }
+            });
+        }else{
+            Log.d(TAG, "cancelled");
+            if(dialog != null) dialog.dismiss();
+        }
+    }
+
+    private void selectPictureFromFacebook(boolean isAvatar){
+        Intent intent = new Intent(this, FacebookAlbumActivity.class);
+        int requestCode = isAvatar ? AppConstants.SELECT_PICTURE_AVATAR : AppConstants.SELECT_PICTURE_COVER;
+        startActivityForResult(intent, requestCode);
+    }
+
+    private void useFacebookPicture(boolean isAvatar){
+        //Show dialog
+        dialog = ProgressDialog.show(this, getString(R.string.uploading_picutre),
+                getString(R.string.uploading_picutre_msg), true);
+
+        final String url, type;
+        if(isAvatar){
+            url = Needle.userModel.getFbUser().getPicture().getData().getUrl();
+            type = AppConstants.PROFILE_PICTURE;
+        }else{
+            url = Needle.userModel.getFbUser().getCover().getSource();
+            type = AppConstants.COVER_PICTURE;
+        }
+
+        ApiClient.getInstance().updateImage(this, Needle.userModel.getUserId(), url, type, new Callback<ImageResult>(){
+            @Override
+            public void onResponse(Call<ImageResult> call, Response<ImageResult> response) {
+                ImageResult result = response.body();
+                if(dialog != null) dialog.dismiss();
+                if(result.getSuccessCode() == 1){
+
+                    if (type == AppConstants.COVER_PICTURE){
+                        Log.d(TAG, "Cover image updated!");
+
+                        Picasso.with(UserProfileActivity.this)
+                                .load(url)
+                                .error(R.drawable.mat)
+                                .placeholder(R.drawable.gradient_foreground)
+                                .fit()
+                                .into(cover);
+
+                        Needle.userModel.getUser().setCoverPictureURL(result.getUrl());
+                        Needle.userModel.saveUser();
+                    }else{
+                        Log.d(TAG, "Profile image updated!");
+
+                        Picasso.with(UserProfileActivity.this)
+                                .load(url)
+                                .error(R.drawable.person_placeholder)
+                                .transform(new CropCircleTransformation(UserProfileActivity.this, 2, Color.WHITE))
+                                .into(avatar);
+
+                        Needle.userModel.getUser().setPictureURL(result.getUrl());
+                        Needle.userModel.saveUser();
+                    }
+
+                    Toast.makeText(UserProfileActivity.this, R.string.image_upload_success_msg, Toast.LENGTH_SHORT).show();
+                }else{
+                    Log.d(TAG, "Cover image update failed! Error : " + result.getMessage()) ;
+                    Toast.makeText(UserProfileActivity.this, R.string.image_upload_failed_msg, Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ImageResult> call, Throwable t) {
+                Log.d(TAG, "Cover image update failed! Error : " + t.getMessage());
+                Toast.makeText(UserProfileActivity.this, R.string.image_upload_failed_msg, Toast.LENGTH_SHORT).show();
+
+                if(dialog != null) dialog.dismiss();
+            }
+        });
     }
 
     //Listener

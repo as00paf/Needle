@@ -4,6 +4,7 @@ import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.util.Log;
 
+import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.Marker;
 import com.nemator.needle.utils.BitmapUtils;
@@ -46,8 +47,13 @@ public class MarkerTarget implements Target {
     @Override
     public void onPrepareLoad(Drawable placeHolderDrawable)
     {
-        Bitmap placeHolderBitmap = BitmapUtils.drawableToBitmap(placeHolderDrawable);
-        marker.setIcon(BitmapDescriptorFactory.fromBitmap(placeHolderBitmap));
+        try{
+            Bitmap placeHolderBitmap = BitmapUtils.drawableToBitmap(placeHolderDrawable);
+            BitmapDescriptor descriptor = BitmapDescriptorFactory.fromBitmap(placeHolderBitmap);
+            marker.setIcon(descriptor);
+        }catch (Exception e){
+
+        }
     }
 
 

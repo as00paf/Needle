@@ -32,8 +32,8 @@ public class AuthenticationActivity extends AppCompatActivity {
 
         Needle.networkController.init(AuthenticationActivity.this);
         Needle.googleApiController.init(this);
-        Needle.userModel.init(this);
         Needle.authenticationController.init(this);
+        Needle.userModel.init(this);
         Needle.gcmController.init(this);
 
         initUser();

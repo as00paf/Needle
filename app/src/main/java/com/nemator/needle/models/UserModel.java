@@ -5,7 +5,7 @@ import android.content.SharedPreferences;
 
 import com.nemator.needle.Needle;
 import com.nemator.needle.controller.AuthenticationController;
-import com.nemator.needle.models.vo.FacebookUserVO;
+import com.nemator.needle.models.vo.facebook.FacebookUserVO;
 import com.nemator.needle.models.vo.UserVO;
 import com.nemator.needle.utils.AppConstants;
 
@@ -22,6 +22,7 @@ public class UserModel {
     private SharedPreferences sharedPreferences;
     private SharedPreferences.Editor editor;
     private ArrayList<UserVO> friends;
+    private FacebookUserVO fbUser;
 
     public UserModel(){
     }
@@ -38,8 +39,13 @@ public class UserModel {
         sharedPreferences = context.getSharedPreferences("com.nemator.needle", Context.MODE_PRIVATE);
         editor = sharedPreferences.edit();
         user = UserVO.retrieve(sharedPreferences);
+        fbUser = FacebookUserVO.retrieve(sharedPreferences);
         loggedIn = sharedPreferences.getBoolean(AppConstants.TAG_LOGGED_IN, false);
         initialized = true;
+
+        if(user.getLoginType() == AuthenticationController.LOGIN_TYPE_FACEBOOK){
+            Needle.authenticationController.facebookLogin();
+        }
     }
 
     //Getters/Setters
@@ -110,15 +116,20 @@ public class UserModel {
 
     public void saveUser(){
         user.save(sharedPreferences);
+        if(fbUser != null){
+            fbUser.save(sharedPreferences);
+        }
     }
 
     public void setUserFromFacebookAccount(FacebookUserVO fbUser) {
+        this.fbUser = fbUser;
         this.user.setEmail(fbUser.getEmail());
         this.user.setPictureURL(fbUser.getPicture().getData().getUrl());
         this.user.setCoverPictureURL(fbUser.getCover().getSource());
         this.user.setUserName(fbUser.getName());
         this.user.setSocialNetworkUserId(fbUser.getId());
         this.user.setLoginType(AuthenticationController.LOGIN_TYPE_FACEBOOK);
+        this.saveUser();
     }
 
     public boolean isInitialized() {
@@ -131,5 +142,13 @@ public class UserModel {
 
     public void setFriends(ArrayList<UserVO> friends) {
         this.friends = friends;
+    }
+
+    public FacebookUserVO getFbUser() {
+        return fbUser;
+    }
+
+    public void setFbUser(FacebookUserVO fbUser) {
+        this.fbUser = fbUser;
     }
 }

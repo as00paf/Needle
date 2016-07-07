@@ -11,6 +11,9 @@ import java.io.Serializable;
  * Created by Alex on 13/02/2016.
  */
 public class FacebookPictureDataVO implements Serializable, Parcelable {
+    @SerializedName("id")
+    private String id;
+
     @SerializedName("url")
     private String url;
 
@@ -40,6 +43,14 @@ public class FacebookPictureDataVO implements Serializable, Parcelable {
 
     public void setUrl(String url) {
         this.url = url;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     @Override

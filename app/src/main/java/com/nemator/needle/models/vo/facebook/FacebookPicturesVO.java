@@ -1,10 +1,8 @@
 package com.nemator.needle.models.vo.facebook;
 
 import android.os.Parcel;
-import android.os.Parcelable;
 
 import com.google.gson.annotations.SerializedName;
-import com.nemator.needle.adapter.FacebookAlbumAdapter;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -12,24 +10,24 @@ import java.util.ArrayList;
 /**
  * Created by Alex on 13/02/2016.
  */
-public class FacebookAlbumsVO implements Serializable {
+public class FacebookPicturesVO implements Serializable {
 
     @SerializedName("data")
-    private ArrayList<FacebookAlbumVO> data;
+    private ArrayList<FacebookPictureDataVO> data;
 
-    protected FacebookAlbumsVO(Parcel in) {
+    protected FacebookPicturesVO(Parcel in) {
         data = in.readParcelable(FacebookPictureDataVO.class.getClassLoader());
     }
 
-    public ArrayList<FacebookAlbumVO> getData() {
+    public ArrayList<FacebookPictureDataVO> getData() {
         return data;
     }
 
-    public void setData(ArrayList<FacebookAlbumVO> data) {
+    public void setData(ArrayList<FacebookPictureDataVO> data) {
         this.data = data;
     }
 
-    public FacebookAlbumVO get(int position) {
+    public FacebookPictureDataVO get(int position) {
         return data.get(position);
     }
 }

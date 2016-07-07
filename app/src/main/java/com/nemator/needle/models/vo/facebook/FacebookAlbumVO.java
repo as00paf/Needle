@@ -1,8 +1,5 @@
 package com.nemator.needle.models.vo.facebook;
 
-import android.os.Parcel;
-import android.os.Parcelable;
-
 import com.google.gson.annotations.SerializedName;
 
 import java.io.Serializable;
@@ -21,8 +18,14 @@ public class FacebookAlbumVO implements Serializable {
     @SerializedName("created_time")
     private String createdTime;
 
-    @SerializedName("coverURL")
-    private String coverURL;
+    @SerializedName("picture")
+    private FacebookPictureVO picture;
+
+    @SerializedName("count")
+    private String count;
+
+    @SerializedName("photos")
+    private FacebookPicturesVO photos;
 
     public FacebookAlbumVO() {
     }
@@ -52,11 +55,27 @@ public class FacebookAlbumVO implements Serializable {
         this.createdTime = createdTime;
     }
 
-    public String getCoverURL() {
-        return coverURL;
+    public FacebookPictureVO getPicture() {
+        return picture;
     }
 
-    public void setCoverURL(String coverURL) {
-        this.coverURL = coverURL;
+    public void setPicture(FacebookPictureVO picture) {
+        this.picture = picture;
+    }
+
+    public String getCount() {
+        return count;
+    }
+
+    public void setCount(String count) {
+        this.count = count;
+    }
+
+    public FacebookPicturesVO getPhotos() {
+        return photos;
+    }
+
+    public void setPhotos(FacebookPicturesVO photos) {
+        this.photos = photos;
     }
 }

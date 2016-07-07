@@ -11,6 +11,7 @@ public class AppConstants {
     public static final String TWITTER_API_SECRET = "gXYWKOBs0oBrTSJAE9epiZc8TVRS3GNdl6dq5uTKkp1jHtJDfx";
 
     //Json tags
+    public static final String TAG_NAME = "name";
     public static final String TAG_TYPE = "type";
     public static final String TAG_USER = "user";
     public static final String TAG_ACTION = "action";
@@ -33,6 +34,7 @@ public class AppConstants {
     public static final String TAG_SECTION = "section";
     public static final String TAG_NOTIFICATION = "notification";
     public static final String TAG_FRIENDSHIP = "friendship";
+    public static final String TAG_ALBUM = "album";
 
 
     //Location updates
@@ -55,6 +57,7 @@ public class AppConstants {
     public static final String IS_FIRST_START = "isFirstStart";
     public static final String PROFILE_PICTURE = "profile_picture";
     public static final String COVER_PICTURE = "cover_picture";
+    public static final String TAG_REQUEST_CODE = "request_code";
     public static String RECEIVED_LOCATION_LIST = "receivedLocationList";
     public static String SENT_LOCATION_LIST = "sentLocationList";
 
@@ -107,5 +110,6 @@ public class AppConstants {
     public static final String TAG_FB_USER_ID = "fb_id";
     public static final String TAG_COVER_FB_PICTURE_URL = "fb_" + COVER_PICTURE;
     public static final String TAG_FB_PICTURE_URL = "fb_" + PROFILE_PICTURE;
+
 
 }

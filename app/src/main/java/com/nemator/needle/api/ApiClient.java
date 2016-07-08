@@ -185,8 +185,8 @@ public class ApiClient {
         call.enqueue(callback);
     }
 
-    public void fetchUsersNotInHaystack(int haystackId, Callback<UsersResult> callback) {
-        Call<UsersResult> call = client.fetchUsersNotInHaystack(haystackId);
+    public void getFriendsNotInHaystack(int userId, int haystackId, Callback<UsersResult> callback) {
+        Call<UsersResult> call = client.getFriendsNotInHaystack(userId, haystackId);
         call.enqueue(callback);
     }
 

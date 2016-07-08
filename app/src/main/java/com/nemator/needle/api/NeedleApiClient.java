@@ -112,9 +112,6 @@ public interface NeedleApiClient {
     @GET("haystackUser.php")
     Call<UsersResult> fetchHaystackUsers(@Query("userId") int userId, @Query("haystackId") int haystackId);
 
-    @GET("fetchUsersNotInHaystack.php")
-    Call<UsersResult> fetchUsersNotInHaystack(@Query("haystackId") int haystackId);//TODO : replace
-
     @POST("haystackUser.php")
     Call<HaystackResult> addUsersToHaystack(@Body HaystackVO haystack);
 
@@ -147,6 +144,9 @@ public interface NeedleApiClient {
 
     @GET("friends.php")
     Call<FriendshipResult> getFriendship(@Query("userId") int userId, @Query("friendId") int friendId);
+
+    @GET("friends.php")
+    Call<UsersResult> getFriendsNotInHaystack(@Query("userId") int userId, @Query("haystackId") int haystackId);
 
     @POST("friends.php")
     Call<FriendshipResult> sendFriendRequest(@Body FriendshipVO friendshipVO);

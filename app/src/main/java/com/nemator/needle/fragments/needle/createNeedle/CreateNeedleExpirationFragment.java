@@ -71,6 +71,10 @@ public class CreateNeedleExpirationFragment extends Fragment {
         minutes = calendar.getTime().getMinutes()+10;
 
         //calendarView.setDate(calendar.get(Calendar.DATE));
+
+        int daysInMonth = calendar.getActualMaximum(Calendar.DAY_OF_MONTH);
+        //calendarView.setMaxDate(daysInMonth);
+
         calendarView.setOnDateChangeListener(new CalendarView.OnDateChangeListener() {
             @Override
             public void onSelectedDayChange(CalendarView view, int year, int month, int dayOfMonth) {

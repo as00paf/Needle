@@ -50,6 +50,7 @@ public class CropCircleTransformation implements com.squareup.picasso.Transforma
         canvas.drawCircle(r, r, r - s, stroke);
 
         squaredBitmap.recycle();
+        //source.recycle();???
         return bitmap;
     }
 

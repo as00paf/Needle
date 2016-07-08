@@ -2,16 +2,18 @@ package com.nemator.needle.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.Toast;
 
+import com.nemator.needle.Needle;
 import com.nemator.needle.R;
 import com.nemator.needle.adapter.UserCardAdapter;
 import com.nemator.needle.api.ApiClient;
@@ -30,6 +32,7 @@ public class UserSelectActivity extends AppCompatActivity{
     private Toolbar toolbar;
     private RecyclerView listView;
     private SwipeRefreshLayout swipeLayout;
+    private FloatingActionButton fab;
 
     private UserCardAdapter userListAdapter;
     private GridLayoutManager layoutManager;
@@ -64,6 +67,15 @@ public class UserSelectActivity extends AppCompatActivity{
         });
         swipeLayout.setRefreshing(true);
 
+        //FAB
+        fab = (FloatingActionButton) findViewById(R.id.fab);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                returnSelectedUsers();
+            }
+        });
+
         Bundle bundle = getIntent().getExtras();
         haystack = bundle.getParcelable(AppConstants.TAG_HAYSTACK);
         if(haystack != null){
@@ -72,17 +84,10 @@ public class UserSelectActivity extends AppCompatActivity{
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.select_users, menu);
-        return true;
-    }
-
-    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch(item.getItemId()){
-            case R.id.action_done:
             case android.R.id.home:
-                returnSelectedUsers();
+                super.onBackPressed();
                 return true;
         }
 
@@ -90,7 +95,7 @@ public class UserSelectActivity extends AppCompatActivity{
     }
 
     private void fetchUsersNotInHaystack() {
-        ApiClient.getInstance().fetchUsersNotInHaystack(haystack.getId(), usersNotInHaystackFetchedCallback);
+        ApiClient.getInstance().getFriendsNotInHaystack(Needle.userModel.getUserId(), haystack.getId(), usersNotInHaystackFetchedCallback);
     }
 
     private Callback<UsersResult> usersNotInHaystackFetchedCallback = new Callback<UsersResult>() {

@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
+import android.text.style.CharacterStyle;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -254,7 +255,7 @@ public class GoogleAPIController implements GoogleApiClient.ConnectionCallbacks,
 
     }
 
-    public ArrayList<CustomPlace> getPredictions(CharSequence constraint, PlacesRecyclerAdapter adapter, LatLngBounds bounds, AutocompleteFilter placeFilter, Context context) {
+    /*public ArrayList<CustomPlace> getPredictions(CharSequence constraint, PlacesRecyclerAdapter adapter, LatLngBounds bounds, AutocompleteFilter placeFilter, Context context) {
         if (isConnected()) {
             Log.i(TAG, "Executing autocomplete query for: " + constraint);
             PendingResult<AutocompletePredictionBuffer> results =
@@ -284,7 +285,7 @@ public class GoogleAPIController implements GoogleApiClient.ConnectionCallbacks,
             while (iterator.hasNext()) {
                 AutocompletePrediction prediction = iterator.next();
                 CustomPlace place = new CustomPlace(prediction.getPlaceId(), prediction.getDescription(),
-                        prediction.getDescription(), null);
+                        prediction.getFullText(CharacterStyle.wrap(c)), null);
 
                 resultList.add(place);
             }
@@ -301,7 +302,7 @@ public class GoogleAPIController implements GoogleApiClient.ConnectionCallbacks,
         }
 
         return null;
-    }
+    }*/
 
 
     public GoogleSignInOptions getGSO() {

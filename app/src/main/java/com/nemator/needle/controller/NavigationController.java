@@ -138,7 +138,8 @@ public class NavigationController implements HomeActivity.NavigationHandler, OnA
                 activity.startActivity(intent);
                 return;
             case AppConstants.SECTION_NEEDLES:
-                if(needleListFragment == null) needleListFragment = new NeedleListFragment();
+                if(needleListFragment == null) needleListFragment = NeedleListFragment.newInstance();
+                /*if(needleListFragment == null) */needleListFragment = NeedleListFragment.newInstance();
                 newFragment = needleListFragment;
                 onStateChange(AppState.NEEDLE_RECEIVED_TAB);
                 actionBar.setTitle(R.string.title_needles);
@@ -364,7 +365,9 @@ public class NavigationController implements HomeActivity.NavigationHandler, OnA
         setCurrentState(AppState.LOGIN);
 
         activity.finish();
-        activity.startActivity(new Intent(activity.getBaseContext(), AuthenticationActivity.class));
+        Intent intent = new Intent(activity.getBaseContext(), AuthenticationActivity.class);
+        intent.setAction(AppConstants.LOG_OUT);
+        activity.startActivity(intent);
     }
 
     public void showProgress(String message, Boolean cancelable) {

@@ -96,9 +96,7 @@ public class FriendsTabFragment extends Fragment{
             excepted.addAll(friends);//Friends
         }
 
-        if(excepted.size() > 0){
-            ApiClient.getInstance().getPotentialFriends(excepted, potentialFriendsCallback);
-        }
+        ApiClient.getInstance().getPotentialFriends(excepted, potentialFriendsCallback);
     }
 
     private Callback<FriendsResult> potentialFriendsCallback = new Callback<FriendsResult>() {

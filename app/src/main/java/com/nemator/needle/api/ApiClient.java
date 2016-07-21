@@ -305,7 +305,7 @@ public class ApiClient {
             exceptions[index] = user.getId();
         }
 
-        Call<FriendsResult> call = client.getPotentialFriends(exceptions);
+        Call<FriendsResult> call = client.getPotentialFriends(Needle.userModel.getUserId(), exceptions);
         call.enqueue(callBack);
     }
 }

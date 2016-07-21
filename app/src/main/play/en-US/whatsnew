@@ -1,2 +1,7 @@
-+Now users can add other users in haystacks
-*Fixed user select Activity and added Fab
+*Updated all Google libs
++Added analytics lib
+*Fixed discover tab bug
+*Fixed Facebook logout bug
+*Fixed blank Needles fragment
+*Now using real user marker in haystack creation
+*Tried fixing calendar issue for small screens

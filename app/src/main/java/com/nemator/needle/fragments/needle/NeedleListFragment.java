@@ -36,7 +36,6 @@ public class NeedleListFragment extends Fragment {
     public static String TAG = "NeedleListFragment";
 
     //Views
-    private View rootView;
     private ViewPager locationSharingViewPager;
     private TabLayout mSlidingTabLayout;
     private FloatingActionButton fab;
@@ -66,8 +65,8 @@ public class NeedleListFragment extends Fragment {
         if(savedInstanceState != null){
             if(mNeedlePagerAdapter != null){
                 NeedleListTabFragment receivedTab = mNeedlePagerAdapter.getReceivedFragment();
-
                 NeedleListTabFragment sentTab = mNeedlePagerAdapter.getSentFragment();
+
                 receivedLocationsList = savedInstanceState.getParcelableArrayList(AppConstants.RECEIVED_LOCATION_LIST);
                 sentLocationsList = savedInstanceState.getParcelableArrayList(AppConstants.SENT_LOCATION_LIST);
 
@@ -79,6 +78,8 @@ public class NeedleListFragment extends Fragment {
                 if(sentTab != null) sentTab.updateNeedlesList(sentLocationsList);
             }
         }
+
+        setRetainInstance(true);
     }
 
     @Override
@@ -103,56 +104,53 @@ public class NeedleListFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        if(rootView == null){
-            rootView = inflater.inflate(R.layout.fragment_needle_list, container, false);
+        View rootView = inflater.inflate(R.layout.fragment_needle_list, container, false);
 
-            //FAB
-            fab = (FloatingActionButton) rootView.findViewById(R.id.fab);
-            fab.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Intent intent = new Intent(getContext(), CreateNeedleActivity.class);
-                    startActivity(intent);
+        //FAB
+        fab = (FloatingActionButton) rootView.findViewById(R.id.fab);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getContext(), CreateNeedleActivity.class);
+                startActivity(intent);
+            }
+        });
+
+        //View pager
+        mNeedlePagerAdapter = new NeedlePagerAdapter(getActivity().getSupportFragmentManager(), this);
+        locationSharingViewPager = (ViewPager) rootView.findViewById(R.id.view_pager);
+        locationSharingViewPager.setOffscreenPageLimit(2);
+        locationSharingViewPager.setAdapter(mNeedlePagerAdapter);
+
+        //Tabs
+        mSlidingTabLayout = (TabLayout) rootView.findViewById(R.id.tabs);
+        mSlidingTabLayout.setTabMode(TabLayout.MODE_FIXED);
+        mSlidingTabLayout.setTabGravity(TabLayout.GRAVITY_FILL);
+        mSlidingTabLayout.setupWithViewPager(locationSharingViewPager);
+
+        locationSharingViewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+                switch (position) {
+                    case 0:
+                        stateChangeCallback.onStateChange(AppState.NEEDLE_RECEIVED_TAB);
+                        break;
+                    case 1:
+                        stateChangeCallback.onStateChange(AppState.NEEDLE_SENT_TAB);
+                        break;
                 }
-            });
+            }
 
-            //View pager
-            mNeedlePagerAdapter = new NeedlePagerAdapter(getActivity().getSupportFragmentManager(), this);
-            locationSharingViewPager = (ViewPager) rootView.findViewById(R.id.view_pager);
-            locationSharingViewPager.setOffscreenPageLimit(2);
-            locationSharingViewPager.setAdapter(mNeedlePagerAdapter);
+            @Override
+            public void onPageScrollStateChanged(int state) {
 
-            //Tabs
-            mSlidingTabLayout = (TabLayout) rootView.findViewById(R.id.tabs);
-            mSlidingTabLayout.setTabMode(TabLayout.MODE_FIXED);
-            mSlidingTabLayout.setTabGravity(TabLayout.GRAVITY_FILL);
-            mSlidingTabLayout.setupWithViewPager(locationSharingViewPager);
-
-            locationSharingViewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
-                @Override
-                public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-
-                }
-
-                @Override
-                public void onPageSelected(int position) {
-                    switch (position) {
-                        case 0:
-                            stateChangeCallback.onStateChange(AppState.NEEDLE_RECEIVED_TAB);
-                            break;
-                        case 1:
-                            stateChangeCallback.onStateChange(AppState.NEEDLE_SENT_TAB);
-                            break;
-                    }
-                }
-
-                @Override
-                public void onPageScrollStateChanged(int state) {
-
-                }
-            });
-
-        }
+            }
+        });
 
         return rootView;
     }

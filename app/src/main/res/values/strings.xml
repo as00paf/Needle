@@ -89,6 +89,7 @@
     <string name="fetch_haystack_error">Could Not Fetch Haystacks</string>
     <string name="share_location_back">Share Location Back</string>
     <string name="location_shared_back">Location Shared Back!</string>
+    <string name="location_share_back_cancelled">Location Share Back Cancelled!</string>
     <string name="stop_sharing_location">Stop Sharing Location</string>
 
     <!-- Needle -->

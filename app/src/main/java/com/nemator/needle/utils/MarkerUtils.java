@@ -30,13 +30,47 @@ import com.squareup.picasso.Transformation;
 public class MarkerUtils {
 
     public static UserMarker createUserMarker(Context context, GoogleMap map, UserVO user, LatLng location, String snippet){
+        //Create map marker with options
+        MarkerOptions myMarkerOptions = new MarkerOptions().position(location);
+        myMarkerOptions.anchor(1.0f, 0.6f);
+
+        //Set Background
+        Bitmap pinBitmap = BitmapUtils.drawableToBitmap(context.getResources().getDrawable(R.drawable.ic_place_black_24dp));
+        Bitmap scaledBitmap = BitmapUtils.scaleBitmap(pinBitmap, pinBitmap.getWidth() * 2, true);
+
+        Marker marker = map.addMarker(myMarkerOptions);
+        marker.setIcon(BitmapDescriptorFactory.fromBitmap(scaledBitmap));
+        marker.setSnippet(snippet);
+
+        //Create marker target
+        final UserMarker userMarker = new UserMarker(user, marker);
+        String pictureURL = user.getPictureURL();
+
+        final MarkerImageTransform transform = new MarkerImageTransform(context);
+
+        //Load and transform picture into marker
+        if(!TextUtils.isEmpty(pictureURL)){
+            Picasso.with(context).load(pictureURL)
+                    .placeholder(R.drawable.person_placeholder)
+                    .transform(transform)
+                    .into(userMarker);
+        }else{
+            Picasso.with(context).load(R.drawable.person_placeholder)
+                    .transform(transform)
+                    .into(userMarker);
+        }
+
+        return userMarker;
+    }
+
+    public static UserMarker createUserMarkerWithCircle(Context context, GoogleMap map, UserVO user, LatLng location, String snippet){
         int strokeColor = ContextCompat.getColor(context, android.R.color.black);
         int shadeColor = ContextCompat.getColor(context, R.color.transparent_grey);
 
-        return createUserMarker(context, map, user, location, snippet, strokeColor, shadeColor);
+        return createUserMarkerWithCircle(context, map, user, location, snippet, strokeColor, shadeColor);
     }
 
-    public static UserMarker createUserMarker(Context context, GoogleMap map, UserVO user, LatLng location, String snippet, int strokeColor, int shadeColor){
+    public static UserMarker createUserMarkerWithCircle(Context context, GoogleMap map, UserVO user, LatLng location, String snippet, int strokeColor, int shadeColor){
         //Create map marker with options
         MarkerOptions myMarkerOptions = new MarkerOptions().position(location);
         myMarkerOptions.anchor(1.0f, 0.6f);

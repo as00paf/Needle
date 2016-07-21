@@ -4,11 +4,12 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.app.FragmentStatePagerAdapter;
 
 import com.nemator.needle.R;
 import com.nemator.needle.fragments.needle.NeedleListTabFragment;
 
-public class NeedlePagerAdapter extends FragmentPagerAdapter {
+public class NeedlePagerAdapter extends FragmentStatePagerAdapter {
     private NeedleListTabFragment receivedFragment;
     private NeedleListTabFragment sentFragment;
 
@@ -21,17 +22,15 @@ public class NeedlePagerAdapter extends FragmentPagerAdapter {
 
     @Override
     public Fragment getItem(int position) {
-        NeedleListTabFragment fragment;
+        NeedleListTabFragment fragment = NeedleListTabFragment.newInstance();
 
         Bundle args = new Bundle();
         Boolean isReceived = (position == 0);
 
         if(isReceived){
-            if(receivedFragment == null) receivedFragment = new NeedleListTabFragment();
-            fragment = receivedFragment;
+            receivedFragment = fragment;
         }else{
-            if(sentFragment == null) sentFragment = new NeedleListTabFragment();
-            fragment = sentFragment;
+            sentFragment = fragment;
         }
 
         args.putBoolean("isReceived", isReceived);

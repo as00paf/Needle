@@ -58,6 +58,7 @@ public class AppConstants {
     public static final String PROFILE_PICTURE = "profile_picture";
     public static final String COVER_PICTURE = "cover_picture";
     public static final String TAG_REQUEST_CODE = "request_code";
+    public static final String LOG_OUT = "logout";
     public static String RECEIVED_LOCATION_LIST = "receivedLocationList";
     public static String SENT_LOCATION_LIST = "sentLocationList";
 

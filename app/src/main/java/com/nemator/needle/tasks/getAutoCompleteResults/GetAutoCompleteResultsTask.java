@@ -2,8 +2,10 @@ package com.nemator.needle.tasks.getAutoCompleteResults;
 
 import android.os.AsyncTask;
 import android.util.Log;
+import android.widget.TextView;
 
 import com.google.android.gms.common.api.PendingResult;
+import com.google.android.gms.common.data.DataBufferUtils;
 import com.google.android.gms.location.places.AutocompletePrediction;
 import com.google.android.gms.location.places.AutocompletePredictionBuffer;
 import com.google.android.gms.location.places.Places;
@@ -84,11 +86,13 @@ public class GetAutoCompleteResultsTask extends AsyncTask<Void, Void, Void> {
                 AutocompletePrediction prediction = iterator.next();
                 // Get the details of this prediction and copy it into a new PlaceAutocomplete object.
                 resultList.add(new PlaceAutoCompleteVO(prediction.getPlaceId(),
-                        prediction.getDescription()));
+                        prediction.getPrimaryText(null)));
             }
 
             // Release the buffer now that all data has been copied.
             autocompletePredictions.release();
+
+            ArrayList<AutocompletePrediction> asd = DataBufferUtils.freezeAndClose(autocompletePredictions);
 
             return null;
         }

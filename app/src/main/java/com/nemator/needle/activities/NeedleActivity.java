@@ -184,7 +184,7 @@ public class NeedleActivity extends AppCompatActivity implements View.OnClickLis
     @Override
     public void onShareBackCancelSuccess(NeedleVO locationSharing) {
         Log.d(TAG, "Location shared back ? " + locationSharing.isSharedBack());
-        Toast.makeText(NeedleActivity.this, getString(R.string.location_shared_back), Toast.LENGTH_SHORT).show();
+        Toast.makeText(NeedleActivity.this, getString(R.string.location_share_back_cancelled), Toast.LENGTH_SHORT).show();
 
         this.needle = locationSharing;
         menu.findItem(R.id.share_location_back).setIcon(R.drawable.ic_my_location_white_24dp);

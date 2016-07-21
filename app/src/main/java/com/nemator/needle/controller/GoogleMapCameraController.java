@@ -17,6 +17,7 @@ import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.nemator.needle.Needle;
+import com.nemator.needle.models.vo.UserVO;
 import com.nemator.needle.views.ICustomMarker;
 import com.nemator.needle.views.UserMarker;
 

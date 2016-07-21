@@ -140,7 +140,7 @@ public interface NeedleApiClient {
     Call<FriendsResult> getFriends(@Query("userId") int userId);
 
     @GET("friends.php")
-    Call<FriendsResult> getPotentialFriends(@Query("exceptions") int... exceptions);
+    Call<FriendsResult> getPotentialFriends(@Query("userId") int userId, @Query("exceptions") int[] exceptions);
 
     @GET("friends.php")
     Call<FriendshipResult> getFriendship(@Query("userId") int userId, @Query("friendId") int friendId);

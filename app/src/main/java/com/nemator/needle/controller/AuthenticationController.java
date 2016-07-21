@@ -347,7 +347,11 @@ public class AuthenticationController {
     }
 
     private void googleSignOut(ResultCallback<Status> callback) {
-        Auth.GoogleSignInApi.signOut(Needle.googleApiController.getGoogleApiClient()).setResultCallback(callback);
+        try{
+            Auth.GoogleSignInApi.signOut(Needle.googleApiController.getGoogleApiClient()).setResultCallback(callback);
+        }catch (Exception exception){
+            Log.d(TAG, "Error : " + exception.getMessage());
+        }
     }
 
     public void revokeGoogleAccess() {

@@ -35,25 +35,37 @@ public class AuthenticationActivity extends AppCompatActivity {
         Needle.authenticationController.init(this);
         Needle.userModel.init(this);
         Needle.gcmController.init(this);
-
-        initUser();
     }
 
     @Override
     protected void onStart() {
         super.onStart();
-        Needle.authenticationController.googleSilentSignIn();
+        initUser();
     }
 
     public void initUser() {
+        Intent intent = getIntent();
         if(Needle.userModel.isLoggedIn()){
             //TODO : manage ?
             Needle.googleApiController.stopAutoManage();
             finish();
 
-            Intent intent = new Intent(this, HomeActivity.class);
+            intent = new Intent(this, HomeActivity.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_TASK_ON_HOME);
             startActivity(intent);
+        }else if (intent != null && intent.getAction() != null && !intent.getAction().equals(AppConstants.LOG_OUT)){
+            //Log in based on usermodel or google
+            if(Needle.userModel.getUser() != null){
+                if(Needle.userModel.getUser().getLoginType() == AuthenticationController.LOGIN_TYPE_GOOGLE){
+                    Needle.authenticationController.googleSilentSignIn();
+                }else if(Needle.userModel.getUser().getLoginType() == AuthenticationController.LOGIN_TYPE_FACEBOOK){
+                    Needle.authenticationController.facebookLogin();
+                }else if(Needle.userModel.getUser().getLoginType() == AuthenticationController.LOGIN_TYPE_TWITTER){
+                    Needle.authenticationController.twitterSignIn();
+                }else{
+                    Needle.authenticationController.googleSilentSignIn();
+                }
+            }
         }
     }
 

@@ -168,6 +168,11 @@ public class UserCardAdapter extends RecyclerView.Adapter<UserCardViewHolder> {
         }
     };
 
+    @Override
+    public long getItemId(int position) {
+        return position;
+    }
+
     public static class Type{
         public static int SINGLE_SELECT = 0;
         public static int MULTI_SELECT = 1;

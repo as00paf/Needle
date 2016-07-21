@@ -1,35 +1,33 @@
 {
   "project_info": {
-    "project_id": "needle-999",
     "project_number": "648034739265",
-    "name": "Needle"
+    "project_id": "needle-999"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "",
-        "client_id": "android:gcm.play.android.samples.com.gcmquickstart",
-        "client_type": 1,
         "android_client_info": {
           "package_name": "gcm.play.android.samples.com.gcmquickstart"
         }
       },
-      "oauth_client": [],
-      "api_key": [],
+      "oauth_client": [
+        {
+          "client_id": "648034739265-5c9cls77evq88kkdufmmc17pfol3535u.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBZS_9kxDcH5hrUZx3TdD9YP9HhU3vAEF4"
+        }
+      ],
       "services": {
         "analytics_service": {
           "status": 1
         },
-        "cloud_messaging_service": {
-          "status": 2,
-          "apns_config": []
-        },
         "appinvite_service": {
           "status": 1,
           "other_platform_oauth_client": []
-        },
-        "google_signin_service": {
-          "status": 1
         },
         "ads_service": {
           "status": 1
@@ -39,13 +37,19 @@
     {
       "client_info": {
         "mobilesdk_app_id": "1:648034739265:android:d55e46cfba829f23",
-        "client_id": "android:com.nemator.needle",
-        "client_type": 1,
         "android_client_info": {
           "package_name": "com.nemator.needle"
         }
       },
       "oauth_client": [
+        {
+          "client_id": "648034739265-38pk7vk8t4o6g8f1deg1qsihaj3e3n52.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.nemator.needle",
+            "certificate_hash": "26231F2D5AB39251666ECEBACFF7A6B53045E256"
+          }
+        },
         {
           "client_id": "648034739265-i3bdfdm5gmo53gur4rp3qteuajdou6h3.apps.googleusercontent.com",
           "client_type": 1,
@@ -53,23 +57,27 @@
             "package_name": "com.nemator.needle",
             "certificate_hash": "F3ABE414AAE1028794B04EC6FEFA9CD3879CF4EA"
           }
+        },
+        {
+          "client_id": "648034739265-5c9cls77evq88kkdufmmc17pfol3535u.apps.googleusercontent.com",
+          "client_type": 3
         }
       ],
-      "api_key": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBZS_9kxDcH5hrUZx3TdD9YP9HhU3vAEF4"
+        }
+      ],
       "services": {
         "analytics_service": {
-          "status": 1
-        },
-        "cloud_messaging_service": {
           "status": 2,
-          "apns_config": []
+          "analytics_property": {
+            "tracking_id": "UA-80671788-1"
+          }
         },
         "appinvite_service": {
           "status": 1,
           "other_platform_oauth_client": []
-        },
-        "google_signin_service": {
-          "status": 1
         },
         "ads_service": {
           "status": 1
@@ -77,6 +85,5 @@
       }
     }
   ],
-  "client_info": [],
-  "ARTIFACT_VERSION": "1"
+  "configuration_version": "1"
 }

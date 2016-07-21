@@ -1,16 +1,11 @@
 package com.nemator.needle.fragments.haystack;
 
 import android.Manifest;
-import android.app.AlarmManager;
 import android.app.AlertDialog;
 import android.app.PendingIntent;
-import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.content.IntentFilter;
 import android.location.Location;
-import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
@@ -27,10 +22,8 @@ import com.google.android.gms.maps.model.Polygon;
 import com.nemator.needle.Needle;
 import com.nemator.needle.R;
 import com.nemator.needle.activities.HaystackActivity;
-import com.nemator.needle.activities.NeedleActivity;
 import com.nemator.needle.api.ApiClient;
 import com.nemator.needle.api.result.TaskResult;
-import com.nemator.needle.api.result.UserResult;
 import com.nemator.needle.api.result.UsersResult;
 import com.nemator.needle.broadcastReceiver.LocationServiceBroadcastReceiver;
 import com.nemator.needle.controller.GoogleMapCameraControllerConfig;
@@ -40,7 +33,6 @@ import com.nemator.needle.models.vo.HaystackVO;
 import com.nemator.needle.models.vo.PinVO;
 import com.nemator.needle.models.vo.UserVO;
 import com.nemator.needle.utils.AppConstants;
-import com.nemator.needle.utils.AppUtils;
 import com.nemator.needle.utils.GoogleMapDrawingUtils;
 import com.nemator.needle.utils.MarkerUtils;
 import com.nemator.needle.utils.PermissionManager;
@@ -252,7 +244,7 @@ public class HaystackMapFragment extends SupportMapFragment implements LocationS
         //Update user's marker
         if(mCurrentLocation != null){
             if(userMarker == null){
-                userMarker = MarkerUtils.createUserMarker(getContext(), mMap, Needle.userModel.getUser(), mCurrentPosition, "Your Position");
+                userMarker = MarkerUtils.createUserMarkerWithCircle(getContext(), mMap, Needle.userModel.getUser(), mCurrentPosition, "Your Position");
             }else{
                 userMarker.updateLocation(mMap, mCurrentPosition);
             }
@@ -291,7 +283,7 @@ public class HaystackMapFragment extends SupportMapFragment implements LocationS
 
                         //marker.showInfoWindow();
                     }else{
-                        marker = MarkerUtils.createUserMarker(getContext(), mMap, user, position, user.getReadableUserName() + "'s Position");
+                        marker = MarkerUtils.createUserMarkerWithCircle(getContext(), mMap, user, position, user.getReadableUserName() + "'s Position");
 
                         Log.i(TAG,"Adding marker with id : "+id+" to map.");
 

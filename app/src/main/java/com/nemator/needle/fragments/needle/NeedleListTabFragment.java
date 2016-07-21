@@ -25,7 +25,6 @@ public class NeedleListTabFragment extends Fragment implements NeedleCardListene
     private static final String TAG = "ListTabFragment";
 
     //Views
-    private View rootView;
     private RecyclerView mRecyclerView;
     private SwipeRefreshLayout swipeLayout;
 
@@ -36,62 +35,51 @@ public class NeedleListTabFragment extends Fragment implements NeedleCardListene
     //Objects
     private NeedleCardAdapter listAdapter;
     private GridLayoutManager layoutManager;
-    private OnActivityStateChangeListener stateChangeCallback;
+
+    public static NeedleListTabFragment newInstance() {
+        NeedleListTabFragment fragment = new NeedleListTabFragment();
+        return fragment;
+    }
+
+    public NeedleListTabFragment() {
+
+    }
 
     @Override
-    public void onCreate(Bundle savedInstanceState){
-        super.onCreate(savedInstanceState);
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        View rootView = inflater.inflate(R.layout.fragment_needle_list_tab, container, false);
 
         Bundle args = getArguments();
         if(args != null){
             isReceived = args.getBoolean("isReceived", true);
         }
-    }
 
-    @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
+        //Recycler View
+        mRecyclerView = (RecyclerView) rootView.findViewById(R.id.list);
+        mRecyclerView.setHasFixedSize(true);
 
-        try {
-            stateChangeCallback = Needle.navigationController;
-        } catch (ClassCastException e) {
-            throw new ClassCastException(activity.toString()
-                    + " must implement OnActivityStateChangeListener and NeedleCardListener");
-        }
-    }
+        layoutManager = new GridLayoutManager(getActivity(), 2);
+        layoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
+            @Override
+            public int getSpanSize(int position) {
+                return listAdapter.getItemViewType(position) == 0 ? 1 : 2;
+            }
+        });
+        mRecyclerView.setLayoutManager(layoutManager);
 
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        if(rootView == null){
-            rootView = inflater.inflate(R.layout.fragment_needle_list_tab, container, false);
+        listAdapter = new NeedleCardAdapter(dataList, getActivity(), !isReceived, this);
+        mRecyclerView.setAdapter(listAdapter);
 
-            //Recycler View
-            mRecyclerView = (RecyclerView) rootView.findViewById(R.id.list);
-            mRecyclerView.setHasFixedSize(true);
+        //Swipe To Refresh
+        swipeLayout = (SwipeRefreshLayout) rootView.findViewById(R.id.swipe_container);
+        swipeLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                onRefreshList();
+            }
+        });
 
-            layoutManager = new GridLayoutManager(getActivity(), 2);
-            layoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
-                @Override
-                public int getSpanSize(int position) {
-                    return listAdapter.getItemViewType(position) == 0 ? 1 : 2;
-                }
-            });
-            mRecyclerView.setLayoutManager(layoutManager);
-
-            listAdapter = new NeedleCardAdapter(dataList, getActivity(), !isReceived, this);
-            mRecyclerView.setAdapter(listAdapter);
-
-            //Swipe To Refresh
-            swipeLayout = (SwipeRefreshLayout) rootView.findViewById(R.id.swipe_container);
-            swipeLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-                @Override
-                public void onRefresh() {
-                    onRefreshList();
-                }
-            });
-            swipeLayout.setRefreshing(true);
-        }
-
+        swipeLayout.setRefreshing(true);
 
         return rootView;
     }
@@ -151,4 +139,6 @@ public class NeedleListTabFragment extends Fragment implements NeedleCardListene
         Log.e(TAG, result);
         Toast.makeText(getContext(), result, Toast.LENGTH_SHORT).show();
     }
+
+
 }

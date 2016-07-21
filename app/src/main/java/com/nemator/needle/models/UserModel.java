@@ -42,10 +42,6 @@ public class UserModel {
         fbUser = FacebookUserVO.retrieve(sharedPreferences);
         loggedIn = sharedPreferences.getBoolean(AppConstants.TAG_LOGGED_IN, false);
         initialized = true;
-
-        if(user.getLoginType() == AuthenticationController.LOGIN_TYPE_FACEBOOK){
-            Needle.authenticationController.facebookLogin();
-        }
     }
 
     //Getters/Setters

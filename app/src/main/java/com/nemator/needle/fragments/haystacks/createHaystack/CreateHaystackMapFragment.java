@@ -1,8 +1,6 @@
 package com.nemator.needle.fragments.haystacks.createHaystack;
 
 import android.Manifest;
-import android.animation.Animator;
-import android.app.SearchManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -11,9 +9,6 @@ import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.LocalBroadcastManager;
-import android.support.v4.view.MenuItemCompat;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SearchView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -24,12 +19,10 @@ import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
-import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.PendingResult;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.location.places.PlaceLikelihoodBuffer;
@@ -43,16 +36,15 @@ import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Polygon;
 import com.nemator.needle.Needle;
 import com.nemator.needle.R;
-import com.nemator.needle.activities.CreateHaystackActivity;
 import com.nemator.needle.controller.GoogleMapCameraController;
 import com.nemator.needle.controller.GoogleMapCameraControllerConfig;
 import com.nemator.needle.controller.GoogleMapController;
 import com.nemator.needle.fragments.SearchFragment;
-import com.nemator.needle.tasks.getAutoCompleteResults.GetAutoCompleteResultsTask;
-import com.nemator.needle.utils.AppConstants;
 import com.nemator.needle.utils.GoogleMapDrawingUtils;
+import com.nemator.needle.utils.MarkerUtils;
 import com.nemator.needle.utils.PermissionManager;
 import com.nemator.needle.utils.SphericalUtil;
+import com.nemator.needle.views.UserMarker;
 
 public class CreateHaystackMapFragment extends CreateHaystackBaseFragment implements GoogleMapController.GoogleMapCallback {
     public static String TAG = "CreateHaystackMapFragment";
@@ -62,6 +54,7 @@ public class CreateHaystackMapFragment extends CreateHaystackBaseFragment implem
     private TextView mRadiusLabel;
     private SupportMapFragment mapFragment;
     private Menu menu;
+    private UserMarker userMarker;
 
     //Data
     private Boolean mIsMapMoveable = false;
@@ -69,10 +62,10 @@ public class CreateHaystackMapFragment extends CreateHaystackBaseFragment implem
     private Polygon mPolygon;
     private Boolean mIsPolygonCircle = true;
     private Float mScaleFactor = 1.0f;
+    private LatLng mCurrentPosition;
 
     //Objects
     private ScaleGestureDetector mScaleDetector;
-    private GetAutoCompleteResultsTask autoCompleteTask;
 
     //Search
     private SearchView searchView;
@@ -110,7 +103,9 @@ public class CreateHaystackMapFragment extends CreateHaystackBaseFragment implem
 
         //Map
         mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.create_haystack_map);
-        mapController = new GoogleMapController(getActivity(), new GoogleMapCameraControllerConfig(), this);
+        GoogleMapCameraControllerConfig config = new GoogleMapCameraControllerConfig();
+        config.setMyLocationEnabled(false);
+        mapController = new GoogleMapController(getActivity(), config, this);
         mapController.initMap(mapFragment);
 
         mScaleDetector = new ScaleGestureDetector(getActivity(), new ScaleListener());
@@ -166,12 +161,11 @@ public class CreateHaystackMapFragment extends CreateHaystackBaseFragment implem
             }
         });
 
-
         return rootView;
     }
 
     private void updateMap() {
-        //Update user's marker and polygon
+        //Update haystack's marker and polygon
         LatLng position = mapController.getCurrentCameraTarget();
         if (position != null) {
             if (mIsPolygonCircle) {
@@ -187,6 +181,14 @@ public class CreateHaystackMapFragment extends CreateHaystackBaseFragment implem
                     mPolygon = GoogleMapDrawingUtils.updatePolygon(mPolygon, position, mScaleFactor);
                 }
             }
+        }
+
+        //Update user's marker
+        mCurrentPosition = mapController.getCurrentPosition();
+        if(userMarker == null){
+            userMarker = MarkerUtils.createUserMarker(getContext(), mapController.getGoogleMap(), Needle.userModel.getUser(), mCurrentPosition, "Your Position");
+        }else{
+            userMarker.updateLocation(mapController.getGoogleMap(), mCurrentPosition);
         }
     }
 

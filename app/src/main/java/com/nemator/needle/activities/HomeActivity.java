@@ -31,6 +31,7 @@ import com.nemator.needle.R;
 import com.nemator.needle.api.ApiClient;
 import com.nemator.needle.api.result.LoginResult;
 import com.nemator.needle.controller.AuthenticationController;
+import com.nemator.needle.models.vo.UserVO;
 import com.nemator.needle.utils.AppConstants;
 import com.nemator.needle.utils.CropCircleTransformation;
 import com.nemator.needle.utils.PermissionManager;
@@ -230,6 +231,7 @@ public class HomeActivity extends AppCompatActivity {
         showNavigationDrawerIfFirstTime();
     }
 
+    //Todo: own class with delegate
     private Callback<LoginResult> userInfosCallback = new Callback<LoginResult>() {
         @Override
         public void onResponse(Call<LoginResult> call, Response<LoginResult> response) {
@@ -237,6 +239,9 @@ public class HomeActivity extends AppCompatActivity {
 
             if(result.getSuccessCode() > 0){
                 Log.d(TAG, "User infos retrieved successfully");
+
+                updateGcmRegIdIfNeeded(result.getUser());
+
                 Needle.userModel.setUser(result.getUser());
 
                 setHaystacksCount(result.getHaystackCount());
@@ -247,6 +252,11 @@ public class HomeActivity extends AppCompatActivity {
             }else{
                 Log.d(TAG, "Failed to retrieve user infos. Error " + result.getMessage());
             }
+        }
+
+        //TODO : update gcm reg id if needed
+        private void updateGcmRegIdIfNeeded(UserVO user) {
+
         }
 
         @Override

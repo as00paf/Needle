@@ -110,7 +110,7 @@ public class NeedleMapFragment extends SupportMapFragment
             }
         }
 
-        needle = ((NeedleActivity) getActivity()).getNeedle();;
+        needle = ((NeedleActivity) getActivity()).getNeedle();
     }
 
     @Override

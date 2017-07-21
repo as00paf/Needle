@@ -60,7 +60,10 @@ public class RemovePostLocationRequestTask extends AsyncTask<Void, Void, TaskRes
         if(success > 0){
             Log.i(TAG, "Post location request removed from db");
         }else{
-            Log.i(TAG, "Could not remove post location request from db");
+            String msg =  "Could not remove post location request from db";
+            Log.e(TAG, msg);
+
+            throw new Error(msg);
         }
 
         //ALARM
